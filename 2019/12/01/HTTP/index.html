@@ -14,15 +14,14 @@
 <meta property="og:site_name" content="个人笔记">
 <meta property="og:description" content="HTTPS(HTTP over SSL)HTTPS 实际上是HTTP over SSL，即在原来的HTTP协议层与TCP协议层之间加入SSL协议层，负责对数据通道进行加密。 TLS&#x2F;SSL产生的背景是HTTP明文传输带来的几个问题： （1） 窃听风险（eavesdropping）：第三方可以获知通信内容。 （2） 篡改风险（tampering）：第三方可以修改通信内容。 （3） 冒充风险（pret">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https:&#x2F;&#x2F;images2017.cnblogs.com&#x2F;blog&#x2F;1191499&#x2F;201709&#x2F;1191499-20170907142439663-265763245.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20170802202122392?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;SouthEast">
-<meta property="og:image" content="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;blogimg&#x2F;asset&#x2F;2014&#x2F;bg2014092003.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20170804162718409?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;SouthEast">
-<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20171012220652432?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU&#x3D;&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;Center">
-<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20171012220845215?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU&#x3D;&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;Center">
-<meta property="og:updated_time" content="2019-12-01T10:33:54.152Z">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;HTTP&#x2F;blog&#x2F;source&#x2F;_posts&#x2F;HTTP&#x2F;ssl%20protocal">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;HTTP&#x2F;blog&#x2F;source&#x2F;_posts&#x2F;HTTP&#x2F;ssl%20handshake">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;HTTP&#x2F;blog&#x2F;source&#x2F;_posts&#x2F;HTTP&#x2F;ca%20cert">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;HTTP&#x2F;blog&#x2F;source&#x2F;_posts&#x2F;HTTP&#x2F;tcp%20handshake">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;HTTP&#x2F;blog&#x2F;source&#x2F;_posts&#x2F;HTTP&#x2F;tcl%20fin">
+<meta property="og:updated_time" content="2019-12-01T10:51:52.055Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;images2017.cnblogs.com&#x2F;blog&#x2F;1191499&#x2F;201709&#x2F;1191499-20170907142439663-265763245.png">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;HTTP&#x2F;blog&#x2F;source&#x2F;_posts&#x2F;HTTP&#x2F;ssl%20protocal">
   
     <link rel="alternate" href="/atom.xml" title="个人笔记" type="application/atom+xml">
   
@@ -103,13 +102,13 @@
 <p>TLS(Transport Layer Security)是SSL的标准化后的产物，有1.0 1.1 1.2三个版本，默认使用1.0</p>
 <p>TLS是SSL的标准化后的产物，现在实际使用的是TLS，由于习惯原因仍经常称之为SSL。</p>
 <h3 id="协议工作流程"><a href="#协议工作流程" class="headerlink" title="协议工作流程"></a>协议工作流程</h3><p>安全传输层协议（TLS）用于在两个通信应用程序之间提供保密性和数据完整性。该协议由两层组成： TLS 记录协议（TLS Record）和 TLS 握手协议（TLS Handshake），协议栈如下：</p>
-<img src="https://images2017.cnblogs.com/blog/1191499/201709/1191499-20170907142439663-265763245.png" alt="img" style="zoom:50%;">
+<img src="/2019/12/01/HTTP/blog\source\_posts\HTTP\ssl protocal" alt="img" style="zoom:50%;">
 
 <p>其中记录协议负责数据的分片、压缩、验证、加密等，握手协议负责客户端与服务端的握手，秘钥交换，告警等。整体流程如下图所示。</p>
-<img src="https://img-blog.csdn.net/20170802202122392?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="img" style="zoom:50%;">
+<img src="/2019/12/01/HTTP/blog\source\_posts\HTTP\ssl handshake" alt="img" style="zoom:50%;">
 
 <p>或者如下图所示：</p>
-<p><img src="http://www.ruanyifeng.com/blogimg/asset/2014/bg2014092003.png" alt="img"></p>
+<p>![img](E:\blog\source_posts\HTTP\ssl handshake 1)</p>
 <p>简单的SSL握手连接过程(仅server端交换证书给client)，详情可见参考文献[3]：</p>
 <ul>
 <li><p>1.client发送ClientHello，指定版本，随机数(RN)，所有支持的密码套件(CipherSuites)</p>
@@ -149,7 +148,7 @@
 </li>
 </ul>
 <p>握手完成后，客户端和服务端完成了对称秘钥session key的交换，数据通过对称秘钥加密后进行传输，实现了加密的数据传输通道。</p>
-<h3 id="CA证书"><a href="#CA证书" class="headerlink" title="CA证书"></a>CA证书</h3><img src="https://img-blog.csdn.net/20170804162718409?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="img" style="zoom:50%;">
+<h3 id="CA证书"><a href="#CA证书" class="headerlink" title="CA证书"></a>CA证书</h3><img src="/2019/12/01/HTTP/blog\source\_posts\HTTP\ca cert" alt="img" style="zoom:50%;">
 
 <p>上面的握手流程讲完并没有描述数字证书扮演的角色，以及服务端向客户端返回证书，客户端进行验证的过程，这部分过程见上图。</p>
 <p>服务端，即站点先向CA申请证书，申请信息中带有自己生成的公钥信息，CA审核通过后签发证书，证书包含服务端公钥、证书签名，证书签名为将证书明文部分计算数字摘要后，用CA的私钥加密的签名，防止证书被篡改（后面会讲到数字签名这块）。证书申请与签发是由站点先行完成的。</p>
@@ -165,13 +164,13 @@
 <p>在HTTP/1.0中，默认使用的是短连接。也就是说，浏览器和服务器每进行一次HTTP操作，就建立一次连接，但任务结束就中断连接。如果客户端浏览器访问的某个HTML或其他类型的 Web页中包含有其他的Web资源，如JavaScript文件、图像文件、CSS文件等，当浏览器每遇到这样一个Web资源，就会建立一个HTTP会话。但从 HTTP/1.1起，默认使用长连接，用以保持连接特性。使用长连接的HTTP协议，会在响应头加入这行代码：</p>
 <p>Connection:keep-alive 服务器和客户端都要设置</p>
 <h2 id="TCP-协议"><a href="#TCP-协议" class="headerlink" title="TCP 协议"></a>TCP 协议</h2><h3 id="三次握手与四次挥手"><a href="#三次握手与四次挥手" class="headerlink" title="三次握手与四次挥手"></a>三次握手与四次挥手</h3><p>TCP连接的建立与释放分别对应的是三次握手与四次挥手，具体如下图：</p>
-<img src="https://img-blog.csdn.net/20171012220652432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img" style="zoom:75%;">
+<img src="/2019/12/01/HTTP/blog\source\_posts\HTTP\tcp handshake" alt="img" style="zoom:75%;">
 
 
 
 
 
-<img src="https://img-blog.csdn.net/20171012220845215?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img" style="zoom:75%;">
+<img src="/2019/12/01/HTTP/blog\source\_posts\HTTP\tcl fin" alt="img" style="zoom:75%;">
 
 
 
@@ -185,7 +184,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://pclhahaha.github.io/2019/12/01/HTTP/" data-id="ck3mvqwqw0000a4wt94q29dx4" class="article-share-link">Share</a>
+      <a data-url="http://pclhahaha.github.io/2019/12/01/HTTP/" data-id="ck3mvxpom0000tgwt305i4hux" class="article-share-link">Share</a>
       
       
     </footer>
