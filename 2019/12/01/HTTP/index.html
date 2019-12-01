@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>HTTP | 个人笔记</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="HTTPS(HTTP over SSL)HTTPS 实际上是HTTP over SSL，即在原来的HTTP协议层与TCP协议层之间加入SSL协议层，负责对数据通道进行加密。 TLS&#x2F;SSL产生的背景是HTTP明文传输带来的几个问题： （1） 窃听风险（eavesdropping）：第三方可以获知通信内容。 （2） 篡改风险（tampering）：第三方可以修改通信内容。 （3） 冒充风险（pret">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP">
+<meta property="og:url" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;HTTP&#x2F;index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="HTTPS(HTTP over SSL)HTTPS 实际上是HTTP over SSL，即在原来的HTTP协议层与TCP协议层之间加入SSL协议层，负责对数据通道进行加密。 TLS&#x2F;SSL产生的背景是HTTP明文传输带来的几个问题： （1） 窃听风险（eavesdropping）：第三方可以获知通信内容。 （2） 篡改风险（tampering）：第三方可以修改通信内容。 （3） 冒充风险（pret">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https:&#x2F;&#x2F;images2017.cnblogs.com&#x2F;blog&#x2F;1191499&#x2F;201709&#x2F;1191499-20170907142439663-265763245.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20170802202122392?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;SouthEast">
+<meta property="og:image" content="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;blogimg&#x2F;asset&#x2F;2014&#x2F;bg2014092003.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20170804162718409?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;SouthEast">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20171012220652432?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU&#x3D;&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;Center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdn.net&#x2F;20171012220845215?watermark&#x2F;2&#x2F;text&#x2F;aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU&#x3D;&#x2F;font&#x2F;5a6L5L2T&#x2F;fontsize&#x2F;400&#x2F;fill&#x2F;I0JBQkFCMA&#x3D;&#x3D;&#x2F;dissolve&#x2F;70&#x2F;gravity&#x2F;Center">
+<meta property="og:updated_time" content="2019-12-01T10:33:54.152Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;images2017.cnblogs.com&#x2F;blog&#x2F;1191499&#x2F;201709&#x2F;1191499-20170907142439663-265763245.png">
+  
+    <link rel="alternate" href="/atom.xml" title="个人笔记" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">个人笔记</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://pclhahaha.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-HTTP" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/12/01/HTTP/" class="article-date">
+  <time datetime="2019-12-01T10:39:21.592Z" itemprop="datePublished">2019-12-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      HTTP
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="HTTPS-HTTP-over-SSL"><a href="#HTTPS-HTTP-over-SSL" class="headerlink" title="HTTPS(HTTP over SSL)"></a>HTTPS(HTTP over SSL)</h1><p>HTTPS 实际上是HTTP over SSL，即在原来的HTTP协议层与TCP协议层之间加入SSL协议层，负责对数据通道进行加密。</p>
+<p>TLS/SSL产生的背景是HTTP明文传输带来的几个问题：</p>
+<p>（1） 窃听风险（eavesdropping）：第三方可以获知通信内容。</p>
+<p>（2） 篡改风险（tampering）：第三方可以修改通信内容。</p>
+<p>（3） 冒充风险（pretending）：第三方可以冒充他人身份参与通信。</p>
+<p>因此要达成的目标是：加密传输（防窃听）、数字签名校验（防篡改）、身份证书（防冒充），基于这三个目标来了解TLS/SSL的工作原理就比较清晰了，能明确每一个部分设计的原因。</p>
+<p>PS : HTTPS 默认端口为443，而HTTP默认端口为80</p>
+<h2 id="TLS-SSL"><a href="#TLS-SSL" class="headerlink" title="TLS/SSL"></a>TLS/SSL</h2><p>先来了解一下TLS/SSL的前世今生。</p>
+<p>SSL(Secure Socket Layer)，由网景公司开发，3.0版本开始标准化为TLS。</p>
+<p>TLS(Transport Layer Security)是SSL的标准化后的产物，有1.0 1.1 1.2三个版本，默认使用1.0</p>
+<p>TLS是SSL的标准化后的产物，现在实际使用的是TLS，由于习惯原因仍经常称之为SSL。</p>
+<h3 id="协议工作流程"><a href="#协议工作流程" class="headerlink" title="协议工作流程"></a>协议工作流程</h3><p>安全传输层协议（TLS）用于在两个通信应用程序之间提供保密性和数据完整性。该协议由两层组成： TLS 记录协议（TLS Record）和 TLS 握手协议（TLS Handshake），协议栈如下：</p>
+<img src="https://images2017.cnblogs.com/blog/1191499/201709/1191499-20170907142439663-265763245.png" alt="img" style="zoom:50%;">
+
+<p>其中记录协议负责数据的分片、压缩、验证、加密等，握手协议负责客户端与服务端的握手，秘钥交换，告警等。整体流程如下图所示。</p>
+<img src="https://img-blog.csdn.net/20170802202122392?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="img" style="zoom:50%;">
+
+<p>或者如下图所示：</p>
+<p><img src="http://www.ruanyifeng.com/blogimg/asset/2014/bg2014092003.png" alt="img"></p>
+<p>简单的SSL握手连接过程(仅server端交换证书给client)，详情可见参考文献[3]：</p>
+<ul>
+<li><p>1.client发送ClientHello，指定版本，随机数(RN)，所有支持的密码套件(CipherSuites)</p>
+<p>ClientHello附带的数据随机数据RN，会在生成session key时使用，Cipher suite列出了client支持的所有加密算法组合，每一组包含3种算法，一个是非对称算法，如RSA，一个是对称算法如DES，3DES，RC4等，一个是Hash算法，如MD5，SHA等，server会从这些算法组合中选取一组，作为本次SSL连接中使用。 </p>
+</li>
+<li><p>2.server回应ServerHello，指定版本，RN，选择CipherSuites，会话ID(Session ID)</p>
+<p>ServerHello包含一个session id，如果SSL连接断开，再次连接时，可以使用该属性重新建立连接，在双方都有缓存的情况下可以省略握手的步骤。server端也会生成随机的RN，用于生成session key使用。server会从client发送的Cipher suite列表中挑出一个，例如RSA+RC4+MD5。</p>
+</li>
+</ul>
+<p><strong>client接到ServerHello并处理后，双发状态是已经协商好了一组算法，包括对称加密、非对称加密、摘要，以及后续计算对称秘钥用的随机数</strong>。</p>
+<ul>
+<li><p>3.server发送Certificate<br>server的证书信息，只包含public key，server保存有public key对应的private key，用于证明server是该证书的实际拥有者。</p>
+<p>那么如何验证呢？原理很简单：client随机生成一串数，用server的public key加密(显然是RSA算法)，发给server，server用private key解密后返回给client，client与原文比较，如果一致，则说明server拥有private key，也就说明与client通信的正是证书的拥有者。</p>
+<p>利用这个原理，就可以实现session key的交换，加密前的那串随机数就可用作session key，因为除了client和server，没有第三方能获得该数据了。实际上session key的交换也是这么做的。<br>原理很简单，实际使用时会复杂很多，数据经过多次hash，伪随机等的运算，前面提到的client和server端得RN都会参与计算。这个原理用于下面client发送ClientKeyExchange前进行session key的计算。</p>
+</li>
+</ul>
+<p><strong>client拿到了server的public key。</strong></p>
+<ul>
+<li><p>4.Server发送ServerHelloDone</p>
+</li>
+<li><p>5.client发送ClientKeyExchange，用于与server交换session key<br>client随机生成48字节的pre-master secret，padding后用public key加密得到130字节的数据发送给server，server解密也能得到pre-master secret。</p>
+</li>
+</ul>
+<p>双方使用pre-master secret、”master secret”常量字节流、前期交换的server端RN和client的RN作为参数，使用一个伪随机函数PRF，其实就是hash之后再hash，最后得到48字节的master secret。master secret再与”key expansion”常量，双方RN经过伪随机函数运算得到key_block，PRF伪随机函数可以循环输出数据，因此我们想得到多少字节都可以，就如Random伪随机函数，给它一个种子，后续用hash计算能得到无数个随机数，如果每次种子相同，得到的序列是一样的，但是这里的输入时48字节的master secret，2个28字节的RN和一个字符串常量，碰撞的可能性是很小的。得到key block后，算法就从中取出session key，IV(对称算法中使用的初始化向量)等。client和server使用的session key是不一样的，但只要双方都知道对方使用的是什么就行了。这里会取出4个：client/server加密正文的key，client/server计算handshake数据hash的key。</p>
+<p><strong>注意双方只交换了pre-master key，后续的计算都是独立完成的，由于算法和种子都一样，所以得到的session key也一致。</strong></p>
+<p><strong>server接到ClientKeyExchange处理后，双方状态是已经协商好了对称秘钥，后续再利用对称秘钥进行一次验证</strong>。</p>
+<ul>
+<li><p>6.client发送ChangeCipherSpec，指示Server从现在开始发送的消息都是加密过的</p>
+</li>
+<li><p>7.client发送Finishd，包含了前面所有握手消息的hash，可以让server验证握手过程是否被第三方篡改</p>
+<p>Finishd：client发送的加密数据，这个消息非常关键，一是能证明握手数据没有被篡改过，二能证明自己确实是session key的拥有者(这里是单边验证，只有server有certificate，server发送的Finished能证明自己含有private key，原理是一样的)。</p>
+<p>client将之前发送的所有握手消息存入handshake messages缓存，进行MD5和SHA-1两种hash运算，再与前面的master secret和一串常量”client finished”进行PRF伪随机运算得到12字节的verify data，还要经过改进的MD5计算得到加密信息。为什么能证明上述两点呢，前面说了只有密钥的拥有者才能解密得到pre-master key，master key，最后得到key block后，进行hash运算得到的结果才与发送方的一致。</p>
+</li>
+<li><p>8.server发送ChangeCipherSpec，指示Client从现在开始发送的消息都是加密过的</p>
+</li>
+<li><p>9.server发送Finishd，包含了前面所有握手消息的hash，可以让client验证握手过程是否被第三方篡改，并且证明自己是Certificate密钥的拥有者（因为如果不是，那么无法得到pre-master key，也就无法计算得到session key），即证明自己的身份。</p>
+</li>
+</ul>
+<p>握手完成后，客户端和服务端完成了对称秘钥session key的交换，数据通过对称秘钥加密后进行传输，实现了加密的数据传输通道。</p>
+<h3 id="CA证书"><a href="#CA证书" class="headerlink" title="CA证书"></a>CA证书</h3><img src="https://img-blog.csdn.net/20170804162718409?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdXN0Y2N3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="img" style="zoom:50%;">
+
+<p>上面的握手流程讲完并没有描述数字证书扮演的角色，以及服务端向客户端返回证书，客户端进行验证的过程，这部分过程见上图。</p>
+<p>服务端，即站点先向CA申请证书，申请信息中带有自己生成的公钥信息，CA审核通过后签发证书，证书包含服务端公钥、证书签名，证书签名为将证书明文部分计算数字摘要后，用CA的私钥加密的签名，防止证书被篡改（后面会讲到数字签名这块）。证书申请与签发是由站点先行完成的。</p>
+<p>客户端在与服务端握手的过程中拿到证书，由于证书明文部分带有证书的公钥信息，能用CA的公钥对签名进行解密，并通过对比解密后的数字摘要与自己用明文计算的数字摘要来验证信息是否被篡改，从而保证了证书的安全性。后续通过证书中的server公钥来验证该server为证书拥有者，原理见上面的握手流程。</p>
+<p>CA证书的安全使得客户端可以验证服务端的身份，防止站点被冒充，即钓鱼网站。</p>
+<h3 id="对称加密算法"><a href="#对称加密算法" class="headerlink" title="对称加密算法"></a>对称加密算法</h3><p>加密和解密使用相同的密钥，计算较快，安全性较差。在SSL中常用的对称加密算法有RC4,AES,3DES,Camellia等。</p>
+<h3 id="非对称加密算法"><a href="#非对称加密算法" class="headerlink" title="非对称加密算法"></a>非对称加密算法</h3><p>加密和解密使用不同的密钥，数据在一端用公钥加密后，在另一端用私钥解密，安全性较高。由于性能问题，非对称加密一般用于数字签名（前面提到的证书的签名）和秘钥（对称加密算法的秘钥）的交换。常见的算法有RSA、DSA、ECC。</p>
+<h3 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h3><p>数字签名就是“非对称加密+摘要算法”，其目的不是为了加密，而是用来防止他人篡改数据。<br>其核心思想是：比如A要给B发送数据，A先用摘要算法得到数据的指纹，然后用A的私钥加密指纹，加密后的指纹就是A的签名，B收到数据和A的签名后，也用同样的摘要算法计算指纹，然后用A公开的公钥解密签名，比较两个指纹，如果相同，说明数据没有被篡改，确实是A发过来的数据。假设C想改A发给B的数据来欺骗B，因为篡改数据后指纹会变，要想跟A的签名里面的指纹一致，就得改签名，但由于没有A的私钥，所以改不了，如果C用自己的私钥生成一个新的签名，B收到数据后用A的公钥根本就解不开。</p>
+<p>至于为什么要使用摘要算法是因为非对称加密算法对原文长度有要求，所以先通过摘要算法生成一段较短的指纹，再进行非对称加密</p>
+<h4 id="摘要算法"><a href="#摘要算法" class="headerlink" title="摘要算法"></a>摘要算法</h4><p>摘要算法不是用来加密的，其输出长度固定，相当于计算数据的指纹，主要用来做数据校验，验证数据的完整性和正确性。常见的算法有CRC、MD5、SHA1、SHA256。<br>CRC32:CRC本身是“冗余校验码”的意思，CRC32则表示会产生一个32bit（8位十六进制数）的校验值。由于CRC32产生校验值时源数据块的每一个bit（位）都参与了计算，所以数据块中即使只有一位发生了变化，也会得到不同的CRC32值。</p>
+<h1 id="HTTP-短连接-vs-长连接"><a href="#HTTP-短连接-vs-长连接" class="headerlink" title="HTTP 短连接 vs 长连接"></a>HTTP 短连接 vs 长连接</h1><p>下面来聊一下短连接与长连接。</p>
+<p>HTTP是一个无状态的面向连接的协议，无状态不代表HTTP不能保持TCP连接，更不能代表HTTP使用的是UDP协议（无连接）。HTTP的短连接、长连接实际上指的是TCP协议的短连接、长连接，长连接即是指多个HTTP请求复用一个TCP连接。</p>
+<p>在HTTP/1.0中，默认使用的是短连接。也就是说，浏览器和服务器每进行一次HTTP操作，就建立一次连接，但任务结束就中断连接。如果客户端浏览器访问的某个HTML或其他类型的 Web页中包含有其他的Web资源，如JavaScript文件、图像文件、CSS文件等，当浏览器每遇到这样一个Web资源，就会建立一个HTTP会话。但从 HTTP/1.1起，默认使用长连接，用以保持连接特性。使用长连接的HTTP协议，会在响应头加入这行代码：</p>
+<p>Connection:keep-alive 服务器和客户端都要设置</p>
+<h2 id="TCP-协议"><a href="#TCP-协议" class="headerlink" title="TCP 协议"></a>TCP 协议</h2><h3 id="三次握手与四次挥手"><a href="#三次握手与四次挥手" class="headerlink" title="三次握手与四次挥手"></a>三次握手与四次挥手</h3><p>TCP连接的建立与释放分别对应的是三次握手与四次挥手，具体如下图：</p>
+<img src="https://img-blog.csdn.net/20171012220652432?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img" style="zoom:75%;">
+
+
+
+
+
+<img src="https://img-blog.csdn.net/20171012220845215?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHVhbmd5dWh1YW5neXU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img" style="zoom:75%;">
+
+
+
+<h1 id="HTTP-2-多路复用"><a href="#HTTP-2-多路复用" class="headerlink" title="HTTP/2 多路复用"></a>HTTP/2 多路复用</h1><p>详细可参考此文：<a href="https://blog.wangriyu.wang/2018/05-HTTP2.html，作者写的非常详细：）" target="_blank" rel="noopener">https://blog.wangriyu.wang/2018/05-HTTP2.html，作者写的非常详细：）</a></p>
+<h6 id="参考文献："><a href="#参考文献：" class="headerlink" title="参考文献："></a>参考文献：</h6><p>[1] <a href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html</a></p>
+<p>[2] <a href="https://blog.csdn.net/ustccw/article/details/76691248" target="_blank" rel="noopener">https://blog.csdn.net/ustccw/article/details/76691248</a></p>
+<p>[3] <a href="https://www.cnblogs.com/piyeyong/archive/2010/07/02/1770208.html" target="_blank" rel="noopener">https://www.cnblogs.com/piyeyong/archive/2010/07/02/1770208.html</a></p>
+<p>[4] <a href="https://blog.csdn.net/huangyuhuangyu/article/details/78220005" target="_blank" rel="noopener">https://blog.csdn.net/huangyuhuangyu/article/details/78220005</a></p>
+<p>[5] <a href="https://blog.wangriyu.wang/2018/05-HTTP2.html" target="_blank" rel="noopener">https://blog.wangriyu.wang/2018/05-HTTP2.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://pclhahaha.github.io/2019/12/01/HTTP/" data-id="ck3mvhtzq00007gwtffht7z3l" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/12/01/HTTP/">HTTP</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 pcl<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
