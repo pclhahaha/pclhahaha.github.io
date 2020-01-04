@@ -164,6 +164,242 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/2020/01/04/spring_start/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/04/spring_start/" class="post-title-link" itemprop="url">Spring Boot/Spring的启动过程分析</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-01-04 21:01:19 / 修改时间：21:00:06" itemprop="dateCreated datePublished" datetime="2020-01-04T21:01:19+08:00">2020-01-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[TOC]</p>
+<h1 id="Spring-Boot-Spring的启动过程分析"><a href="#Spring-Boot-Spring的启动过程分析" class="headerlink" title="Spring Boot/Spring的启动过程分析"></a>Spring Boot/Spring的启动过程分析</h1><h2 id="一、Spring-Boot启动"><a href="#一、Spring-Boot启动" class="headerlink" title="一、Spring Boot启动"></a>一、Spring Boot启动</h2><p>先来一段众所周知的spring boot的启动入口代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        SpringApplication.run(Application<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>里面的核心代码如下，各步骤已添加注释：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment">	 * Run the Spring application, creating and refreshing a new</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> ApplicationContext&#125;.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment">	 * <span class="doctag">@param</span> args the application arguments (usually passed from a Java main method)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">	 * <span class="doctag">@return</span> a running &#123;<span class="doctag">@link</span> ApplicationContext&#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">	 */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">public</span> ConfigurableApplicationContext <span class="title">run</span><span class="params">(String... args)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">		StopWatch stopWatch = <span class="keyword">new</span> StopWatch();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">		stopWatch.start();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">		ConfigurableApplicationContext context = <span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">		Collection&lt;SpringBootExceptionReporter&gt; exceptionReporters = <span class="keyword">new</span> ArrayList&lt;&gt;();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">		configureHeadlessProperty();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="comment">		* 获取META-INF/spring.factories中配置的SpringApplicationRunListener类型的监听器</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="comment">		* 默认只有一个listener是org.springframework.boot.context.event.EventPublishingRunListener</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="comment">    **/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">		SpringApplicationRunListeners listeners = getRunListeners(args);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//EventPublishingRunListener发布ApplicationStartingEvent事件</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">		listeners.starting();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">			ApplicationArguments applicationArguments = <span class="keyword">new</span> DefaultApplicationArguments(args);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">			<span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line"><span class="comment">			* 创建并配置Environment（主要是PropertySource和Profile）</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line"><span class="comment">			*之后调用监听器的environmentPrepared方法，触发EventPublishingRunListener发布ApplicationEnvironmentPreparedEvent事件</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line"><span class="comment">			* 将Environment与Application绑定</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line"><span class="comment">			**/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">      ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">//设置spring.beaninfo.ignore系统属性</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">			configureIgnoreBeanInfo(environment);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">//打印banner</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">			Banner printedBanner = printBanner(environment);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 根据应用类型创建ApplicationContext</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 例如web应用创建的是AnnotationConfigServletWebServerApplicationContext</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      **/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">			context = createApplicationContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">//获取配置的异常上报类，用于后续异常上报</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line">			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter<span class="class">.<span class="keyword">class</span>,</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">39</span></pre></td><td class="code"><pre><span class="line">					new Class[] &#123; ConfigurableApplicationContext.class &#125;, context);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">40</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">41</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * prepareContext内部逻辑：</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">42</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 1. postProcessApplicationContext：配置bean工厂的beanNameGenerator，ConversionService及context的resourceLoader</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">43</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 2. applyInitializers使用META-INF/spring.factories中配置的ApplicationContextInitializer初始化ApplicationContext，默认配了7个</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">44</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 3. 调用监听器的contextPrepared方法，触发EventPublishingRunListener发布ApplicationContextInitializedEvent</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">45</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 4. 获取beanFactory并配置（默认是DefaultListableBeanFactory，此时已有几个spring内部的bean已注册），如注册springApplicationArguments单例类，设置allowBeanDefinitionOverriding参数等，配置懒加载LazyInitializationBeanFactoryPostProcessor</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">46</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 5. 加载bean，看源码是支持xml读取，annotation扫描，甚至groovy，实际上只加载了入口类也就是上面的Application类，将其注册为单例并获取了其注解原数据，即<span class="doctag">@SpringBootApplication</span>注解</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">47</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      * 6. 调用监听器的contextLoaded方法，触发EventPublishingRunListener发布ApplicationPreparedEvent</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">48</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      **/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">49</span></pre></td><td class="code"><pre><span class="line">			prepareContext(context, environment, listeners, applicationArguments, printedBanner);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">50</span></pre></td><td class="code"><pre><span class="line">			<span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">51</span></pre></td><td class="code"><pre><span class="line"><span class="comment">			* 调用AbstractApplicationContext的refresh方法，然后注册shutdownhook，这一步核心其实就是spring的启动了，这个在第3节展开</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">52</span></pre></td><td class="code"><pre><span class="line"><span class="comment">			**/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">53</span></pre></td><td class="code"><pre><span class="line">      refreshContext(context);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">54</span></pre></td><td class="code"><pre><span class="line">			afterRefresh(context, applicationArguments);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">55</span></pre></td><td class="code"><pre><span class="line">			stopWatch.stop();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">56</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">if</span> (<span class="keyword">this</span>.logStartupInfo) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">57</span></pre></td><td class="code"><pre><span class="line">				<span class="keyword">new</span> StartupInfoLogger(<span class="keyword">this</span>.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">58</span></pre></td><td class="code"><pre><span class="line">			&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">59</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">//调用监听器的started方法，触发EventPublishingRunListener发布ApplicationStartedEvent</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">60</span></pre></td><td class="code"><pre><span class="line">			listeners.started(context);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">61</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">//调用ApplicationRunner，然后调用CommandLineRunner</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">62</span></pre></td><td class="code"><pre><span class="line">			callRunners(context, applicationArguments);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">63</span></pre></td><td class="code"><pre><span class="line">		&#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">64</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">//里面有一步是：调用监听器的failed方法，触发EventPublishingRunListener发布ApplicationFailedEvent</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">65</span></pre></td><td class="code"><pre><span class="line">			handleRunFailure(context, ex, exceptionReporters, listeners);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">66</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(ex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">67</span></pre></td><td class="code"><pre><span class="line">		&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">68</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">69</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">//调用监听器的running方法，触发EventPublishingRunListener发布ApplicationReadyEvent</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">70</span></pre></td><td class="code"><pre><span class="line">			listeners.running(context);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">71</span></pre></td><td class="code"><pre><span class="line">		&#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">72</span></pre></td><td class="code"><pre><span class="line">			handleRunFailure(context, ex, exceptionReporters, <span class="keyword">null</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">73</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(ex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">74</span></pre></td><td class="code"><pre><span class="line">		&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">75</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">return</span> context;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">76</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr></table></figure>
+<p>可以看到spring boot的启动是在spring启动的基础上增加了一些特性，例如根据应用类型推断并指定ApplicationContext的具体实现，各阶段事件的发布（提供了一个扩展点），调用ApplicationRunner，CommandLineRunner（又一个扩展点）等。下面来一张详细的流程图，个人觉得这个图画的很好<a href="(https://www.cnblogs.com/l3306/p/10752907.html)">^1</a>，可以参考该图一步步看源码。</p>
+<p><strong>PS：推荐先粗读一遍源码，然后对应用进行debug，一步步看执行逻辑以及每个步骤执行完毕后的数据以及状态，可以对细节有更好的理解。例如，有些变量是在构造器初始化时加载的配置，这个光看源码很难看到。</strong></p>
+<p><img src="/2020/01/04/spring_start/1158841-20190707171658626-1389392187.png" alt="img"></p>
+<h2 id="二、Spring-Boot自动化配置"><a href="#二、Spring-Boot自动化配置" class="headerlink" title="二、Spring Boot自动化配置"></a>二、Spring Boot自动化配置</h2><h3 id="1-EnableAutoConfiguration"><a href="#1-EnableAutoConfiguration" class="headerlink" title="1. @EnableAutoConfiguration"></a>1. @EnableAutoConfiguration</h3><p><img src="/2020/01/04/spring_start/1650e0e47481e59a.png" alt="img"></p>
+<p>spring boot提供了自动配置，@SpringBootApplication注解中的@EnableAutoConfiguration注解是spring boot自动配置的关键，原理可阅读文章【2】<a href="(https://juejin.im/post/5b679fbc5188251aad213110)">^2</a>，以后有机会再展开详细描述。</p>
+<h3 id="2-META-INF-spring-factories"><a href="#2-META-INF-spring-factories" class="headerlink" title="2. META-INF/spring.factories"></a>2. META-INF/spring.factories</h3><p>上面说到@EnableAutoConfiguration注解通过读取META-INF/spring.factories配置文件实现自动配置，这里说一下META-INF/spring.factories配置文件。</p>
+<ol>
+<li>配置是K/V对，key是接口的全限定名，value是该接口的实现类的名字，可以是逗号分隔的多个值，示例如下：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">example.MyService&#x3D;example.MyServiceImpl1,example.MyServiceImpl2</span></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>META-INF/spring.factories配置文件可在多个jar中配置，基于这个我们可以实现自己的自动配置类，并将其配置在自己的jar的META-INF/spring.factories配置文件中，spring boot会帮我们完成自动配置。</p>
+</li>
+<li><p>spring boot自带的META-INF/spring.factories配置文件里已经配置了许多这样的配置项。</p>
+</li>
+<li><p>借助spring框架的SpringFactoriesLoader可以加载META-INF/spring.factories配置文件，SpringFactoriesLoader属于Spring框架私有的一种扩展方案，其主要功能就是从指定的配置文件META-INF/spring.factories加载配置。</p>
+</li>
+</ol>
+<p><strong>是不是有点像java的SPI加载机制</strong></p>
+<h2 id="三、Spring的启动"><a href="#三、Spring的启动" class="headerlink" title="三、Spring的启动"></a>三、Spring的启动</h2><p>上面提到调用了AbstractApplicationContext的refresh()方法，其实就是spring启动时执行的方法，里面的执行顺序是固定的。</p>
+<h3 id="1-AbstractApplicationContext的refresh-方法"><a href="#1-AbstractApplicationContext的refresh-方法" class="headerlink" title="1. AbstractApplicationContext的refresh()方法"></a>1. AbstractApplicationContext的refresh()方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">refresh</span><span class="params">()</span> <span class="keyword">throws</span> BeansException, IllegalStateException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">   <span class="keyword">synchronized</span> (<span class="keyword">this</span>.startupShutdownMonitor) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">// Prepare this context for refreshing.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">      prepareRefresh();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">// Tell the subclass to refresh the internal bean factory.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">     	<span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     	* obtainFreshBeanFactory()方法内部调用refreshBeanFactory()，其默认实现由AbstractRefreshableApplicationContext提供，逻辑是：销毁原来的bean，关闭原来的bean factory，创建新的DefaultListableBeanFactory，调用loadBeanDefinitions()方法加载bean，这部分在后面详细展开；</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     	不过在spring boot的情况下这里的实现是AnnotationConfigServletWebServerApplicationContext类，并不会销毁原来的bean以及bean factory。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     	**/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">      ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">      <span class="comment">// Prepare the bean factory for use in this context.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">     	<span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     	* 摘自该方法的注释，主要是配置bean factory</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="comment">    	* Configure the factory's standard context characteristics,</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="comment">	 		* such as the context's ClassLoader and post-processors.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="comment">	 		**/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">      prepareBeanFactory(beanFactory);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">      <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Allows post-processing of the bean factory in context subclasses.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">       	 <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line"><span class="comment">       	 * 摘自该方法的注释，主要是注册BeanPostProcessors</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * Modify the application context's internal bean factory after its standard</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * initialization. All bean definitions will have been loaded, but no beans</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * will have been instantiated yet. This allows for registering special</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * BeanPostProcessors etc in certain ApplicationContext implementations.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * <span class="doctag">@param</span> beanFactory the bean factory used by the application context</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">         postProcessBeanFactory(beanFactory);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Invoke factory processors registered as beans in the context.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// 这一步会调用BeanFactoryPostProcessor，其中有一个是ConfigurationClassPostProcessor，扫描@Configuration注解标注的类，并完成相应的bean definition的注册</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">         invokeBeanFactoryPostProcessors(beanFactory);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Register bean processors that intercept bean creation.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line">         registerBeanPostProcessors(beanFactory);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Initialize message source for this context.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line">         initMessageSource();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Initialize event multicaster for this context.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">         initApplicationEventMulticaster();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Initialize other special beans in specific context subclasses.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">39</span></pre></td><td class="code"><pre><span class="line">       	 <span class="comment">// web应用的情况下会检查是否有WebServer，若没有则新建一个WebServer，spring boot默认是tomcat</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">40</span></pre></td><td class="code"><pre><span class="line">         onRefresh();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">41</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Check for listener beans and register them.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">42</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// 注册ApplicationListener类型的bean，并将之前发过的ApplicationEvent再发一遍</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">43</span></pre></td><td class="code"><pre><span class="line">         registerListeners();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">44</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Instantiate all remaining (non-lazy-init) singletons.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">45</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// 完成bean factory的初始化，并将剩余的未实例化的单例bean实例化</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">46</span></pre></td><td class="code"><pre><span class="line">         finishBeanFactoryInitialization(beanFactory);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">47</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Last step: publish corresponding event.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">48</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">/*</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">49</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * Finish the refresh of this context, invoking the LifecycleProcessor's</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">50</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * onRefresh() method and publishing the</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">51</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         * &#123;@link org.springframework.context.event.ContextRefreshedEvent&#125;.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">52</span></pre></td><td class="code"><pre><span class="line"><span class="comment">         */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">53</span></pre></td><td class="code"><pre><span class="line">         finishRefresh();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">54</span></pre></td><td class="code"><pre><span class="line">      &#125; <span class="keyword">catch</span> (BeansException ex) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">55</span></pre></td><td class="code"><pre><span class="line">         <span class="keyword">if</span> (logger.isWarnEnabled()) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">56</span></pre></td><td class="code"><pre><span class="line">            logger.warn(<span class="string">"Exception encountered during context initialization - "</span> +</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">57</span></pre></td><td class="code"><pre><span class="line">                  <span class="string">"cancelling refresh attempt: "</span> + ex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">58</span></pre></td><td class="code"><pre><span class="line">         &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">59</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Destroy already created singletons to avoid dangling resources.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">60</span></pre></td><td class="code"><pre><span class="line">         destroyBeans();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">61</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Reset 'active' flag.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">62</span></pre></td><td class="code"><pre><span class="line">         cancelRefresh(ex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">63</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Propagate exception to caller.</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">64</span></pre></td><td class="code"><pre><span class="line">         <span class="keyword">throw</span> ex;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">65</span></pre></td><td class="code"><pre><span class="line">      &#125; <span class="keyword">finally</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">66</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// Reset common introspection caches in Spring's core, since we</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">67</span></pre></td><td class="code"><pre><span class="line">         <span class="comment">// might not ever need metadata for singleton beans anymore...</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">68</span></pre></td><td class="code"><pre><span class="line">         resetCommonCaches();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">69</span></pre></td><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">70</span></pre></td><td class="code"><pre><span class="line">   &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">71</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>这块每一步的逻辑都相当复杂，涉及spring bean容器的很多特性以及扩展点，这些都需要具体去了解，后续再补上每一步的详情，先mark一下。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文基于spring-boot:2.2.1.RELEASE版本，只是粗略过了一遍启动流程，有些部分可能理解有误，内部细节还有待继续研究。另外不得不说，看spring源码是真的累。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/2020/01/04/tomcat_spring_web_application/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/04/tomcat_spring_web_application/" class="post-title-link" itemprop="url">Tomcat中部署spring web application</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-01-04 21:01:19 / 修改时间：21:00:06" itemprop="dateCreated datePublished" datetime="2020-01-04T21:01:19+08:00">2020-01-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[TOC]</p>
+<h1 id="Tomcat中部署spring-web-application"><a href="#Tomcat中部署spring-web-application" class="headerlink" title="Tomcat中部署spring web application"></a>Tomcat中部署spring web application</h1><h2 id="一、Servlet容器"><a href="#一、Servlet容器" class="headerlink" title="一、Servlet容器"></a>一、Servlet容器</h2><p>java的web应用是基于Servlet的，Tomcat是比较有名的Servlet容器，一个Tomcat中可以部署多个Servlet。下图是Tomcat的容器模型。</p>
+<p><img src="/2020/01/04/tomcat_spring_web_application/image002.jpg" alt="图 1 . Tomcat 容器模型"></p>
+<p>有关Servlet与Tomcat的原理推荐阅读下面几篇文章进行了解：</p>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-lo-servlet/index.html</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/</a></p>
+<p><a href="http://objcoding.com/2019/05/30/tomcat-architecture/" target="_blank" rel="noopener">http://objcoding.com/2019/05/30/tomcat-architecture/</a></p>
+<h3 id="1-Tomcat中war的部署"><a href="#1-Tomcat中war的部署" class="headerlink" title="1. Tomcat中war的部署"></a>1. Tomcat中war的部署</h3><p>web应用以war包的形式部署在Tomcat中，web.xml是web应用的部署配置文件，下面说说其中的一些配置元素。</p>
+<table>
+<thead>
+<tr>
+<th>元素</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>servlet</td>
+<td>指定servlet</td>
+</tr>
+<tr>
+<td>servlet-mapping</td>
+<td>指定servlet与url之间的映射关系</td>
+</tr>
+<tr>
+<td>filter</td>
+<td>指定filter</td>
+</tr>
+<tr>
+<td>filter-mapping</td>
+<td>指定filter与url之间的映射关系</td>
+</tr>
+<tr>
+<td>listener</td>
+<td>指定监听器监听servlet上下文事件</td>
+</tr>
+<tr>
+<td>context-param</td>
+<td>servlet上下文初始化参数</td>
+</tr>
+<tr>
+<td>welcome-file-list</td>
+<td>一般用于指定欢迎页，如index.jsp</td>
+</tr>
+</tbody></table>
+<p>以上是对servlet容器的简单介绍，以及在Tomcat中以war部署web应用时，web.xml的作用。</p>
+<h2 id="二、Tomcat中启动spring"><a href="#二、Tomcat中启动spring" class="headerlink" title="二、Tomcat中启动spring"></a>二、Tomcat中启动spring</h2><p>在Tomcat中启动spring也就意味着如何启动并初始化spring上下文，在web应用中该上下文就是WebApplicationContext。</p>
+<h3 id="1-ContextLoadListener"><a href="#1-ContextLoadListener" class="headerlink" title="1. ContextLoadListener"></a>1. ContextLoadListener</h3><p>WebApplicationContext可以通过在web.xml中配置ContextLoadListener这个listener实现初始化。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">listener</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">   <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span></pre></td></tr></table></figure>
+
+<p>ContextLoaderListener实现了ServletContextListener，该接口定义了两个方法可监听servlet的初始化与销毁，该接口的实现类也就是ContextLoaderListener有3种方式可接收到这两个通知事件：</p>
+<ol>
+<li><p>定义在web.xml配置文件中，也就是本文描述的方式；</p>
+</li>
+<li><p>加上javax.servlet.annotation.WebListener注解；</p>
+</li>
+<li><p>通过ServletContext的addListener方法添加；</p>
+</li>
+</ol>
+<p>ContextLoaderListener在配置时需要注意：如果使用了org.springframework.web.util.Log4jConfigListener，需要在web.xml中将该listener配置在其之后。Log4jConfigListener用于初始化定制化的log4j。</p>
+<h3 id="2-WebApplicationContext的创建"><a href="#2-WebApplicationContext的创建" class="headerlink" title="2. WebApplicationContext的创建"></a>2. WebApplicationContext的创建</h3><p>ContextLoaderListener将具体的创建WebApplicationContext的操作委派给ContextLoader执行，其关键方法是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> WebApplicationContext <span class="title">initWebApplicationContext</span><span class="params">(ServletContext servletContext)</span></span></span></pre></td></tr></table></figure>
+
+<p>initWebApplicationContext先创建一个WebApplicationContext，然后完成配置并调用refresh()方法。</p>
+<ol>
+<li><p>WebApplicationContext的默认实现是XmlWebApplicationContext（配置在spring-web包中的ContextLoader.properties文件中），可以通过指定contextClass参数指定WebApplicationContext的实现，当然一般不会这么做。</p>
+</li>
+<li><p>WebApplicationContext初始化的配置文件地址可以通过在web.xml文件中的context-param配置节中配置contextConfigLocation参数指定，如：</p>
+</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">context-param</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">		<span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">		<span class="tag">&lt;<span class="name">param-value</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">			classpath*:config/spring/local/appcontext-*.xml,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">			classpath*:config/spring/appcontext-*.xml</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">		<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">context-param</span>&gt;</span></span></pre></td></tr></table></figure>
+<p>​        PS:存在多个配置文件地址的情况下，后面文件中定义的的bean definition会覆盖前面的。</p>
+<p>还有一些其他的可配置参数可以影响WebApplicationContext的创建，这里没有全部列出，这些一般也是非常用的功能。</p>
+<ol start="3">
+<li>调用refresh()方法实际上是调用了AbstractApplicationContext的refresh()方法，里面就是标准的spring的ApplicationContext的启动流程，主要是BeanFactory的初始化以及相应的bean的加载与初始化，具体可参考我的另一篇文章《Spring Boot/Spring的启动过程分析》。</li>
+</ol>
+<h3 id="3-DispatchServlet"><a href="#3-DispatchServlet" class="headerlink" title="3. DispatchServlet"></a>3. DispatchServlet</h3><p>DispatchServlet是将HTTP请求分发至handlers或者controllers的中央分发器，提供了便利的映射和异常处理功能。下面列一下它的一些特性：</p>
+<ol>
+<li>一个web应用可以配置多个DispatcherServlet，每个DispatcherServlet在自己的命名空间内运行，加载自己私有的包含了mapping的应用上下文。只有通过ContextLoaderListener加载的上下文是共享的。</li>
+<li>通过HandlerMapping的实现类来实现请求request到相应的handler的映射，可覆盖默认实现，默认实现是<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping</span></pre></td></tr></table></figure></li>
+<li>HandlerAdapter接口，用来适配请求和handler，可覆盖默认实现，默认实现是<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter对应org.springframework.web.HttpRequestHandler</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter对应org.springframework.web.servlet.mvc.Controller</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">另外还有一个默认的</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter</span></pre></td></tr></table></figure></li>
+<li>HandlerExceptionResolver负责dispatcher的异常处理策略，例如，发生某些特定异常时映射到某个错误页面。<br>这里只列出一些基础的，还有一些关于ViewResolver，MultipartResolver，LocaleResolver，ThemeResolver的没有列出，感兴趣的可以研究一下。</li>
+</ol>
+<h4 id="DispatchServlet的创建"><a href="#DispatchServlet的创建" class="headerlink" title="DispatchServlet的创建"></a>DispatchServlet的创建</h4><p>DispatchServlet继承了FrameworkServlet，FrameworkServlet继承了HttpServletBean，HttpServletBean继承了HttpServlet。<br>servlet容器启动的时候会调用HttpServlet的init()方法，也就是说会调用HttpServletBean的init()方法，其中会调用FrameworkServlet的initServletBean()方法，其中会调用它的initWebApplicationContext()方法，创建这个DispatchServlet的ApplicationContext，并且会将ContextLoaderListener加载的ApplicationContext作为其parent。</p>
+<p>那么如何才能让servlet容器去创建一个DispatchServlet呢？答案就是在web.xml中进行配置，示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">&lt;servlet&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">        &lt;servlet-name&gt;springmvc&lt;&#x2F;servlet-name&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        &lt;init-param&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">            &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">            &lt;param-value&gt;classpath:config&#x2F;spring.mvc&#x2F;appcontext-servlet.xml&lt;&#x2F;param-value&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        &lt;&#x2F;init-param&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">        &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    &lt;&#x2F;servlet&gt;</span></pre></td></tr></table></figure>
+<p>其中<code>contextConfigLocation</code>参数指定这个DispatcherServlet的ApplicationContext的配置，<code>&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</code>表示在容器启动时就加载。</p>
+<p>好了，再往下就是spring mvc的内容了，还有待研究。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文基于对spring 3.2.5版本的源码阅读，目前spring最新版本已到5.2.x，内容上可能有些过时，但理论上不影响对spring框架的理解。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/2020/01/01/java_lambda/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -533,7 +769,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

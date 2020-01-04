@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://pclhahaha.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="[TOC] Tomcat中部署spring web application一、Servlet容器java的web应用是基于Servlet的，Tomcat是比较有名的Servlet容器，一个Tomcat中可以部署多个Servlet。下图是Tomcat的容器模型。  有关Servlet与Tomcat的原理推荐阅读下面几篇文章进行了解： https:&#x2F;&#x2F;www.ibm.com&#x2F;developerwork">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat中部署spring web application">
+<meta property="og:url" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;01&#x2F;04&#x2F;tomcat_spring_web_application&#x2F;index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="[TOC] Tomcat中部署spring web application一、Servlet容器java的web应用是基于Servlet的，Tomcat是比较有名的Servlet容器，一个Tomcat中可以部署多个Servlet。下图是Tomcat的容器模型。  有关Servlet与Tomcat的原理推荐阅读下面几篇文章进行了解： https:&#x2F;&#x2F;www.ibm.com&#x2F;developerwork">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;01&#x2F;04&#x2F;tomcat_spring_web_application&#x2F;image002.jpg">
+<meta property="og:updated_time" content="2020-01-04T13:00:06.832Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;01&#x2F;04&#x2F;tomcat_spring_web_application&#x2F;image002.jpg">
+
+<link rel="canonical" href="http://pclhahaha.github.io/2020/01/04/tomcat_spring_web_application/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Tomcat中部署spring web application | 个人笔记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">个人笔记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/2020/01/04/tomcat_spring_web_application/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Tomcat中部署spring web application
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-01-04 21:01:19 / 修改时间：21:00:06" itemprop="dateCreated datePublished" datetime="2020-01-04T21:01:19+08:00">2020-01-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[TOC]</p>
+<h1 id="Tomcat中部署spring-web-application"><a href="#Tomcat中部署spring-web-application" class="headerlink" title="Tomcat中部署spring web application"></a>Tomcat中部署spring web application</h1><h2 id="一、Servlet容器"><a href="#一、Servlet容器" class="headerlink" title="一、Servlet容器"></a>一、Servlet容器</h2><p>java的web应用是基于Servlet的，Tomcat是比较有名的Servlet容器，一个Tomcat中可以部署多个Servlet。下图是Tomcat的容器模型。</p>
+<p><img src="/2020/01/04/tomcat_spring_web_application/image002.jpg" alt="图 1 . Tomcat 容器模型"></p>
+<p>有关Servlet与Tomcat的原理推荐阅读下面几篇文章进行了解：</p>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-lo-servlet/index.html</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/</a></p>
+<p><a href="http://objcoding.com/2019/05/30/tomcat-architecture/" target="_blank" rel="noopener">http://objcoding.com/2019/05/30/tomcat-architecture/</a></p>
+<h3 id="1-Tomcat中war的部署"><a href="#1-Tomcat中war的部署" class="headerlink" title="1. Tomcat中war的部署"></a>1. Tomcat中war的部署</h3><p>web应用以war包的形式部署在Tomcat中，web.xml是web应用的部署配置文件，下面说说其中的一些配置元素。</p>
+<table>
+<thead>
+<tr>
+<th>元素</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>servlet</td>
+<td>指定servlet</td>
+</tr>
+<tr>
+<td>servlet-mapping</td>
+<td>指定servlet与url之间的映射关系</td>
+</tr>
+<tr>
+<td>filter</td>
+<td>指定filter</td>
+</tr>
+<tr>
+<td>filter-mapping</td>
+<td>指定filter与url之间的映射关系</td>
+</tr>
+<tr>
+<td>listener</td>
+<td>指定监听器监听servlet上下文事件</td>
+</tr>
+<tr>
+<td>context-param</td>
+<td>servlet上下文初始化参数</td>
+</tr>
+<tr>
+<td>welcome-file-list</td>
+<td>一般用于指定欢迎页，如index.jsp</td>
+</tr>
+</tbody></table>
+<p>以上是对servlet容器的简单介绍，以及在Tomcat中以war部署web应用时，web.xml的作用。</p>
+<h2 id="二、Tomcat中启动spring"><a href="#二、Tomcat中启动spring" class="headerlink" title="二、Tomcat中启动spring"></a>二、Tomcat中启动spring</h2><p>在Tomcat中启动spring也就意味着如何启动并初始化spring上下文，在web应用中该上下文就是WebApplicationContext。</p>
+<h3 id="1-ContextLoadListener"><a href="#1-ContextLoadListener" class="headerlink" title="1. ContextLoadListener"></a>1. ContextLoadListener</h3><p>WebApplicationContext可以通过在web.xml中配置ContextLoadListener这个listener实现初始化。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">listener</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">   <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span></pre></td></tr></table></figure>
+
+<p>ContextLoaderListener实现了ServletContextListener，该接口定义了两个方法可监听servlet的初始化与销毁，该接口的实现类也就是ContextLoaderListener有3种方式可接收到这两个通知事件：</p>
+<ol>
+<li><p>定义在web.xml配置文件中，也就是本文描述的方式；</p>
+</li>
+<li><p>加上javax.servlet.annotation.WebListener注解；</p>
+</li>
+<li><p>通过ServletContext的addListener方法添加；</p>
+</li>
+</ol>
+<p>ContextLoaderListener在配置时需要注意：如果使用了org.springframework.web.util.Log4jConfigListener，需要在web.xml中将该listener配置在其之后。Log4jConfigListener用于初始化定制化的log4j。</p>
+<h3 id="2-WebApplicationContext的创建"><a href="#2-WebApplicationContext的创建" class="headerlink" title="2. WebApplicationContext的创建"></a>2. WebApplicationContext的创建</h3><p>ContextLoaderListener将具体的创建WebApplicationContext的操作委派给ContextLoader执行，其关键方法是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> WebApplicationContext <span class="title">initWebApplicationContext</span><span class="params">(ServletContext servletContext)</span></span></span></pre></td></tr></table></figure>
+
+<p>initWebApplicationContext先创建一个WebApplicationContext，然后完成配置并调用refresh()方法。</p>
+<ol>
+<li><p>WebApplicationContext的默认实现是XmlWebApplicationContext（配置在spring-web包中的ContextLoader.properties文件中），可以通过指定contextClass参数指定WebApplicationContext的实现，当然一般不会这么做。</p>
+</li>
+<li><p>WebApplicationContext初始化的配置文件地址可以通过在web.xml文件中的context-param配置节中配置contextConfigLocation参数指定，如：</p>
+</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">context-param</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">		<span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">		<span class="tag">&lt;<span class="name">param-value</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">			classpath*:config/spring/local/appcontext-*.xml,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">			classpath*:config/spring/appcontext-*.xml</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">		<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">context-param</span>&gt;</span></span></pre></td></tr></table></figure>
+<p>​        PS:存在多个配置文件地址的情况下，后面文件中定义的的bean definition会覆盖前面的。</p>
+<p>还有一些其他的可配置参数可以影响WebApplicationContext的创建，这里没有全部列出，这些一般也是非常用的功能。</p>
+<ol start="3">
+<li>调用refresh()方法实际上是调用了AbstractApplicationContext的refresh()方法，里面就是标准的spring的ApplicationContext的启动流程，主要是BeanFactory的初始化以及相应的bean的加载与初始化，具体可参考我的另一篇文章《Spring Boot/Spring的启动过程分析》。</li>
+</ol>
+<h3 id="3-DispatchServlet"><a href="#3-DispatchServlet" class="headerlink" title="3. DispatchServlet"></a>3. DispatchServlet</h3><p>DispatchServlet是将HTTP请求分发至handlers或者controllers的中央分发器，提供了便利的映射和异常处理功能。下面列一下它的一些特性：</p>
+<ol>
+<li>一个web应用可以配置多个DispatcherServlet，每个DispatcherServlet在自己的命名空间内运行，加载自己私有的包含了mapping的应用上下文。只有通过ContextLoaderListener加载的上下文是共享的。</li>
+<li>通过HandlerMapping的实现类来实现请求request到相应的handler的映射，可覆盖默认实现，默认实现是<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping</span></pre></td></tr></table></figure></li>
+<li>HandlerAdapter接口，用来适配请求和handler，可覆盖默认实现，默认实现是<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter对应org.springframework.web.HttpRequestHandler</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter对应org.springframework.web.servlet.mvc.Controller</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">另外还有一个默认的</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter</span></pre></td></tr></table></figure></li>
+<li>HandlerExceptionResolver负责dispatcher的异常处理策略，例如，发生某些特定异常时映射到某个错误页面。<br>这里只列出一些基础的，还有一些关于ViewResolver，MultipartResolver，LocaleResolver，ThemeResolver的没有列出，感兴趣的可以研究一下。</li>
+</ol>
+<h4 id="DispatchServlet的创建"><a href="#DispatchServlet的创建" class="headerlink" title="DispatchServlet的创建"></a>DispatchServlet的创建</h4><p>DispatchServlet继承了FrameworkServlet，FrameworkServlet继承了HttpServletBean，HttpServletBean继承了HttpServlet。<br>servlet容器启动的时候会调用HttpServlet的init()方法，也就是说会调用HttpServletBean的init()方法，其中会调用FrameworkServlet的initServletBean()方法，其中会调用它的initWebApplicationContext()方法，创建这个DispatchServlet的ApplicationContext，并且会将ContextLoaderListener加载的ApplicationContext作为其parent。</p>
+<p>那么如何才能让servlet容器去创建一个DispatchServlet呢？答案就是在web.xml中进行配置，示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">&lt;servlet&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">        &lt;servlet-name&gt;springmvc&lt;&#x2F;servlet-name&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;&#x2F;servlet-class&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        &lt;init-param&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">            &lt;param-name&gt;contextConfigLocation&lt;&#x2F;param-name&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">            &lt;param-value&gt;classpath:config&#x2F;spring.mvc&#x2F;appcontext-servlet.xml&lt;&#x2F;param-value&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        &lt;&#x2F;init-param&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">        &lt;load-on-startup&gt;1&lt;&#x2F;load-on-startup&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    &lt;&#x2F;servlet&gt;</span></pre></td></tr></table></figure>
+<p>其中<code>contextConfigLocation</code>参数指定这个DispatcherServlet的ApplicationContext的配置，<code>&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</code>表示在容器启动时就加载。</p>
+<p>好了，再往下就是spring mvc的内容了，还有待研究。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文基于对spring 3.2.5版本的源码阅读，目前spring最新版本已到5.2.x，内容上可能有些过时，但理论上不影响对spring框架的理解。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/01/java_lambda/" rel="prev" title="Java 函数式编程">
+      <i class="fa fa-chevron-left"></i> Java 函数式编程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/04/spring_start/" rel="next" title="Spring Boot/Spring的启动过程分析">
+      Spring Boot/Spring的启动过程分析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Tomcat中部署spring-web-application"><span class="nav-number">1.</span> <span class="nav-text">Tomcat中部署spring web application</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、Servlet容器"><span class="nav-number">1.1.</span> <span class="nav-text">一、Servlet容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Tomcat中war的部署"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. Tomcat中war的部署</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、Tomcat中启动spring"><span class="nav-number">1.2.</span> <span class="nav-text">二、Tomcat中启动spring</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-ContextLoadListener"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. ContextLoadListener</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-WebApplicationContext的创建"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. WebApplicationContext的创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-DispatchServlet"><span class="nav-number">1.2.3.</span> <span class="nav-text">3. DispatchServlet</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DispatchServlet的创建"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">DispatchServlet的创建</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">2.</span> <span class="nav-text">小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">pcl</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
