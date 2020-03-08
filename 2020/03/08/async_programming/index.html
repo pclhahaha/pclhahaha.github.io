@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://pclhahaha.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="JAVA-从异步编程到响应式编程Q：响应式编程带来了什么好处？A：当并发连接增加，很多时候我们是通过多线程、线程池的方式来提升性能，然而线程数增加后系统开销也增加了，而且很多场景下线程大部分是执行IO操作，其大部分时间是处于idle状态的，资源利用率不高。响应式编程通过引入非阻塞non-blocking的特性，实现了线程资源的充分利用。 这是一幅盗来的图^1，展示了响应式编程的发展历程，尤其是在J">
+<meta property="og:type" content="article">
+<meta property="og:title" content="async_programming">
+<meta property="og:url" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;03&#x2F;08&#x2F;async_programming&#x2F;index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="JAVA-从异步编程到响应式编程Q：响应式编程带来了什么好处？A：当并发连接增加，很多时候我们是通过多线程、线程池的方式来提升性能，然而线程数增加后系统开销也增加了，而且很多场景下线程大部分是执行IO操作，其大部分时间是处于idle状态的，资源利用率不高。响应式编程通过引入非阻塞non-blocking的特性，实现了线程资源的充分利用。 这是一幅盗来的图^1，展示了响应式编程的发展历程，尤其是在J">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;03&#x2F;08&#x2F;async_programming&#x2F;image-blog-body-completablefuture3.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;03&#x2F;08&#x2F;async_programming&#x2F;image-blog-body-completablefuture2.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;03&#x2F;08&#x2F;async_programming&#x2F;legend.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;03&#x2F;08&#x2F;async_programming&#x2F;Composition.1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;03&#x2F;08&#x2F;async_programming&#x2F;diagram-reactive-1290533f3f01ec9c57baf2cc9ea9fa2f-20200306130014908.svg">
+<meta property="og:updated_time" content="2020-03-08T09:09:52.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;pclhahaha.github.io&#x2F;2020&#x2F;03&#x2F;08&#x2F;async_programming&#x2F;image-blog-body-completablefuture3.jpg">
+
+<link rel="canonical" href="http://pclhahaha.github.io/2020/03/08/async_programming/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>async_programming | 个人笔记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">个人笔记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/2020/03/08/async_programming/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          async_programming
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-08 17:10:20 / 修改时间：17:09:52" itemprop="dateCreated datePublished" datetime="2020-03-08T17:10:20+08:00">2020-03-08</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="JAVA-从异步编程到响应式编程"><a href="#JAVA-从异步编程到响应式编程" class="headerlink" title="JAVA-从异步编程到响应式编程"></a>JAVA-从异步编程到响应式编程</h1><p>Q：响应式编程带来了什么好处？<br>A：当并发连接增加，很多时候我们是通过多线程、线程池的方式来提升性能，然而线程数增加后系统开销也增加了，而且很多场景下线程大部分是执行IO操作，其大部分时间是处于idle状态的，资源利用率不高。响应式编程通过引入非阻塞non-blocking的特性，实现了线程资源的充分利用。</p>
+<p>这是一幅盗来的图<a href="https://www.jrebel.com/blog/java-completablefuture-api" target="_blank" rel="noopener">^1</a>，展示了响应式编程的发展历程，尤其是在JVM或者说JAVA领域。这里面比较核心的就是Reactive Streams规范、ReacticeX项目及其包含的RxJava、Project Reactor项目、JAVA方面的CompletableFuture API和Flow API。</p>
+<img src="/2020/03/08/async_programming/image-blog-body-completablefuture3.jpg" alt="CompletableFuture API and Reactive Programming Timeline" style="zoom: 67%;">
+
+<h2 id="一、CompletableFuture"><a href="#一、CompletableFuture" class="headerlink" title="一、CompletableFuture"></a>一、CompletableFuture</h2><p>首先，CompletableFuture是Future，意味着它支持任务异步执行。在此基础上，它还支持异步任务之间的依赖关系、异步任务的回调等。对于日常业务逻辑，使用CompletableFuture能够通过将业务逻辑异步化，来提升cpu利用率、缩短响应时间，达到提升性能的目的。</p>
+<p>那么CompletableFuture和响应式编程的区别是什么呢？</p>
+<p>关键区别在于Stream这个概念上，CompletableFuture描述的是单次执行的结果，尽管可以通过异步任务之间的依赖关系构建一串异步任务组成的执行图，本质上面向的是单次操作，例如一次rpc请求的处理<a href="https://www.jrebel.com/blog/java-completablefuture-api" target="_blank" rel="noopener">^1</a>。</p>
+<img src="/2020/03/08/async_programming/image-blog-body-completablefuture2.jpg" alt="Java CompletableFuture API Example Invoice Path" style="zoom:67%;">
+
+<p>响应式编程则面向的是Stream，或者说叫“流”，也即是数据或事件的序列，有点类似JAVA的Stream API。</p>
+<p>当然用CompletableFuture也能够实现对数据/事件流的处理，但是有一个关键的特性是响应式编程具备而CompletableFuture则需要重新实现的，并且实现起来很复杂，那就是back pressure。back pressure就是在下游无法承载上游的压力时，采取一些措施。</p>
+<p>至于Java中提供的CallBack、Future机制在实现响应式编程中的问题和缺点，例如“callback hell”，不支持lazy computation等，可以从<a href="https://projectreactor.io/docs/core/release/reference/#getting-started中找到答案。" target="_blank" rel="noopener">https://projectreactor.io/docs/core/release/reference/#getting-started中找到答案。</a></p>
+<p>所以，我们需要一套框架或者说类库来更好的实现响应式编程，需要具备以下特性：</p>
+<ul>
+<li>支持异步任务的封装及组装，需要API来对异步任务进行包装，并且需要很多种算子来对异步任务进行组装，包括过滤、组装、异常处理等算子</li>
+<li>减少异步任务的嵌套，减少代码的复杂性，增加可读性，避免“callback hell”等复杂度很高的代码</li>
+<li>支持背压back pressure，也就是下游和上游之间能协商数据流的速度</li>
+</ul>
+<h2 id="二、响应式编程-从ReactiveX到RxJava"><a href="#二、响应式编程-从ReactiveX到RxJava" class="headerlink" title="二、响应式编程-从ReactiveX到RxJava"></a>二、响应式编程-从ReactiveX到RxJava</h2><p>项目主页：<a href="http://reactivex.io/" target="_blank" rel="noopener">http://reactivex.io/</a></p>
+<p>github：<a href="https://github.com/ReactiveX?page=2" target="_blank" rel="noopener">https://github.com/ReactiveX?page=2</a></p>
+<p>官网定义如下：</p>
+<blockquote>
+<p><a href="http://reactivex.io/" target="_blank" rel="noopener">ReactiveX</a> is a collection of open source projects. The content of this page is licensed under Creative Commons Attribution 3.0 License, and code samples are licensed under the BSD License.</p>
+</blockquote>
+<blockquote>
+<p>ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern, and functional programming</p>
+</blockquote>
+<blockquote>
+<p>ReactiveX is a library for composing asynchronous and event-based programs by using observable sequences.</p>
+</blockquote>
+<p>ReactiveX基于观察者模式、迭代者模式和函数式编程的组合，为构建异步的基于事件的应用提供了一套类库，并且它是一个多语言的项目，例如，JAVA中对应的就是RxJava类库。</p>
+<h3 id="2-1-核心概念"><a href="#2-1-核心概念" class="headerlink" title="2.1 核心概念"></a>2.1 核心概念</h3><h4 id="2-1-1-Observable-2"><a href="#2-1-1-Observable-2" class="headerlink" title="2.1.1 Observable^2"></a>2.1.1 Observable<a href="http://reactivex.io/documentation/observable.html" target="_blank" rel="noopener">^2</a></h4><img src="/2020/03/08/async_programming/legend.png" alt="img" style="zoom: 50%;">
+
+
+
+<p>如上图所示，一个Observable其实就是一个产生数据流的对象，它能够转换为另一个Observable。</p>
+<p>Observable可以被Observer订阅（subscribe），一个完整的Observer订阅Observable的例子的伪代码如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> myOnNext     = &#123; item -&gt; <span class="comment">/* do something useful with item */</span> &#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> myError      = &#123; throwable -&gt; <span class="comment">/* react sensibly to a failed call */</span> &#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> myComplete   = &#123; <span class="comment">/* clean up after the final response */</span> &#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> myObservable = someMethod(itsParameters);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">myObservable.subscribe(myOnNext, myError, myComplete);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// go on about my business</span></span></pre></td></tr></table></figure>
+
+<p>其中onNext, onError, onComplete三个方法是Observer需要实现的。分别用于对数据流的正常处理，异常处理，完成操作。</p>
+<h4 id="2-1-2-Observable的各种算子（Operator）"><a href="#2-1-2-Observable的各种算子（Operator）" class="headerlink" title="2.1.2 Observable的各种算子（Operator）"></a>2.1.2 Observable的各种算子（Operator）</h4><p>算子可用于连接Observable，或者改变Observable的行为。Operator能够将Observable串联起来，形成一条chain。</p>
+<p>ReactiveX支持的算子数量较多，这里就不展开了，可以到 <a href="http://reactivex.io/documentation/operators.html" target="_blank" rel="noopener">http://reactivex.io/documentation/operators.html</a> 这里查看。</p>
+<h4 id="2-1-3-Single"><a href="#2-1-3-Single" class="headerlink" title="2.1.3 Single"></a>2.1.3 Single</h4><p>Single是RxJava中引进的类似Observable，但只产生一个数据的对象，因此订阅它的Observer只需要实现onSuccess，onError方法即可。</p>
+<p>Single也有很多对应的算子，可用于创建Single、对Single进行转换、组装、连接、延时等，具体可查看：<a href="http://reactivex.io/documentation/single.html" target="_blank" rel="noopener">http://reactivex.io/documentation/single.html</a></p>
+<h4 id="2-1-4-Subject"><a href="#2-1-4-Subject" class="headerlink" title="2.1.4 Subject"></a>2.1.4 Subject</h4><p><a href="http://reactivex.io/documentation/subject.html" target="_blank" rel="noopener">http://reactivex.io/documentation/subject.html</a></p>
+<p>一个Subject既是Observable，又是Observer，表明它既可以订阅一个或多个Observable，又可以作为Observable将其订阅到的数据流重新发出，因此它类似一种桥梁或者说代理。</p>
+<h4 id="2-1-5-Scheduler"><a href="#2-1-5-Scheduler" class="headerlink" title="2.1.5 Scheduler"></a>2.1.5 Scheduler</h4><p><a href="http://reactivex.io/documentation/scheduler.html" target="_blank" rel="noopener">http://reactivex.io/documentation/scheduler.html</a></p>
+<p>Rx默认是单线程的，整条链路上的调用都在Subscribe方法被调用的线程中执行。不过一些算子接收Scheduler作为参数，控制算子在哪个Scheduler上执行，这里可以认为Scheduler是某种线程池，提供了多线程资源。</p>
+<p>SubscribeOn算子指定Observable开始执行的线程，而SubscribeOn算子在链路的什么地方被调用并不重要。</p>
+<p>ObserveOn算子指定了从该调用开始往后的算子所在的执行线程，如果要改变线程，则需要重新调用ObserveOn，指定一个新的Scheduler。</p>
+<h3 id="2-2-RxJava"><a href="#2-2-RxJava" class="headerlink" title="2.2 RxJava"></a>2.2 RxJava</h3><p>github：<a href="https://github.com/ReactiveX/RxJava" target="_blank" rel="noopener">https://github.com/ReactiveX/RxJava</a></p>
+<p>github wiki：<a href="https://github.com/ReactiveX/RxJava/wiki" target="_blank" rel="noopener">https://github.com/ReactiveX/RxJava/wiki</a></p>
+<p>RxJava是ReactiveX项目的一部分，它也遵守Reactive Streams规范。不要以为RxJava是只针对Java语言的，RxJava本身也是支持多语言的，支持一堆基于JVM的语言。下面是RxJava的最最最入门级demo，包括Observable的创建，组装，订阅：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RxJavaDemo</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        RxJavaDemo demo = <span class="keyword">new</span> RxJavaDemo();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        demo.hello(<span class="string">"pcl"</span>, <span class="string">"j"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">        demo.customObservableBlocking().subscribe(s -&gt; System.out.println(s));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        demo.customObservableNonBlocking().subscribe(s -&gt; System.out.println(s));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">        demo.simpleComposition();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * hello world</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     *</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * <span class="doctag">@param</span> args</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(String... args)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">        Flowable.fromArray(args).subscribe(s -&gt; System.out.println(<span class="string">"Hello "</span> + s + <span class="string">"!"</span>));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * Creating an Observable from an Existing Data Structure</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createObservables</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">        Observable&lt;String&gt; o1 = Observable.fromArray(<span class="keyword">new</span> String[]&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">        Integer[] list = &#123;<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>&#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">        Observable&lt;Integer&gt; o2 = Observable.fromArray(list);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">        Observable&lt;String&gt; o3 = Observable.just(<span class="string">"one object"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * This example shows a custom Observable that blocks</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * when subscribed to (does not spawn an extra thread).</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     *</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> Observable&lt;String&gt; <span class="title">customObservableBlocking</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> Observable.&lt;String&gt;create(emitter -&gt; &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">50</span>; i++) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line">                emitter.onNext(<span class="string">"count_"</span> + i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">39</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">40</span></pre></td><td class="code"><pre><span class="line">            emitter.onComplete();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">41</span></pre></td><td class="code"><pre><span class="line">        &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">42</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">43</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">44</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * 创建一个非阻塞的Observable</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">45</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     *</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">46</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">47</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">48</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> Observable&lt;String&gt; <span class="title">customObservableNonBlocking</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">49</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> Observable.&lt;String&gt;create(emitter -&gt; &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">50</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">new</span> Thread() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">51</span></pre></td><td class="code"><pre><span class="line">                <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">52</span></pre></td><td class="code"><pre><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">53</span></pre></td><td class="code"><pre><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">50</span>; i++) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">54</span></pre></td><td class="code"><pre><span class="line">                        emitter.onNext(<span class="string">"count_"</span> + i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">55</span></pre></td><td class="code"><pre><span class="line">                    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">56</span></pre></td><td class="code"><pre><span class="line">                    emitter.onComplete();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">57</span></pre></td><td class="code"><pre><span class="line">                &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">58</span></pre></td><td class="code"><pre><span class="line">            &#125;.start();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">59</span></pre></td><td class="code"><pre><span class="line">        &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">60</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">61</span></pre></td><td class="code"><pre><span class="line">		<span class="comment">/**</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">62</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     * 用算子对Observable进行组装，或者转变</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">63</span></pre></td><td class="code"><pre><span class="line"><span class="comment">     */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">64</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">simpleComposition</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">65</span></pre></td><td class="code"><pre><span class="line">        customObservableNonBlocking().skip(<span class="number">10</span>).take(<span class="number">5</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">66</span></pre></td><td class="code"><pre><span class="line">                .map(stringValue -&gt; &#123;<span class="keyword">return</span> stringValue + <span class="string">"_xform"</span>;&#125;)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">67</span></pre></td><td class="code"><pre><span class="line">                .subscribe(s -&gt; System.out.println(<span class="string">"onNext =&gt; "</span> + s));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">68</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">69</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>其中simpleComposition()方法的marble diagram如下图所示<a href="https://github.com/ReactiveX/RxJava/wiki/How-To-Use-RxJava" target="_blank" rel="noopener">^3</a>，在reactive编程模型中，常常用marble diagram表示数据流的流转。</p>
+<img src="/2020/03/08/async_programming/Composition.1.png" alt="img" style="zoom:25%;">
+
+<h4 id="2-2-1-异常处理"><a href="#2-2-1-异常处理" class="headerlink" title="2.2.1 异常处理"></a>2.2.1 异常处理</h4><p>Observable一般不抛出异常，而是发出一个onError通知，不过有些情况下，例如调用onError()方法本身失败的话，会抛出RuntimeException、OnErrorFailedException、OnErrorNotImplementedException异常。</p>
+<p>可以使用异常处理算子来处理onError()方法通知的异常。subscribe的时候可以传入第二个方法处理异常。</p>
+<h4 id="2-2-1-RxJava的算子"><a href="#2-2-1-RxJava的算子" class="headerlink" title="2.2.1 RxJava的算子"></a>2.2.1 RxJava的算子</h4><p>只能说RxJava支持的算子很多，就不多说了，当然你也可以自己写新的算子，这就属于比较难的操作了。</p>
+<h4 id="2-2-2-back-pressure"><a href="#2-2-2-back-pressure" class="headerlink" title="2.2.2 back pressure"></a>2.2.2 back pressure</h4><p>其实从上面一路写下来，有没有发现RxJava和Stream API非常相似，我是这么觉得的。但是这里就要说一说RxJava所具备的背压这一特性，是响应式编程的非常重要的一个特性。</p>
+<p>back pressure就是在下游无法承载上游的压力时，采取一些措施，通知上游放慢速度。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    source</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    .observeOn(Schedulers.computation())</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    .subscribe(v -&gt; compute(v), Throwable::printStackTrace);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">        source.onNext(i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    Thread.sleep(<span class="number">10_000</span>);</span></pre></td></tr></table></figure>
+
+<p>这段代码会抛出MissingBackpressureException异常，因为PublishProcessor不支持背压，而observeOn算子内部的buffer是有边界的，当PublishProcessor产生数据的速度超过计算的速度时，数据会存在observeOn的内部buffer中，当溢出时就抛出MissingBackpressureException异常。</p>
+<p>如果改成下面的代码则可以正常运行，因为Flowable.range支持背压，range可以和observeOn之间通过类似协程的机制，协商应该以什么样的速度产生数据。具体的机制是，range通过调用observeOn的onSubscribe方法发送一个callback方法（org.reactivestreams.Subscription接口的实现）给订阅者，observeOn回调Subscription.request(n)方法告诉range产生n个数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Flowable.range(<span class="number">1</span>, <span class="number">1_000_000</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">.observeOn(Schedulers.computation())</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">.subscribe(v -&gt; compute(v), Throwable::printStackTrace);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">Thread.sleep(<span class="number">10_000</span>);</span></pre></td></tr></table></figure>
+
+<p>下面通过一个更显式的例子来说明，先调用onStart方法要求range发送一个数据，然后异步调用onNext方法进行数据计算，并再发一个request要求一个数据，注意onStart中request执行完后，range就会发送数据，会异步触发onNext，若此时onStart中初始化操作尚未完成，则可能产生异常</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Flowable.range(<span class="number">1</span>, <span class="number">1_000_000</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">                .subscribe(<span class="keyword">new</span> DisposableSubscriber&lt;Integer&gt;() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">                    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">                        request(<span class="number">1</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(Integer v)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">                        v = v * <span class="number">2</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">                        System.out.println(v);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">                        request(<span class="number">1</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">                    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">                    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable ex)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">                        ex.printStackTrace();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">                    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">                    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onComplete</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">                        System.out.println(<span class="string">"Done!"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">                    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">                &#125;);</span></pre></td></tr></table></figure>
+
+<h5 id="2-2-2-1-解决背压问题-增加buffer-size"><a href="#2-2-2-1-解决背压问题-增加buffer-size" class="headerlink" title="2.2.2.1 解决背压问题-增加buffer size"></a>2.2.2.1 解决背压问题-增加buffer size</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    source.observeOn(Schedulers.computation(), <span class="number">1024</span> * <span class="number">1024</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">          .subscribe(e -&gt; &#123; &#125;, Throwable::printStackTrace);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        source.onNext(i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>仍然有机会产生MissingBackpressureException</p>
+<h5 id="2-2-2-2-解决背压问题-批量算子-采样算子"><a href="#2-2-2-2-解决背压问题-批量算子-采样算子" class="headerlink" title="2.2.2.2 解决背压问题-批量算子/采样算子"></a>2.2.2.2 解决背压问题-批量算子/采样算子</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    source</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">          .buffer(<span class="number">1024</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">          .observeOn(Schedulers.computation(), <span class="number">1024</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">          .subscribe(list -&gt; &#123; </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">              list.parallelStream().map(e -&gt; e * e).first();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">          &#125;, Throwable::printStackTrace);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">        source.onNext(i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">    source</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">          .sample(<span class="number">1</span>, TimeUnit.MILLISECONDS)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">          .observeOn(Schedulers.computation(), <span class="number">1024</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">          .subscribe(v -&gt; compute(v), Throwable::printStackTrace);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">        source.onNext(i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>仍然有机会产生MissingBackpressureException</p>
+<h5 id="2-2-2-3-解决背压问题-onBackpressureXXX-算子"><a href="#2-2-2-3-解决背压问题-onBackpressureXXX-算子" class="headerlink" title="2.2.2.3 解决背压问题-onBackpressureXXX 算子"></a>2.2.2.3 解决背压问题-onBackpressureXXX 算子</h5><p>onBackpressureBuffer()<br>onBackpressureBuffer(int capacity)<br>onBackpressureBuffer(int capacity, Action onOverflow)<br>onBackpressureBuffer(int capacity, Action onOverflow, BackpressureOverflowStrategy strategy)<br>onBackpressureDrop()<br>onBackpressureLatest()</p>
+<p>还有一个办法是创建支持背压的数据源。</p>
+<h2 id="三、响应式编程-从Reactive-Streams到Project-Reactor"><a href="#三、响应式编程-从Reactive-Streams到Project-Reactor" class="headerlink" title="三、响应式编程-从Reactive Streams到Project Reactor"></a>三、响应式编程-从Reactive Streams到Project Reactor</h2><p>上文提到RxJava属于ReactiveX项目，也遵守Reactive Streams规范，这里就介绍一下Reactive Streams规范，以及在其基础上的Project Reactor。</p>
+<h3 id="3-1-Reactive-Streams"><a href="#3-1-Reactive-Streams" class="headerlink" title="3.1 Reactive Streams"></a>3.1 Reactive Streams</h3><p>主页：<a href="https://www.reactive-streams.org/" target="_blank" rel="noopener">https://www.reactive-streams.org/</a></p>
+<blockquote>
+<p>Reactive Streams is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols.</p>
+</blockquote>
+<p>Reactive Streams是一套规范，为异步流处理及非阻塞的背压提供了标准。</p>
+<p>对于Java程序员，Reactive Streams是一个API。Reactive Streams为我们提供了Java中的Reactive Programming的通用API。<code>Reactive Streams API</code>中仅仅包含了如下四个接口<a href="https://zhuanlan.zhihu.com/p/95966853" target="_blank" rel="noopener">^4</a>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//发布者</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="class"><span class="keyword">interface</span>  <span class="title">Publisher</span> &lt; <span class="title">T</span> &gt; </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">public</span>  <span class="keyword">void</span>  subscribe（Subscriber &lt;？<span class="keyword">super</span>  T &gt;  s）;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//订阅者</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="class"><span class="keyword">interface</span>  <span class="title">Subscriber</span> &lt; <span class="title">T</span> &gt; </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">public</span>  <span class="keyword">void</span>  onSubscribe（Subscription  s）;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">public</span>  <span class="keyword">void</span>  onNext（T  t）;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">public</span>  <span class="keyword">void</span>  onError（Throwable  t）;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">public</span>  <span class="keyword">void</span>  onComplete（）;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//表示Subscriber消费Publisher发布的一个消息的生命周期</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Subscription</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span><span class="params">(<span class="keyword">long</span> n)</span></span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cancel</span><span class="params">()</span></span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//处理器，表示一个处理阶段，它既是订阅者也是发布者，并且遵守两者的契约</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Processor</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; <span class="keyword">extends</span> <span class="title">Subscriber</span>&lt;<span class="title">T</span>&gt;, <span class="title">Publisher</span>&lt;<span class="title">R</span>&gt; </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">	</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><a href="https://github.com/reactive-streams/reactive-streams-jvm" target="_blank" rel="noopener">https://github.com/reactive-streams/reactive-streams-jvm</a> 定义了Reactive Streams的JVM规范。</p>
+<p><strong>Java9中Flow类下的内容与Reactive Streams完全一致，这部分留到后面研究。</strong></p>
+<p>其他还有AKKA Streams支持Reactive Streams。</p>
+<p>Publisher-Subscriber接口既有观察者模式，又包含了迭代器模式。Subscriber通过订阅的方式实现了观察者模式。由Publisher通过push元素实现对元素的迭代，而相应的Java中的Iterator是通过pull的方式实现迭代。push的方式是响应式编程的关键，Publisher通过调用Subscriber的onNext方法通知Subscriber下一个元素，通过onError通知异常，通过onComplete通知完成。</p>
+<h3 id="3-2-Project-Reactor"><a href="#3-2-Project-Reactor" class="headerlink" title="3.2 Project Reactor"></a>3.2 Project Reactor</h3><p>主页：<a href="https://projectreactor.io/" target="_blank" rel="noopener">https://projectreactor.io/</a></p>
+<blockquote>
+<p>Reactor is a fourth-generation reactive library, based on the <a href="https://github.com/reactive-streams/reactive-streams-jvm" target="_blank" rel="noopener">Reactive Streams</a><br>specification, for building non-blocking applications on the JVM</p>
+</blockquote>
+<p>Reactor文档：</p>
+<p><a href="https://projectreactor.io/docs/core/release/reference/" target="_blank" rel="noopener">https://projectreactor.io/docs/core/release/reference/</a></p>
+<p>Reactor Core运行需要Java8+环境，可以直接和Java8的函数式API交互，包括CompletableFuture，Stream和Duration。它实现了Reactive Streams规范，并提供Flux和Mono两个异步序列API，Flux是支持N个元素的序列，Mono是支持0个或1个的序列（类似RxJava中的Single）。<strong>reactor-netty</strong>项目支持非阻塞的IPC(inter-process communication)，它还提供了支持HTTP(包括WebSockets)、TCP、UDP协议的带有背压特性的网络引擎，支持响应式的边界码，适合微服务框架。</p>
+<p>Reactor实现了Reactive Streams规范，因此实现了Publisher, Subscriber接口。需要注意的一点是Publisher创建后，并不开始产生数据，各种算子对Publisher的包装也不会导致数据开始产生，只有当调用链由Subscriber订阅后，内部调用request方法才会触发数据开始流动。</p>
+<p>Reactor背压的实现机制和RxJava类似。也是通过上面提到的request机制来进行协商。</p>
+<h4 id="3-2-1-Flux与Mono"><a href="#3-2-1-Flux与Mono" class="headerlink" title="3.2.1 Flux与Mono"></a>3.2.1 Flux与Mono</h4><p>Flux与Mono是Publisher的实现，其创建代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createFluxMono</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">        Flux&lt;String&gt; seq1 = Flux.just(<span class="string">"foo"</span>, <span class="string">"bar"</span>, <span class="string">"foobar"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        List&lt;String&gt; iterable = Arrays.asList(<span class="string">"foo"</span>, <span class="string">"bar"</span>, <span class="string">"foobar"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        Flux&lt;String&gt; seq2 = Flux.fromIterable(iterable);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        Mono&lt;String&gt; noData = Mono.empty();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        Mono&lt;String&gt; data = Mono.just(<span class="string">"foo"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">        Flux&lt;Integer&gt; numbersFromFiveToSeven = Flux.range(<span class="number">5</span>, <span class="number">3</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>其subscribe代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">subscribe</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">  			<span class="comment">//最后一个函数表示对每一个元素执行的操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        Flux&lt;Integer&gt; ints1 = Flux.range(<span class="number">1</span>, <span class="number">3</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        ints1.subscribe(i -&gt; System.out.println(i));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">				<span class="comment">//最后一个函数表示异常时执行的操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">        Flux&lt;Integer&gt; ints2 = Flux.range(<span class="number">1</span>, <span class="number">4</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                .map(i -&gt; &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">                    <span class="keyword">if</span> (i &lt;= <span class="number">3</span>) <span class="keyword">return</span> i;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Got to 4"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">                &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">        ints2.subscribe(i -&gt; System.out.println(i),</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">                error -&gt; System.err.println(<span class="string">"Error: "</span> + error));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">				<span class="comment">//最后一个函数表示完成时执行的操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">        Flux&lt;Integer&gt; ints3 = Flux.range(<span class="number">1</span>, <span class="number">4</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">        ints3.subscribe(i -&gt; System.out.println(i),</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">                error -&gt; System.err.println(<span class="string">"Error "</span> + error),</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">                () -&gt; System.out.println(<span class="string">"Done"</span>));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">  			<span class="comment">//最后一个函数表示订阅时执行的操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">  			Flux&lt;Integer&gt; ints4 = Flux.range(<span class="number">1</span>, <span class="number">4</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">        ints4.subscribe(i -&gt; System.out.println(i),</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">                error -&gt; System.err.println(<span class="string">"Error "</span> + error),</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">                () -&gt; System.out.println(<span class="string">"Done"</span>),</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">                sub -&gt; sub.request(<span class="number">2</span>));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>以上是Reactor的一些基操，其他部分的内容包括算子的使用、背压的实现、异步的实现、异常处理、测试、Debug以及一些高级特性等，建议还是看官方文档，不是一篇文章能讲完的。</p>
+<p>总的来说，Reactor的实现和RxJava在很多方面是相似的。</p>
+<h3 id="3-3-Spring-WebFlux"><a href="#3-3-Spring-WebFlux" class="headerlink" title="3.3 Spring WebFlux"></a>3.3 Spring WebFlux</h3><img src="/2020/03/08/async_programming/diagram-reactive-1290533f3f01ec9c57baf2cc9ea9fa2f-20200306130014908.svg" alt="Spring Reactive diagram">
+
+<p>在Project Reactor提供的类库的基础上，Spring构建了自己的reactive技术栈。Spring WebFlux可以运行在Netty, Undertow服务器上或者Servlet 3.1+ 的web容器中。</p>
+<p>再一次推荐官方文档：</p>
+<p><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux" target="_blank" rel="noopener">https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux</a></p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/09/java_concurrent/" rel="prev" title="JAVA并发基础">
+      <i class="fa fa-chevron-left"></i> JAVA并发基础
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JAVA-从异步编程到响应式编程"><span class="nav-number">1.</span> <span class="nav-text">JAVA-从异步编程到响应式编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、CompletableFuture"><span class="nav-number">1.1.</span> <span class="nav-text">一、CompletableFuture</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、响应式编程-从ReactiveX到RxJava"><span class="nav-number">1.2.</span> <span class="nav-text">二、响应式编程-从ReactiveX到RxJava</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-核心概念"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-Observable-2"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">2.1.1 Observable^2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-Observable的各种算子（Operator）"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">2.1.2 Observable的各种算子（Operator）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-Single"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">2.1.3 Single</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4-Subject"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">2.1.4 Subject</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-5-Scheduler"><span class="nav-number">1.2.1.5.</span> <span class="nav-text">2.1.5 Scheduler</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-RxJava"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 RxJava</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-异常处理"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.2.1 异常处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-RxJava的算子"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2.1 RxJava的算子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-back-pressure"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.2.2 back pressure</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-1-解决背压问题-增加buffer-size"><span class="nav-number">1.2.2.3.1.</span> <span class="nav-text">2.2.2.1 解决背压问题-增加buffer size</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-2-解决背压问题-批量算子-采样算子"><span class="nav-number">1.2.2.3.2.</span> <span class="nav-text">2.2.2.2 解决背压问题-批量算子/采样算子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-3-解决背压问题-onBackpressureXXX-算子"><span class="nav-number">1.2.2.3.3.</span> <span class="nav-text">2.2.2.3 解决背压问题-onBackpressureXXX 算子</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、响应式编程-从Reactive-Streams到Project-Reactor"><span class="nav-number">1.3.</span> <span class="nav-text">三、响应式编程-从Reactive Streams到Project Reactor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Reactive-Streams"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 Reactive Streams</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Project-Reactor"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 Project Reactor</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-Flux与Mono"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">3.2.1 Flux与Mono</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Spring-WebFlux"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 Spring WebFlux</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">1.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">pcl</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
