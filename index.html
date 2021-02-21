@@ -164,6 +164,180 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/2021/02/21/cgroups/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/21/cgroups/" class="post-title-link" itemprop="url">cgroups学习笔记</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-21 17:18:51 / 修改时间：17:17:14" itemprop="dateCreated datePublished" datetime="2021-02-21T17:18:51+08:00">2021-02-21</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[TOC]</p>
+<h1 id="cgroups学习笔记"><a href="#cgroups学习笔记" class="headerlink" title="cgroups学习笔记"></a>cgroups学习笔记</h1><h2 id="一、名词解释"><a href="#一、名词解释" class="headerlink" title="一、名词解释"></a>一、名词解释</h2><ul>
+<li>hierarchy 类似文件书树的树形结构，树上的节点表示cgroup，hierarchy与一个或多个subsystem，即资源控制器关联，子节点的资源不能超过父节点的资源限制</li>
+<li>cgroup 树形结构上的节点，表示共享资源限制的一组task</li>
+<li>task cgroup中的进程</li>
+<li>subsystem 资源控制器，控制不同系统硬件资源<ul>
+<li>blkio 限制对磁盘，固态硬盘，usb等存储设备的访问速率</li>
+<li>cpu 限制cpu时间片占比</li>
+<li>cpuacct 生成cgroup中进程（task）的cpu资源使用情况</li>
+<li>cpuset 将独立的cpu和内存结点分配给cgroup</li>
+<li>devices 控制cgroup对设备的访问权限</li>
+<li>freezer 挂起或恢复cgroup中进程</li>
+<li>memory 限制cgroup的内存使用限制并生成使用情况报告</li>
+<li>net_cls 给网络包打赏标签classid，用于区分不同cgroup的网络包</li>
+<li>net_prio 动态设置网络流量的优先级</li>
+<li>ns namespace subsystem，后续单独讲到</li>
+<li>perf_event 识别task所属的cgroup，并用于性能分析</li>
+</ul>
+</li>
+</ul>
+<h2 id="二、hierarchy、cgroup、subsystem、task的规则"><a href="#二、hierarchy、cgroup、subsystem、task的规则" class="headerlink" title="二、hierarchy、cgroup、subsystem、task的规则"></a>二、hierarchy、cgroup、subsystem、task的规则</h2><table>
+<thead>
+<tr>
+<th>规则</th>
+<th>示意图</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同一个hierarchy可以关联多个subsystem</td>
+<td><img src="/2021/02/21/cgroups/RMG-rule1.png" alt="Rule 1" style="zoom:50%;"></td>
+</tr>
+<tr>
+<td>一个subsystem不能同时关联到两个hierarchy上，前提是其中任意一个已经关联了一个subsystem</td>
+<td><img src="/2021/02/21/cgroups/RMG-rule2.png" alt="Rule 2—The numbered bullets represent a time sequence in which the subsystems are attached." style="zoom:50%;"></td>
+</tr>
+<tr>
+<td>一个task可以同时是两个hierarchy中的cgroup的成员，但不能同时是同一个hierarchy中两个cgroup的成员</td>
+<td><img src="/2021/02/21/cgroups/RMG-rule3.png" alt="Rule 3" style="zoom:50%;"></td>
+</tr>
+<tr>
+<td>进程fork出的子进程继承原进程的cgroup设置，fork完成后可独立修改</td>
+<td><img src="/2021/02/21/cgroups/RMG-rule4.png" alt="Rule 4—The numbered bullets represent a time sequence in which the task forks." style="zoom:50%;"></td>
+</tr>
+</tbody></table>
+<p>上述规则带来的结果：</p>
+<ul>
+<li>由于一个task在一个hierarchy内只能属于一个cgroup，也就意味着这个hierarchy关联的资源控制器对于这个task只有一种限制方式</li>
+<li>可以将多个subsystem组合在一起对一个hierarchy起作用</li>
+<li>可以将一个hierarchy关联的多个subsystem拆分出去并关联其他的hierarchy，类似的也可以进行合并</li>
+<li>可以对一个task在所有subsystem管理的资源上进行指定的配置</li>
+</ul>
+<h2 id="三、cgroups的使用"><a href="#三、cgroups的使用" class="headerlink" title="三、cgroups的使用"></a>三、cgroups的使用</h2><p>通过安装libcgroup可以方便的配置cgroups。cgconfig服务利用/etc/cgconfig.conf配置文件和/etc/cgconfig.d/文件夹中的配置文件控制hierarchy的创建，subsystem的关联，cgroup的创建。<br>hierarchy的挂载示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mount &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">	cpuset	&#x3D; &#x2F;cgroup&#x2F;cpuset;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">	cpu	&#x3D; &#x2F;cgroup&#x2F;cpu;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	cpuacct	&#x3D; &#x2F;cgroup&#x2F;cpuacct;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	memory	&#x3D; &#x2F;cgroup&#x2F;memory;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	devices	&#x3D; &#x2F;cgroup&#x2F;devices;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	freezer	&#x3D; &#x2F;cgroup&#x2F;freezer;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	net_cls	&#x3D; &#x2F;cgroup&#x2F;net_cls;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	blkio	&#x3D; &#x2F;cgroup&#x2F;blkio;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+<p>cgroup创建的示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">group daemons &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">     cpuset &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">         cpuset.mems &#x3D; 0;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">         cpuset.cpus &#x3D; 0;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">     &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">group daemons&#x2F;sql &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">     perm &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">         task &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">             uid &#x3D; root;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">             gid &#x3D; sqladmin;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">         &#125; admin &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">             uid &#x3D; root;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">             gid &#x3D; root;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">         &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">     &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">     cpuset &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">         cpuset.mems &#x3D; 0;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">         cpuset.cpus &#x3D; 0;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">     &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>lssubsys命令可以列出所有subsystem以及其目前关联的hierarchy。</p>
+<p>使用mount命令控制subsystem与hierarchy的关联，包括新增，删除等。</p>
+<p>使用unmount可以删掉hierarchy，使用cgclear可以在hierarchy仍然有cgroup的情况下将其删除。</p>
+<p>其他命令不再赘述，可参考参考资料。</p>
+<h2 id="四、subsystem调参"><a href="#四、subsystem调参" class="headerlink" title="四、subsystem调参"></a>四、subsystem调参</h2><p>由于subsystem数量较多，下面主要写一下cpu和memory这两个。</p>
+<h3 id="4-1-cpu"><a href="#4-1-cpu" class="headerlink" title="4.1 cpu"></a>4.1 cpu</h3><p>假设现有一个叫/cgroup/cpu的hierarchy，关联了cpu subsyatem。</p>
+<p>限制一个cgroup使用25%cpu，另一个cgroup使用75%cpu，示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# echo 250 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;blue&#x2F;cpu.shares</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">~]# echo 750 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;red&#x2F;cpu.shares</span></pre></td></tr></table></figure>
+
+<p>限制一个cgroup使用整个cpu示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# echo 10000 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;red&#x2F;cpu.cfs_quota_us</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">~]# echo 10000 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;red&#x2F;cpu.cfs_period_us</span></pre></td></tr></table></figure>
+
+<p>限制一个cgroup使用单个cpu的10%示例如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# echo 10000 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;red&#x2F;cpu.cfs_quota_us</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">~]# echo 100000 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;red&#x2F;cpu.cfs_period_us</span></pre></td></tr></table></figure>
+
+<p>在多核机器上允许一个cgroup使用两个cpu示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# echo 200000 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;red&#x2F;cpu.cfs_quota_us</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">~]# echo 100000 &gt; &#x2F;cgroup&#x2F;cpu&#x2F;red&#x2F;cpu.cfs_period_us</span></pre></td></tr></table></figure>
+
+<h3 id="4-2-memory"><a href="#4-2-memory" class="headerlink" title="4.2 memory"></a>4.2 memory</h3><p>下面的示例展示在一个限制了memory使用上限的cgroup中的进程如何被oom killer杀死并发送通知的。</p>
+<ol>
+<li><p>创建一个cgroup并关联memory subsystem</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# mount -t cgroup -o memory memory &#x2F;cgroup&#x2F;memory</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">~]# mkdir &#x2F;cgroup&#x2F;memory&#x2F;blue</span></pre></td></tr></table></figure>
+</li>
+<li><p>设置cgroup中的进程使用内存的上线为100m</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# echo 104857600 &gt; memory.limit_in_bytes</span></pre></td></tr></table></figure>
+</li>
+<li><p>进入cgroup目录确认oom killer已开启</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# cd &#x2F;cgroup&#x2F;memory&#x2F;blue</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">blue]# cat memory.oom_control</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">oom_kill_disable 0</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">under_oom 0</span></pre></td></tr></table></figure>
+</li>
+<li><p>将当前shell进程移动至cgroup中的tasks文件中，这样在这个shell中启动的程序就自动加入了这个cgroup</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">blue]# echo $$ &gt; tasks</span></pre></td></tr></table></figure>
+</li>
+<li><p>启动一个测试程序，测试程序尝试分配大量内存超出限制。一旦达到cgroup的内存上线就会被oom killer杀死。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">blue]# ~&#x2F;mem-hog</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Killed</span></pre></td></tr></table></figure>
+
+<p>测试程序如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> KB (1024)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MB (1024 * KB)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GB (1024 * MB)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">char</span> *p;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">again:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">while</span> ((p = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(GB)))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">		<span class="built_in">memset</span>(p, <span class="number">0</span>, GB);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">while</span> ((p = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(MB)))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">		<span class="built_in">memset</span>(p, <span class="number">0</span>, MB);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">while</span> ((p = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(KB)))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">		<span class="built_in">memset</span>(p, <span class="number">0</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">				KB);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">	sleep(<span class="number">1</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">goto</span> again;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+</li>
+<li><p>关闭oom killer，然后再启动测试程序，测试程序用完内存后会一直暂停，直到有新的可用内存出现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">blue]# echo 1 &gt; memory.oom_control</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">blue]# ~&#x2F;mem-hog</span></pre></td></tr></table></figure>
+</li>
+<li><p>尽管测试程序没有被杀死，但cgroup的under_oom状态已经表明达到了内存上限。重新启动oom killer会将测试进程立刻杀死</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]# cat &#x2F;cgroup&#x2F;memory&#x2F;blue&#x2F;memory.oom_control</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">oom_kill_disable 1</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">under_oom 1</span></pre></td></tr></table></figure>
+</li>
+<li><p>为了获得oom的通知，创建一个接收通知的程序oom_notification </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/eventfd.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">die</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *msg)</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">	<span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"error: %s: %s(%d)\n"</span>, msg, strerror(errno), errno);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">	<span class="built_in">exit</span>(EXIT_FAILURE);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">usage</span><span class="params">(<span class="keyword">void</span>)</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">	<span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"usage: oom_eventfd_test &lt;cgroup.event_control&gt; &lt;memory.oom_control&gt;\n"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">	<span class="built_in">exit</span>(EXIT_FAILURE);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFSIZE 256</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">char</span> buf[BUFSIZE];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">int</span> efd, cfd, ofd, rb, wb;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">uint64_t</span> u;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (argc != <span class="number">3</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">		usage();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> ((efd = eventfd(<span class="number">0</span>, <span class="number">0</span>)) == <span class="number">-1</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">		die(<span class="string">"eventfd"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> ((cfd = <span class="built_in">open</span>(argv[<span class="number">1</span>], O_WRONLY)) == <span class="number">-1</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">		die(<span class="string">"cgroup.event_control"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">39</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> ((ofd = <span class="built_in">open</span>(argv[<span class="number">2</span>], O_RDONLY)) == <span class="number">-1</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">40</span></pre></td><td class="code"><pre><span class="line">		die(<span class="string">"memory.oom_control"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">41</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">42</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> ((wb = <span class="built_in">snprintf</span>(buf, BUFSIZE, <span class="string">"%d %d"</span>, efd, ofd)) &gt;= BUFSIZE)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">43</span></pre></td><td class="code"><pre><span class="line">		die(<span class="string">"buffer too small"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">44</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">45</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (<span class="built_in">write</span>(cfd, buf, wb) == <span class="number">-1</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">46</span></pre></td><td class="code"><pre><span class="line">		die(<span class="string">"write cgroup.event_control"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">47</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">48</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (<span class="built_in">close</span>(cfd) == <span class="number">-1</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">49</span></pre></td><td class="code"><pre><span class="line">		die(<span class="string">"close cgroup.event_control"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">50</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">51</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">for</span> (;;) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">52</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">if</span> (<span class="built_in">read</span>(efd, &amp;u, <span class="keyword">sizeof</span>(<span class="keyword">uint64_t</span>)) != <span class="keyword">sizeof</span>(<span class="keyword">uint64_t</span>))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">53</span></pre></td><td class="code"><pre><span class="line">			die(<span class="string">"read eventfd"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">54</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">55</span></pre></td><td class="code"><pre><span class="line">		<span class="built_in">printf</span>(<span class="string">"mem_cgroup oom event received\n"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">56</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">57</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">58</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">59</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+</li>
+<li><p>再另一个控制台运行接收通知的程序oom_notification ，再在另一个控制台运行测试程序，可以看到在oom_notification 程序的std output中展示字符串”mem_cgroup oom event received“</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">~]$ .&#x2F;oom_notification &#x2F;cgroup&#x2F;memory&#x2F;blue&#x2F;cgroup.event_control &#x2F;cgroup&#x2F;memory&#x2F;blue&#x2F;memory.oom_control</span></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">blue]# ~&#x2F;mem-hog</span></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="五、使用场景"><a href="#五、使用场景" class="headerlink" title="五、使用场景"></a>五、使用场景</h2><ul>
+<li>使用blkio subsyatem提升数据量io的优先级</li>
+<li>使用net_prio  subsystem修改网络流量的优先级</li>
+<li>给不同的用户组按比例分配cpu和内存</li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/index" target="_blank" rel="noopener">https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/index</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/2020/03/08/async_programming/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1596,7 +1770,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1622,7 +1796,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
