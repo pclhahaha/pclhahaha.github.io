@@ -471,34 +471,9 @@ else { int insertPos = -(idx + 1); }  // 没找到，取反减一得到应插入
 
 **实际场景：** MySQL 页内二分查找记录、Java `TreeMap.ceilingEntry()` / `floorEntry()`、Redis ZSet 的 `ZRANGEBYSCORE` 需要先二分找到起始位置再顺序遍历。
 
+
+> 📖 独立文章：[分治思想与外部归并排序](/external-merge-sort/)
 ### 8.3 递归与分治：MapReduce / GFS 的外排序
-
-**问题：** 要对 100GB 数据排序，但内存只有 4GB。怎么办？
-
-**解法：外部归并排序 (External Merge Sort)**——这就是 MapReduce 和 GFS 的排序基础：
-
-```
-外部归并排序 (100GB, 内存 4GB):
-Phase 1 (分片排序):
-  100GB → split → [4GB] [4GB] [4GB] ... [4GB]   (25 个分片)
-  每个 4GB 分片在内存中排序（快排/堆排）
-  输出 25 个有序小文件到磁盘
-
-Phase 2 (归并):
-  每个文件读一小块到输入 buffer (堆/败者树维护最小值)
-          ↓
-  K 路归并 → 输出最终有序大文件
-```
-
-**MapReduce 的 Shuffle 阶段**就是这个思路的分布式版本：Map 每个输出分区内排序，Reduce 拉取多个 Map 的分区数据做归并排序 (`merge sort`)。
-
-**分治思想在后端的更多体现：**
-- **数据库分库分表**：把数据按分片键拆分到多个库/表 → 查询方汇总合并
-- **聚合查询下推**：`COUNT(*)`/`SUM()` 先在各分片执行，结果汇总到协调者
-- **GFS 的 chunk 设计**：大文件被切分成 64MB chunks 分布式存储在 chunkserver 上
-
-> 更详细的 GFS 设计参见 [分布式系统](distributed.md)。
-
 
 实现可以用数组 + 指针循环移动，也可以用 Redis `ZSET`（score 为时间戳，`ZREMRANGEBYSCORE` 删除过期元素，`ZCARD` 获取窗口内计数）。Sentinel/Gateway 的限流模块广泛使用滑动窗口算法。
 
