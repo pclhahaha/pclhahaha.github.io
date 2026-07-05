@@ -516,25 +516,6 @@ public class Order {
 
 落地建议：不需教条画六边形，关键是做到 (1) 领域层零外部依赖 (2) 所有外部依赖通过接口倒置。做到这两点，换数据库/换 MQ/换 RPC 框架时领域代码一行不用改。
 
-### 4.4 CQRS (命令查询职责分离)
-
-读写分离——查询需求常需扁平化多表 JOIN，与聚合模型不一致。引入 CQRS 可解除这种矛盾：
-
-```java
-// 写模型——完整聚合
-@Service
-public class OrderWriteService {
-    public void submitOrder(SubmitOrderCommand cmd) { ... }
-}
-
-// 读模型——扁平化视图，可直查 ES/Redis/物化视图
-@Service
-public class OrderReadService {
-    public OrderDetailVO getOrderDetail(String orderId) {
-        return orderReadDao.selectDetail(orderId);  // 预 JOIN 好
-    }
-}
-```
 
 **事件溯源 (Event Sourcing)** 是 CQRS 进阶版：存储所有事件序列而非当前状态。适用于审计要求极高的金融场景，但复杂度高，不要轻易使用。
 

@@ -73,37 +73,6 @@ OSI 七层做减法，TCP/IP 四层做加法——前者先定义完整模型再
 
 ## 二、TCP 传输控制协议
 
-### 2.1 三次握手
-
-```
-客户端                             服务端
-   |-- SYN (seq=x) ---------------->|  SYN_SENT → SYN_RCVD
-   |<- SYN+ACK (seq=y, ack=x+1) ---|  SYN_RCVD → ESTABLISHED
-   |-- ACK (seq=x+1, ack=y+1) ---->|  ESTABLISHED
-```
-
-**为什么是三次，不是两次？**
-
-核心原因：**防止历史连接导致服务端资源浪费**（RFC 793）。假设两次握手：
-
-1. 客户端发送 SYN(seq=90)，网络延迟未到达
-2. 客户端超时重发 SYN(seq=100)，两次握手建立连接，数据传输完毕关闭
-3. 旧的 SYN(seq=90) 到达服务端，服务端直接进入 ESTABLISHED 分配资源，等待客户端发数据
-4. 客户端认为这不是合法连接，不理会，服务端资源白白浪费
-
-三次握手让客户端在最终 ACK 阶段有机会拒绝旧的连接请求。另外，三次握手恰好让双方都能确认对方的初始序列号(ISN)，两次握手只能确认一方的 ISN。
-
-**SYN Flood 攻击及防御**
-
-攻击者伪造大量不存在的源 IP 发送 SYN，服务端回复 SYN+ACK 后进入 SYN_RCVD 分配半连接资源。半连接队列被占满，正常用户 SYN 被丢弃。
-
-| 防御方式 | 原理 | 命令 |
-|----------|------|------|
-| SYN Cookie | 连接信息编码进 ISN，不预分配资源 | `sysctl -w net.ipv4.tcp_syncookies=1` |
-| 增大半连接队列 | 提高 backlog | `sysctl -w net.ipv4.tcp_max_syn_backlog=8192` |
-| 缩短重试 | 减少 SYN 重传次数 | `sysctl -w net.ipv4.tcp_syn_retries=3` |
-
-**全连接队列溢出**：当 accept() 速度跟不上新连接到达速度时，全连接队列溢出：
 
 ```bash
 netstat -s | grep -i "listen.*overflow"
@@ -502,59 +471,6 @@ Pinning 管理成本高(证书更换需客户端发版)。现代实践倾向 DNS
 
 ---
 
-## 六、DNS 域名系统
-
-### 6.1 迭代查询 vs 递归查询
-
-- **递归查询**：客户端→本地 DNS→根 DNS→.com NS→最终结果一层层回传。最简单但对递归 DNS 负担大
-- **迭代查询**：本地 DNS 逐个查询根→`.com` NS→权威 NS，组装结果后返回。运营商 DNS→权威 DNS 通常用迭代
-
-### 6.2 DNS 缓存层次
-
-| 缓存位置 | TTL 行为 | 说明 |
-|----------|----------|------|
-| 浏览器缓存 | 独立，~1min | Chrome: `chrome://net-internals/#dns` |
-| OS 缓存 | 遵从记录 TTL | `ipconfig /displaydns` |
-| 递归 DNS | 可能延长 TTL | 8.8.8.8, 114.114.114.114 |
-| 权威 DNS | 无缓存 | 直接返回查询结果 |
-
-注意：部分递归 DNS 会忽略过短的 TTL(TTL 延展)，也存在负缓存(NXDOMAIN 结果)。
-
-### 6.3 CDN 原理
-
-CDN 通过 DNS 将用户导向最近的边缘节点：
-
-```
-用户 → 递归 DNS → CDN 权威 DNS(智能 DNS)
-    → 根据来源 IP(地理位置/运营商/负载) 返回最近边缘节点 IP
-    → 用户访问边缘节点
-    → 未命中 → 回源 → 缓存
-```
-
-**后端关注**：
-- 缓存穿透：大量 CDN miss 直接打回源站，需做好限流降级
-- 缓存一致性：内容更新后需 Purge 或等 TTL 过期
-- 日志：源站通过 `X-Forwarded-For` / `X-Real-IP` 获取真实 IP
-
-### 6.4 DNS 优化
-
-1. **减少查询次数**：域名收敛、HTTP/2 多路复用
-2. **DNS Prefetch**：`<link rel="dns-prefetch" href="//api.example.com">`
-3. **HTTPDNS**：绕过运营商 DNS，直接向 HTTPDNS 服务商请求，避免劫持并获得准确调度
-4. **Anycast DNS**：多节点共享 IP，BGP 自动路由最近节点
-5. **长连接+连接池**：减少建连频率
-
-### 6.5 DNS 负载均衡
-
-DNS Round-Robin 返回多个 A 记录轮询排序，实现粗粒度负载均衡：
-
-```
-example.com. 300 IN A 192.168.1.1
-example.com. 300 IN A 192.168.1.2
-example.com. 300 IN A 192.168.1.3
-```
-
-局限：缓存导致不均匀、无故障剔除、无法感知实时负载。GSLB 结合健康检查+地理位置更智能，但后端内部仍依赖 L4/L7 负载均衡器。
 
 ---
 

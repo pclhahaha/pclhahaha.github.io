@@ -132,89 +132,8 @@ BlockingQueue的put和take方法会抛出一个InterruptedException，Thread.sle
 
 CountDownLatch基于AQS实现，CyclicBarrier基于ReentrantLock，而ReentrantLock基于AQS实现。AQS提供了一个基于队列的同步器框架，许多同步器可以基于AQS实现，AQS的原理在第五节详细展开描述。
 
-## 二、Java内存模型 (Java Memory Model)
 
-在可共享内存的多处理器架构中，存在CPU多级缓存与内存的缓存一致性问题，不同的架构由不同的缓存一致性协议，本质上是通过内存屏障来实现。另外还有指令重排序问题，指令重排序提升了性能，然而在多线程环境中如果无法确认代码的执行顺序，就无法确认代码的正确性。
-
-JMM(Java Memory Model)通过提供自己的存储模型，屏蔽了java虚拟机与底层硬件存储模型的差异化，在语言层面定义了**内存屏障**，用来屏蔽不同硬件存储模型的内存屏障的不同实现。
-
-### 1. 从硬件平台的存储模型到Java存储模型
-
-#### 1.1 缓存一致性问题 cache coherence
-
-![处理器Cache模型](/java/concurrency/d69cecab903313c776b50de1c43050bc31123.png)
-
-CPU一般有多级缓存，与主内存之间通过同步协议保证一致性，比较经典的是MESI协议，参考https://blog.csdn.net/muxiqingyang/article/details/6615199、https://www.cnblogs.com/yanlong300/p/8986041.html。
-
-#### 1.2 指令重排序
-
-指令重排序可能是编译器指令重排序（编译器级别）或CPU指令重排序（处理器级别，out-of-order execution），指令重排序可以使计算性能得到提升。
-即使指令没有重排序，由于CPU缓存的存在，缓存刷新至内存的时许不同也会导致重排序问题。
-
-#### 1.3 memory barrier 内存屏障
-
-内存屏障（Memory Barrier，或有时叫做内存栅栏，Memory Fence）是一种CPU指令，用于控制特定条件下的重排序和内存可见性问题。Java编译器也会根据内存屏障的规则禁止重排序。
-
-内存屏障可以被分为以下几种类型：
-
-- LoadLoad屏障：对于这样的语句Load1; LoadLoad; Load2，在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。
-- StoreStore屏障：对于这样的语句Store1; StoreStore; Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。
-- LoadStore屏障：对于这样的语句Load1; LoadStore; Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。
-- StoreLoad屏障：对于这样的语句Store1; StoreLoad; Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。它的开销是四种屏障中最大的。在大多数处理器的实现中，这个屏障是个万能屏障，兼具其它三种内存屏障的功能。
-
-![内存屏障示意表](/java/concurrency/bde75d1129494bf77b8b8b1ade546cd276768.png)
-
-
-以上关于指令重排序、内存屏障的描述参考了https://tech.meituan.com/2014/09/23/java-memory-reordering.html，希望深入的了解的可直接阅读原文。
-
-#### 1.4 Java存储模型的happens-before法则[^4]
-
-JMM为程序中的所有动作定义了一种happens-before关系，两个操作如果满足happens-before关系，则前者的结果一定对后者可见，保证了顺序性及可见性，而不满足happens-before关系的动作之间可以任意重排序。
-
-- 程序次序法则：同一线程中，代码中先出现的动作happens-before代码中后出现的动作，这只保证最终执行结果与顺序执行一致，并不能保证指令不重排序，只是结果上表现为happens-before。这个可以解释为，同一线程中前面的写操作对后面操作可见。
-- 监视器锁法则：对同一个监视器锁的解锁happens-before后续对该锁的加锁，显式锁同样适用。
-- volatile法则：对volatile修饰的域的写happens-before后续对其的读操作，原子变量同样适用。
-- 线程启动法则：一个线程内，对Thread.start的调用happens-before每一个被启动线程中的动作。
-- 线程终结法则：线程中的任何动作happens-before其他线程监测到这个线程已经终结，或者从Thread.join调用中成功返回，或者Thread.isAlive返回false
-- 中断法则：一个线程调用另一个线程的interrupt happens-before被中断的线程发现中断
-- 终结法则：一个对象的构造函数的结束happens-before这个对象的finalizer的开始
-- 传递性：如果A happens-before B，且B happens-before C，则A happens-before C
-
-基于happens-before可以推断出多线程情况下代码的执行顺序，当然如果正确没有使用相应的同步机制，大部分操作是无法推断的😣。
-
-#### 1.5 volatile、synchorized、final[^3]
-
-- volatile关键字：volatile关键字可以保证直接从主存中读取一个变量，如果这个变量被修改后，总是会被写回到主存中去。普通变量与volatile变量的区别是：volatile的特殊规则保证了新值能立即同步到主内存，以及每个线程在每次使用volatile变量前都立即从主内存刷新。因此我们可以说volatile保证了多线程操作时变量的可见性，而普通变量则不能保证这一点。
-- synchorized关键字：同步块的可见性是由以下机制保证的：
-  "如果对一个变量执行lock操作，将会清空工作内存中变量的值，在执行引擎使用这个变量前需要重新执行load或assign操作初始化变量的值"
-  "对一个变量执行unlock操作之前，必须先把此变量的值同步到主内存中（执行store和write操作）
-- final关键字：final关键字的可见性是指，被final修饰的字段在构造器中一旦被初始化完成，并且构造器没有把"this"的引用传递出去（this引用逃逸是一件很危险的事情，其他线程有可能通过这个引用访问到"初始化了一半"的对象），那么在其他线程就能看见final字段的值（无须同步）
-
-
-### 2. CPU缓存的伪共享问题
-
-CPU缓存的最小单位是缓存行 (Cache Line) ，一个缓存行的大小通常是 64 字节（取决于 CPU），它有效地引用主内存中的一块地址。一个 Java 的 long 类型是 8 字节，因此在一个缓存行中可以存 8 个 long 类型的变量。
-
-假设两个线程A和B运行在两个CPU上，每个CPU都有一个缓存行中存放了两个volatile long类型的变量X和Y，A更新X后，由于X是volatile的，B所在CPU的缓存行就失效了，需要重新加载，即使B想要更新的是Y，两者逻辑上不存在竞争关系，但在缓存行这个层次上发生了冲突。这是一个伪共享问题的典型场景。
-
-上述场景中，假如A和B交替执行，那么伪共享问题一直发生，对性能影响会很大。
-
-#### 2.1 @sun.misc.Contended注解
-
-在Java 7之前，可以在属性的前后进行padding来避免伪共享问题。
-
-在Java 8中，提供了@sun.misc.Contended注解来避免伪共享，原理是在使用此注解的对象或字段的前后各增加128字节大小的padding，使用2倍于大多数硬件缓存行的大小来避免相邻扇区预取导致的伪共享冲突。
-
-
-
-以上关于伪共享问题的内容参考了https://www.jianshu.com/p/c3c108c3dcfd。
-
-### 3. 重新理解对象的安全发布与初始化安全性
-
-在了解了JMM之后，可以回顾一下之前提到的对象的安全发布以及初始化安全性。
-
-理解对象安全发布的一个很好的例子就是懒汉单例模式（当然现在已经不推荐使用懒汉单例模式了，它复杂且节约的性能有限），理解为何instance变量必须被volatile修饰才能保证安全。推荐思考一下。
-
+> 📖 独立文章：[JMM (Java Memory Model)](/java-memory-model/)
 
 ## 三、原子变量类
 
@@ -351,84 +270,6 @@ class BoundedBuffer {
 
 参考文献【1】[^1]做了非常好的总结，推荐直接阅读该文章。 
 
-## 五、AQS(AbstractQueuedSynchronizer)原理及应用
-### 1. AQS原理
-<img src="/java/concurrency/aqsuml.png" alt="aqs" style="zoom: 50%;" />
-
-上面在讲ReentrantLock等的过程中说到它是基于AQS实现的。AQS提供了一个框架，该框架可用于实现基于FIFO队列的阻塞锁或相关同步器(semaphores, events, etc)。由于只是提供了一个框架，其子类需要提供具体实现，一般来说子类应该被定义为non-public的内部辅助类（例如ReentrantLock类内部的Sync类，如上面类图所示），用于实现其外部类的同步性质。AQS框架支持独占模式和共享模式，供具体实现来选择。下面列出其子类需要具体实现的方法列表。
-
-| 需要子类实现的方法 | 作用                    |
-| ------------------ | ----------------------- |
-| tryAcquire         | 尝试在互斥模式下acquire |
-| tryRelease         | 尝试在互斥模式下release |
-| tryAcquireShared   | 尝试在共享模式下acquire |
-| tryReleaseShared   | 尝试在共享模式下acquire |
-| isHeldExclusively  | 判断是否被当前线程独占  |
-
-子类通过实现上面这些方法决定了同步器在获取同步时的行为。
-
-下面来解释一下AQS的运行机制。
-
-#### 1.1 Node类
-从上面的类图可以看到AQS类内部有一个Node类，该类用于实现一个双向链表，表示等待获取的线程队列，该类有5个成员变量
-| 变量               | 含义                   |
-| ----------------- | ----------------------- |
-| waitStatus        | 该节点的状态：CANCELLED(acquire取消，在锁的场景下可以理解为取消加锁), SIGNAL(等待唤醒), CONDITION(等待一个condition的唤醒), PROPAGATE(共享模式下), 0(初始状态) |
-| thread            | 该等待节点对应的线程 |
-| prev  | 等待队列的前一个节点 |
-| next  | 等待队列的后一个节点 |
-| nextWaiter | 若该节点在等待一个condition，则nextWaiter指向等待该condition的下一个节点 |
-
-#### 1.2 ConditionObject类
-ConditionObject类实现了Condition接口，Condition一般是配合Lock使用，这里ConditionObject用于配合AQS实现类似的效果，例如，可以创建多个ConditionObject类表示不同的条件，满足某一个条件则唤醒该ConditionObject对应的等待队列中的节点，并将其加入AQS的等待队列，去尝试获取锁。
-
-| 变量  | 含义                    |
-| ----------------- | ----------------------- |
-| firstWaiter        | 该ConditionObject的等待队列的头节点 |
-| nextWaiter        | 该ConditionObject的等待队列的尾节点 |
-
-#### 1.3 AQS类
-
-有3个成员变量
-
-| 变量 | 含义                    |
-| ---------------- | ----------------------- |
-| state            | 保存状态的变量，在锁的场景下可以是锁的状态，如0表示未加锁，1表示加锁；或者可重入锁的情况下保存锁重入的次数，0表示未加锁，3表示已加锁并重入了3次 |
-| head             | 等待获取锁的队列的头节点 |
-| tail             | 等待获取锁的队列的尾节点 |
-
-
-通过上面对3个类以及AQS源码的分析，我们可以得出AQS的运行时数据结构，当尝试获取锁时，将对应线程加入等待队列，释放锁时，将其移出队列。若要支持Condition，则可以利用ConditionObject，ConditionObject实现了条件队列。
-
-<img src="/java/concurrency/aqs.png" alt="aqs" style="zoom: 50%;" />
-
-
-
-#### 1.4 基于AQS实现的锁及其他同步器
-
-基于AQS实现的锁及其他同步器如下：
-
-| 使用了AQS的同步器实现  | 使用场景                               |
-| ---------------------- | -------------------------------------- |
-| ReentrantLock          | 可重入锁，类似synchronized             |
-| ReentrantReadWriteLock | 读写锁，适用于需要加锁的读多写少的场景 |
-| Semaphore              | 信号量，用于控制并发量                 |
-| CountdownLatch         | 闭锁，让线程等待其他线程的完成         |
-
-### 2. ReentrantLock
-
-ReentrantLock的特性如下：
-
-- 可重入：同一个线程最大重入次数2147483647
-
-- 支持公平锁与非公平锁：公平锁是指线程获取锁时要先判断当前排队的线程队列是否为空，为空则直接通过CAS机制尝试获取锁，不为空则排队；非公平锁是指线程获取锁时先尝试获取锁，失败则再次尝试获取锁（自旋），再次失败则进入排队队列，进入排队队列后，所有线程都排队，死循环至获取锁成功或中断。
-
-ReentrantLock是利用AQS实现的，具体的分析可以查看美团技术团队的这篇文章
-
-https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html[^2]
-
-非常详细，示意图清晰。
-
 
 ## 六、多线程框架
 ### 1. Executor框架(JAVA 5)
@@ -534,53 +375,6 @@ CompletionService整合了Executor和BlockingQueue的功能，ExecutorCompletion
 
   参见文章《Object.finalize()方法与Finalizer类浅析》，推荐的操作是：不要使用Finalier
 
-### 2. Fork/Join框架 (JAVA 7)
-
-Java 7 引入了 Fork/Join 框架，通过 RecursiveTask 和 RecursiveAction 这两个类可以方便地实现 Fork/Join 模式：
-
-- **RecursiveTask**：用于有返回值的计算任务，继承自 ForkJoinTask，需要实现 `compute()` 方法并返回结果
-- **RecursiveAction**：用于无返回值的计算任务，同样继承自 ForkJoinTask，需要实现 `compute()` 方法，无返回值
-
-Fork/Join 框架的异常处理：任务在执行过程中如果抛出异常，可以通过 ForkJoinTask 的 `get()` 方法获取到（`get()` 会将异常包装为 ExecutionException 抛出），也可以通过 `isCompletedAbnormally()` 和 `getException()` 方法来检查。
-
-使用 Fork/Join 框架时需要特别注意任务切分的方式。JDK 用来执行 Fork/Join 任务的工作线程池大小默认等于 CPU 核心数，在一个 4 核 CPU 上，最多可以同时执行 4 个子任务。但是如果切分不当，执行时间可能会超出预期。
-
-这是因为执行 `compute()` 方法的线程本身也是一个 Worker 线程，当对两个子任务分别调用 `fork()` 时，这个 Worker 线程会把两个子任务都分派给其他 Worker，而自己则停下来等待结果——白白浪费了 Fork/Join 线程池中的一个 Worker 线程。这导致原本 4 个子任务至少需要 7 个线程才能并发执行，反而增加了额外开销。
-
-正确的做法是使用 `invokeAll()` 方法：查看 JDK 的 `invokeAll()` 方法源码可以发现，对于 N 个任务，其中 N-1 个任务会使用 `fork()` 交给其他线程异步执行，而 `invokeAll()` 会保留一个任务由当前线程直接调用 `compute()` 同步执行。这样充分利用了线程池，确保没有空闲的线程。
-
-#### 2.1 ForkJoinPool
-
-ForkJoinPool 是专门为运行 ForkJoinTask 任务而实现的 ExecutorService，同样提供了管理和监控功能。与一般的 ExecutorService（如 ThreadPoolExecutor）相比，ForkJoinPool 的核心区别在于采用了 **work-stealing（工作窃取）** 算法，这正是它能够高效执行 Fork/Join 类型任务的关键所在。
-
-##### 2.1.1 ForkJoinWorkerThreadFactory
-
-ForkJoinWorkerThreadFactory 是 ForkJoinPool 的静态成员内部接口，用于为指定的 ForkJoinPool 创建 ForkJoinWorkerThread 工作线程。默认实现是 DefaultForkJoinWorkerThreadFactory，一般情况下直接使用默认实现即可。
-
-##### 2.1.2 work-stealing 工作窃取算法
-
-工作窃取算法的核心思想是：池中的每个工作线程都拥有一个双端队列（WorkQueue），用于存放待执行的任务。当线程完成自身队列中的所有任务后，会尝试从其他繁忙线程的队列尾部"窃取"任务来执行，而不是空闲等待。
-
-具体来说：
-
-- 每个 Worker 线程维护一个双端队列，新任务添加到队列头部
-- Worker 线程从自身队列头部取出任务执行（LIFO，后进先出），这样有利于局部性和缓存命中
-- 当 Worker 线程的队列为空时，它会随机选择一个其他 Worker 的队列，从队列的**尾部**窃取任务（FIFO，先进先出）
-- 被窃取的通常是较大的、拆分较早的任务，这有助于保持工作负载的均衡
-
-这种"自己从头取、别人从尾偷"的双端队列设计，最大程度地减少了窃取线程与被窃取线程之间的竞争，因为两者操作的是双端队列的不同端。
-
-对应于第一节 3.4 中提到的双端队列概念，Fork/Join 框架正是工作窃取算法最经典的应用场景。
-
-##### 2.1.3 ForkJoinWorkerThread
-
-ForkJoinWorkerThread 是由 ForkJoinWorkerThreadFactory 创建的线程，每个线程都绑定到 ForkJoinPool 中的一个 WorkQueue。线程在运行时会不断地从自己的队列或者通过工作窃取从其他队列获取并执行 ForkJoinTask。
-
-##### 2.1.4 WorkQueue
-
-WorkQueue 是 ForkJoinPool 内部的双端队列实现，用于存放 ForkJoinTask。Pool 中所有线程都会尝试从各自队列或其他队列中寻找并执行任务，当找不到任何可执行的任务时，线程会阻塞等待新的任务到来。
-
-##### 2.1.5 ForkJoinTask
 
 ForkJoinTask 是 Fork/Join 框架中任务的抽象基类，RecursiveTask 和 RecursiveAction 均继承自它。ForkJoinTask 提供了 `fork()` 方法用于异步执行任务（将任务放入当前线程的 WorkQueue 中排队），以及 `join()` 方法用于等待任务执行完成并获取结果。
 
