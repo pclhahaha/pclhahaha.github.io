@@ -39,12 +39,21 @@ type: index
   <h1>后端知识图谱</h1>
   <p>全栈后端工程师知识体系 · 持续更新</p>
   <div class="kg-stats">
-    <div class="kg-stat"><div class="kg-stat-num">126</div><div class="kg-stat-label">篇文章</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">130</div><div class="kg-stat-label">篇文章</div></div>
     <div class="kg-stat"><div class="kg-stat-num">13</div><div class="kg-stat-label">分类</div></div>
     <div class="kg-stat"><div class="kg-stat-num">300+</div><div class="kg-stat-label">标签</div></div>
   </div>
 </div>
 
+
+
+<div class="kg-section">
+  <div class="kg-section-title"><span class="emoji">🗺️</span>学习导航</div>
+  <div class="kg-links">
+    <a class="kg-link" href="/learning-roadmap/">后端学习路线</a>
+    <a class="kg-link" href="/java-interview/">面试 FAQ</a>
+  </div>
+</div>
 
 <div class="kg-section">
   <div class="kg-section-title"><span class="emoji">🔬</span>CS 基础</div>
@@ -292,6 +301,9 @@ type: index
       <a class="kg-link" href="/notification-system-design/">通知系统</a>
       <a class="kg-link" href="/web-crawler-design/">分布式爬虫</a>
       <a class="kg-link" href="/architecture-evolution/">架构风格演进</a>
+      <a class="kg-link" href="/cache-strategy/">缓存策略总论</a>
+      <a class="kg-link" href="/rest-api-design/">REST API 设计规范</a>
+      <a class="kg-link" href="/testing-system/">后端测试体系</a>
       <a class="kg-link" href="/system-design/">📖 系统设计方法论（全文）</a>
     </div>
   </div>
