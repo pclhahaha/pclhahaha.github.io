@@ -11,7 +11,7 @@ categories:
   - 可观测性
 ---
 
-### 4.1 核心概念
+### 1.1 核心概念
 
 ```
 Trace Id: a1b2c3d4e5f67890
@@ -27,7 +27,7 @@ Trace Id: a1b2c3d4e5f67890
 - **SpanContext**：跨进程传递上下文（TraceId + SpanId + Baggage）
 - **上下文传播**：通过 HTTP Header `traceparent` 或 gRPC Metadata 传递
 
-### 4.2 OpenTelemetry 标准
+### 1.2 OpenTelemetry 标准
 
 OTel 统一了 OpenTracing + OpenCensus，成为可观测性**采集标准**：
 
@@ -63,7 +63,7 @@ java -javaagent:opentelemetry-javaagent.jar \
      -jar order-service.jar
 ```
 
-### 4.3 Jaeger 架构
+### 1.3 Jaeger 架构
 
 ```
 Service A/B/C + Jaeger Client
@@ -90,7 +90,7 @@ Service A/B/C + Jaeger Client
 | Cassandra | 超大流量 | 线性扩展，运维复杂 |
 | ClickHouse | 新选择 | 列存高压缩，OLAP 分析快 |
 
-### 4.4 SkyWalking
+### 1.4 SkyWalking
 
 国人开源 APM，Java Agent 自动埋点极强，几乎零代码侵入。
 
@@ -115,7 +115,7 @@ public void processOrder(Order order) {
 }
 ```
 
-### 4.5 Spring Cloud Sleuth + Zipkin
+### 1.5 Spring Cloud Sleuth + Zipkin
 
 ```yaml
 spring:
@@ -139,7 +139,7 @@ Sleuth 自动将 `traceId` 和 `spanId` 注入 MDC，日志输出：
 [inventory-service,a1b2c3d4e5f67890,1234567890abcdef] INFO - stock deducted
 ```
 
-### 4.6 采样策略
+### 1.6 采样策略
 
 全量追踪成本极高。生产推荐混合策略：
 ```

@@ -12,7 +12,7 @@ categories:
   - 微服务
 ---
 
-### 7.1 限流
+### 1.1 限流
 
 > 限流的令牌桶/漏桶/滑动窗口等算法详见 [分布式系统理论基础](distributed-theory.md) 的"流量控制"章节。
 
@@ -34,7 +34,7 @@ public Order createOrderFallback(CreateOrderRequest request, BlockException e) {
 }
 ```
 
-### 7.2 熔断（Circuit Breaker）
+### 1.2 熔断（Circuit Breaker）
 
 熔断器的灵感来自电路保险丝：当电流过大时自动断开，保护电路。在微服务中同理——当某个下游服务故障率达到阈值，熔断器断开，后续请求直接失败（快速失败），不继续压垮它。
 
@@ -70,7 +70,7 @@ HystrixCommand.Setter
 - 不要对**所有异常**都触发熔断计数——业务异常（如"商品已下架"）不是下游故障，不应参与熔断统计
 - 熔断颗粒度：一般以服务为单位，细粒度的可以到方法级别
 
-### 7.3 降级（Fallback）
+### 1.3 降级（Fallback）
 
 降级是熔断/限流被触发后的兜底逻辑。当系统判定当前不可靠时，宁可返回一个降级结果，也不让上游超时等待。
 
@@ -95,7 +95,7 @@ public User getUserFallback(Long id) {
 }
 ```
 
-### 7.4 Sentinel
+### 1.4 Sentinel
 
 Sentinel（阿里开源）是取代 Hystrix 的更好选择，Hystrix 已进入维护模式。Sentinel 的核心能力：
 
@@ -148,7 +148,7 @@ spring:
             rule-type: flow
 ```
 
-### 7.5 隔离
+### 1.5 隔离
 
 隔离是防止"服务内一个接口的异常拖整个服务"的关键。
 

@@ -12,7 +12,7 @@ categories:
   - 集合
 ---
 
-### 3.1 JDK 7: Segment 分段锁
+### 1.1 JDK 7: Segment 分段锁
 
 ```
 ConcurrentHashMap
@@ -37,7 +37,7 @@ public V put(K key, V value) {
 
 **缺陷**: Segment 数量固定, 粒度有限; 跨 Segment 操作需全锁。
 
-### 3.2 JDK 8: CAS + synchronized — 为什么重构?
+### 1.2 JDK 8: CAS + synchronized — 为什么重构?
 
 | 维度 | JDK 7 | JDK 8 |
 |------|-------|-------|
@@ -53,7 +53,7 @@ public V put(K key, V value) {
 2. 锁粒度缩小到桶级后, 如果用 ReentrantLock, 最坏情况每个桶一个 AQS 队列, 内存不可接受
 3. CAS 用于无锁插入空桶, synchronized 仅用于冲突时锁桶头, 两种机制互补
 
-### 3.3 put 流程
+### 1.3 put 流程
 
 ```java
 final V putVal(K key, V value, boolean onlyIfAbsent) {
@@ -111,7 +111,7 @@ while ((tab = table) == null || tab.length == 0) {
 }
 ```
 
-### 3.4 多线程协同扩容 (transfer)
+### 1.4 多线程协同扩容 (transfer)
 
 JDK 8 最大亮点 — 多个写线程一起参与扩容:
 
@@ -147,7 +147,7 @@ if (U.compareAndSwapInt(this, TRANSFERINDEX, nextIndex,
 
 **线程退出机制**: 每个线程完成所分配区间后 CAS 递减 sizeCtl 中记录的参与线程数, 最后一个退出线程负责 `finishing` 收尾 (替换 table, 更新 sizeCtl)。
 
-### 3.5 CounterCell 计数方案
+### 1.5 CounterCell 计数方案
 
 基于 `Striped64` (LongAdder 模板):
 
@@ -165,7 +165,7 @@ private transient volatile CounterCell[] counterCells;
 
 `size()` 返回的是**近似快照**, 非精确值 — 统计期间可能有并发修改。
 
-### 3.6 get 为什么不需要加锁?
+### 1.6 get 为什么不需要加锁?
 
 ```java
 public V get(Object key) {
@@ -186,7 +186,7 @@ public V get(Object key) {
 3. 扩容用尾插法, 已存在节点不被修改; `ForwardingNode.find()` 去 `nextTable` 查找
 4. 迭代器是**弱一致性** (weakly consistent), 不抛 `ConcurrentModificationException`
 
-### 3.7 线程安全 Map 对比
+### 1.7 线程安全 Map 对比
 
 | 特性 | Hashtable | synchronizedMap | ConcurrentHashMap |
 |------|-----------|-----------------|-------------------|

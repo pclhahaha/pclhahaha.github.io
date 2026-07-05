@@ -10,7 +10,7 @@ categories:
   - 微服务
 ---
 
-### 5.1 网关的作用
+### 1.1 网关的作用
 
 网关是所有外部请求进入微服务体系的第一道关口，做的是"横切关注点"的抽象：
 
@@ -37,7 +37,7 @@ categories:
 
 网关的本质是把每个微服务都需要处理的基础设施逻辑上提到网关层，让业务开发关注"做什么"而不是"怎么做身份校验/限流/日志"。但注意：**网关不宜承载重业务逻辑**——它是流量入口，逻辑越重延迟越大，影响全站。
 
-### 5.2 Spring Cloud Gateway
+### 1.2 Spring Cloud Gateway
 
 Spring Cloud Gateway 基于 **WebFlux（Reactor + Netty）**，非阻塞 I/O，性能和资源利用率远超传统 Servlet 容器。
 
@@ -101,7 +101,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
 }
 ```
 
-### 5.3 Zuul 1.x vs Zuul 2.x vs Gateway
+### 1.3 Zuul 1.x vs Zuul 2.x vs Gateway
 
 | 维度       | Zuul 1.x              | Zuul 2.x                 | Spring Cloud Gateway |
 | ---------- | --------------------- | ------------------------ | -------------------- |

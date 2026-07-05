@@ -12,11 +12,11 @@ categories:
   - 分布式
 ---
 
-### 6.1 为什么需要分布式 ID
+### 1.1 为什么需要分布式 ID
 
 在单库系统中，数据库自增主键可以满足 ID 生成的唯一性需求。但分库分表后，多个数据库独立增长会导致 ID 冲突；而业务 ID 通常需要全局唯一、趋势递增（利于索引），因此需要专门的分布式 ID 生成方案。
 
-### 6.2 UUID
+### 1.2 UUID
 
 ```
 550e8400-e29b-41d4-a716-446655440000
@@ -30,7 +30,7 @@ categories:
 
 适用场景：非主键的唯一标识（如日志 traceId、临时 token）。
 
-### 6.3 数据库自增ID
+### 1.3 数据库自增ID
 
 通过独立的 ID 生成表（或号段表）获取全局自增 ID：
 
@@ -48,7 +48,7 @@ SELECT max_id FROM id_generator WHERE biz_tag = 'order';
 
 **问题**：DB 成为单点瓶颈。一次 DB 交互只能获取 `step` 个 ID，用完后再请求。
 
-### 6.4 号段模式（Leaf-segment）
+### 1.4 号段模式（Leaf-segment）
 
 美团 Leaf 的号段模式是对数据库方案的升级：
 
@@ -78,7 +78,7 @@ public class SegmentBuffer {
 
 优点：解决了 DB 的性能瓶颈，可实现 10w+ QPS；缺点：ID 不是严格全局自增（多实例各自消耗号段，时间线可能交错）。
 
-### 6.5 Snowflake（雪花算法）
+### 1.5 Snowflake（雪花算法）
 
 Twitter 开源的经典方案，ID 为 64 位长整型：
 
@@ -136,7 +136,7 @@ public synchronized long nextId() {
 }
 ```
 
-### 6.6 Redis 自增
+### 1.6 Redis 自增
 
 利用 Redis 单线程特性与 `INCR` / `INCRBY` 命令：
 
@@ -151,7 +151,7 @@ INCRBY order_id 10 → 返回 1011（预取号段）
 | 实现极简 | 非严格趋势递增（主从切换后可能回退） |
 | 可横向扩展（分段 key） | 需额外维护 Redis 集群 |
 
-### 6.7 各方案对比
+### 1.7 各方案对比
 
 | 方案 | 趋势递增 | 高可用 | 性能 | 依赖 | 适用场景 |
 |------|----------|--------|------|------|----------|
@@ -161,7 +161,7 @@ INCRBY order_id 10 → 返回 1011（预取号段）
 | Snowflake | 近似（时间序） | 高 | 极高 | 无（本地生成） | 通用高并发 |
 | Redis | 是 | 中 | 高 | Redis | 已有 Redis 的中小规模 |
 
-### 6.8 美团 Leaf 与百度 UidGenerator
+### 1.8 美团 Leaf 与百度 UidGenerator
 
 **美团 Leaf**：双模式架构——号段模式 + Snowflake 模式，通过 ZooKeeper 注册 workerId 并做心跳续约。
 
