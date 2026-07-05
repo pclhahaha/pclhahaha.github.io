@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Hive 是大数据 SQL 查询引擎的鼻祖，但今天它的角色已经从”查询引擎”转变为”元数据管理 + ETL 管道”。Presto&#x2F;Trino 则凭借内存计算能力接替了交互式查询的角色。 一、Hive 的核心概念123456用户 SQL → Hive Metastore (MySQL) → 获取表 Schema&#x2F;分区信息">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hive 与 Presto&#x2F;Trino 实战">
+<meta property="og:url" content="http://pclhahaha.github.io/hive-trino-guide/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Hive 是大数据 SQL 查询引擎的鼻祖，但今天它的角色已经从”查询引擎”转变为”元数据管理 + ETL 管道”。Presto&#x2F;Trino 则凭借内存计算能力接替了交互式查询的角色。 一、Hive 的核心概念123456用户 SQL → Hive Metastore (MySQL) → 获取表 Schema&#x2F;分区信息">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据工程">
+<meta property="article:tag" content="Hive">
+<meta property="article:tag" content="Presto">
+<meta property="article:tag" content="Trino">
+<meta property="article:tag" content="SQL">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/hive-trino-guide/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/hive-trino-guide/","path":"hive-trino-guide/","title":"Hive 与 Presto/Trino 实战"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Hive 与 Presto/Trino 实战 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81Hive-%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">一、Hive 的核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">表类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E7%AE%A1%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">分区管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Hive-on-S3-%E7%9A%84%E5%9D%91"><span class="nav-number">2.</span> <span class="nav-text">二、Hive on S3 的坑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4%E6%85%A2%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.1.</span> <span class="nav-text">小文件导致慢查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hive-Metastore-%E8%86%A8%E8%83%80"><span class="nav-number">2.2.</span> <span class="nav-text">Hive Metastore 膨胀</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81Presto-Trino%E2%80%94%E2%80%94%E4%BA%A4%E4%BA%92%E5%BC%8F%E6%9F%A5%E8%AF%A2%E5%BC%95%E6%93%8E"><span class="nav-number">3.</span> <span class="nav-text">三、Presto&#x2F;Trino——交互式查询引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E%E6%BC%94%E8%BF%9B"><span class="nav-number">4.</span> <span class="nav-text">四、执行引擎演进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">五、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/hive-trino-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Hive 与 Presto&#x2F;Trino 实战 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Hive 与 Presto/Trino 实战
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Hive 是大数据 SQL 查询引擎的鼻祖，但今天它的角色已经从”查询引擎”转变为”元数据管理 + ETL 管道”。Presto&#x2F;Trino 则凭借内存计算能力接替了交互式查询的角色。</p>
+<h2 id="一、Hive-的核心概念"><a href="#一、Hive-的核心概念" class="headerlink" title="一、Hive 的核心概念"></a>一、Hive 的核心概念</h2><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">用户 <span class="keyword">SQL</span> → Hive Metastore (MySQL) → 获取表 <span class="keyword">Schema</span>/分区信息</span><br><span class="line">                                       ↓</span><br><span class="line">                              Hive 执行引擎</span><br><span class="line">                              (MapReduce/Tez/Spark)</span><br><span class="line">                                       ↓</span><br><span class="line">                              HDFS / S3 上的数据文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="表类型"><a href="#表类型" class="headerlink" title="表类型"></a>表类型</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>数据位置</th>
+<th>删除表</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MANAGED TABLE</strong></td>
+<td>Hive 仓库目录</td>
+<td>数据也被删除</td>
+<td>临时表</td>
+</tr>
+<tr>
+<td><strong>EXTERNAL TABLE</strong></td>
+<td>外部路径（如 S3）</td>
+<td>只删元数据，数据保留</td>
+<td>数据湖标准做法</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- External table（数据湖推荐）</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> events (</span><br><span class="line">    event_id    <span class="type">BIGINT</span>,</span><br><span class="line">    user_id     <span class="type">BIGINT</span>,</span><br><span class="line">    event_type  STRING</span><br><span class="line">)</span><br><span class="line">PARTITIONED <span class="keyword">BY</span> (dt STRING)</span><br><span class="line">STORED <span class="keyword">AS</span> PARQUET</span><br><span class="line">LOCATION <span class="string">&#x27;s3://bucket/events/&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="分区管理"><a href="#分区管理" class="headerlink" title="分区管理"></a>分区管理</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 手动添加分区</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> events <span class="keyword">ADD</span> <span class="keyword">PARTITION</span> (dt<span class="operator">=</span><span class="string">&#x27;2026-07-01&#x27;</span>) </span><br><span class="line">LOCATION <span class="string">&#x27;s3://bucket/events/dt=2026-07-01/&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 自动恢复所有分区（元数据同步）</span></span><br><span class="line">MSCK REPAIR <span class="keyword">TABLE</span> events;</span><br></pre></td></tr></table></figure>
+
+<p>注意：<code>MSCK REPAIR</code> 在大量分区时会非常慢——它需要列出 S3 上的所有前缀。如果分区数超过几千个，应考虑直接使用 Iceberg 等表格式自管理分区的元数据，而非依赖 Hive Metastore 的分区机制。</p>
+<h2 id="二、Hive-on-S3-的坑"><a href="#二、Hive-on-S3-的坑" class="headerlink" title="二、Hive on S3 的坑"></a>二、Hive on S3 的坑</h2><h3 id="小文件导致慢查询"><a href="#小文件导致慢查询" class="headerlink" title="小文件导致慢查询"></a>小文件导致慢查询</h3><p>Hive 的 MapReduce 执行引擎默认为每个文件启动一个 Mapper。如果 S3 上有 10000 个小文件，就会启动 10000 个 Mapper——极度浪费且慢。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>ETL 输出时 <code>coalesce</code> 合并文件</li>
+<li>定期运行小文件合并任务</li>
+<li>使用 <code>hive.input.format=org.apache.hadoop.hive.ql.io.CombineHiveInputFormat</code>（自动在 Map 端合并小文件）</li>
+</ul>
+<h3 id="Hive-Metastore-膨胀"><a href="#Hive-Metastore-膨胀" class="headerlink" title="Hive Metastore 膨胀"></a>Hive Metastore 膨胀</h3><p>每个分区都在 MySQL Metastore 中占用一条记录。数百万分区 → Metastore 查询变慢。</p>
+<p><strong>解决方案</strong>：用 Iceberg&#x2F;Hudi 等表格式替代 Hive 原生分区管理。</p>
+<h2 id="三、Presto-Trino——交互式查询引擎"><a href="#三、Presto-Trino——交互式查询引擎" class="headerlink" title="三、Presto&#x2F;Trino——交互式查询引擎"></a>三、Presto&#x2F;Trino——交互式查询引擎</h2><p>Trino（前身 PrestoSQL）是一个分布式 SQL 查询引擎，与 Hive 的关键区别：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Hive</th>
+<th>Trino</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>执行模型</td>
+<td>MapReduce&#x2F;Tez（磁盘中间结果）</td>
+<td>纯内存管道（Pipeline）</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>分钟级</td>
+<td>秒级（交互式查询）</td>
+</tr>
+<tr>
+<td>容错</td>
+<td>支持重跑失败 Task</td>
+<td>查询失败需要重新提交</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>批处理 ETL</td>
+<td>BI 报表、Ad-hoc 查询</td>
+</tr>
+</tbody></table>
+<p>Trino 的核心理念是 <strong>“纯内存、无磁盘”的流水线执行</strong>——数据在内存中从一个算子流向另一个算子，中间结果不落盘。这带来了极快的响应速度，但代价是无法处理超大内存的数据集和单节点故障导致全查询重跑。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- Trino 查询（和 Hive SQL 几乎一样）</span></span><br><span class="line"><span class="keyword">SELECT</span> user_id, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> cnt</span><br><span class="line"><span class="keyword">FROM</span> hive.events</span><br><span class="line"><span class="keyword">WHERE</span> dt <span class="operator">&gt;=</span> <span class="string">&#x27;2026-07-01&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> user_id</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> cnt <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<p>Trino 可以连接多个数据源做联邦查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 关联 Hive 表（S3）和 PostgreSQL 表</span></span><br><span class="line"><span class="keyword">SELECT</span> h.user_id, p.user_name, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> cnt</span><br><span class="line"><span class="keyword">FROM</span> hive.events h</span><br><span class="line"><span class="keyword">JOIN</span> postgresql.public.users p <span class="keyword">ON</span> h.user_id <span class="operator">=</span> p.id</span><br><span class="line"><span class="keyword">WHERE</span> h.dt <span class="operator">=</span> <span class="string">&#x27;2026-07-05&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> h.user_id, p.user_name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、执行引擎演进"><a href="#四、执行引擎演进" class="headerlink" title="四、执行引擎演进"></a>四、执行引擎演进</h2><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Hive</span> <span class="literal">on</span> MapReduce（<span class="number">2012</span>）→ Hive <span class="literal">on</span> Tez（<span class="number">2015</span>）→ Hive <span class="literal">on</span> Spark（<span class="number">2016</span>）→ </span><br><span class="line"><span class="attribute">Presto</span>/Trino 交互式查询（<span class="number">2018</span>+）→ Spark SQL 批处理（当前主力）</span><br></pre></td></tr></table></figure>
+
+<p>当前最佳实践：</p>
+<ul>
+<li><strong>ETL 管道</strong>：Spark on EMR（性能 + 生态）</li>
+<li><strong>交互式查询</strong>：Trino（亚秒-秒级）</li>
+<li><strong>元数据管理</strong>：Hive Metastore &#x2F; AWS Glue Catalog</li>
+<li><strong>表格式</strong>：Iceberg（取代传统 Hive 分区）</li>
+</ul>
+<h2 id="五、小结"><a href="#五、小结" class="headerlink" title="五、小结"></a>五、小结</h2><p>Hive 的定位已经从全能选手转变为元数据入口，真正的计算能力由 Spark 和 Trino 承担。实践中常见的是”Hive Metastore 管理表定义 + Spark 做 ETL + Trino 做 BI 查询”的组合。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" rel="tag"># 数据工程</a>
+              <a href="/tags/Hive/" rel="tag"># Hive</a>
+              <a href="/tags/Presto/" rel="tag"># Presto</a>
+              <a href="/tags/Trino/" rel="tag"># Trino</a>
+              <a href="/tags/SQL/" rel="tag"># SQL</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/iceberg-delta-hudi/" rel="prev" title="Iceberg &#x2F; Delta Lake &#x2F; Hudi 表格式对比">
+                  <i class="fa fa-angle-left"></i> Iceberg / Delta Lake / Hudi 表格式对比
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/google-spanner-case-study/" rel="next" title="Google Spanner 架构——万亿行数据五个9的高可用">
+                  Google Spanner 架构——万亿行数据五个9的高可用 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

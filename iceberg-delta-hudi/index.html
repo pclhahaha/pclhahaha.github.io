@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="数据湖的原始形态是直接在 S3&#x2F;HDFS 上写 Parquet 文件——没有表语义、没有 ACID、没有时间旅行。Iceberg、Delta Lake、Hudi 这三大表格式在原始 Parquet 之上添加了一层元数据管理，让数据湖有了数仓的可靠性。 一、为什么需要表格式123456789101112无表格式的 S3 Parquet:  s3:&#x2F;&#x2F;bucket&#x2F;events&#x2F;dt&#x3D;202">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Iceberg &#x2F; Delta Lake &#x2F; Hudi 表格式对比">
+<meta property="og:url" content="http://pclhahaha.github.io/iceberg-delta-hudi/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="数据湖的原始形态是直接在 S3&#x2F;HDFS 上写 Parquet 文件——没有表语义、没有 ACID、没有时间旅行。Iceberg、Delta Lake、Hudi 这三大表格式在原始 Parquet 之上添加了一层元数据管理，让数据湖有了数仓的可靠性。 一、为什么需要表格式123456789101112无表格式的 S3 Parquet:  s3:&#x2F;&#x2F;bucket&#x2F;events&#x2F;dt&#x3D;202">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据工程">
+<meta property="article:tag" content="Iceberg">
+<meta property="article:tag" content="Delta Lake">
+<meta property="article:tag" content="Hudi">
+<meta property="article:tag" content="数据湖">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/iceberg-delta-hudi/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/iceberg-delta-hudi/","path":"iceberg-delta-hudi/","title":"Iceberg / Delta Lake / Hudi 表格式对比"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Iceberg / Delta Lake / Hudi 表格式对比 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%A1%A8%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">一、为什么需要表格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%B8%89%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94"><span class="nav-number">2.</span> <span class="nav-text">二、三方案对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81Iceberg%E2%80%94%E2%80%94%E6%9C%80%E4%B8%AD%E7%AB%8B%E7%9A%84%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">三、Iceberg——最中立的方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Delta-Lake%E2%80%94%E2%80%94Spark-%E9%A6%96%E9%80%89"><span class="nav-number">4.</span> <span class="nav-text">四、Delta Lake——Spark 首选</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Hudi%E2%80%94%E2%80%94%E6%B5%81%E5%BC%8F%E5%9C%BA%E6%99%AF%E9%A6%96%E9%80%89"><span class="nav-number">5.</span> <span class="nav-text">五、Hudi——流式场景首选</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E9%80%89%E5%9E%8B%E5%BB%BA%E8%AE%AE"><span class="nav-number">6.</span> <span class="nav-text">六、选型建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/iceberg-delta-hudi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Iceberg &#x2F; Delta Lake &#x2F; Hudi 表格式对比 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Iceberg / Delta Lake / Hudi 表格式对比
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>数据湖的原始形态是直接在 S3&#x2F;HDFS 上写 Parquet 文件——没有表语义、没有 ACID、没有时间旅行。Iceberg、Delta Lake、Hudi 这三大表格式在原始 Parquet 之上添加了一层元数据管理，让数据湖有了数仓的可靠性。</p>
+<h2 id="一、为什么需要表格式"><a href="#一、为什么需要表格式" class="headerlink" title="一、为什么需要表格式"></a>一、为什么需要表格式</h2><figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">无表格式的 S3 Parquet:</span><br><span class="line">  s3://bucket/events/dt=2026<span class="string">-07</span><span class="string">-01</span>/</span><br><span class="line">    part<span class="string">-0001</span>.parquet</span><br><span class="line">    part<span class="string">-0002</span>.parquet</span><br><span class="line">  s3://bucket/events/dt=2026<span class="string">-07</span><span class="string">-02</span>/</span><br><span class="line">    part<span class="string">-0003</span>.parquet</span><br><span class="line"></span><br><span class="line">问题：</span><br><span class="line">  - 没有 schema 管理：不知道表有哪些列、类型是什么</span><br><span class="line">  - 没有事务：写入过程中其他人读到不完整数据</span><br><span class="line">  - 没有时间旅行：无法回退</span><br><span class="line">  - 分区变更需重写数据</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">有表格式（如 Iceberg）:</span><br><span class="line">  s3:<span class="operator">//</span>bucket<span class="operator">/</span>events<span class="symbol">/</span></span><br><span class="line">    metadata<span class="symbol">/</span></span><br><span class="line">      v1.json → 当前版本的表结构<span class="operator">+</span>文件清单</span><br><span class="line">      snap-<span class="operator">*</span>.avro → 每次写入的快照</span><br><span class="line">    data<span class="symbol">/</span></span><br><span class="line">      <span class="attr">dt</span><span class="operator">=</span><span class="number">202</span>6-<span class="number">0</span>7-<span class="number">01</span><span class="operator">/</span>file-<span class="number">1</span>.parquet</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、三方案对比"><a href="#二、三方案对比" class="headerlink" title="二、三方案对比"></a>二、三方案对比</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Iceberg</th>
+<th>Delta Lake</th>
+<th>Hudi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>创始</strong></td>
+<td>Netflix</td>
+<td>Databricks</td>
+<td>Uber</td>
+</tr>
+<tr>
+<td><strong>ACID</strong></td>
+<td>✅ 乐观并发</td>
+<td>✅ 乐观并发</td>
+<td>✅ OCC&#x2F;MVCC</td>
+</tr>
+<tr>
+<td><strong>时间旅行</strong></td>
+<td>✅ Snapshot</td>
+<td>✅ Version</td>
+<td>✅ Commit Timeline</td>
+</tr>
+<tr>
+<td><strong>Schema 演化</strong></td>
+<td>✅ 完整</td>
+<td>✅ 完整</td>
+<td>✅ 完整</td>
+</tr>
+<tr>
+<td><strong>分区演化</strong></td>
+<td>✅ 元数据变更即可</td>
+<td>❌ 需重写数据</td>
+<td>❌ 需重写数据</td>
+</tr>
+<tr>
+<td><strong>生态</strong></td>
+<td>中立，Spark&#x2F;Flink&#x2F;Trino&#x2F;Presto</td>
+<td>Spark 为主，Trino 有限</td>
+<td>Spark&#x2F;Flink&#x2F;Hive</td>
+</tr>
+<tr>
+<td><strong>流式写入</strong></td>
+<td>有限</td>
+<td>有限</td>
+<td><strong>最佳</strong>（Upsert&#x2F;Delete原生支持）</td>
+</tr>
+<tr>
+<td><strong>文件格式</strong></td>
+<td>Parquet&#x2F;ORC&#x2F;Avro</td>
+<td>Parquet</td>
+<td>Parquet&#x2F;ORC</td>
+</tr>
+</tbody></table>
+<h2 id="三、Iceberg——最中立的方案"><a href="#三、Iceberg——最中立的方案" class="headerlink" title="三、Iceberg——最中立的方案"></a>三、Iceberg——最中立的方案</h2><p>Iceberg 由 Netflix 捐赠给 Apache，是三者中最具生态中立性的方案。它的关键优势：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 时间旅行</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> events <span class="keyword">FOR</span> SYSTEM_VERSION <span class="keyword">AS</span> <span class="keyword">OF</span> <span class="string">&#x27;2026-07-01 00:00:00&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- Schema 演化（安全添加列）</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> events <span class="keyword">ADD</span> <span class="keyword">COLUMN</span> new_field STRING;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 分区演化（不重写数据改分区策略）</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> events REPLACE <span class="keyword">PARTITION</span> FIELD (days(dt));</span><br></pre></td></tr></table></figure>
+
+<p><strong>分区演化</strong>是 Iceberg 的独特能力——可以改变分区策略而无需重写历史数据，新策略只对未来的写入生效，查询时 Iceberg 透明处理新旧分区。</p>
+<h2 id="四、Delta-Lake——Spark-首选"><a href="#四、Delta-Lake——Spark-首选" class="headerlink" title="四、Delta Lake——Spark 首选"></a>四、Delta Lake——Spark 首选</h2><p>Delta Lake 由 Databricks 主导，与 Spark 深度集成：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Delta Lake 写入</span></span><br><span class="line">df.write.<span class="built_in">format</span>(<span class="string">&quot;delta&quot;</span>).mode(<span class="string">&quot;overwrite&quot;</span>).save(<span class="string">&quot;s3://bucket/table/&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 时间旅行</span></span><br><span class="line">spark.read.<span class="built_in">format</span>(<span class="string">&quot;delta&quot;</span>).option(<span class="string">&quot;versionAsOf&quot;</span>, <span class="number">5</span>).load(<span class="string">&quot;s3://bucket/table/&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># MERGE (Upsert)</span></span><br><span class="line">delta_table.alias(<span class="string">&quot;t&quot;</span>).merge(</span><br><span class="line">    updates.alias(<span class="string">&quot;u&quot;</span>), <span class="string">&quot;t.id = u.id&quot;</span></span><br><span class="line">).whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Vacuum（清理旧版本文件）</span></span><br><span class="line">delta_table.vacuum(retentionHours=<span class="number">168</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Delta Lake 与 Databricks 的 Photon 引擎深度绑定，在 Databricks 环境下性能无可匹敌，但在开源 Spark 上的性能与 Iceberg 相当。VACUUM 操作需定期执行，否则版本文件会无限增长。</p>
+<h2 id="五、Hudi——流式场景首选"><a href="#五、Hudi——流式场景首选" class="headerlink" title="五、Hudi——流式场景首选"></a>五、Hudi——流式场景首选</h2><p>Hudi 由 Uber 开发，设计初衷是解决流式数据的 Upsert 问题：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Hudi 流式写入</span></span><br><span class="line">df.write.<span class="built_in">format</span>(<span class="string">&quot;hudi&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.table.name&quot;</span>, <span class="string">&quot;events&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.datasource.write.operation&quot;</span>, <span class="string">&quot;upsert&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.datasource.write.recordkey.field&quot;</span>, <span class="string">&quot;id&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.datasource.write.precombine.field&quot;</span>, <span class="string">&quot;ts&quot;</span>) \</span><br><span class="line">    .mode(<span class="string">&quot;append&quot;</span>) \</span><br><span class="line">    .save(<span class="string">&quot;s3://bucket/events/&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Hudi 的两种表类型：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>读优化</th>
+<th>写优化</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>COW</strong> (Copy on Write)</td>
+<td>列存 Parquet</td>
+<td>全量重写</td>
+<td>读多写少</td>
+</tr>
+<tr>
+<td><strong>MOR</strong> (Merge on Read)</td>
+<td>Base Parquet + Delta Avro</td>
+<td>增量追加</td>
+<td>写多读少、实时更新</td>
+</tr>
+</tbody></table>
+<p>MOR 表在写入时只追加增量日志（Avro 格式），查询时合并 Base 和 Delta 的数据——牺牲少量读性能换取近实时的写入延迟。</p>
+<h2 id="六、选型建议"><a href="#六、选型建议" class="headerlink" title="六、选型建议"></a>六、选型建议</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>通用数据湖、多引擎环境</td>
+<td><strong>Iceberg</strong>（最中立）</td>
+</tr>
+<tr>
+<td>Databricks&#x2F;Spark 为主</td>
+<td><strong>Delta Lake</strong>（原生集成）</td>
+</tr>
+<tr>
+<td>流式 Upsert、CDC</td>
+<td><strong>Hudi</strong>（流式写入最强）</td>
+</tr>
+<tr>
+<td>AWS EMR + S3</td>
+<td><strong>Iceberg</strong> 或 <strong>Hudi</strong></td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>三种表格式的本质都是在 Parquet 之上加”表管理层”。Iceberg 赢在中立性和分区演化，Delta Lake 赢在 Spark 生态和 Databricks 支持，Hudi 赢在流式 Upsert。选型时最重要的不是功能对比表，而是你的计算引擎生态——选和已有基础设施集成最好的。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" rel="tag"># 数据工程</a>
+              <a href="/tags/Iceberg/" rel="tag"># Iceberg</a>
+              <a href="/tags/Delta-Lake/" rel="tag"># Delta Lake</a>
+              <a href="/tags/Hudi/" rel="tag"># Hudi</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E6%B9%96/" rel="tag"># 数据湖</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/instant-messaging-design/" rel="prev" title="即时通讯系统设计 (WhatsApp&#x2F;微信)">
+                  <i class="fa fa-angle-left"></i> 即时通讯系统设计 (WhatsApp/微信)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/hive-trino-guide/" rel="next" title="Hive 与 Presto&#x2F;Trino 实战">
+                  Hive 与 Presto/Trino 实战 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

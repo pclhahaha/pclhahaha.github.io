@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="数据工程的月度账单很容易失控——一个忘记关的 EMR 集群周末跑了两天烧掉 $5000，一个没有生命周期策略的 S3 bucket 存了 5 年的冷数据但没人访问。控制成本的起点是可视化每一项支出的来源。 一、成本构成   项目 占比（典型） 优化空间    EMR EC2 实例 50-60% 最大   S3 存储 15-20% 中等   Redshift 集群 10-15% 中等   Glue&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据工程成本优化">
+<meta property="og:url" content="http://pclhahaha.github.io/data-cost-optimization/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="数据工程的月度账单很容易失控——一个忘记关的 EMR 集群周末跑了两天烧掉 $5000，一个没有生命周期策略的 S3 bucket 存了 5 年的冷数据但没人访问。控制成本的起点是可视化每一项支出的来源。 一、成本构成   项目 占比（典型） 优化空间    EMR EC2 实例 50-60% 最大   S3 存储 15-20% 中等   Redshift 集群 10-15% 中等   Glue&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据工程">
+<meta property="article:tag" content="成本优化">
+<meta property="article:tag" content="AWS">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/data-cost-optimization/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/data-cost-optimization/","path":"data-cost-optimization/","title":"数据工程成本优化"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据工程成本优化 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%88%90%E6%9C%AC%E6%9E%84%E6%88%90"><span class="nav-number">1.</span> <span class="nav-text">一、成本构成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81EMR-%E4%BC%98%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">二、EMR 优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spot-On-Demand-%E6%B7%B7%E5%90%88"><span class="nav-number">2.1.</span> <span class="nav-text">Spot + On-Demand 混合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Auto-Scaling-%E7%AD%96%E7%95%A5"><span class="nav-number">2.2.</span> <span class="nav-text">Auto Scaling 策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6%E4%BC%98%E5%8C%96"><span class="nav-number">2.3.</span> <span class="nav-text">作业调度优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81S3-%E4%BC%98%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">三、S3 优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Redshift-%E4%BC%98%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">四、Redshift 优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%9B%91%E6%8E%A7%E4%B8%8E%E5%91%8A%E8%AD%A6"><span class="nav-number">5.</span> <span class="nav-text">五、监控与告警</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%88%90%E6%9C%AC%E4%BC%98%E5%8C%96%E6%B8%85%E5%8D%95"><span class="nav-number">6.</span> <span class="nav-text">六、成本优化清单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/data-cost-optimization/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据工程成本优化 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据工程成本优化
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>数据工程的月度账单很容易失控——一个忘记关的 EMR 集群周末跑了两天烧掉 $5000，一个没有生命周期策略的 S3 bucket 存了 5 年的冷数据但没人访问。控制成本的起点是<strong>可视化每一项支出的来源</strong>。</p>
+<h2 id="一、成本构成"><a href="#一、成本构成" class="headerlink" title="一、成本构成"></a>一、成本构成</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>占比（典型）</th>
+<th>优化空间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EMR EC2 实例</td>
+<td>50-60%</td>
+<td>最大</td>
+</tr>
+<tr>
+<td>S3 存储</td>
+<td>15-20%</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>Redshift 集群</td>
+<td>10-15%</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>Glue&#x2F;Athena 查询</td>
+<td>5-10%</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>数据传输（跨AZ&#x2F;跨区域）</td>
+<td>5-10%</td>
+<td>大</td>
+</tr>
+</tbody></table>
+<h2 id="二、EMR-优化"><a href="#二、EMR-优化" class="headerlink" title="二、EMR 优化"></a>二、EMR 优化</h2><h3 id="Spot-On-Demand-混合"><a href="#Spot-On-Demand-混合" class="headerlink" title="Spot + On-Demand 混合"></a>Spot + On-Demand 混合</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;InstanceFleets&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;InstanceFleetType&quot;</span><span class="punctuation">:</span> <span class="string">&quot;CORE&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;TargetOnDemandCapacity&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;TargetSpotCapacity&quot;</span><span class="punctuation">:</span> <span class="number">6</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;InstanceTypeConfigs&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;InstanceType&quot;</span><span class="punctuation">:</span> <span class="string">&quot;r6g.2xlarge&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;InstanceType&quot;</span><span class="punctuation">:</span> <span class="string">&quot;r5.2xlarge&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;InstanceType&quot;</span><span class="punctuation">:</span> <span class="string">&quot;r7g.2xlarge&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 Instance Fleets 混合多种实例类型提高 Spot 获取率</li>
+<li>Core 节点（运行 HDFS&#x2F;Namenode）用 On-Demand，Task 节点用 Spot</li>
+<li>单可用区部署，避免跨 AZ 数据传输费</li>
+</ul>
+<h3 id="Auto-Scaling-策略"><a href="#Auto-Scaling-策略" class="headerlink" title="Auto Scaling 策略"></a>Auto Scaling 策略</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 低峰期（凌晨）自动缩容到最小</span></span><br><span class="line"><span class="attr">ScaleDownRule:</span></span><br><span class="line">  <span class="attr">Trigger:</span> <span class="string">YARNMemoryAvailablePercentage</span> <span class="string">&gt;</span> <span class="number">80</span> <span class="string">for</span> <span class="string">300s</span></span><br><span class="line">  <span class="attr">Action:</span> <span class="string">减少</span> <span class="number">2</span> <span class="string">个</span> <span class="string">Task</span> <span class="string">节点</span></span><br><span class="line">  <span class="attr">Cooldown:</span> <span class="string">300s</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 高峰期缩容条件更严格</span></span><br><span class="line"><span class="attr">ScaleUpRule:</span></span><br><span class="line">  <span class="attr">Trigger:</span> <span class="string">YARNMemoryAvailablePercentage</span> <span class="string">&lt;</span> <span class="number">20</span> <span class="string">for</span> <span class="string">120s</span></span><br><span class="line">  <span class="attr">Action:</span> <span class="string">增加</span> <span class="number">2</span> <span class="string">个</span> <span class="string">Task</span> <span class="string">节点</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="作业调度优化"><a href="#作业调度优化" class="headerlink" title="作业调度优化"></a>作业调度优化</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Airflow DAG - 错峰执行</span></span><br><span class="line">dag = DAG(</span><br><span class="line">    <span class="string">&quot;daily_etl&quot;</span>,</span><br><span class="line">    schedule_interval=<span class="string">&quot;0 3 * * *&quot;</span>,  <span class="comment"># 凌晨 3 点，集群低峰</span></span><br><span class="line">    ...</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、S3-优化"><a href="#三、S3-优化" class="headerlink" title="三、S3 优化"></a>三、S3 优化</h2><table>
+<thead>
+<tr>
+<th>优化</th>
+<th>节省</th>
+<th>实现</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S3 Intelligent-Tiering</td>
+<td>自动分层，省 20-40%</td>
+<td>开启即可，自动监控访问模式</td>
+</tr>
+<tr>
+<td>生命周期策略</td>
+<td>归档冷数据，省 50-80%</td>
+<td>30天后→IA，90天后→Glacier</td>
+</tr>
+<tr>
+<td>删除未完成的分段上传</td>
+<td>清理碎文件</td>
+<td>生命周期规则中设置 AbortIncompleteMultipartUpload</td>
+</tr>
+<tr>
+<td>合并小文件</td>
+<td>减少 LIST&#x2F;PUT 请求费</td>
+<td>Spark coalesce + 定时合并任务</td>
+</tr>
+<tr>
+<td>压缩格式</td>
+<td>省存储 40-60%</td>
+<td>Parquet + ZSTD</td>
+</tr>
+</tbody></table>
+<h2 id="四、Redshift-优化"><a href="#四、Redshift-优化" class="headerlink" title="四、Redshift 优化"></a>四、Redshift 优化</h2><ul>
+<li><strong>暂停集群</strong>：开发&#x2F;测试集群在非工作时间暂停</li>
+<li><strong>RA3 实例</strong>：计算和存储分离，存储按 S3 计费（更便宜）</li>
+<li><strong>Concurrency Scaling</strong>：只在高峰期启用，按使用量付费</li>
+<li><strong>Spectrum</strong>：冷数据放 S3 直接用 Spectrum 查，不入 Redshift 本地</li>
+</ul>
+<h2 id="五、监控与告警"><a href="#五、监控与告警" class="headerlink" title="五、监控与告警"></a>五、监控与告警</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># AWS Budget Alert</span></span><br><span class="line">budget = Budget(</span><br><span class="line">    amount=<span class="number">5000</span>,  <span class="comment"># 月度预算 $5000</span></span><br><span class="line">    threshold=<span class="number">0.8</span>,  <span class="comment"># 80% 时告警</span></span><br><span class="line">    notification=[<span class="string">&quot;slack&quot;</span>, <span class="string">&quot;email&quot;</span>]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>关键监控指标：</p>
+<ul>
+<li>每日按服务拆分的费用（AWS Cost Explorer）</li>
+<li>Spot 中断率（过高说明价格设置太低）</li>
+<li>EMR 集群空闲时间（长时间空闲自动终止）</li>
+</ul>
+<h2 id="六、成本优化清单"><a href="#六、成本优化清单" class="headerlink" title="六、成本优化清单"></a>六、成本优化清单</h2><table>
+<thead>
+<tr>
+<th>优化</th>
+<th>预估节省</th>
+<th>实施难度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Task 节点全用 Spot</td>
+<td>60-70%</td>
+<td>低</td>
+</tr>
+<tr>
+<td>S3 生命周期策略</td>
+<td>30-50%</td>
+<td>低</td>
+</tr>
+<tr>
+<td>合并小文件</td>
+<td>10-20%</td>
+<td>中</td>
+</tr>
+<tr>
+<td>错峰调度</td>
+<td>10-20%</td>
+<td>低</td>
+</tr>
+<tr>
+<td>压缩格式 (ZSTD)</td>
+<td>20-40%</td>
+<td>低</td>
+</tr>
+<tr>
+<td>Redshift 暂停非生产集群</td>
+<td>30-50%</td>
+<td>低</td>
+</tr>
+<tr>
+<td>自动终止空闲 EMR</td>
+<td>5-10%</td>
+<td>中</td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>数据工程成本优化的核心是”用 Spot 跑计算、用生命周期管存储、用监控抓异常”。前三项做到，一般能省 40-60% 的月账单。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" rel="tag"># 数据工程</a>
+              <a href="/tags/%E6%88%90%E6%9C%AC%E4%BC%98%E5%8C%96/" rel="tag"># 成本优化</a>
+              <a href="/tags/AWS/" rel="tag"># AWS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/data-modeling-guide/" rel="prev" title="数据建模方法论">
+                  <i class="fa fa-angle-left"></i> 数据建模方法论
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/cicd-practices/" rel="next" title="CI&#x2F;CD 实践">
+                  CI/CD 实践 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

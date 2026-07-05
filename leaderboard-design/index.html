@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="排行榜是游戏、社交、电商中最常见的功能之一。从手游的战力榜到直播的礼物榜，从社区签到榜到电商销量榜——排行榜的设计看似简单，但一旦加上”实时更新””千万用户””多维度””分周期”等真实约束，就变成了一个有深度的系统设计问题。 一、需求分析1.1 功能需求   需求 说明 示例    更新分数 用户分数变化时更新排名 玩家完成一场对局 +50 分   查询排名 查询指定用户的当前排名 “我是第 32">
+<meta property="og:type" content="article">
+<meta property="og:title" content="排行榜系统设计">
+<meta property="og:url" content="http://pclhahaha.github.io/leaderboard-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="排行榜是游戏、社交、电商中最常见的功能之一。从手游的战力榜到直播的礼物榜，从社区签到榜到电商销量榜——排行榜的设计看似简单，但一旦加上”实时更新””千万用户””多维度””分周期”等真实约束，就变成了一个有深度的系统设计问题。 一、需求分析1.1 功能需求   需求 说明 示例    更新分数 用户分数变化时更新排名 玩家完成一场对局 +50 分   查询排名 查询指定用户的当前排名 “我是第 32">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="TopK">
+<meta property="article:tag" content="排行榜">
+<meta property="article:tag" content="Redis ZSet">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/leaderboard-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/leaderboard-design/","path":"leaderboard-design/","title":"排行榜系统设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>排行榜系统设计 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">一、需求分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%8A%9F%E8%83%BD%E9%9C%80%E6%B1%82"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 功能需求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E9%9D%9E%E5%8A%9F%E8%83%BD%E9%9C%80%E6%B1%82"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 非功能需求</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%96%B9%E6%A1%88%E9%80%89%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">二、方案选型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8-MySQL"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 为什么不用 MySQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%94%A8-Redis-ZSet"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 用 Redis ZSet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 复杂度分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">3.</span> <span class="nav-text">三、数据结构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-ZSet-%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 ZSet 的底层实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%86%85%E5%AD%98%E4%BC%B0%E7%AE%97"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 内存估算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AE%9E%E6%97%B6%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5"><span class="nav-number">4.</span> <span class="nav-text">四、实时更新策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E7%A7%AF%E5%88%86%E5%8F%98%E5%8A%A8-%E2%86%92-%E6%8E%92%E5%90%8D%E6%9B%B4%E6%96%B0%E5%BB%B6%E6%97%B6"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 积分变动 → 排名更新延时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E6%89%B9%E9%87%8F%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 批量更新优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%A4%9A%E5%91%A8%E6%9C%9F%E6%8E%92%E8%A1%8C%E6%A6%9C%EF%BC%88%E6%97%A5-%E5%91%A8-%E6%9C%88-%E6%80%BB%E6%A6%9C%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">五、多周期排行榜（日&#x2F;周&#x2F;月&#x2F;总榜）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 方案对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E6%8E%A8%E8%8D%90%E6%96%B9%E6%A1%88%EF%BC%9A%E7%8B%AC%E7%AB%8B-Key"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 推荐方案：独立 Key</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E5%AE%9A%E6%97%B6%E9%87%8D%E7%BD%AE"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 定时重置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%88%86%E6%AE%B5%E6%8E%92%E8%A1%8C%E6%A6%9C"><span class="nav-number">6.</span> <span class="nav-text">六、分段排行榜</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E4%B8%8E%E5%8E%86%E5%8F%B2%E6%95%B0%E6%8D%AE%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">7.</span> <span class="nav-text">七、与历史数据的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AE%B9%E9%87%8F%E4%BC%B0%E7%AE%97"><span class="nav-number">8.</span> <span class="nav-text">八、容量估算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">九、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/leaderboard-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="排行榜系统设计 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          排行榜系统设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>排行榜是游戏、社交、电商中最常见的功能之一。从手游的战力榜到直播的礼物榜，从社区签到榜到电商销量榜——排行榜的设计看似简单，但一旦加上”实时更新””千万用户””多维度””分周期”等真实约束，就变成了一个有深度的系统设计问题。</p>
+<h2 id="一、需求分析"><a href="#一、需求分析" class="headerlink" title="一、需求分析"></a>一、需求分析</h2><h3 id="1-1-功能需求"><a href="#1-1-功能需求" class="headerlink" title="1.1 功能需求"></a>1.1 功能需求</h3><table>
+<thead>
+<tr>
+<th>需求</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>更新分数</strong></td>
+<td>用户分数变化时更新排名</td>
+<td>玩家完成一场对局 +50 分</td>
+</tr>
+<tr>
+<td><strong>查询排名</strong></td>
+<td>查询指定用户的当前排名</td>
+<td>“我是第 328 名”</td>
+</tr>
+<tr>
+<td><strong>Top N 查询</strong></td>
+<td>查询排行榜前 N 名</td>
+<td>全服战力榜前 100</td>
+</tr>
+<tr>
+<td><strong>周边排名</strong></td>
+<td>查询用户周围的名次</td>
+<td>“比我高 3 名和低 3 名的玩家”</td>
+</tr>
+<tr>
+<td><strong>分周期</strong></td>
+<td>日榜&#x2F;周榜&#x2F;月榜&#x2F;总榜</td>
+<td>每周一重置周榜</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-非功能需求"><a href="#1-2-非功能需求" class="headerlink" title="1.2 非功能需求"></a>1.2 非功能需求</h3><ul>
+<li><strong>实时性</strong>：分数更新后 1 秒内反映在排名中</li>
+<li><strong>高并发</strong>：支持 1000 万用户同时在线，排行榜查询 QPS 10 万+</li>
+<li><strong>低延迟</strong>：排名查询 &lt; 5ms</li>
+<li><strong>可扩展</strong>：排行榜玩家数量可达数千万</li>
+</ul>
+<h2 id="二、方案选型"><a href="#二、方案选型" class="headerlink" title="二、方案选型"></a>二、方案选型</h2><h3 id="2-1-为什么不用-MySQL"><a href="#2-1-为什么不用-MySQL" class="headerlink" title="2.1 为什么不用 MySQL"></a>2.1 为什么不用 MySQL</h3><p>最直观的做法是用 MySQL 存储分数，然后 <code>SELECT COUNT(*) FROM leaderboard WHERE score &gt; ?</code> 来计算排名：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询用户排名（暴力方案）</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="operator">+</span> <span class="number">1</span> <span class="keyword">AS</span> rank </span><br><span class="line"><span class="keyword">FROM</span> leaderboard </span><br><span class="line"><span class="keyword">WHERE</span> score <span class="operator">&gt;</span> (<span class="keyword">SELECT</span> score <span class="keyword">FROM</span> leaderboard <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">1001</span>);</span><br></pre></td></tr></table></figure>
+
+<p>问题：千万用户排行榜，这条 SQL 需要全表扫描。即使按 score 建索引，高频率的更新会导致索引维护开销巨大。</p>
+<h3 id="2-2-用-Redis-ZSet"><a href="#2-2-用-Redis-ZSet" class="headerlink" title="2.2 用 Redis ZSet"></a>2.2 用 Redis ZSet</h3><p>Redis 的 Sorted Set（ZSet）将<strong>插入和排名查询都控制在 O(log N)</strong> 的时间复杂度。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 更新分数</span></span><br><span class="line">ZADD leaderboard:total 1500 user:1001</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询排名（ZREVRANK 返回降序排名，0-based）</span></span><br><span class="line">ZREVRANK leaderboard:total user:1001</span><br><span class="line"><span class="comment"># → 327（排名第 328）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询 Top 10</span></span><br><span class="line">ZREVRANGE leaderboard:total 0 9 WITHSCORES</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询分数</span></span><br><span class="line">ZSCORE leaderboard:total user:1001</span><br><span class="line"><span class="comment"># → &quot;1500&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询用户周围排名（前后各 3 名）</span></span><br><span class="line">ZREVRANGEBYSCORE leaderboard:total +inf -inf WITHSCORES LIMIT 324 7</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-复杂度分析"><a href="#2-3-复杂度分析" class="headerlink" title="2.3 复杂度分析"></a>2.3 复杂度分析</h3><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>Redis ZSet</th>
+<th>MySQL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>插入&#x2F;更新分数</td>
+<td>O(log N)</td>
+<td>O(log N)（索引更新）</td>
+</tr>
+<tr>
+<td>查询排名</td>
+<td>O(log N)</td>
+<td>O(N) 或 O(log N)（需要额外优化）</td>
+</tr>
+<tr>
+<td>Top N 查询</td>
+<td>O(log N + N)</td>
+<td>O(log N + N)</td>
+</tr>
+<tr>
+<td>批量查询</td>
+<td>O(M log N)</td>
+<td>O(M log N)</td>
+</tr>
+</tbody></table>
+<p>Redis ZSet 的各项操作在同量级上比 MySQL 快 10-100 倍（纯内存 vs 磁盘 IO），且 API 天然适合排行榜场景。</p>
+<h2 id="三、数据结构设计"><a href="#三、数据结构设计" class="headerlink" title="三、数据结构设计"></a>三、数据结构设计</h2><h3 id="3-1-ZSet-的底层实现"><a href="#3-1-ZSet-的底层实现" class="headerlink" title="3.1 ZSet 的底层实现"></a>3.1 ZSet 的底层实现</h3><p>Redis ZSet 底层是 <strong>skiplist + dict</strong> 的双结构：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ZADD leaderboard <span class="number">1500</span> user:<span class="number">1001</span></span><br><span class="line"></span><br><span class="line">skiplist 结构（按 score 排序）:</span><br><span class="line">  &#123;user:<span class="number">1003</span>, <span class="number">2000</span>&#125;</span><br><span class="line">  &#123;user:<span class="number">1007</span>, <span class="number">1850</span>&#125;</span><br><span class="line">  &#123;user:<span class="number">1001</span>, <span class="number">1500</span>&#125;</span><br><span class="line">  &#123;user:<span class="number">1012</span>, <span class="number">1200</span>&#125;</span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">dict 结构（O(<span class="number">1</span>) 按成员查找）:</span><br><span class="line">  <span class="string">&quot;user:1001&quot;</span> → score = <span class="number">1500</span></span><br><span class="line">  <span class="string">&quot;user:1003&quot;</span> → score = <span class="number">2000</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>skiplist 负责范围查询和排序（ZREVRANGE、ZREVRANK）</li>
+<li>dict 负责 O(1) 按成员查分数（ZSCORE）</li>
+</ul>
+<p>两者通过共享同一份成员数据保持一致性。</p>
+<h3 id="3-2-内存估算"><a href="#3-2-内存估算" class="headerlink" title="3.2 内存估算"></a>3.2 内存估算</h3><p>ZSet 的内存占用：</p>
+<ul>
+<li>每个成员（member）：约 50-80 字节（包含 skiplist 节点、dict entry、sds 字符串）</li>
+<li>1000 万玩家 → 约 500-800 MB</li>
+<li>加上分数（double: 8 字节）和指针开销，总计约 1-1.5 GB</li>
+</ul>
+<p>单机 Redis 可以轻松承载，超过这个规模可以考虑 Redis Cluster 分片。</p>
+<h2 id="四、实时更新策略"><a href="#四、实时更新策略" class="headerlink" title="四、实时更新策略"></a>四、实时更新策略</h2><h3 id="4-1-积分变动-→-排名更新延时"><a href="#4-1-积分变动-→-排名更新延时" class="headerlink" title="4.1 积分变动 → 排名更新延时"></a>4.1 积分变动 → 排名更新延时</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">玩家完成对局 → 应用服务器更新数据库 → 更新 Redis ZADD → 排名立即生效</span><br></pre></td></tr></table></figure>
+
+<p>一次积分更新包括：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">update_score</span>(<span class="params">user_id: <span class="built_in">str</span>, delta: <span class="built_in">int</span></span>):</span><br><span class="line">    <span class="comment"># 1. 更新数据库（持久化）</span></span><br><span class="line">    db.execute(<span class="string">&quot;UPDATE users SET score = score + ? WHERE id = ?&quot;</span>, delta, user_id)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 2. 更新 Redis（实时排名）</span></span><br><span class="line">    redis.zincrby(<span class="string">&quot;leaderboard:total&quot;</span>, delta, <span class="string">f&quot;user:<span class="subst">&#123;user_id&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-批量更新优化"><a href="#4-2-批量更新优化" class="headerlink" title="4.2 批量更新优化"></a>4.2 批量更新优化</h3><p>当有大量玩家同时完成对局（如大型赛事结束），可以批量更新：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用 Redis Pipeline 批量更新</span></span><br><span class="line">pipe = redis.pipeline()</span><br><span class="line"><span class="keyword">for</span> user_id, delta <span class="keyword">in</span> score_changes:</span><br><span class="line">    pipe.zincrby(<span class="string">&quot;leaderboard:total&quot;</span>, delta, <span class="string">f&quot;user:<span class="subst">&#123;user_id&#125;</span>&quot;</span>)</span><br><span class="line">pipe.execute()</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、多周期排行榜（日-周-月-总榜）"><a href="#五、多周期排行榜（日-周-月-总榜）" class="headerlink" title="五、多周期排行榜（日&#x2F;周&#x2F;月&#x2F;总榜）"></a>五、多周期排行榜（日&#x2F;周&#x2F;月&#x2F;总榜）</h2><h3 id="5-1-方案对比"><a href="#5-1-方案对比" class="headerlink" title="5.1 方案对比"></a>5.1 方案对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>做法</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>独立 Key</strong></td>
+<td>每个周期一个 ZSet</td>
+<td>实现简单、查询快</td>
+<td>内存 x 4 倍（日&#x2F;周&#x2F;月&#x2F;总）</td>
+</tr>
+<tr>
+<td><strong>按日期分 Key</strong></td>
+<td>每天一个 ZSet，查询时合并</td>
+<td>内存可控</td>
+<td>查询需合并计算，复杂</td>
+</tr>
+<tr>
+<td><strong>定时快照</strong></td>
+<td>总榜实时更新，周期榜定时从总榜快照</td>
+<td>节省内存</td>
+<td>周期榜有延迟（最高 1 小时）</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-推荐方案：独立-Key"><a href="#5-2-推荐方案：独立-Key" class="headerlink" title="5.2 推荐方案：独立 Key"></a>5.2 推荐方案：独立 Key</h3><p>对于千万级用户，用独立 Key 存储四个周期榜：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">leaderboard</span>:daily:<span class="number">20260705</span>   ← 日榜（每天 <span class="number">0</span> 点重置）</span><br><span class="line"><span class="attribute">leaderboard</span>:weekly:<span class="number">202627</span>    ← 周榜（每周一 <span class="number">0</span> 点重置）</span><br><span class="line"><span class="attribute">leaderboard</span>:monthly:<span class="number">202607</span>   ← 月榜（每月 <span class="number">1</span> 日 <span class="number">0</span> 点重置）</span><br><span class="line"><span class="attribute">leaderboard</span>:total            ← 总榜（永不重置）</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-定时重置"><a href="#5-3-定时重置" class="headerlink" title="5.3 定时重置"></a>5.3 定时重置</h3><p>使用 Lua 脚本原子性地删除旧 Key 并建立新空榜：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 重置日榜</span></span><br><span class="line">redis.call(<span class="string">&quot;DEL&quot;</span>, <span class="string">&quot;leaderboard:daily:&quot;</span> .. new_date)</span><br><span class="line"><span class="comment">-- 将过去 24 小时内活跃用户的分数复制到新榜（可选，需要从其他存储拉取）</span></span><br></pre></td></tr></table></figure>
+
+<p>或者直接新建空榜即可——用户在当日第一次获得分数时自动加入日榜。</p>
+<h2 id="六、分段排行榜"><a href="#六、分段排行榜" class="headerlink" title="六、分段排行榜"></a>六、分段排行榜</h2><p>当用户量极大（如数亿），单榜排名会有问题：</p>
+<ul>
+<li><strong>大 V 效应</strong>：前 100 名被头部玩家垄断，普通用户看不到自己的进步</li>
+<li><strong>更新频率</strong>：千万用户的排行榜，每次都更新整个 ZSet 压力大</li>
+</ul>
+<p>方案：按段位分榜。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">leaderboard</span>:bronze    ← <span class="number">0</span>-<span class="number">999</span> 分段</span><br><span class="line"><span class="attribute">leaderboard</span>:silver    ← <span class="number">1000</span>-<span class="number">1999</span> 分段</span><br><span class="line"><span class="attribute">leaderboard</span>:gold      ← <span class="number">2000</span>-<span class="number">2999</span> 分段</span><br><span class="line"><span class="attribute">leaderboard</span>:platinum  ← <span class="number">3000</span>-<span class="number">3999</span> 分段</span><br><span class="line"><span class="attribute">leaderboard</span>:diamond   ← <span class="number">4000</span>+ 分段</span><br></pre></td></tr></table></figure>
+
+<p>玩家只在当前段位内排名，段位提升时转移到新榜。每个段位的排行榜玩家数在百万级别，查询更高效。</p>
+<h2 id="七、与历史数据的关系"><a href="#七、与历史数据的关系" class="headerlink" title="七、与历史数据的关系"></a>七、与历史数据的关系</h2><p>排行榜只是”当前快照”，真正的积分明细存储在 MySQL 中：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> score_logs (</span><br><span class="line">    id <span class="type">BIGINT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT,</span><br><span class="line">    user_id <span class="type">BIGINT</span> <span class="keyword">NOT NULL</span>,</span><br><span class="line">    score_change <span class="type">INT</span> <span class="keyword">NOT NULL</span>,   <span class="comment">-- 正数为加分，负数为减分</span></span><br><span class="line">    reason <span class="type">VARCHAR</span>(<span class="number">50</span>),          <span class="comment">-- &#x27;game_win&#x27;, &#x27;daily_bonus&#x27;, &#x27;admin_adjust&#x27;</span></span><br><span class="line">    created_at <span class="type">TIMESTAMP</span> <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span>,</span><br><span class="line">    INDEX idx_user_time (user_id, created_at)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>排行榜依赖于 Redis ZSet（实时查询），积分明细依赖于 MySQL（持久化、审计、恢复）。如果 Redis 数据丢失（如宕机），可以从 MySQL 全量重建排行榜：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 从 MySQL 重建排行榜</span></span><br><span class="line">users = db.query(<span class="string">&quot;SELECT user_id, score FROM users ORDER BY score DESC&quot;</span>)</span><br><span class="line">pipe = redis.pipeline()</span><br><span class="line"><span class="keyword">for</span> user_id, score <span class="keyword">in</span> users:</span><br><span class="line">    pipe.zadd(<span class="string">&quot;leaderboard:total&quot;</span>, &#123;<span class="string">f&quot;user:<span class="subst">&#123;user_id&#125;</span>&quot;</span>: score&#125;)</span><br><span class="line">pipe.execute()</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、容量估算"><a href="#八、容量估算" class="headerlink" title="八、容量估算"></a>八、容量估算</h2><p>假设 5000 万用户，人均分数变动 10 次&#x2F;天：</p>
+<ul>
+<li>Redis 内存：5000 万 × 80 字节 ≈ 4GB（四榜 ≈ 16GB）</li>
+<li>写入 QPS：5000 万 × 10 &#x2F; 86400 ≈ 5800 QPS（Redis 轻松应对）</li>
+<li>读取 QPS：假设 10 万 QPS（排行榜高频查看），Redis 单机 10 万 QPS（多个 key 查询）</li>
+</ul>
+<p>如果超过单机 Redis 容量，使用 Redis Cluster 按用户 ID 哈希分片——但注意 ZSet 的成员不可拆分，所以分片只适用于多榜场景（每个榜独立），不适用于拆分单个大榜。</p>
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>排行榜系统的核心选择是 Redis ZSet——它的 skiplist + dict 双结构天然适配”更新分数 O(log N) + 查询排名 O(log N)”的需求。在工程实践中，关键权衡点在于：多周期的内存开销、分段榜的玩家体验优化、以及 Redis 和 MySQL 之间的一致性保证。对于绝大多数排行榜场景（千万级用户、万级 QPS），单机 Redis + 多 Key 方案已经足够。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/TopK/" rel="tag"># TopK</a>
+              <a href="/tags/%E6%8E%92%E8%A1%8C%E6%A6%9C/" rel="tag"># 排行榜</a>
+              <a href="/tags/Redis-ZSet/" rel="tag"># Redis ZSet</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/lease-mechanism/" rel="prev" title="Lease 租约机制">
+                  <i class="fa fa-angle-left"></i> Lease 租约机制
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learning-roadmap/" rel="next" title="后端工程师学习路线">
+                  后端工程师学习路线 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="意图：为另一个对象提供一个替身或占位符，以控制对原对象的访问。 为什么重要：代理是 Spring AOP 的底层基石，是理解 Spring 框架最关键的几个模式之一。 UML 简述：代理持有真实对象的引用，实现相同的接口，在调用前后添加额外逻辑。 JDK 动态代理 vs CGLIB 这是面试中的高频问题。两者的本质区别在于实现机制：    维度 JDK 动态代理 CGLIB 代理    机制 基于">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代理模式 — JDK动态代理 vs CGLIB">
+<meta property="og:url" content="http://pclhahaha.github.io/proxy-pattern/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="意图：为另一个对象提供一个替身或占位符，以控制对原对象的访问。 为什么重要：代理是 Spring AOP 的底层基石，是理解 Spring 框架最关键的几个模式之一。 UML 简述：代理持有真实对象的引用，实现相同的接口，在调用前后添加额外逻辑。 JDK 动态代理 vs CGLIB 这是面试中的高频问题。两者的本质区别在于实现机制：    维度 JDK 动态代理 CGLIB 代理    机制 基于">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="AOP">
+<meta property="article:tag" content="JDK动态代理">
+<meta property="article:tag" content="CGLIB">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="代理">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/proxy-pattern/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/proxy-pattern/","path":"proxy-pattern/","title":"代理模式 — JDK动态代理 vs CGLIB"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>代理模式 — JDK动态代理 vs CGLIB | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/proxy-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="代理模式 — JDK动态代理 vs CGLIB | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          代理模式 — JDK动态代理 vs CGLIB
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><strong>意图</strong>：为另一个对象提供一个替身或占位符，以控制对原对象的访问。</p>
+<p><strong>为什么重要</strong>：代理是 Spring AOP 的底层基石，是理解 Spring 框架最关键的几个模式之一。</p>
+<p><strong>UML 简述</strong>：代理持有真实对象的引用，实现相同的接口，在调用前后添加额外逻辑。</p>
+<p><strong>JDK 动态代理 vs CGLIB</strong></p>
+<p>这是面试中的高频问题。两者的本质区别在于实现机制：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>JDK 动态代理</th>
+<th>CGLIB 代理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>机制</td>
+<td>基于接口，运行时生成 <code>$Proxy</code> 类实现目标接口</td>
+<td>基于继承，运行时生成目标类的子类</td>
+</tr>
+<tr>
+<td>要求</td>
+<td>目标类必须实现接口</td>
+<td>目标类不能是 final，方法不能是 final</td>
+</tr>
+<tr>
+<td>创建方式</td>
+<td><code>Proxy.newProxyInstance()</code></td>
+<td><code>Enhancer.create()</code></td>
+</tr>
+<tr>
+<td>invoke 方式</td>
+<td><code>InvocationHandler.invoke()</code></td>
+<td><code>MethodInterceptor.intercept()</code></td>
+</tr>
+<tr>
+<td>性能</td>
+<td>JDK 6 后优化明显，性能接近 CGLIB</td>
+<td>早期比 JDK 代理快，现在差距很小</td>
+</tr>
+<tr>
+<td>Spring 默认</td>
+<td>目标有接口时默认使用</td>
+<td>目标无接口时使用</td>
+</tr>
+</tbody></table>
+<p><strong>JDK 动态代理示例</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(User user)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;保存用户: &quot;</span> + user.getName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 代理处理器</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LogHandler</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object target;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">LogHandler</span><span class="params">(Object target)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.target = target;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;&gt;&gt;&gt; 开始调用: &quot;</span> + method.getName());</span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> method.invoke(target, args);</span><br><span class="line">        <span class="type">long</span> <span class="variable">cost</span> <span class="operator">=</span> System.currentTimeMillis() - start;</span><br><span class="line">        System.out.println(<span class="string">&quot;&gt;&gt;&gt; 调用完成: &quot;</span> + method.getName() + <span class="string">&quot;, 耗时: &quot;</span> + cost + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建代理</span></span><br><span class="line"><span class="type">UserService</span> <span class="variable">proxy</span> <span class="operator">=</span> (UserService) Proxy.newProxyInstance(</span><br><span class="line">    UserService.class.getClassLoader(),</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;UserService.class&#125;,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">LogHandler</span>(<span class="keyword">new</span> <span class="title class_">UserServiceImpl</span>())</span><br><span class="line">);</span><br><span class="line">proxy.save(<span class="keyword">new</span> <span class="title class_">User</span>());  <span class="comment">// 所有调用都会被 LogHandler 拦截</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Spring AOP 代理选择策略</strong></p>
+<p>Spring 的代理选择是一个典型的”策略 + 工厂”组合：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">如果目标类实现了接口 → 默认使用 <span class="keyword">JDK </span>动态代理</span><br><span class="line">否则 → 使用 CGLIB 代理</span><br><span class="line">Spring <span class="keyword">Boot </span><span class="number">2</span>.x 起默认使用 CGLIB（因为更少限制）</span><br></pre></td></tr></table></figure>
+
+<p>可以强制指定：<code>@EnableAspectJAutoProxy(proxyTargetClass = true)</code> —— 始终使用 CGLIB。</p>
+<p><strong>AOP 核心链路</strong>（以 <code>@Transactional</code> 为例）：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. Bean 初始化后的 postProcessAfterInitialization </span><br><span class="line">   → 创建代理对象（JDK/CGLIB）</span><br><span class="line">2. 调用代理对象的方法</span><br><span class="line">   → TransactionInterceptor.invoke()</span><br><span class="line">3. 开启事务 →<span class="built_in"> invoke </span>目标方法 → 提交/回滚事务</span><br><span class="line">4. 返回结果给调用者</span><br></pre></td></tr></table></figure>
+
+<p>理解这个过程是排查 AOP 失效问题的前提。最常见的问题场景：</p>
+<ul>
+<li><strong>同类方法调用</strong>：<code>this.methodB()</code> 不经过代理，AOP 不生效</li>
+<li><strong>私有方法</strong>：代理无法拦截 private 方法</li>
+<li><strong>static&#x2F;final 方法</strong>：CGLIB 无法代理</li>
+</ul>
+<p><strong>代理模式的变体</strong></p>
+<table>
+<thead>
+<tr>
+<th>变体</th>
+<th>用途</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>远程代理</td>
+<td>为远程对象提供本地代表</td>
+<td>RMI Stub, Feign 接口</td>
+</tr>
+<tr>
+<td>虚拟代理</td>
+<td>延迟加载开销大的对象</td>
+<td>Hibernate Lazy Loading</td>
+</tr>
+<tr>
+<td>保护代理</td>
+<td>控制访问权限</td>
+<td>Spring Security 方法级权限</td>
+</tr>
+<tr>
+<td>缓存代理</td>
+<td>缓存计算结果</td>
+<td><code>@Cacheable</code></td>
+</tr>
+</tbody></table>
+<hr>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AOP/" rel="tag"># AOP</a>
+              <a href="/tags/JDK%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" rel="tag"># JDK动态代理</a>
+              <a href="/tags/CGLIB/" rel="tag"># CGLIB</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+              <a href="/tags/%E4%BB%A3%E7%90%86/" rel="tag"># 代理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/raft-algorithm/" rel="prev" title="Raft 共识算法详解">
+                  <i class="fa fa-angle-left"></i> Raft 共识算法详解
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/paxos-algorithm/" rel="next" title="Paxos 算法">
+                  Paxos 算法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

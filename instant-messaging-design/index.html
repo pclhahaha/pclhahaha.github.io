@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="即时通讯（IM）是现代互联网最核心的应用场景之一。WhatsApp 日处理 400 亿条消息，微信日活跃用户超 10 亿。设计一个支撑亿级用户的 IM 系统，考验的是对网络协议、消息可靠性、存储架构和分布式系统的综合理解。 一、核心需求分析1.1 功能需求 一对一消息：用户 A 发消息给用户 B，B 实时收到 群聊消息：消息广播至群内所有在线成员 在线状态：展示用户在线&#x2F;离线&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="即时通讯系统设计 (WhatsApp&#x2F;微信)">
+<meta property="og:url" content="http://pclhahaha.github.io/instant-messaging-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="即时通讯（IM）是现代互联网最核心的应用场景之一。WhatsApp 日处理 400 亿条消息，微信日活跃用户超 10 亿。设计一个支撑亿级用户的 IM 系统，考验的是对网络协议、消息可靠性、存储架构和分布式系统的综合理解。 一、核心需求分析1.1 功能需求 一对一消息：用户 A 发消息给用户 B，B 实时收到 群聊消息：消息广播至群内所有在线成员 在线状态：展示用户在线&#x2F;离线&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="WebSocket">
+<meta property="article:tag" content="即时通讯">
+<meta property="article:tag" content="消息队列">
+<meta property="article:tag" content="WhatsApp">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/instant-messaging-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/instant-messaging-design/","path":"instant-messaging-design/","title":"即时通讯系统设计 (WhatsApp/微信)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>即时通讯系统设计 (WhatsApp/微信) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A0%B8%E5%BF%83%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">一、核心需求分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%8A%9F%E8%83%BD%E9%9C%80%E6%B1%82"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 功能需求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E9%9D%9E%E5%8A%9F%E8%83%BD%E9%9C%80%E6%B1%82"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 非功能需求</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AE%E9%80%89%E6%8B%A9"><span class="nav-number">2.</span> <span class="nav-text">二、通信协议选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8-HTTP-%E7%9F%AD%E8%BD%AE%E8%AF%A2%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 为什么不用 HTTP 短轮询？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%95%BF%E8%BF%9E%E6%8E%A5%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 长连接方案对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-WebSocket-%E8%BF%9E%E6%8E%A5%E7%AE%A1%E7%90%86"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 WebSocket 连接管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%B6%88%E6%81%AF%E5%8F%AF%E9%9D%A0%E6%8A%95%E9%80%92"><span class="nav-number">3.</span> <span class="nav-text">三、消息可靠投递</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%B6%88%E6%81%AF%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 消息生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E7%A6%BB%E7%BA%BF%E6%B6%88%E6%81%AF%E5%A4%84%E7%90%86"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 离线消息处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%B6%88%E6%81%AF%E5%8E%BB%E9%87%8D"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 消息去重</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%BE%A4%E8%81%8A%E6%B6%88%E6%81%AF%E5%88%86%E5%8F%91"><span class="nav-number">4.</span> <span class="nav-text">四、群聊消息分发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%86%99%E6%89%A9%E6%95%A3-vs-%E8%AF%BB%E6%89%A9%E6%95%A3"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 写扩散 vs 读扩散</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 实现细节</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">五、存储架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E6%B6%88%E6%81%AF%E5%AD%98%E5%82%A8"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 消息存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E7%94%A8%E6%88%B7%E7%8A%B6%E6%80%81"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 用户状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E6%80%BB%E8%A7%88"><span class="nav-number">6.</span> <span class="nav-text">六、系统架构总览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%89%A9%E5%B1%95%E6%80%A7%E8%80%83%E9%87%8F"><span class="nav-number">7.</span> <span class="nav-text">七、扩展性考量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-WhatsApp-%E7%9A%84%E6%9E%B6%E6%9E%84%E5%93%B2%E5%AD%A6"><span class="nav-number">7.1.</span> <span class="nav-text">7.2 WhatsApp 的架构哲学</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">八、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/instant-messaging-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="即时通讯系统设计 (WhatsApp&#x2F;微信) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          即时通讯系统设计 (WhatsApp/微信)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>即时通讯（IM）是现代互联网最核心的应用场景之一。WhatsApp 日处理 400 亿条消息，微信日活跃用户超 10 亿。设计一个支撑亿级用户的 IM 系统，考验的是对网络协议、消息可靠性、存储架构和分布式系统的综合理解。</p>
+<h2 id="一、核心需求分析"><a href="#一、核心需求分析" class="headerlink" title="一、核心需求分析"></a>一、核心需求分析</h2><h3 id="1-1-功能需求"><a href="#1-1-功能需求" class="headerlink" title="1.1 功能需求"></a>1.1 功能需求</h3><ul>
+<li><strong>一对一消息</strong>：用户 A 发消息给用户 B，B 实时收到</li>
+<li><strong>群聊消息</strong>：消息广播至群内所有在线成员</li>
+<li><strong>在线状态</strong>：展示用户在线&#x2F;离线&#x2F;最后在线时间</li>
+<li><strong>历史消息</strong>：新设备登录后可拉取历史消息</li>
+<li><strong>已读回执</strong>：消息已投递&#x2F;已读状态同步</li>
+</ul>
+<h3 id="1-2-非功能需求"><a href="#1-2-非功能需求" class="headerlink" title="1.2 非功能需求"></a>1.2 非功能需求</h3><ul>
+<li><strong>低延迟</strong>：消息端到端延迟 &lt; 100ms（体感实时）</li>
+<li><strong>高可靠</strong>：消息不丢、不重、不乱序</li>
+<li><strong>高并发</strong>：支持亿级同时在线用户</li>
+<li><strong>跨设备</strong>：手机、PC、Web 同时在线，消息同步</li>
+</ul>
+<h2 id="二、通信协议选择"><a href="#二、通信协议选择" class="headerlink" title="二、通信协议选择"></a>二、通信协议选择</h2><h3 id="2-1-为什么不用-HTTP-短轮询？"><a href="#2-1-为什么不用-HTTP-短轮询？" class="headerlink" title="2.1 为什么不用 HTTP 短轮询？"></a>2.1 为什么不用 HTTP 短轮询？</h3><p>传统的 HTTP 请求-响应模式不适合 IM：</p>
+<ul>
+<li>客户端必须不断发请求检查新消息，浪费带宽和电量</li>
+<li>延迟高：轮询间隔决定了消息送达的上限</li>
+<li>服务端无法主动推送</li>
+</ul>
+<h3 id="2-2-长连接方案对比"><a href="#2-2-长连接方案对比" class="headerlink" title="2.2 长连接方案对比"></a>2.2 长连接方案对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>协议</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>WebSocket</td>
+<td>TCP 全双工</td>
+<td>浏览器原生支持、双向通信、连接复用</td>
+<td>需要维护连接状态</td>
+</tr>
+<tr>
+<td>TCP 私有协议</td>
+<td>自定义</td>
+<td>性能最优、包体精简</td>
+<td>客户端实现成本高</td>
+</tr>
+<tr>
+<td>MQTT</td>
+<td>发布-订阅</td>
+<td>适合 IoT、QoS 分级</td>
+<td>不直接支持群聊语义</td>
+</tr>
+</tbody></table>
+<p><strong>推荐</strong>：移动端用 WebSocket + Protobuf 序列化，Web 端直接用 WebSocket。</p>
+<h3 id="2-3-WebSocket-连接管理"><a href="#2-3-WebSocket-连接管理" class="headerlink" title="2.3 WebSocket 连接管理"></a>2.3 WebSocket 连接管理</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">客户端                          服务端</span><br><span class="line">  │                               │</span><br><span class="line">  ├──── WebSocket 握手 ──────────→│</span><br><span class="line">  │     (HTTP Upgrade)            │</span><br><span class="line">  ├←──── <span class="number">101</span> Switching ──────────┤</span><br><span class="line">  │                               │</span><br><span class="line">  ├──── 心跳 PING ───────────────→│  每 <span class="number">30s</span></span><br><span class="line">  ├←──── PONG ───────────────────┤</span><br><span class="line">  │                               │</span><br><span class="line">  ├──── 发送消息 (protobuf) ─────→│</span><br><span class="line">  ├←──── ACK ────────────────────┤</span><br></pre></td></tr></table></figure>
+
+<p>关键设计决策：</p>
+<ul>
+<li><strong>心跳间隔</strong>：30 秒发送一次 PING，60 秒未收到 PONG 判定连接断开</li>
+<li><strong>断线重连</strong>：指数退避延迟（1s → 2s → 4s → 8s，最大 60s）</li>
+<li><strong>连接迁移</strong>：用户切换网络时，携带 last_event_id 在新连接上继续收取未 ACK 的消息</li>
+</ul>
+<h2 id="三、消息可靠投递"><a href="#三、消息可靠投递" class="headerlink" title="三、消息可靠投递"></a>三、消息可靠投递</h2><h3 id="3-1-消息生命周期"><a href="#3-1-消息生命周期" class="headerlink" title="3.1 消息生命周期"></a>3.1 消息生命周期</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">发送方 → 网关 → 消息队列 → 接收方</span><br><span class="line">  │       │        │          │</span><br><span class="line">存本地   鉴权    持久化    推送+ACK</span><br></pre></td></tr></table></figure>
+
+<p>每条消息的投递状态：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SENT → DELIVERED → READ</span><br><span class="line">(已发送)  (已送达)   (已读)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-离线消息处理"><a href="#3-2-离线消息处理" class="headerlink" title="3.2 离线消息处理"></a>3.2 离线消息处理</h3><p>当接收方离线时：</p>
+<ol>
+<li>消息存入接收方的离线消息队列（Redis List &#x2F; MySQL）</li>
+<li>接收方上线后，从 last_event_id 开始拉取</li>
+<li>拉取完成后，标记这些消息为 DELIVERED</li>
+</ol>
+<p>消息 ID 设计：使用 Snowflake 算法生成全局递增 ID（64 位，毫秒级时间戳 + 机器 ID + 序列号），保证同一会话内消息有序。</p>
+<h3 id="3-3-消息去重"><a href="#3-3-消息去重" class="headerlink" title="3.3 消息去重"></a>3.3 消息去重</h3><p>由于网络重试，同一条消息可能被投递多次。通过以下机制保证幂等：</p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>客户端生成 msg_id</strong></td>
+<td>发送方生成 UUID 作为消息唯一标识</td>
+</tr>
+<tr>
+<td><strong>服务端去重</strong></td>
+<td>收到消息后，Redis SETNX <code>msg:&#123;msg_id&#125;</code> 检查是否已处理</td>
+</tr>
+<tr>
+<td><strong>接收方去重</strong></td>
+<td>接收方本地维护已接收消息 ID 集合，丢弃重复消息</td>
+</tr>
+</tbody></table>
+<h2 id="四、群聊消息分发"><a href="#四、群聊消息分发" class="headerlink" title="四、群聊消息分发"></a>四、群聊消息分发</h2><h3 id="4-1-写扩散-vs-读扩散"><a href="#4-1-写扩散-vs-读扩散" class="headerlink" title="4.1 写扩散 vs 读扩散"></a>4.1 写扩散 vs 读扩散</h3><p>群聊的核心难题：一条消息要送达成千上万个群成员。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>做法</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>写扩散</strong></td>
+<td>发消息时为每个群成员写一条收件箱记录</td>
+<td>读简单、延迟低</td>
+<td>大群写入放大严重（万人群 &#x3D; 万次写入）</td>
+</tr>
+<tr>
+<td><strong>读扩散</strong></td>
+<td>消息只写一份到群的 timeline</td>
+<td>写简单、存储省</td>
+<td>每个成员上线都读群消息，读压力大</td>
+</tr>
+<tr>
+<td><strong>混合策略</strong></td>
+<td>小群写扩散 + 大群读扩散</td>
+<td>平衡性能</td>
+<td>实现复杂</td>
+</tr>
+</tbody></table>
+<p><strong>WhatsApp 的做法</strong>：小群（&lt; 100 人）写扩散，大群（≥ 100 人）读扩散。</p>
+<h3 id="4-2-实现细节"><a href="#4-2-实现细节" class="headerlink" title="4.2 实现细节"></a>4.2 实现细节</h3><p><strong>小群写扩散流程</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 用户发消息 → 查群成员列表</span><br><span class="line"><span class="bullet">2.</span> 对每个成员：插入一条消息到成员的收件箱队列</span><br><span class="line"><span class="bullet">3.</span> 对在线成员：直接推送消息</span><br><span class="line"><span class="bullet">4.</span> 对离线成员：消息留在收件箱中等待上线拉取</span><br></pre></td></tr></table></figure>
+
+<p><strong>大群读扩散流程</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 用户发消息 → 写入群的 timeline（MySQL 表）</span><br><span class="line"><span class="bullet">2.</span> 成员打开群聊 → 从 timeline 拉取最新消息</span><br><span class="line"><span class="bullet">3.</span> 在线成员实时收到通知（有新消息），但不推送消息内容</span><br><span class="line"><span class="bullet">4.</span> 客户端决定是否立即拉取还是等用户主动查看</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、存储架构"><a href="#五、存储架构" class="headerlink" title="五、存储架构"></a>五、存储架构</h2><h3 id="5-1-消息存储"><a href="#5-1-消息存储" class="headerlink" title="5.1 消息存储"></a>5.1 消息存储</h3><table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>存储方案</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>在线消息</td>
+<td>Redis Stream &#x2F; Kafka</td>
+<td>实时投递，TTL 短（24h）</td>
+</tr>
+<tr>
+<td>离线消息</td>
+<td>Redis List + MySQL</td>
+<td>离线消息先存 Redis，定期归档到 MySQL</td>
+</tr>
+<tr>
+<td>历史消息</td>
+<td>MySQL + 冷热分离</td>
+<td>近 7 天热数据，更早的数据归档到对象存储</td>
+</tr>
+<tr>
+<td>附件&#x2F;图片</td>
+<td>对象存储 (S3&#x2F;OSS) + CDN</td>
+<td>缩略图、原图分别存储</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-用户状态"><a href="#5-2-用户状态" class="headerlink" title="5.2 用户状态"></a>5.2 用户状态</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Redis Hash：</span><br><span class="line"><span class="symbol">  user:</span><span class="punctuation">&#123;</span>user_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">    status:</span> <span class="string">&quot;online&quot;</span> | <span class="string">&quot;offline&quot;</span></span><br><span class="line"><span class="symbol">    last_seen:</span> <span class="number">1625097600</span></span><br><span class="line"><span class="symbol">    device_tokens:</span> [<span class="string">&quot;token1&quot;</span>, <span class="string">&quot;token2&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>在线状态通过心跳维护。定期（每 30s）更新 <code>last_seen</code> 时间戳，超过 60 秒未更新标记为离线。</p>
+<h2 id="六、系统架构总览"><a href="#六、系统架构总览" class="headerlink" title="六、系统架构总览"></a>六、系统架构总览</h2><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">                   ┌──────────────┐</span><br><span class="line">                   │    CDN       │  (图片/文件)</span><br><span class="line">                   └──────┬───────┘</span><br><span class="line">                          │</span><br><span class="line">客户端 ←── WebSocket ──→ <span class="selector-attr">[接入层网关集群]</span></span><br><span class="line">                          │</span><br><span class="line">                   ┌──────┴───────┐</span><br><span class="line">                   │   消息队列    │  (Kafka/RocketMQ)</span><br><span class="line">                   └──────┬───────┘</span><br><span class="line">                          │</span><br><span class="line">            ┌─────────────┼─────────────┐</span><br><span class="line">            │             │             │</span><br><span class="line">       <span class="selector-attr">[消息处理]</span>    <span class="selector-attr">[状态服务]</span>     <span class="selector-attr">[存储服务]</span></span><br><span class="line">       (去重/路由)   (在线/离线)    (MySQL+Redis)</span><br><span class="line">            │             │             │</span><br><span class="line">            └─────────────┼─────────────┘</span><br><span class="line">                          │</span><br><span class="line">                   <span class="selector-attr">[推送服务]</span></span><br><span class="line">                   (WebSocket Push + APNs/FCM 离线推送)</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、扩展性考量"><a href="#七、扩展性考量" class="headerlink" title="七、扩展性考量"></a>七、扩展性考量</h2><ul>
+<li><strong>接入层无状态</strong>：WebSocket 网关只负责连接管理和协议转换，业务逻辑下沉到消息处理层</li>
+<li><strong>按用户 ID 分片</strong>：消息队列按 user_id 哈希分区，保证同一用户的消息有序处理</li>
+<li><strong>消息 ID 递增</strong>：Snowflake 生成全局递增 ID，客户端用 ID 判断消息顺序</li>
+<li><strong>多机房部署</strong>：用户就近接入，消息通过专线同步到异地机房</li>
+<li><strong>容量评估</strong>：假设 1 亿用户、人均日发送 50 条消息，日均 50 亿条消息，峰值 QPS ≈ 50亿 &#x2F; 86400 × 1.5（峰值系数） ≈ 8.7 万 QPS</li>
+</ul>
+<h3 id="7-2-WhatsApp-的架构哲学"><a href="#7-2-WhatsApp-的架构哲学" class="headerlink" title="7.2 WhatsApp 的架构哲学"></a>7.2 WhatsApp 的架构哲学</h3><p>WhatsApp 后端能支撑 400 亿日消息量，依靠几个核心设计决策：</p>
+<p><strong>每连接一个 Erlang 进程，无连接池</strong>。传统后端用连接池复用 TCP 连接，WhatsApp 反其道而行——每个用户连接映射为一个轻量级 Erlang 进程（约 300 字节），不池化、不多路复用。这在其他语言下是不可行的（Java 线程需 ~1MB 栈），但 BEAM 虚拟机的进程模型让”百万进程一台机器”成为现实。</p>
+<p><strong>全异步消息传递</strong>。所有内部通信都是异步的——进程发送消息后立即继续处理下一件事，不等待回复。这避免了传统同步调用中的线程阻塞问题。</p>
+<p><strong>单向复制</strong>。数据从主数据中心单向复制到备用数据中心。备用节点只读，不处理写入。当主数据中心宕机时，备用节点中的进程状态会自动重新创建（Erlang Supervisor 树的设计），而非依赖复杂的主备切换。</p>
+<p><strong>ETS 内存表 + 直写缓存</strong>。WhatsApp 后端的许多集群使用 ETS（Erlang Term Storage，内存共享表）作为内部数据存储。配合直写缓存模式，读操作走内存表，写操作同时更新内存表和持久化存储——用空间换时间，极致优化读取延迟。</p>
+<h2 id="八、小结"><a href="#八、小结" class="headerlink" title="八、小结"></a>八、小结</h2><p>即时通讯系统的核心挑战是<strong>消息可靠性</strong>（不丢不重不乱序）和<strong>实时性</strong>（毫秒级端到端延迟）。关键架构决策包括：WebSocket 长连接、消息 ID 去重、小群写扩散&#x2F;大群读扩散的分发策略、以及 Redis + MySQL 的分层存储。WhatsApp 通过 Erlang&#x2F;OTP 构建的分布式 Actor 模型天然适合这种场景，而微信则选择了 C++ 协同程序 + 同步 RPC 的技术路线——两种方案都在亿级规模上证明了各自的可行性。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/WebSocket/" rel="tag"># WebSocket</a>
+              <a href="/tags/%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF/" rel="tag"># 即时通讯</a>
+              <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag"># 消息队列</a>
+              <a href="/tags/WhatsApp/" rel="tag"># WhatsApp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/io-multiplexing/" rel="prev" title="IO 多路复用 — select&#x2F;poll&#x2F;epoll">
+                  <i class="fa fa-angle-left"></i> IO 多路复用 — select/poll/epoll
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/iceberg-delta-hudi/" rel="next" title="Iceberg &#x2F; Delta Lake &#x2F; Hudi 表格式对比">
+                  Iceberg / Delta Lake / Hudi 表格式对比 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

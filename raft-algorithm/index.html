@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Raft 是 Diego Ongaro 和 John Ousterhout 于 2013 年提出的共识算法，核心设计目标是功能与 Paxos 等价但更易于理解和工程实现。Raft 将共识问题分解为三个相对独立的子问题：领导者选举（Leader Election）、日志复制（Log Replication）、安全性（Safety）。 1.1 基础概念 节点状态：每个节点在任何时刻处于三种状态之一——">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Raft 共识算法详解">
+<meta property="og:url" content="http://pclhahaha.github.io/raft-algorithm/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Raft 是 Diego Ongaro 和 John Ousterhout 于 2013 年提出的共识算法，核心设计目标是功能与 Paxos 等价但更易于理解和工程实现。Raft 将共识问题分解为三个相对独立的子问题：领导者选举（Leader Election）、日志复制（Log Replication）、安全性（Safety）。 1.1 基础概念 节点状态：每个节点在任何时刻处于三种状态之一——">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="共识算法">
+<meta property="article:tag" content="Raft">
+<meta property="article:tag" content="etcd">
+<meta property="article:tag" content="Consul">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/raft-algorithm/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/raft-algorithm/","path":"raft-algorithm/","title":"Raft 共识算法详解"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Raft 共识算法详解 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">1.1 基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#7-2-2-Leader-Election%EF%BC%88%E9%A2%86%E5%AF%BC%E8%80%85%E9%80%89%E4%B8%BE%EF%BC%89"><span class="nav-number">1.1.</span> <span class="nav-text">7.2.2 Leader Election（领导者选举）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-2-3-Log-Replication%EF%BC%88%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">7.2.3 Log Replication（日志复制）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-2-4-%E5%AE%89%E5%85%A8%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="nav-number">1.3.</span> <span class="nav-text">7.2.4 安全性保证</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/raft-algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Raft 共识算法详解 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Raft 共识算法详解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Raft 是 Diego Ongaro 和 John Ousterhout 于 2013 年提出的共识算法，核心设计目标是功能与 Paxos 等价但更易于理解和工程实现。Raft 将共识问题分解为三个相对独立的子问题：<strong>领导者选举（Leader Election）</strong>、<strong>日志复制（Log Replication）</strong>、<strong>安全性（Safety）</strong>。</p>
+<h3 id="1-1-基础概念"><a href="#1-1-基础概念" class="headerlink" title="1.1 基础概念"></a>1.1 基础概念</h3><ul>
+<li><strong>节点状态</strong>：每个节点在任何时刻处于三种状态之一——<strong>Leader</strong>（最多一个，处理所有客户端请求）、<strong>Follower</strong>（被动响应 Leader 和 Candidate 的 RPC）、<strong>Candidate</strong>（竞选 Leader 的中间状态）</li>
+<li><strong>Term（任期）</strong>：逻辑时钟概念，用连续递增的整数表示。每个 Term 最多产生一个 Leader，如果选举失败（选票分散），该 Term 以无 Leader 结束，进入下一个 Term</li>
+<li><strong>心跳机制</strong>：Leader 周期性向所有 Follower 发送 AppendEntries RPC（即使没有新的日志要复制），Follower 收到心跳后重置选举超时计时器——心跳压制了 Follower 发起选举的冲动</li>
+</ul>
+<h4 id="7-2-2-Leader-Election（领导者选举）"><a href="#7-2-2-Leader-Election（领导者选举）" class="headerlink" title="7.2.2 Leader Election（领导者选举）"></a>7.2.2 Leader Election（领导者选举）</h4><ol>
+<li>所有节点以 <strong>Follower</strong> 身份启动</li>
+<li>Follower 在 <strong>election timeout</strong>（随机 150–300ms）内未收到 Leader 的心跳 → 自身变为 <strong>Candidate</strong>，将当前 Term +1</li>
+<li>Candidate 先给自己投一票，然后并行向所有其他节点发送 <strong>RequestVote RPC</strong></li>
+<li>三种可能的结果：<ul>
+<li><strong>赢得选举</strong>：在一个 Term 内获得超过半数选票 → 成为 Leader，立即向所有节点发送心跳（空的 AppendEntries）建立权威，阻止新的选举</li>
+<li><strong>其他节点成为 Leader</strong>：收到来自新 Leader 的心跳，且心跳中的 Term ≥ 自身 Term → 承认新 Leader，退回 Follower 状态</li>
+<li><strong>选票分散（Split Vote）</strong>：无人获得多数票 → 超时后 Term +1，重新发起选举。随机超时机制（每个 Candidate 的选举超时独立随机）极大降低了反复分散的概率</li>
+</ul>
+</li>
+</ol>
+<h4 id="7-2-3-Log-Replication（日志复制）"><a href="#7-2-3-Log-Replication（日志复制）" class="headerlink" title="7.2.3 Log Replication（日志复制）"></a>7.2.3 Log Replication（日志复制）</h4><ol>
+<li>Leader 接收客户端写请求，将命令封装为日志条目追加到本地日志中</li>
+<li>Leader 并行向所有 Follower 发送 <strong>AppendEntries RPC</strong>，携带需要复制的日志条目</li>
+<li>当某条日志条目被<strong>超过半数</strong>的节点安全写入后，Leader 将该条目标记为 <strong>committed</strong>，然后应用到状态机（执行命令），并将结果返回客户端</li>
+<li>Leader 在后续的 AppendEntries 中携带 <strong>leaderCommit</strong> 索引，通知各 Follower 哪些条目已被提交——Follower 据此将对应条目应用到自己的状态机</li>
+</ol>
+<p>Raft 的日志复制保证了 Log Matching Property（日志匹配特性）：如果不同日志中两条条目拥有相同的 Index 和 Term，则它们存储的命令相同、且该 Index 之前的所有条目也完全一致。这是 Raft 安全性保证的基石。</p>
+<h4 id="7-2-4-安全性保证"><a href="#7-2-4-安全性保证" class="headerlink" title="7.2.4 安全性保证"></a>7.2.4 安全性保证</h4><ul>
+<li><strong>Election Restriction</strong>：Candidate 的日志必须至少和大多数节点一样”新”（比较最后一个日志条目的 Term 和 Index），否则不会被选为 Leader。这保证了已提交的日志不会在新 Leader 上任后被覆盖</li>
+<li><strong>Commitment Rule</strong>：Leader 只能通过计数副本数来提交<strong>当前 Term</strong> 的日志条目，历史 Term 的条目通过”连带提交”（Leader 提交了一条当前 Term 的日志后，所有之前的日志也随之提交）</li>
+<li><strong>Configuration Change</strong>：使用 Joint Consensus（联合共识）在两阶段中安全地变更集群成员</li>
+</ul>
+<p>实现案例：etcd、Consul、TiKV、CockroachDB</p>
+<p>推荐阅读：Raft 论文（《In Search of an Understandable Consensus Algorithm》）、Raft 官网的可视化动画、MIT 6.824 课程的 Raft 实验</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/" rel="tag"># 共识算法</a>
+              <a href="/tags/Raft/" rel="tag"># Raft</a>
+              <a href="/tags/etcd/" rel="tag"># etcd</a>
+              <a href="/tags/Consul/" rel="tag"># Consul</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/rate-limiting-algorithms/" rel="prev" title="限流算法对比">
+                  <i class="fa fa-angle-left"></i> 限流算法对比
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/proxy-pattern/" rel="next" title="代理模式 — JDK动态代理 vs CGLIB">
+                  代理模式 — JDK动态代理 vs CGLIB <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

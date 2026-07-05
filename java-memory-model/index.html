@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="在可共享内存的多处理器架构中，存在CPU多级缓存与内存的缓存一致性问题，不同的架构由不同的缓存一致性协议，本质上是通过内存屏障来实现。另外还有指令重排序问题，指令重排序提升了性能，然而在多线程环境中如果无法确认代码的执行顺序，就无法确认代码的正确性。 JMM(Java Memory Model)通过提供自己的存储模型，屏蔽了java虚拟机与底层硬件存储模型的差异化，在语言层面定义了内存屏障，用来屏">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JMM (Java Memory Model)">
+<meta property="og:url" content="http://pclhahaha.github.io/java-memory-model/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="在可共享内存的多处理器架构中，存在CPU多级缓存与内存的缓存一致性问题，不同的架构由不同的缓存一致性协议，本质上是通过内存屏障来实现。另外还有指令重排序问题，指令重排序提升了性能，然而在多线程环境中如果无法确认代码的执行顺序，就无法确认代码的正确性。 JMM(Java Memory Model)通过提供自己的存储模型，屏蔽了java虚拟机与底层硬件存储模型的差异化，在语言层面定义了内存屏障，用来屏">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://pclhahaha.github.io/java/concurrency/d69cecab903313c776b50de1c43050bc31123.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/concurrency/bde75d1129494bf77b8b8b1ade546cd276768.png">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JMM">
+<meta property="article:tag" content="happens-before">
+<meta property="article:tag" content="volatile">
+<meta property="article:tag" content="内存屏障">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://pclhahaha.github.io/java/concurrency/d69cecab903313c776b50de1c43050bc31123.png">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/java-memory-model/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/java-memory-model/","path":"java-memory-model/","title":"JMM (Java Memory Model)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JMM (Java Memory Model) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BB%8E%E7%A1%AC%E4%BB%B6%E5%B9%B3%E5%8F%B0%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B%E5%88%B0Java%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">1. 从硬件平台的存储模型到Java存储模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98-cache-coherence"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 缓存一致性问题 cache coherence</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92%E5%BA%8F"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 指令重排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-memory-barrier-%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 memory barrier 内存屏障</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-Java%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B%E7%9A%84happens-before%E6%B3%95%E5%88%99-4"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 Java存储模型的happens-before法则[^4]</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-volatile%E3%80%81synchorized%E3%80%81final-3"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 volatile、synchorized、final[^3]</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-CPU%E7%BC%93%E5%AD%98%E7%9A%84%E4%BC%AA%E5%85%B1%E4%BA%AB%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">2. CPU缓存的伪共享问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-sun-misc-Contended%E6%B3%A8%E8%A7%A3"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 @sun.misc.Contended注解</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%87%8D%E6%96%B0%E7%90%86%E8%A7%A3%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%AE%89%E5%85%A8%E5%8F%91%E5%B8%83%E4%B8%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E5%85%A8%E6%80%A7"><span class="nav-number">3.</span> <span class="nav-text">3. 重新理解对象的安全发布与初始化安全性</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-memory-model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="JMM (Java Memory Model) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JMM (Java Memory Model)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E5%B9%B6%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">并发</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在可共享内存的多处理器架构中，存在CPU多级缓存与内存的缓存一致性问题，不同的架构由不同的缓存一致性协议，本质上是通过内存屏障来实现。另外还有指令重排序问题，指令重排序提升了性能，然而在多线程环境中如果无法确认代码的执行顺序，就无法确认代码的正确性。</p>
+<p>JMM(Java Memory Model)通过提供自己的存储模型，屏蔽了java虚拟机与底层硬件存储模型的差异化，在语言层面定义了<strong>内存屏障</strong>，用来屏蔽不同硬件存储模型的内存屏障的不同实现。</p>
+<h3 id="1-从硬件平台的存储模型到Java存储模型"><a href="#1-从硬件平台的存储模型到Java存储模型" class="headerlink" title="1. 从硬件平台的存储模型到Java存储模型"></a>1. 从硬件平台的存储模型到Java存储模型</h3><h4 id="1-1-缓存一致性问题-cache-coherence"><a href="#1-1-缓存一致性问题-cache-coherence" class="headerlink" title="1.1 缓存一致性问题 cache coherence"></a>1.1 缓存一致性问题 cache coherence</h4><p><img src="/java/concurrency/d69cecab903313c776b50de1c43050bc31123.png" alt="处理器Cache模型"></p>
+<p>CPU一般有多级缓存，与主内存之间通过同步协议保证一致性，比较经典的是MESI协议，参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/muxiqingyang/article/details/6615199%E3%80%81https://www.cnblogs.com/yanlong300/p/8986041.html%E3%80%82">https://blog.csdn.net/muxiqingyang/article/details/6615199、https://www.cnblogs.com/yanlong300/p/8986041.html。</a></p>
+<h4 id="1-2-指令重排序"><a href="#1-2-指令重排序" class="headerlink" title="1.2 指令重排序"></a>1.2 指令重排序</h4><p>指令重排序可能是编译器指令重排序（编译器级别）或CPU指令重排序（处理器级别，out-of-order execution），指令重排序可以使计算性能得到提升。<br>即使指令没有重排序，由于CPU缓存的存在，缓存刷新至内存的时许不同也会导致重排序问题。</p>
+<h4 id="1-3-memory-barrier-内存屏障"><a href="#1-3-memory-barrier-内存屏障" class="headerlink" title="1.3 memory barrier 内存屏障"></a>1.3 memory barrier 内存屏障</h4><p>内存屏障（Memory Barrier，或有时叫做内存栅栏，Memory Fence）是一种CPU指令，用于控制特定条件下的重排序和内存可见性问题。Java编译器也会根据内存屏障的规则禁止重排序。</p>
+<p>内存屏障可以被分为以下几种类型：</p>
+<ul>
+<li>LoadLoad屏障：对于这样的语句Load1; LoadLoad; Load2，在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。</li>
+<li>StoreStore屏障：对于这样的语句Store1; StoreStore; Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。</li>
+<li>LoadStore屏障：对于这样的语句Load1; LoadStore; Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。</li>
+<li>StoreLoad屏障：对于这样的语句Store1; StoreLoad; Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。它的开销是四种屏障中最大的。在大多数处理器的实现中，这个屏障是个万能屏障，兼具其它三种内存屏障的功能。</li>
+</ul>
+<p><img src="/java/concurrency/bde75d1129494bf77b8b8b1ade546cd276768.png" alt="内存屏障示意表"></p>
+<p>以上关于指令重排序、内存屏障的描述参考了<a target="_blank" rel="noopener" href="https://tech.meituan.com/2014/09/23/java-memory-reordering.html%EF%BC%8C%E5%B8%8C%E6%9C%9B%E6%B7%B1%E5%85%A5%E7%9A%84%E4%BA%86%E8%A7%A3%E7%9A%84%E5%8F%AF%E7%9B%B4%E6%8E%A5%E9%98%85%E8%AF%BB%E5%8E%9F%E6%96%87%E3%80%82">https://tech.meituan.com/2014/09/23/java-memory-reordering.html，希望深入的了解的可直接阅读原文。</a></p>
+<h4 id="1-4-Java存储模型的happens-before法则-4"><a href="#1-4-Java存储模型的happens-before法则-4" class="headerlink" title="1.4 Java存储模型的happens-before法则[^4]"></a>1.4 Java存储模型的happens-before法则[^4]</h4><p>JMM为程序中的所有动作定义了一种happens-before关系，两个操作如果满足happens-before关系，则前者的结果一定对后者可见，保证了顺序性及可见性，而不满足happens-before关系的动作之间可以任意重排序。</p>
+<ul>
+<li>程序次序法则：同一线程中，代码中先出现的动作happens-before代码中后出现的动作，这只保证最终执行结果与顺序执行一致，并不能保证指令不重排序，只是结果上表现为happens-before。这个可以解释为，同一线程中前面的写操作对后面操作可见。</li>
+<li>监视器锁法则：对同一个监视器锁的解锁happens-before后续对该锁的加锁，显式锁同样适用。</li>
+<li>volatile法则：对volatile修饰的域的写happens-before后续对其的读操作，原子变量同样适用。</li>
+<li>线程启动法则：一个线程内，对Thread.start的调用happens-before每一个被启动线程中的动作。</li>
+<li>线程终结法则：线程中的任何动作happens-before其他线程监测到这个线程已经终结，或者从Thread.join调用中成功返回，或者Thread.isAlive返回false</li>
+<li>中断法则：一个线程调用另一个线程的interrupt happens-before被中断的线程发现中断</li>
+<li>终结法则：一个对象的构造函数的结束happens-before这个对象的finalizer的开始</li>
+<li>传递性：如果A happens-before B，且B happens-before C，则A happens-before C</li>
+</ul>
+<p>基于happens-before可以推断出多线程情况下代码的执行顺序，当然如果正确没有使用相应的同步机制，大部分操作是无法推断的😣。</p>
+<h4 id="1-5-volatile、synchorized、final-3"><a href="#1-5-volatile、synchorized、final-3" class="headerlink" title="1.5 volatile、synchorized、final[^3]"></a>1.5 volatile、synchorized、final[^3]</h4><ul>
+<li>volatile关键字：volatile关键字可以保证直接从主存中读取一个变量，如果这个变量被修改后，总是会被写回到主存中去。普通变量与volatile变量的区别是：volatile的特殊规则保证了新值能立即同步到主内存，以及每个线程在每次使用volatile变量前都立即从主内存刷新。因此我们可以说volatile保证了多线程操作时变量的可见性，而普通变量则不能保证这一点。</li>
+<li>synchorized关键字：同步块的可见性是由以下机制保证的：<br>“如果对一个变量执行lock操作，将会清空工作内存中变量的值，在执行引擎使用这个变量前需要重新执行load或assign操作初始化变量的值”<br>“对一个变量执行unlock操作之前，必须先把此变量的值同步到主内存中（执行store和write操作）</li>
+<li>final关键字：final关键字的可见性是指，被final修饰的字段在构造器中一旦被初始化完成，并且构造器没有把”this”的引用传递出去（this引用逃逸是一件很危险的事情，其他线程有可能通过这个引用访问到”初始化了一半”的对象），那么在其他线程就能看见final字段的值（无须同步）</li>
+</ul>
+<h3 id="2-CPU缓存的伪共享问题"><a href="#2-CPU缓存的伪共享问题" class="headerlink" title="2. CPU缓存的伪共享问题"></a>2. CPU缓存的伪共享问题</h3><p>CPU缓存的最小单位是缓存行 (Cache Line) ，一个缓存行的大小通常是 64 字节（取决于 CPU），它有效地引用主内存中的一块地址。一个 Java 的 long 类型是 8 字节，因此在一个缓存行中可以存 8 个 long 类型的变量。</p>
+<p>假设两个线程A和B运行在两个CPU上，每个CPU都有一个缓存行中存放了两个volatile long类型的变量X和Y，A更新X后，由于X是volatile的，B所在CPU的缓存行就失效了，需要重新加载，即使B想要更新的是Y，两者逻辑上不存在竞争关系，但在缓存行这个层次上发生了冲突。这是一个伪共享问题的典型场景。</p>
+<p>上述场景中，假如A和B交替执行，那么伪共享问题一直发生，对性能影响会很大。</p>
+<h4 id="2-1-sun-misc-Contended注解"><a href="#2-1-sun-misc-Contended注解" class="headerlink" title="2.1 @sun.misc.Contended注解"></a>2.1 @sun.misc.Contended注解</h4><p>在Java 7之前，可以在属性的前后进行padding来避免伪共享问题。</p>
+<p>在Java 8中，提供了@sun.misc.Contended注解来避免伪共享，原理是在使用此注解的对象或字段的前后各增加128字节大小的padding，使用2倍于大多数硬件缓存行的大小来避免相邻扇区预取导致的伪共享冲突。</p>
+<p>以上关于伪共享问题的内容参考了<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c3c108c3dcfd%E3%80%82">https://www.jianshu.com/p/c3c108c3dcfd。</a></p>
+<h3 id="3-重新理解对象的安全发布与初始化安全性"><a href="#3-重新理解对象的安全发布与初始化安全性" class="headerlink" title="3. 重新理解对象的安全发布与初始化安全性"></a>3. 重新理解对象的安全发布与初始化安全性</h3><p>在了解了JMM之后，可以回顾一下之前提到的对象的安全发布以及初始化安全性。</p>
+<p>理解对象安全发布的一个很好的例子就是懒汉单例模式（当然现在已经不推荐使用懒汉单例模式了，它复杂且节约的性能有限），理解为何instance变量必须被volatile修饰才能保证安全。推荐思考一下。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/JMM/" rel="tag"># JMM</a>
+              <a href="/tags/happens-before/" rel="tag"># happens-before</a>
+              <a href="/tags/volatile/" rel="tag"># volatile</a>
+              <a href="/tags/%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C/" rel="tag"># 内存屏障</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/java-nio-channel-buffer/" rel="prev" title="Java NIO — Channel&#x2F;Buffer&#x2F;Selector">
+                  <i class="fa fa-angle-left"></i> Java NIO — Channel/Buffer/Selector
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/java-linkedhashmap-lru/" rel="next" title="LinkedHashMap 与 LRU 缓存">
+                  LinkedHashMap 与 LRU 缓存 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

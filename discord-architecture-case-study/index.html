@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Discord 的核心卖点是”低延迟的语音+文字聊天”。在游戏场景下，1500 万并发用户、数百万个语音频道、亚 100ms 延迟的实时语音传输——这些需求对服务器的并发处理能力提出了极高要求。 一、Elixir 的选择Discord 最初使用 Erlang（WhatsApp 同款语言），后来迁移到 Elixir——一种运行在 Erlang VM (BEAM) 上的现代函数式语言。 选择 BEAM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Discord 单服务器1500万用户架构">
+<meta property="og:url" content="http://pclhahaha.github.io/discord-architecture-case-study/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Discord 的核心卖点是”低延迟的语音+文字聊天”。在游戏场景下，1500 万并发用户、数百万个语音频道、亚 100ms 延迟的实时语音传输——这些需求对服务器的并发处理能力提出了极高要求。 一、Elixir 的选择Discord 最初使用 Erlang（WhatsApp 同款语言），后来迁移到 Elixir——一种运行在 Erlang VM (BEAM) 上的现代函数式语言。 选择 BEAM">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="Discord">
+<meta property="article:tag" content="WebSocket">
+<meta property="article:tag" content="实时通信">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/discord-architecture-case-study/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/discord-architecture-case-study/","path":"discord-architecture-case-study/","title":"Discord 单服务器1500万用户架构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Discord 单服务器1500万用户架构 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81Elixir-%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">1.</span> <span class="nav-text">一、Elixir 的选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Guild-%E4%B8%8E-Channel-%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">二、Guild 与 Channel 模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81WebSocket-%E8%BF%9E%E6%8E%A5%E7%AE%A1%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">三、WebSocket 连接管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%AF%AD%E9%9F%B3%E4%BC%A0%E8%BE%93"><span class="nav-number">4.</span> <span class="nav-text">四、语音传输</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%B6%88%E6%81%AF%E5%AD%98%E5%82%A8"><span class="nav-number">5.</span> <span class="nav-text">五、消息存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81How-Discord-Serves-15M-Users-on-One-Server"><span class="nav-number">6.</span> <span class="nav-text">六、How Discord Serves 15M Users on One Server</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-MidJourney-%E6%9E%81%E7%AB%AF%E6%A1%88%E4%BE%8B"><span class="nav-number">6.1.</span> <span class="nav-text">6.2 MidJourney 极端案例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/discord-architecture-case-study/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Discord 单服务器1500万用户架构 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Discord 单服务器1500万用户架构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Discord 的核心卖点是”低延迟的语音+文字聊天”。在游戏场景下，1500 万并发用户、数百万个语音频道、亚 100ms 延迟的实时语音传输——这些需求对服务器的并发处理能力提出了极高要求。</p>
+<h2 id="一、Elixir-的选择"><a href="#一、Elixir-的选择" class="headerlink" title="一、Elixir 的选择"></a>一、Elixir 的选择</h2><p>Discord 最初使用 Erlang（WhatsApp 同款语言），后来迁移到 Elixir——一种运行在 Erlang VM (BEAM) 上的现代函数式语言。</p>
+<p>选择 BEAM 虚拟机的核心理由：</p>
+<ul>
+<li><strong>轻量级进程</strong>：每个 Discord 用户连接对应一个 BEAM 进程，约 2KB 内存</li>
+<li><strong>抢占式调度</strong>：不依赖操作系统线程调度，BEAM 自己调度进程——防止单个慢进程阻塞整体系统</li>
+<li><strong>OTP</strong>：内置的容错框架（Supervisor 树）</li>
+<li><strong>热更新</strong>：无需重启服务即可部署新代码（在游戏进行中尤为重要）</li>
+</ul>
+<h2 id="二、Guild-与-Channel-模型"><a href="#二、Guild-与-Channel-模型" class="headerlink" title="二、Guild 与 Channel 模型"></a>二、Guild 与 Channel 模型</h2><p>Discord 的核心数据结构是 Server（Guild）和 Channel：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Guild (服务器)</span><br><span class="line">  ├── Channel <span class="selector-tag">A</span> (文字频道)</span><br><span class="line">  │      ├── Message <span class="number">1</span></span><br><span class="line">  │      └── Message <span class="number">2</span></span><br><span class="line">  ├── Channel <span class="selector-tag">B</span> (语音频道)</span><br><span class="line">  │      └── User Connections</span><br><span class="line">  └── Channel C (公告频道)</span><br></pre></td></tr></table></figure>
+
+<p>关键设计决策——Discord 使用 <strong>Monolith 架构</strong>：同一台服务器同时处理用户连接、消息路由、语音传输。这与微服务哲学截然相反——为什么？</p>
+<p><strong>低延迟要求</strong>：语音+文字必须在亚 100ms 内交互。如果是微服务，每个消息需要跨越多个服务的网络调用（REST&#x2F;gRPC），延迟翻倍。单体架构中，所有功能运行在同一 BEAM 实例中，消息传递在内存中完成（微秒级），远比网络调用（毫秒级）快。</p>
+<h2 id="三、WebSocket-连接管理"><a href="#三、WebSocket-连接管理" class="headerlink" title="三、WebSocket 连接管理"></a>三、WebSocket 连接管理</h2><p>每个在线用户的 WebSocket 连接对应一个 Erlang 进程（约 2KB）：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">连接建立：</span><br><span class="line">  客户端 → WebSocket 握手 → Discord Gateway <span class="built_in">Server</span></span><br><span class="line">      ↓</span><br><span class="line">  创建 Gateway 进程 (<span class="number">2</span>KB)</span><br><span class="line">      ├─ 鉴权 token</span><br><span class="line">      ├─ 拉取用户 guild 列表</span><br><span class="line">      └─ 订阅相关的 guild 事件</span><br><span class="line"></span><br><span class="line">消息投递：</span><br><span class="line">  发送消息 → 接收方在同一个 guild → 直接广播给该 guild 的所有订阅用户</span><br></pre></td></tr></table></figure>
+
+<p><strong>扇出问题</strong>：一个拥有 50 万成员的大 guild，发一条消息需要通知 50 万个进程。Discord 的优化：</p>
+<ol>
+<li>使用 ETS（Erlang Term Storage，内存中的共享表）存储 guild 成员关系</li>
+<li>通过 <code>pg2</code> 模块（进程组）订阅事件广播——多个进程共享同一事件流</li>
+<li>语音和文字的事件通道分离，避免语音流量阻塞文字推送</li>
+</ol>
+<h2 id="四、语音传输"><a href="#四、语音传输" class="headerlink" title="四、语音传输"></a>四、语音传输</h2><p>Discord 的语音通话是实时传输，延迟要求极高（&lt; 200ms）。关键设计：</p>
+<table>
+<thead>
+<tr>
+<th>技术选择</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>WebRTC</strong></td>
+<td>浏览器原生支持，已优化的实时音视频协议</td>
+</tr>
+<tr>
+<td><strong>Opus 编码</strong></td>
+<td>低延迟的语音编码格式，40ms 帧大小</td>
+</tr>
+<tr>
+<td><strong>SFU (Selective Forwarding Unit)</strong></td>
+<td>服务器只转发流，不解码&#x2F;重编码——降低 CPU 开销</td>
+</tr>
+</tbody></table>
+<p>语音流量不经过业务逻辑层，直接通过 WebRTC 的媒体通道传输，降低中间跳数。</p>
+<h2 id="五、消息存储"><a href="#五、消息存储" class="headerlink" title="五、消息存储"></a>五、消息存储</h2><p>Discord 不使用关系型数据库存储消息。消息是海量的、不可变的（不修改不删除）、按时间排序的——这些特征更匹配 Cassandra。</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">消息数据模型：</span><br><span class="line">  <span class="built_in">Partition</span> <span class="built_in">Key</span><span class="operator">:</span> <span class="type">channel_id</span></span><br><span class="line">  <span class="variable">Clustering</span> <span class="built_in">Key</span><span class="operator">:</span> <span class="type">message_id</span> <span class="punctuation">(</span><span class="variable">Snowflake</span><span class="operator">,</span> 时间排序<span class="punctuation">)</span></span><br><span class="line">  <span class="variable">Columns</span><span class="operator">:</span> <span class="type">author_id</span><span class="operator">,</span> <span class="variable">content</span><span class="operator">,</span> <span class="variable">timestamp</span><span class="operator">,</span> <span class="variable">attachments</span><span class="operator">...</span></span><br></pre></td></tr></table></figure>
+
+<p>Cassandra 的宽列模型天然适合”按频道查询消息时间线”。读路径：<code>SELECT * FROM messages WHERE channel_id = ? ORDER BY message_id DESC LIMIT 50</code>。</p>
+<h2 id="六、How-Discord-Serves-15M-Users-on-One-Server"><a href="#六、How-Discord-Serves-15M-Users-on-One-Server" class="headerlink" title="六、How Discord Serves 15M Users on One Server"></a>六、How Discord Serves 15M Users on One Server</h2><p>Discord 经常提到一个令人印象深刻的数字：<strong>一台服务器就能承载 1500 万并发用户</strong>。这不是虚构——BEAM 的进程模型使这成为可能。</p>
+<p>计算如下：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">单台服务器：</span><br><span class="line"><span class="bullet">  -</span> 1500万 Erlang 进程 × 2KB/进程 = 30GB 内存</span><br><span class="line"><span class="bullet">  -</span> 加上应用程序内存和缓冲区：~50-100GB 总内存</span><br><span class="line"><span class="bullet">  -</span> 单台服务器配 128-256GB RAM 完全可行</span><br></pre></td></tr></table></figure>
+
+<p>当然，这只是”连接数”的极限。在实际架构中，Discord 并没有真正把所有用户放到一台机器上——出于容错和负载均衡，他们会将用户分布到多个 BEAM 集群上。但这个数字说明了 BEAM 在处理高并发方面的天然优势。</p>
+<h3 id="6-2-MidJourney-极端案例"><a href="#6-2-MidJourney-极端案例" class="headerlink" title="6.2 MidJourney 极端案例"></a>6.2 MidJourney 极端案例</h3><p>Discord 的单服极限在 MidJourney 的冲击下达到了新高度。MidJourney 官方服务器的并发用户突破了 <strong>1100 万</strong>，远超之前最大的公会（Roblox 和 Fortnite 约 100 万成员）。Discord 工程团队此前认为 100 万成员已接近单服极限——这一假设被彻底打破。</p>
+<p>为了应对这一规模，Discord 采用了多语言协同策略：<strong>Rust 处理热点路径</strong>上的计算密集型任务，而 Elixir 继续负责 95% 的业务逻辑（连接管理、消息路由）。当单语言方案触及性能上限时，用不同语言覆盖不同复杂度层级，是工程实用主义的典范。</p>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>Discord 的架构选择体现了”反范式”思维：在微服务流行的时代，选择单体架构来满足实时通信的低延迟要求；在 NoSQL 流行的时代，选择 Cassandra 来存储海量消息；在主流语言之外，选择小众的 Elixir&#x2F;Erlang 来发挥 BEAM 虚拟机的并发优势。这些选择共同构成了支持数千万用户的实时通信平台。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/Discord/" rel="tag"># Discord</a>
+              <a href="/tags/WebSocket/" rel="tag"># WebSocket</a>
+              <a href="/tags/%E5%AE%9E%E6%97%B6%E9%80%9A%E4%BF%A1/" rel="tag"># 实时通信</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/distributed-theory/" rel="prev" title="分布式系统理论基础">
+                  <i class="fa fa-angle-left"></i> 分布式系统理论基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/dev-practices/" rel="next" title="后端开发实践: 从代码规范到 CI&#x2F;CD">
+                  后端开发实践: 从代码规范到 CI/CD <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

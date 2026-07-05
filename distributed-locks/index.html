@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="在分布式系统中，多个进程可能同时操作共享资源。分布式锁是保证互斥访问的基础原语。 1.1 基于数据库实现方式利用数据库的唯一索引特性实现锁的排他性： 1234567-- 尝试获取锁INSERT INTO distributed_lock (lock_key, holder, expire_time) VALUES (&#x27;order_lock&#x27;, &#x27;node-1&amp;#x27">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式锁 — Redis&#x2F;ZK&#x2F;DB">
+<meta property="og:url" content="http://pclhahaha.github.io/distributed-locks/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="在分布式系统中，多个进程可能同时操作共享资源。分布式锁是保证互斥访问的基础原语。 1.1 基于数据库实现方式利用数据库的唯一索引特性实现锁的排他性： 1234567-- 尝试获取锁INSERT INTO distributed_lock (lock_key, holder, expire_time) VALUES (&#x27;order_lock&#x27;, &#x27;node-1&amp;#x27">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="ZooKeeper">
+<meta property="article:tag" content="分布式锁">
+<meta property="article:tag" content="Redlock">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/distributed-locks/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/distributed-locks/","path":"distributed-locks/","title":"分布式锁 — Redis/ZK/DB"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式锁 — Redis/ZK/DB | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">1.1 基于数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">实现方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A6%81%E7%82%B9"><span class="nav-number">1.2.</span> <span class="nav-text">要点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">1.3.</span> <span class="nav-text">优缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%9F%BA%E4%BA%8E-Redis"><span class="nav-number">2.</span> <span class="nav-text">1.2 基于 Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SET-NX-PX"><span class="nav-number">2.1.</span> <span class="nav-text">SET NX PX</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redlock-%E7%AE%97%E6%B3%95%EF%BC%88Redis-%E5%AE%98%E6%96%B9%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">Redlock 算法（Redis 官方分布式锁）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redlock-%E4%BA%89%E8%AE%AE"><span class="nav-number">2.3.</span> <span class="nav-text">Redlock 争议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redisson"><span class="nav-number">2.4.</span> <span class="nav-text">Redisson</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%9F%BA%E4%BA%8E-ZooKeeper-etcd"><span class="nav-number">3.</span> <span class="nav-text">1.3 基于 ZooKeeper &#x2F; etcd</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ZK-%E4%B8%B4%E6%97%B6%E9%A1%BA%E5%BA%8F%E8%8A%82%E7%82%B9"><span class="nav-number">3.1.</span> <span class="nav-text">ZK 临时顺序节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#etcd-%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.</span> <span class="nav-text">etcd 实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E4%B8%89%E7%A7%8D%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-%E9%80%89%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">1.4 三种方案对比 + 选型</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/distributed-locks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式锁 — Redis&#x2F;ZK&#x2F;DB | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式锁 — Redis/ZK/DB
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在分布式系统中，多个进程可能同时操作共享资源。分布式锁是保证互斥访问的基础原语。</p>
+<h3 id="1-1-基于数据库"><a href="#1-1-基于数据库" class="headerlink" title="1.1 基于数据库"></a>1.1 基于数据库</h3><h4 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h4><p>利用数据库的唯一索引特性实现锁的排他性：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 尝试获取锁</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> distributed_lock (lock_key, holder, expire_time) </span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;order_lock&#x27;</span>, <span class="string">&#x27;node-1&#x27;</span>, NOW() <span class="operator">+</span> <span class="type">INTERVAL</span> <span class="number">30</span> <span class="keyword">SECOND</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 释放锁</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> distributed_lock </span><br><span class="line"><span class="keyword">WHERE</span> lock_key <span class="operator">=</span> <span class="string">&#x27;order_lock&#x27;</span> <span class="keyword">AND</span> holder <span class="operator">=</span> <span class="string">&#x27;node-1&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h4><ul>
+<li>唯一索引保证同一时刻只有一个节点持有锁</li>
+<li><code>expire_time</code> 防止持锁节点宕机后锁永远不被释放</li>
+<li>后台心跳线程定期更新 <code>expire_time</code> 延长锁</li>
+<li>释放时验证 <code>holder</code>，防止误删其他节点的锁</li>
+</ul>
+<h4 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h4><table>
+<thead>
+<tr>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>方案简单，依赖现有基础设施</td>
+<td>数据库是单点，性能瓶颈</td>
+</tr>
+<tr>
+<td>事务支持，实现可靠</td>
+<td>锁释放需要额外的超时检测</td>
+</tr>
+<tr>
+<td>不需要额外组件</td>
+<td>高并发场景下数据库压力大</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-基于-Redis"><a href="#1-2-基于-Redis" class="headerlink" title="1.2 基于 Redis"></a>1.2 基于 Redis</h3><h4 id="SET-NX-PX"><a href="#SET-NX-PX" class="headerlink" title="SET NX PX"></a>SET NX PX</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取锁 (Jedis)</span></span><br><span class="line"><span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> jedis.set(<span class="string">&quot;lock_key&quot;</span>, <span class="string">&quot;unique_value&quot;</span>, </span><br><span class="line">    SetParams.setParams().nx().px(<span class="number">30000</span>));  <span class="comment">// NX: 不存在才设置, PX: 过期30s</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放锁（Lua 脚本保证原子性）</span></span><br><span class="line"><span class="type">String</span> <span class="variable">script</span> <span class="operator">=</span> <span class="string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) == ARGV[1] then &quot;</span> +</span><br><span class="line">                <span class="string">&quot;   return redis.call(&#x27;del&#x27;, KEYS[1]) &quot;</span> +</span><br><span class="line">                <span class="string">&quot;else return 0 end&quot;</span>;</span><br><span class="line">jedis.eval(script, Collections.singletonList(<span class="string">&quot;lock_key&quot;</span>), </span><br><span class="line">    Collections.singletonList(<span class="string">&quot;unique_value&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><code>unique_value</code>（UUID + 线程ID）保证释放时是锁的持有者，防止误删</li>
+<li>Lua 脚本保证 get + del 的原子性</li>
+<li>过期时间需要合理设置——太短可能业务未完成锁已释放，太长可能长期阻塞</li>
+</ul>
+<h4 id="Redlock-算法（Redis-官方分布式锁）"><a href="#Redlock-算法（Redis-官方分布式锁）" class="headerlink" title="Redlock 算法（Redis 官方分布式锁）"></a>Redlock 算法（Redis 官方分布式锁）</h4><p>在 Redis 主从架构中，主节点宕机后从节点可能尚未同步锁信息，导致两个客户端同时持有锁。Redlock 通过多实例规避此问题：</p>
+<ol>
+<li>获取当前时间（毫秒）</li>
+<li>依次向 N 个独立的 Redis 实例请求锁（SET NX PX），使用相同的 key 和随机 value</li>
+<li>获取锁的时间 &#x3D; 当前时间 - 步骤1 的时间。只有当获取到超过半数（N&#x2F;2+1）实例的锁，且总耗时 &lt; 锁的有效时间，才算成功</li>
+<li>若获取失败，向所有实例发送释放请求</li>
+</ol>
+<h4 id="Redlock-争议"><a href="#Redlock-争议" class="headerlink" title="Redlock 争议"></a>Redlock 争议</h4><p>Martin Kleppmann 对 Redlock 提出了著名批评，核心观点：</p>
+<ul>
+<li>Redlock 依赖非单调的时钟假设——GC 停顿、时钟跳跃可能导致锁提前过期</li>
+<li>分布式锁不是安全的——即使 Redlock 也无法保证 100% 互斥</li>
+<li>推荐使用 <strong>fencing token</strong>（单调递增的序列号）来保证正确性</li>
+</ul>
+<h4 id="Redisson"><a href="#Redisson" class="headerlink" title="Redisson"></a>Redisson</h4><p>Redisson 是 Java 生态最流行的 Redis 客户端（提供分布式锁），关键实现：</p>
+<ul>
+<li><strong>Watch Dog 看门狗</strong>：默认锁过期时间 30s，后台每 10s 续期一次（<code>internalLockLeaseTime / 3</code>），进程存活期间锁永不过期</li>
+<li><strong>可重入锁</strong>：通过 hash 结构存储锁持有计数（key → threadId → count），加锁时 count++，解锁时 count–</li>
+<li><strong>公平锁</strong>：基于 Redis 队列 + Pub&#x2F;Sub 实现等待线程排队唤醒</li>
+<li><strong>红锁</strong>：<code>RedissonRedLock</code> 封装 Redlock 算法，组合多个 <code>RLock</code> 实例</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Redisson 使用示例</span></span><br><span class="line"><span class="type">RLock</span> <span class="variable">lock</span> <span class="operator">=</span> redisson.getLock(<span class="string">&quot;order_lock&quot;</span>);</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 尝试加锁，最多等待 10s，锁有效期 30s</span></span><br><span class="line">    <span class="keyword">if</span> (lock.tryLock(<span class="number">10</span>, <span class="number">30</span>, TimeUnit.SECONDS)) &#123;</span><br><span class="line">        <span class="comment">// 业务逻辑</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (lock.isHeldByCurrentThread()) &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-基于-ZooKeeper-etcd"><a href="#1-3-基于-ZooKeeper-etcd" class="headerlink" title="1.3 基于 ZooKeeper &#x2F; etcd"></a>1.3 基于 ZooKeeper &#x2F; etcd</h3><h4 id="ZK-临时顺序节点"><a href="#ZK-临时顺序节点" class="headerlink" title="ZK 临时顺序节点"></a>ZK 临时顺序节点</h4><p>核心原理：</p>
+<ol>
+<li>所有客户端在同一父节点下创建<strong>临时顺序节点</strong>（EPHEMERAL + SEQUENTIAL）</li>
+<li>客户端获取所有子节点列表，若自己的节点序号最小则获得锁</li>
+<li>若不是最小，则对前一个节点注册 <strong>Watch</strong>，当前序节点删除（释放锁或客户端断开）时收到通知</li>
+<li>临时节点的特性：客户端 session 断开时节点自动删除，天然防止死锁</li>
+</ol>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/locks/order/</span><br><span class="line">    ├── _c_<span class="number">0000000001</span>  ← 持锁（序号最小）</span><br><span class="line">    ├── _c_<span class="number">0000000002</span>  ← 等待，watch _c_<span class="number">0000000001</span></span><br><span class="line">    └── _c_<span class="number">0000000003</span>  ← 等待，watch _c_<span class="number">0000000002</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="etcd-实现"><a href="#etcd-实现" class="headerlink" title="etcd 实现"></a>etcd 实现</h4><p>etcd 基于 Raft 实现 CP 模型的分布式锁，使用 <code>lease</code> + 事务实现：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// etcd 分布式锁 (Go 伪代码)</span></span><br><span class="line">txn := client.Txn(ctx).</span><br><span class="line">    If(clientv3.Compare(clientv3.CreateRevision(key), <span class="string">&quot;=&quot;</span>, <span class="number">0</span>)).</span><br><span class="line">    Then(clientv3.OpPut(key, val, clientv3.WithLease(leaseId))).</span><br><span class="line">    Else(clientv3.OpGet(key))</span><br><span class="line"></span><br><span class="line">resp, _ := txn.Commit()</span><br><span class="line"><span class="keyword">if</span> !resp.Succeeded &#123;</span><br><span class="line">    <span class="comment">// 锁已被其他客户端持有</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-三种方案对比-选型"><a href="#1-4-三种方案对比-选型" class="headerlink" title="1.4 三种方案对比 + 选型"></a>1.4 三种方案对比 + 选型</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>数据库</th>
+<th>Redis</th>
+<th>ZooKeeper&#x2F;etcd</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>可靠性</td>
+<td>中</td>
+<td>中低（单实例）&#x2F; 中（Redlock）</td>
+<td>高（CP 系统）</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>低</td>
+<td>极高</td>
+<td>中</td>
+</tr>
+<tr>
+<td>实现复杂度</td>
+<td>低</td>
+<td>低（单实例）&#x2F; 中（Redlock）</td>
+<td>中</td>
+</tr>
+<tr>
+<td>死锁风险</td>
+<td>需手动超时处理</td>
+<td>需设过期 + 看门狗</td>
+<td>临时节点自动处理</td>
+</tr>
+<tr>
+<td>客户端阻塞等待</td>
+<td>需要轮询</td>
+<td>Pub&#x2F;Sub 或轮询</td>
+<td>Watch 机制</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>低并发、已有 DB</td>
+<td>高并发、可接受低概率失效</td>
+<td>强一致性要求</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li><strong>Redis</strong>：高并发、可接受极低概率的锁失效（如防重复提交、缓存更新串行化）</li>
+<li><strong>ZK&#x2F;etcd</strong>：对一致性有严格要求的场景（如选主、任务调度唯一执行）</li>
+<li><strong>数据库</strong>：没有 Redis&#x2F;ZK 基础设施的小团队、低并发场景</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+              <a href="/tags/ZooKeeper/" rel="tag"># ZooKeeper</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" rel="tag"># 分布式锁</a>
+              <a href="/tags/Redlock/" rel="tag"># Redlock</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/distributed-id/" rel="prev" title="分布式 ID 生成方案">
+                  <i class="fa fa-angle-left"></i> 分布式 ID 生成方案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/dijkstra-shortest-path/" rel="next" title="Dijkstra 最短路径算法">
+                  Dijkstra 最短路径算法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

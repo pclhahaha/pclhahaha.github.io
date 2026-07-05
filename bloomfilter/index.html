@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="背景与动机在软件系统中，我们经常需要判断一个元素是否在某个集合里：用户名是否已注册、URL 是否已经爬取过、商品 ID 是否在黑名单里。最直接的方案是用 HashSet 或数据库，这些方案在小规模数据下完全够用，但当数据量上升到数千万甚至数十亿时，内存开销会急剧膨胀。 以一个简单的计算为例：假设要存储 1000 万个 64 位整数，Java HashSet&lt;Long&gt; 每个元素大约需要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="布隆过滤器 (Bloom Filter)">
+<meta property="og:url" content="http://pclhahaha.github.io/bloomfilter/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="背景与动机在软件系统中，我们经常需要判断一个元素是否在某个集合里：用户名是否已注册、URL 是否已经爬取过、商品 ID 是否在黑名单里。最直接的方案是用 HashSet 或数据库，这些方案在小规模数据下完全够用，但当数据量上升到数千万甚至数十亿时，内存开销会急剧膨胀。 以一个简单的计算为例：假设要存储 1000 万个 64 位整数，Java HashSet&lt;Long&gt; 每个元素大约需要">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="Bloom Filter">
+<meta property="article:tag" content="缓存">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/bloomfilter/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/bloomfilter/","path":"bloomfilter/","title":"布隆过滤器 (Bloom Filter)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>布隆过滤器 (Bloom Filter) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">背景与动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">数据结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text">插入过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E8%BF%87%E7%A8%8B"><span class="nav-number">2.3.</span> <span class="nav-text">查询过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E8%83%BD%E5%88%A0%E9%99%A4%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.4.</span> <span class="nav-text">不能删除的原因</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E6%8E%A8%E5%AF%BC"><span class="nav-number">3.</span> <span class="nav-text">数学推导</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E5%AE%9A%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">符号定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AF%E5%88%A4%E7%8E%87%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC"><span class="nav-number">3.2.</span> <span class="nav-text">误判率公式推导</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E4%BC%98%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0%E4%B8%AA%E6%95%B0-k"><span class="nav-number">3.3.</span> <span class="nav-text">最优哈希函数个数 k</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%8D%E6%95%B0%E7%BB%84%E5%A4%A7%E5%B0%8F-m-%E7%9A%84%E7%A1%AE%E5%AE%9A"><span class="nav-number">3.4.</span> <span class="nav-text">位数组大小 m 的确定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E8%AE%A1%E7%AE%97%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.5.</span> <span class="nav-text">实际计算示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%8F%82%E6%95%B0%E5%AF%B9%E7%85%A7%E8%A1%A8"><span class="nav-number">3.6.</span> <span class="nav-text">常见参数对照表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Guava-BloomFilter-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">4.1.</span> <span class="nav-text">Guava BloomFilter 源码分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">4.2.</span> <span class="nav-text">Redis 布隆过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%86%99%E5%AE%8C%E6%95%B4-Java-%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.3.</span> <span class="nav-text">手写完整 Java 实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E7%A7%8D"><span class="nav-number">5.</span> <span class="nav-text">变种</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Counting-Bloom-Filter%EF%BC%88%E8%AE%A1%E6%95%B0%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">Counting Bloom Filter（计数布隆过滤器）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cuckoo-Filter%EF%BC%88%E5%B8%83%E8%B0%B7%E9%B8%9F%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">Cuckoo Filter（布谷鸟过滤器）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Scalable-Bloom-Filter%EF%BC%88%E5%8F%AF%E6%89%A9%E5%B1%95%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">Scalable Bloom Filter（可扩展布隆过滤器）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Burst-Filter%EF%BC%88%E7%88%86%E5%8F%91%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%89"><span class="nav-number">5.4.</span> <span class="nav-text">Burst Filter（爆发过滤器）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">6.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E9%98%B2%E6%8A%A4"><span class="nav-number">6.1.</span> <span class="nav-text">缓存穿透防护</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A7%E9%9B%86%E5%90%88%E5%8E%BB%E9%87%8D%EF%BC%88%E7%88%AC%E8%99%AB-URL-%E5%8E%BB%E9%87%8D%EF%BC%89"><span class="nav-number">6.2.</span> <span class="nav-text">大集合去重（爬虫 URL 去重）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%91%E5%90%8D%E5%8D%95%E6%A0%A1%E9%AA%8C"><span class="nav-number">6.3.</span> <span class="nav-text">黑名单校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%8E%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E"><span class="nav-number">6.4.</span> <span class="nav-text">数据库与存储引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">6.5.</span> <span class="nav-text">网络过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">6.6.</span> <span class="nav-text">面试常见问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/bloomfilter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="布隆过滤器 (Bloom Filter) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          布隆过滤器 (Bloom Filter)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">CS基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h2><p>在软件系统中，我们经常需要判断一个元素是否在某个集合里：用户名是否已注册、URL 是否已经爬取过、商品 ID 是否在黑名单里。最直接的方案是用 <code>HashSet</code> 或数据库，这些方案在小规模数据下完全够用，但当数据量上升到数千万甚至数十亿时，内存开销会急剧膨胀。</p>
+<p>以一个简单的计算为例：假设要存储 1000 万个 64 位整数，Java <code>HashSet&lt;Long&gt;</code> 每个元素大约需要 80 字节（对象头 + 引用 + HashMap 内部结构），总计约 760 MB。如果换成 Redis <code>SET</code>，同样规模的数据需要 GB 级别内存。这对于内存资源敏感的场景是不可接受的——尤其是在做<strong>缓存穿透防护</strong>时，我们可能只关心一个 key “绝对不存在”，此时用 Set 性价比极低。</p>
+<p>布隆过滤器（Bloom Filter）正是为了解决这种”空间换时间 vs 精确性权衡”问题而设计的概率性数据结构。由 Burton Howard Bloom 在 1970 年提出，它用极少的内存就能回答：</p>
+<ul>
+<li><strong>“这个元素一定不在集合里”</strong> —— 100% 确定</li>
+<li><strong>“这个元素可能在集合里”</strong> —— 存在一定误判率</li>
+</ul>
+<p>核心思想：牺牲少量精确性（可控的误判率），换取巨大的空间节省。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>1000万元素内存</th>
+<th>误判率</th>
+<th>是否支持删除</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HashSet<Long></td>
+<td>~760 MB</td>
+<td>0%</td>
+<td>是</td>
+</tr>
+<tr>
+<td>布隆过滤器 (1%误判)</td>
+<td>~12 MB</td>
+<td>1%</td>
+<td>否</td>
+</tr>
+<tr>
+<td>布隆过滤器 (0.01%误判)</td>
+<td>~24 MB</td>
+<td>0.01%</td>
+<td>否</td>
+</tr>
+</tbody></table>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>布隆过滤器由两个核心组件构成：</p>
+<ol>
+<li><strong>位数组（Bit Array）</strong>：一个长度为 <code>m</code> 的二进制数组，所有位初始值为 <code>0</code></li>
+<li><strong>K 个独立的哈希函数</strong>：每个哈希函数将输入映射到 <code>[0, m-1]</code> 范围内的整数</li>
+</ol>
+<div style="text-align:center">
+<pre>
+初始状态 (m=18, 所有位为 0):
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+│ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
+ 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17
+</pre>
+</div>
+
+<h3 id="插入过程"><a href="#插入过程" class="headerlink" title="插入过程"></a>插入过程</h3><p>当插入一个元素 <code>x</code> 时：</p>
+<ol>
+<li>用 K 个哈希函数分别计算 <code>x</code> 的哈希值：<code>h1(x)</code>, <code>h2(x)</code>, …, <code>hk(x)</code></li>
+<li>将哈希值取模得到 K 个位置：<code>h1(x) % m</code>, <code>h2(x) % m</code>, …, <code>hk(x) % m</code></li>
+<li>将这 K 个位置的二进制值设置为 <code>1</code></li>
+</ol>
+<div style="text-align:center">
+<pre>
+插入 "hello" → K=3 个哈希分别映射到位置 2, 7, 14:
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+│ 0 │ 0 │ 1 │ 0 │ 0 │ 0 │ 0 │ 1 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 1 │ 0 │ 0 │ 0 │
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
+ 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17
+
+<p>再插入 “world” → 映射到 3, 9, 14:<br>┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐<br>│ 0 │ 0 │ 1 │ 1 │ 0 │ 0 │ 0 │ 1 │ 0 │ 1 │ 0 │ 0 │ 0 │ 0 │ 1 │ 0 │ 0 │ 0 │<br>└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘<br>(位置 14 被两次插入共享——这是后续”误判”的来源)<br></pre></p>
+</div>
+
+<h3 id="查询过程"><a href="#查询过程" class="headerlink" title="查询过程"></a>查询过程</h3><p>当查询元素 <code>x</code> 是否存在时：</p>
+<ol>
+<li>用同样的 K 个哈希函数计算 <code>x</code> 的哈希值，得到 K 个位置</li>
+<li>检查位数组中这 K 个位置：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>K 个位置的状态</th>
+<th>结论</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>所有位都是 <code>1</code></td>
+<td><strong>可能存在</strong></td>
+<td>这些位可能由其他元素设置</td>
+</tr>
+<tr>
+<td>任意一位是 <code>0</code></td>
+<td><strong>一定不存在</strong></td>
+<td>如果插入过 x，该位应该是 1</td>
+</tr>
+</tbody></table>
+<p><strong>为什么可能误判？</strong> 元素 <code>x</code> 映射的 K 个位置可能恰好被其他插入过的元素共同覆盖，导致虽然 <code>x</code> 从未被插入，但所有位都已经是 <code>1</code>。</p>
+<p><strong>为什么不会漏判？</strong> 如果 <code>x</code> 被插入过，这 K 个位置一定都是 <code>1</code>——布隆过滤器永远不会删除已经置为 <code>1</code> 的位。</p>
+<h3 id="不能删除的原因"><a href="#不能删除的原因" class="headerlink" title="不能删除的原因"></a>不能删除的原因</h3><p>布隆过滤器不支持删除操作的根本原因在于：一个位可能被多个元素共享。如上例中位置 <code>14</code> 同时被 <code>&quot;hello&quot;</code> 和 <code>&quot;world&quot;</code> 共享。如果把位置 <code>14</code> 从 <code>1</code> 改为 <code>0</code>（代表删除了 <code>&quot;hello&quot;</code>），那么查询 <code>&quot;world&quot;</code> 时会发现位置 <code>14</code> 是 <code>0</code>，于是错误地判定 <code>&quot;world&quot;</code> 不在集合中——<strong>造成漏判</strong>。</p>
+<h2 id="数学推导"><a href="#数学推导" class="headerlink" title="数学推导"></a>数学推导</h2><h3 id="符号定义"><a href="#符号定义" class="headerlink" title="符号定义"></a>符号定义</h3><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>m</td>
+<td>位数组长度（bit 数）</td>
+</tr>
+<tr>
+<td>n</td>
+<td>预期插入元素个数</td>
+</tr>
+<tr>
+<td>k</td>
+<td>哈希函数个数</td>
+</tr>
+<tr>
+<td>p</td>
+<td>误判率（false positive rate）</td>
+</tr>
+</tbody></table>
+<h3 id="误判率公式推导"><a href="#误判率公式推导" class="headerlink" title="误判率公式推导"></a>误判率公式推导</h3><p><strong>步骤 1：插入一个元素后，某一位仍为 0 的概率</strong></p>
+<p>插入一个元素时，某次哈希命中的概率是 <code>1/m</code>，未命中的概率是 <code>1 - 1/m</code>。K 次哈希过后，特定的某一位仍然为 0 的概率：</p>
+<p>[<br>P_0 &#x3D; \left(1 - \frac{1}{m}\right)^k<br>]</p>
+<p><strong>步骤 2：插入 n 个元素后，某一位仍为 0 的概率</strong></p>
+<p>n 个元素共有 <code>n * k</code> 次哈希操作，某一位从未被设为 1 的概率：</p>
+<p>[<br>P_0(n) &#x3D; \left(1 - \frac{1}{m}\right)^{kn}<br>]</p>
+<p>利用极限公式：当 m 较大时，<code>(1 - 1/m)^m ≈ 1/e</code>，可得：</p>
+<p>[<br>P_0(n) &#x3D; \left[\left(1 - \frac{1}{m}\right)^{m}\right]^{\frac{kn}{m}} \approx e^{-kn&#x2F;m}<br>]</p>
+<p><strong>步骤 3：某一位为 1 的概率</strong></p>
+<p>[<br>P_1 &#x3D; 1 - e^{-kn&#x2F;m}<br>]</p>
+<p><strong>步骤 4：误判发生的概率</strong></p>
+<p>误判发生意味着查询一个不在集合中的元素时，它对应的 K 个位置恰好全部为 1：</p>
+<p>[<br>P &#x3D; \left(1 - e^{-kn&#x2F;m}\right)^k<br>]</p>
+<p>这就是经典的布隆过滤器误判率公式：</p>
+<p>[<br>\boxed{P &#x3D; \left(1 - e^{-kn&#x2F;m}\right)^k}<br>]</p>
+<h3 id="最优哈希函数个数-k"><a href="#最优哈希函数个数-k" class="headerlink" title="最优哈希函数个数 k"></a>最优哈希函数个数 k</h3><p>为了使误判率最小，我们对 p 取对数后对 k 求导：</p>
+<p>[<br>f(k) &#x3D; \ln P &#x3D; k \cdot \ln\left(1 - e^{-kn&#x2F;m}\right)<br>]</p>
+<p>令导数为 0：</p>
+<p>[<br>\frac{df}{dk} &#x3D; \ln\left(1 - e^{-kn&#x2F;m}\right) + k \cdot \frac{1}{1 - e^{-kn&#x2F;m}} \cdot \left(-e^{-kn&#x2F;m} \cdot \frac{-n}{m}\right) \cdot \ln e &#x3D; 0<br>]</p>
+<p>设 <code>p = e^&#123;-kn/m&#125;</code>，简化后得到：</p>
+<p>[<br>\boxed{k &#x3D; \frac{m}{n} \cdot \ln 2 ≈ 0.693 \cdot \frac{m}{n}}<br>]</p>
+<p>当 <code>k</code> 取此值时的最优误判率（此时位数组中被置为 1 的比例恰好为 50%）：</p>
+<p>[<br>P_{min} &#x3D; \left(\frac{1}{2}\right)^k \approx \left(0.6185\right)^{m&#x2F;n}<br>]</p>
+<h3 id="位数组大小-m-的确定"><a href="#位数组大小-m-的确定" class="headerlink" title="位数组大小 m 的确定"></a>位数组大小 m 的确定</h3><p>在实际设计中，我们通常已知 n（预期数据量）和 p（目标误判率），进而反推 m 和 k：</p>
+<p>由 <code>k = (m/n) * ln2</code> 和 <code>P = (1/2)^k</code> 得：</p>
+<p>[<br>\boxed{m &#x3D; -\frac{n \cdot \ln P}{(\ln 2)^2}}<br>]</p>
+<p>[<br>\boxed{k &#x3D; \frac{m}{n} \cdot \ln 2}<br>]</p>
+<p><strong>重要观察：</strong> m 与 n 成线性关系，与 log(1&#x2F;P) 成正比。这意味着即使要求极低的误判率（如 0.0001%），m 的增长也只是对数级别。</p>
+<h3 id="实际计算示例"><a href="#实际计算示例" class="headerlink" title="实际计算示例"></a>实际计算示例</h3><p><strong>问题：</strong> 预期存储 n &#x3D; 1,000 万条记录，要求误判率 P ≤ 0.01%（即 1&#x2F;10000 的误判率）。</p>
+<p><strong>计算 m：</strong></p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">m = -<span class="number">10</span>,<span class="number">000,000</span> * ln(<span class="number">0</span>.<span class="number">0001</span>) / (ln <span class="number">2</span>)^²</span><br><span class="line">  = -<span class="number">10</span>,<span class="number">000,000</span> * (-<span class="number">9</span>.<span class="number">21</span>) / <span class="number">0</span>.<span class="number">4805</span></span><br><span class="line">  ≈ <span class="number">191,700</span>,<span class="number">000</span> bits</span><br><span class="line">  ≈ <span class="number">22</span>.<span class="number">85</span> MB</span><br></pre></td></tr></table></figure>
+
+<p><strong>计算 k：</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">k</span> = <span class="number">0</span>.<span class="number">693</span> * <span class="number">191</span>,<span class="number">700</span>,<span class="number">000</span> / <span class="number">10</span>,<span class="number">000</span>,<span class="number">000</span> ≈ <span class="number">13</span>.<span class="number">3</span> → 取 <span class="number">13</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>验证：</strong> P &#x3D; (1 - e^(-13*10M&#x2F;192M))^13 ≈ 0.0001 &#x3D; 0.01%</p>
+<p><strong>结论：</strong> 只需要约 23 MB 内存即可存储 1000 万条数据，且误判率仅为万分之一。</p>
+<h3 id="常见参数对照表"><a href="#常见参数对照表" class="headerlink" title="常见参数对照表"></a>常见参数对照表</h3><table>
+<thead>
+<tr>
+<th>预期元素数 n</th>
+<th>误判率 P</th>
+<th>m (bit)</th>
+<th>k</th>
+<th>内存占用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10 万</td>
+<td>1%</td>
+<td>958,506</td>
+<td>7</td>
+<td>~117 KB</td>
+</tr>
+<tr>
+<td>10 万</td>
+<td>0.1%</td>
+<td>1,437,759</td>
+<td>10</td>
+<td>~175 KB</td>
+</tr>
+<tr>
+<td>100 万</td>
+<td>1%</td>
+<td>9,585,059</td>
+<td>7</td>
+<td>~1.14 MB</td>
+</tr>
+<tr>
+<td>100 万</td>
+<td>0.1%</td>
+<td>14,377,590</td>
+<td>10</td>
+<td>~1.71 MB</td>
+</tr>
+<tr>
+<td>1000 万</td>
+<td>0.01%</td>
+<td>191,701,168</td>
+<td>13</td>
+<td>~22.85 MB</td>
+</tr>
+<tr>
+<td>1 亿</td>
+<td>0.001%</td>
+<td>2,875,518,004</td>
+<td>20</td>
+<td>~342.92 MB</td>
+</tr>
+</tbody></table>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h3 id="Guava-BloomFilter-源码分析"><a href="#Guava-BloomFilter-源码分析" class="headerlink" title="Guava BloomFilter 源码分析"></a>Guava BloomFilter 源码分析</h3><p>Google Guava 提供了生产级布隆过滤器实现 <code>com.google.common.hash.BloomFilter</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建示例</span></span><br><span class="line">BloomFilter&lt;String&gt; filter = BloomFilter.create(</span><br><span class="line">    Funnels.stringFunnel(StandardCharsets.UTF_8),</span><br><span class="line">    <span class="number">10_000_000</span>,  <span class="comment">// 预期插入量</span></span><br><span class="line">    <span class="number">0.0001</span>       <span class="comment">// 误判率 0.01%</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">filter.put(<span class="string">&quot;key-12345&quot;</span>);</span><br><span class="line"><span class="type">boolean</span> <span class="variable">mayExist</span> <span class="operator">=</span> filter.mightContain(<span class="string">&quot;key-12345&quot;</span>);  <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>核心源码（简化版），<code>put</code> 方法：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="type">boolean</span> <span class="title function_">put</span><span class="params">(T object, Funnel&lt;? <span class="built_in">super</span> T&gt; funnel,</span></span><br><span class="line"><span class="params">                       <span class="type">int</span> numHashFunctions, LockFreeBitArray bits)</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">bitSize</span> <span class="operator">=</span> bits.bitSize();</span><br><span class="line">    <span class="comment">// 通过 MurmurHash3 计算 128-bit hash，然后拆分为两个 64-bit</span></span><br><span class="line">    <span class="type">byte</span>[] bytes = Hashing.murmur3_128().hashObject(object, funnel).asBytes();</span><br><span class="line">    <span class="type">long</span> <span class="variable">hash1</span> <span class="operator">=</span> lowerEight(bytes);  <span class="comment">// 低 64 位</span></span><br><span class="line">    <span class="type">long</span> <span class="variable">hash2</span> <span class="operator">=</span> upperEight(bytes);  <span class="comment">// 高 64 位</span></span><br><span class="line"></span><br><span class="line">    <span class="type">boolean</span> <span class="variable">bitsChanged</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="comment">// 使用 Double Hashing 技巧：计算 g_i = hash1 + i * hash2</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; numHashFunctions; i++) &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">combinedHash</span> <span class="operator">=</span> hash1 + (<span class="type">long</span>) i * hash2;</span><br><span class="line">        <span class="keyword">if</span> (combinedHash &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            combinedHash = ~combinedHash;  <span class="comment">// 处理溢出</span></span><br><span class="line">        &#125;</span><br><span class="line">        bitsChanged |= bits.set(combinedHash % bitSize);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> bitsChanged;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong><code>mightContain</code> 方法：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="type">boolean</span> <span class="title function_">mightContain</span><span class="params">(T object, Funnel&lt;? <span class="built_in">super</span> T&gt; funnel,</span></span><br><span class="line"><span class="params">                                <span class="type">int</span> numHashFunctions, LockFreeBitArray bits)</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">bitSize</span> <span class="operator">=</span> bits.bitSize();</span><br><span class="line">    <span class="type">byte</span>[] bytes = Hashing.murmur3_128().hashObject(object, funnel).asBytes();</span><br><span class="line">    <span class="type">long</span> <span class="variable">hash1</span> <span class="operator">=</span> lowerEight(bytes);</span><br><span class="line">    <span class="type">long</span> <span class="variable">hash2</span> <span class="operator">=</span> upperEight(bytes);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; numHashFunctions; i++) &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">combinedHash</span> <span class="operator">=</span> hash1 + (<span class="type">long</span>) i * hash2;</span><br><span class="line">        <span class="keyword">if</span> (combinedHash &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            combinedHash = ~combinedHash;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!bits.get(combinedHash % bitSize)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;  <span class="comment">// 任一位为 0 则一定不存在</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;  <span class="comment">// 所有位都是 1，可能存在</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键设计：</strong></p>
+<ul>
+<li><strong>Double Hashing</strong>（Kirsch-Mitzenmacher 技巧）：只计算两次哈希值 <code>h1</code> 和 <code>h2</code>，然后 <code>g_i(x) = h1(x) + i * h2(x)</code> 来生成 K 个哈希值。数学上已证明这不会显著增加误判率，但大幅降低了哈希计算代价。</li>
+<li>Guava 使用 <code>MurmurHash3_128</code> 生成 128-bit 哈希，天然拆解出 <code>h1</code> 和 <code>h2</code>。</li>
+</ul>
+<h3 id="Redis-布隆过滤器"><a href="#Redis-布隆过滤器" class="headerlink" title="Redis 布隆过滤器"></a>Redis 布隆过滤器</h3><p><strong>方案一：RedisBloom 模块（推荐）</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 RedisBloom 模块</span></span><br><span class="line">redis-server --loadmodule /path/to/redisbloom.so</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用</span></span><br><span class="line">BF.RESERVE myfilter 0.0001 10000000     <span class="comment"># 误判率 0.01%, 预期 1000 万</span></span><br><span class="line">BF.ADD myfilter <span class="string">&quot;item1&quot;</span></span><br><span class="line">BF.EXISTS myfilter <span class="string">&quot;item1&quot;</span>              <span class="comment"># 返回 1</span></span><br><span class="line">BF.EXISTS myfilter <span class="string">&quot;item2&quot;</span>              <span class="comment"># 返回 0</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>方案二：Bitmap + 自定义哈希（适用于无 RedisBloom 模块）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lua 脚本实现简易版布隆过滤器</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RedisBloomFilter</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Jedis jedis;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String key;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span>[] seeds;  <span class="comment">// 哈希种子</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(String value)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> seed : seeds) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> hash(value, seed);</span><br><span class="line">            jedis.setbit(key, hash, <span class="literal">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(String value)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> seed : seeds) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> hash(value, seed);</span><br><span class="line">            <span class="keyword">if</span> (!jedis.getbit(key, hash)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(String value, <span class="type">int</span> seed)</span> &#123;</span><br><span class="line">        <span class="comment">// 类似 Guava 的轮子</span></span><br><span class="line">        <span class="keyword">return</span> Hashing.murmur3_32(seed).hashString(value, UTF_8).asInt() &amp; <span class="number">0x7FFFFFFF</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="手写完整-Java-实现"><a href="#手写完整-Java-实现" class="headerlink" title="手写完整 Java 实现"></a>手写完整 Java 实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.BitSet;</span><br><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BloomFilter</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> BitSet bitSet;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> bitSize;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> expectedInsertions;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> HashFunction[] hashFunctions;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">BloomFilter</span><span class="params">(<span class="type">int</span> expectedInsertions, <span class="type">double</span> fpp)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.expectedInsertions = expectedInsertions;</span><br><span class="line">        <span class="built_in">this</span>.bitSize = (<span class="type">int</span>) (-expectedInsertions * Math.log(fpp) / (Math.log(<span class="number">2</span>) * Math.log(<span class="number">2</span>)));</span><br><span class="line">        <span class="type">int</span> <span class="variable">numHashFunctions</span> <span class="operator">=</span> (<span class="type">int</span>) (Math.ceil((bitSize / (<span class="type">double</span>) expectedInsertions) * Math.log(<span class="number">2</span>)));</span><br><span class="line">        <span class="built_in">this</span>.bitSet = <span class="keyword">new</span> <span class="title class_">BitSet</span>(bitSize);</span><br><span class="line">        <span class="built_in">this</span>.hashFunctions = <span class="keyword">new</span> <span class="title class_">HashFunction</span>[numHashFunctions];</span><br><span class="line">        <span class="type">Random</span> <span class="variable">random</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>(<span class="number">0xcafebabe</span>);  <span class="comment">// 固定种子保证可复现</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; numHashFunctions; i++) &#123;</span><br><span class="line">            hashFunctions[i] = <span class="keyword">new</span> <span class="title class_">HashFunction</span>(random.nextInt(), random.nextInt());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">put</span><span class="params">(T value)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (HashFunction f : hashFunctions) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> f.hash(value);</span><br><span class="line">            bitSet.set(Math.abs(hash % bitSize));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">mightContain</span><span class="params">(T value)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (HashFunction f : hashFunctions) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> f.hash(value);</span><br><span class="line">            <span class="keyword">if</span> (!bitSet.get(Math.abs(hash % bitSize))) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 组合式哈希：h(x) = seed1 * hash(x) + seed2</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">HashFunction</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> seed1;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> seed2;</span><br><span class="line"></span><br><span class="line">        HashFunction(<span class="type">int</span> seed1, <span class="type">int</span> seed2) &#123;</span><br><span class="line">            <span class="built_in">this</span>.seed1 = seed1;</span><br><span class="line">            <span class="built_in">this</span>.seed2 = seed2;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object obj)</span> &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> obj.hashCode();</span><br><span class="line">            <span class="keyword">return</span> seed1 * h + seed2;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用示例：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BloomFilter&lt;String&gt; filter = <span class="keyword">new</span> <span class="title class_">BloomFilter</span>&lt;&gt;(<span class="number">10_000_000</span>, <span class="number">0.0001</span>);</span><br><span class="line">filter.put(<span class="string">&quot;user_123&quot;</span>);</span><br><span class="line">filter.put(<span class="string">&quot;user_456&quot;</span>);</span><br><span class="line">System.out.println(filter.mightContain(<span class="string">&quot;user_123&quot;</span>));  <span class="comment">// true</span></span><br><span class="line">System.out.println(filter.mightContain(<span class="string">&quot;user_789&quot;</span>));  <span class="comment">// false (大概率)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>生产建议：</strong> 手写实现适合理解原理，生产环境请使用 Guava <code>BloomFilter</code> 或 RedisBloom。生产级实现需要考虑线程安全、序列化、哈希函数均匀性（MurmurHash3）、<code>BitSet</code> 内存布局优化等问题。</p>
+<h2 id="变种"><a href="#变种" class="headerlink" title="变种"></a>变种</h2><h3 id="Counting-Bloom-Filter（计数布隆过滤器）"><a href="#Counting-Bloom-Filter（计数布隆过滤器）" class="headerlink" title="Counting Bloom Filter（计数布隆过滤器）"></a>Counting Bloom Filter（计数布隆过滤器）</h3><p><strong>解决的问题：</strong> 标准布隆过滤器不支持删除。</p>
+<p><strong>原理：</strong> 将位数组中的每一位替换为一个 <code>n-bit</code> 计数器（通常 4 bit）。插入时计数器加 1，删除时计数器减 1。</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">插入 → 对应 <span class="built_in">K</span> 个计数器各 <span class="operator">+</span><span class="number">1</span></span><br><span class="line">删除 → 对应 <span class="built_in">K</span> 个计数器各 <span class="operator">-</span><span class="number">1</span></span><br><span class="line">查询 → 所有 <span class="built_in">K</span> 个计数器 <span class="operator">&gt;</span> <span class="number">0</span> → 可能存在</span><br></pre></td></tr></table></figure>
+
+<p><strong>溢出处理：</strong> 使用 4-bit 计数器（最大 15），当计数器达到最大值时不再递增，牺牲少量准确性换取空间。实际情况中溢出的概率极低——当 m&#x2F;n 配置合理时，每个计数器的期望值远小于 15。</p>
+<p><strong>空间代价：</strong> 是标准布隆过滤器的 4 倍（4-bit 计数器 vs 1-bit）。</p>
+<h3 id="Cuckoo-Filter（布谷鸟过滤器）"><a href="#Cuckoo-Filter（布谷鸟过滤器）" class="headerlink" title="Cuckoo Filter（布谷鸟过滤器）"></a>Cuckoo Filter（布谷鸟过滤器）</h3><p>2014 年由 CMU 提出，核心改进：</p>
+<ul>
+<li><strong>支持删除</strong></li>
+<li><strong>空间效率更高</strong> —— 同等误判率下比 Counting Bloom Filter 节省约 30%-40% 空间</li>
+<li>使用 <strong>Cuckoo Hashing</strong> + 指纹（fingerprint）：每个元素计算一个 <code>f</code> 位指纹，存储在两个候选桶（bucket）的任意一个中</li>
+</ul>
+<p><strong>特点：</strong></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Bloom Filter</th>
+<th>Counting BF</th>
+<th>Cuckoo Filter</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>支持删除</td>
+<td>否</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>空间效率</td>
+<td>最优</td>
+<td>4x</td>
+<td>优于 CBF</td>
+</tr>
+<tr>
+<td>查询性能</td>
+<td>O(k)</td>
+<td>O(k)</td>
+<td>O(1)，只需检查两个桶</td>
+</tr>
+<tr>
+<td>插入性能</td>
+<td>O(k)</td>
+<td>O(k)</td>
+<td>最坏 O(∞) 需要 rehash</td>
+</tr>
+<tr>
+<td>误报控制</td>
+<td>精确</td>
+<td>精确</td>
+<td>精确</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>Redis Cuckoo Filter 指令：<code>CF.RESERVE</code>, <code>CF.ADD</code>, <code>CF.EXISTS</code>, <code>CF.DEL</code></p>
+</blockquote>
+<h3 id="Scalable-Bloom-Filter（可扩展布隆过滤器）"><a href="#Scalable-Bloom-Filter（可扩展布隆过滤器）" class="headerlink" title="Scalable Bloom Filter（可扩展布隆过滤器）"></a>Scalable Bloom Filter（可扩展布隆过滤器）</h3><p>标准布隆过滤器有个致命弱点：<strong>容量必须在初始化时确定</strong>。一旦实际数据量远超预期 n，误判率会急剧上升（公式中的 <code>n</code> 是实际插入数而非预期数）。</p>
+<p>Scalable Bloom Filter 通过<strong>动态添加新的布隆过滤器层</strong>来解决：</p>
+<ul>
+<li>当当前过滤器”饱和”时，创建一个新的布隆过滤器</li>
+<li>新过滤器的误判率设置得更严格（通常等比递减）</li>
+<li>查询时只需检查所有层</li>
+</ul>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Layer</span> <span class="number">1</span> (n=<span class="number">100</span> 万, P=<span class="number">0</span>.<span class="number">01</span>) → 满后创建</span><br><span class="line"><span class="attribute">Layer</span> <span class="number">2</span> (n=<span class="number">200</span> 万, P=<span class="number">0</span>.<span class="number">001</span>) → 满后创建</span><br><span class="line"><span class="attribute">Layer</span> <span class="number">3</span> (n=<span class="number">400</span> 万, P=<span class="number">0</span>.<span class="number">0001</span>) → ...</span><br><span class="line"><span class="attribute">Layer</span> N (n 加倍, P 递减)</span><br></pre></td></tr></table></figure>
+
+<p>时间开销为对数级，因为层数增加缓慢且早期的层误判率更高（更容易直接”否定”）。</p>
+<h3 id="Burst-Filter（爆发过滤器）"><a href="#Burst-Filter（爆发过滤器）" class="headerlink" title="Burst Filter（爆发过滤器）"></a>Burst Filter（爆发过滤器）</h3><p>一种混合结构：由一个”当前活跃”的小布隆过滤器 + 一个持久化的大布隆过滤器构成。数据首先写入活跃过滤器，达到阈值后合并入持久化过滤器。适合<strong>写入密集型</strong>场景（如高频日志去重），减少了每次写入都要操作大过滤器的开销。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><h3 id="缓存穿透防护"><a href="#缓存穿透防护" class="headerlink" title="缓存穿透防护"></a>缓存穿透防护</h3><p>缓存穿透是指查询一个<strong>数据库和缓存中都不存在的 key</strong>，请求直接穿透到数据库。恶意用户可以通过构造大量不存在的 key 造成 DB 压力。</p>
+<p><strong>标准方案：</strong></p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">请求 → 布隆过滤器(mightContain?) → 否 → 直接拒绝（不查缓存/<span class="built_in">DB</span>）</span><br><span class="line">                                  → 是 → 查缓存 → 未命中 → 查 <span class="built_in">DB</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>实现要点：</strong></p>
+<ul>
+<li>布隆过滤器初始使用数据库中所有有效 key 初始化</li>
+<li>新增 key 时同步 add 到过滤器</li>
+<li>布隆过滤器定期从 DB 全量重建（避免长期运行积累误差）</li>
+<li>布隆过滤器本身也可放在 Redis 中做分布式共享</li>
+</ul>
+<p><strong>典型案例：</strong> 某电商商品详情页缓存穿透防护，使用 50 MB Redis Bloom Filter 过滤掉 &gt;99% 的无效商品 ID 查询，将穿透请求从数万 QPS 降低到个位数。</p>
+<h3 id="大集合去重（爬虫-URL-去重）"><a href="#大集合去重（爬虫-URL-去重）" class="headerlink" title="大集合去重（爬虫 URL 去重）"></a>大集合去重（爬虫 URL 去重）</h3><p>网络爬虫需要维护”已访问 URL”集合来避免重复抓取：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 候选 URL 进入队列前 → 查询布隆过滤器</span><br><span class="line"><span class="bullet">2.</span> 可能存在 → 略过（允许少数漏抓）</span><br><span class="line"><span class="bullet">3.</span> 一定不存在 → 加入队列 + 插入布隆过滤器</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据量估算：</strong> 假设要抓取 100 亿个 URL，每个 URL 平均 80 字符，HashSet 存储需要 ~8 TB 内存，而使用布隆过滤器（误判率 0.001%）仅需约 20 GB。</p>
+<h3 id="黑名单校验"><a href="#黑名单校验" class="headerlink" title="黑名单校验"></a>黑名单校验</h3><p>在应用层的黑名单场景中，通常不需要保证 100% 的召回率，但需要极致的内存效率和查询速度：</p>
+<ul>
+<li><strong>垃圾邮件过滤</strong>：邮件服务器用布隆过滤器存储已知的垃圾邮件哈希，快速筛掉</li>
+<li><strong>IP&#x2F;用户封禁</strong>：网关层对黑名单 IP 做布隆过滤器快速放行</li>
+<li><strong>弱密码字典</strong>：注册时用布隆过滤器快速检查密码是否在已知弱密码列表中</li>
+</ul>
+<blockquote>
+<p>注意：对于需要”精确匹配”的黑名单（如支付风控），布隆过滤器只能做第一层粗筛，命中后仍需查询精确集合。</p>
+</blockquote>
+<h3 id="数据库与存储引擎"><a href="#数据库与存储引擎" class="headerlink" title="数据库与存储引擎"></a>数据库与存储引擎</h3><p><strong>LevelDB &#x2F; RocksDB：</strong> SSTable 底层使用布隆过滤器判断一个 key 是否可能在某 SSTable 中。如果布隆过滤器说”不在”，直接跳过该 SSTable 的磁盘查找。这是 LSM-Tree 读放大的关键优化。</p>
+<p><strong>配置：</strong></p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">RocksDB:</span> ColumnFamilyOptions::optimize_filters_for_hits</span><br><span class="line"><span class="symbol">Cassandra:</span> 每个 SSTable 自带一个布隆过滤器，默认误判率 <span class="number">0.01</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Apache Cassandra：</strong> Cassandra 的每个 SSTable 维护一个布隆过滤器。读请求到达时，先通过布隆过滤器判断 key 是否可能在该 SSTable 中，从而避免扫描全部 SSTable。这是 Cassandra 读性能的核心保证之一，配合 LSM-Tree 的 Compaction 策略使用。</p>
+<p><strong>Google Bigtable：</strong> Bigtable 的 SSTable 格式中内置了布隆过滤器，用于加快”点查（point lookup）”——快速跳过不包含目标 key 的 SSTable 文件。</p>
+<p><strong>Apache HBase：</strong> HBase 继承了 Bigtable 的设计，在 HFile 格式中支持多种布隆过滤器类型：</p>
+<ul>
+<li><code>ROW</code> 级别：按 row key 过滤</li>
+<li><code>ROWCOL</code> 级别：按 row key + column family + qualifier 过滤</li>
+<li>HBase 允许在建表时通过 <code>BLOOMFILTER =&gt; &#39;ROW&#39;</code> 显式指定</li>
+</ul>
+<p><strong>实践案例：</strong></p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">一个生产级的<span class="number"> 12 </span>节点 Cassandra 集群，数据总量约<span class="number"> 2 </span>TB/节点。</span><br><span class="line">在启用布隆过滤器后，点查询延迟从 15ms 降低到 2ms 以下（P99），</span><br><span class="line">因为超过 90% 的 SSTable 查找被布隆过滤器直接跳过。</span><br></pre></td></tr></table></figure>
+
+<h3 id="网络过滤器"><a href="#网络过滤器" class="headerlink" title="网络过滤器"></a>网络过滤器</h3><ul>
+<li><strong>Squid Cache</strong>：使用布隆过滤器做 Web 缓存摘要，在以 Cache Digest 协议共享缓存摘要时大幅降低带宽开销</li>
+<li><strong>CDN</strong>：节点间同步缓存摘要，用布隆过滤器描述”我缓存了哪些资源”，比传输完整 URL 列表节省 10x 以上带宽</li>
+<li><strong>路由器</strong>：分布式路由表中使用布隆过滤器做快速前缀匹配</li>
+</ul>
+<h3 id="面试常见问题"><a href="#面试常见问题" class="headerlink" title="面试常见问题"></a>面试常见问题</h3><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>关键要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>布隆过滤器的原理</td>
+<td>位数组 + K 个哈希，绝对不在 vs 可能存在</td>
+</tr>
+<tr>
+<td>为什么不会漏判</td>
+<td>插入过的元素对应位一定是 1</td>
+</tr>
+<tr>
+<td>为什么有误判</td>
+<td>多个元素可能恰好覆盖了 K 个位置</td>
+</tr>
+<tr>
+<td>误判率公式</td>
+<td><code>P = (1 - e^(-kn/m))^k</code></td>
+</tr>
+<tr>
+<td>最优 K 值</td>
+<td><code>k = (m/n) * ln2</code></td>
+</tr>
+<tr>
+<td>为什么不支持删除</td>
+<td>一个位可能被多个元素共享，重置会漏判</td>
+</tr>
+<tr>
+<td>如何支持删除</td>
+<td>Counting Bloom Filter &#x2F; Cuckoo Filter</td>
+</tr>
+<tr>
+<td>实际系统怎么用</td>
+<td>缓存穿透、爬虫去重、LSM-Tree SSTable 加速</td>
+</tr>
+<tr>
+<td>容量超了怎么办</td>
+<td>误判率会上升 → 使用 Scalable Bloom Filter</td>
+</tr>
+<tr>
+<td>Guava 实现用了什么技巧</td>
+<td>Double Hashing + MurmurHash3_128</td>
+</tr>
+<tr>
+<td>和 Bitmap 的区别</td>
+<td>Bitmap 是精确的，需要 1:1 映射；布隆过滤器是多对多映射</td>
+</tr>
+<tr>
+<td>Redis 中怎么用</td>
+<td>BF.ADD &#x2F; BF.EXISTS（RedisBloom 模块）或 Bitmap + Lua</td>
+</tr>
+</tbody></table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>布隆过滤器用极小的空间代价换取了可控的误判率，是”概率换空间”思想的典范应用。在实际工程中，它已经被反复证明是处理大规模集合成员查询问题的最优方案之一：</p>
+<ul>
+<li><strong>缓存层：</strong> 用几十 MB 内存挡掉数百万无效请求</li>
+<li><strong>存储引擎层：</strong> 作为 “快速否定器” 避免昂贵的磁盘 I&#x2F;O</li>
+<li><strong>网络层：</strong> 以极低的带宽开销完成分布式集合摘要交换</li>
+</ul>
+<p>理解布隆过滤器，不仅仅是掌握一个数据结构，更是理解一种工程权衡的哲学——<strong>在合适的场景下，允许可控的”错误”往往能带来数量级的性能&#x2F;空间提升。</strong></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/Bloom-Filter/" rel="tag"># Bloom Filter</a>
+              <a href="/tags/%E7%BC%93%E5%AD%98/" rel="tag"># 缓存</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/cache-strategy/" rel="prev" title="缓存策略总论">
+                  <i class="fa fa-angle-left"></i> 缓存策略总论
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/architecture-evolution/" rel="next" title="架构风格演进——单体到微服务到Serverless">
+                  架构风格演进——单体到微服务到Serverless <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

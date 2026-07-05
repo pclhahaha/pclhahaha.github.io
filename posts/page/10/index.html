@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:type" content="website">
+<meta property="og:title" content="个人笔记">
+<meta property="og:url" content="http://pclhahaha.github.io/posts/page/10/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="pcl">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/posts/page/10/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"posts/page/10/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">个人笔记</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/fst-finite-state-transducer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/fst-finite-state-transducer/" class="post-title-link" itemprop="url">FST 有限状态转换器</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>FST 是 Elasticsearch&#x2F;Lucene 引擎的基石数据结构。</strong> 需要先理解为什么有它：</p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ES 数据流向:</span><br><span class="line">原始文档</span><br><span class="line">  ↓ 分词 (Analyzer)</span><br><span class="line"><span class="keyword">Term</span> 字典 (所有不重复的词)  ← 可能数百万甚至数亿个</span><br><span class="line">  ↓ 每个 <span class="keyword">Term</span> → 倒排列表 (Posting List, 哪些文档包含这个词)</span><br><span class="line">倒排索引</span><br></pre></td></tr></table></figure>
+
+<p><strong>问题：</strong> 数亿个 Term，怎么快速找到某个词对应的倒排列表？最直接的办法是哈希表 (O(1))，但哈希表没法前缀查询。B-Tree 可以，但字符比较的存储效率低。</p>
+<p><strong>FST 的解法：</strong> FST 本质上是一个<strong>有向无环图 (Minimal Acyclic DFA)</strong>，将共享前缀和后缀的字符串压缩到极致。</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">普通 Trie 存储 <span class="string">&quot;mon&quot;</span>, <span class="string">&quot;tues&quot;</span>, <span class="string">&quot;thurs&quot;</span>:</span><br><span class="line">        root</span><br><span class="line">       / |<span class="string"> \</span></span><br><span class="line"><span class="string">      m  t  t            (多个 t 重复)</span></span><br><span class="line"><span class="string">      </span>|<span class="string">  </span>|<span class="string">  </span>|</span><br><span class="line">      o  u  h</span><br><span class="line">      |<span class="string">  </span>|<span class="string">  </span>|</span><br><span class="line">      n  e  u</span><br><span class="line">         |<span class="string">  </span>|</span><br><span class="line">         s  r</span><br><span class="line">            |<span class="string"></span></span><br><span class="line"><span class="string">            s</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">FST 存储 (共享前缀 + 后缀):</span></span><br><span class="line"><span class="string">    [root]</span></span><br><span class="line"><span class="string">      ├── m → o → n [$]</span></span><br><span class="line"><span class="string">      └── t ─┬─ u → e → s [$]</span></span><br><span class="line"><span class="string">             └─ h → u → r → s [$]</span></span><br></pre></td></tr></table></figure>
+
+<p>FST 共享了 <code>t</code> 前缀和 <code>s</code> 后缀，而且每个节点上可以挂载数值（如 Term 在倒排文件中的偏移量），既是<strong>字典</strong>又是<strong>映射</strong>。</p>
+<p><strong>Lucene 的 BlockTree Terms Index：</strong></p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Lucene 内部术语索引:</span><br><span class="line"><span class="string">                    [Term Index (FST)]</span></span><br><span class="line">                           │</span><br><span class="line">                    ┌──────┼──────┐</span><br><span class="line">                    │      │      │</span><br><span class="line">            term_a ─┘ term_m ─┘ term_z ─┘</span><br><span class="line">                    │      │      │</span><br><span class="line">                    ▼      ▼      ▼</span><br><span class="line"><span class="string">              [Term Dictionary (BlockTree - 有序前缀块)]</span></span><br><span class="line">                    │      │      │</span><br><span class="line">                    ▼      ▼      ▼</span><br><span class="line"><span class="string">            [Posting Lists (跳表/FOR编码/RBM位图)]</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Term Index</strong>：用 FST 存储所有 Term 的前缀，快速定位到 Term Dictionary 对应的 block</li>
+<li><strong>Term Dictionary</strong>：用 BlockTree 存储，每块包含一些按字典序排序的 Term，块内二分查找</li>
+<li><strong>Posting List</strong>：倒排列表，存储文档 ID 列表，用 FOR 编码&#x2F;RBM 位图压缩</li>
+</ul>
+<p>FST 极大地压缩了 Term Index 的内存占用——通常可以把一个 10 亿 Term 的索引前缀压缩到几 GB 甚至几百 MB，<strong>全部加载到内存中</strong>，实现微秒级的 Term 定位。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/gfs-paper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/gfs-paper/" class="post-title-link" itemprop="url">GFS 论文解读</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>GFS 是 Google 于 2003 年发表的经典分布式文件系统论文（《The Google File System》），其系统设计思想深刻影响了后续分布式存储系统的发展（HDFS 即为 GFS 的开源实现）。本节从前提假设、系统架构、一致性模型和系统交互四个方面分析 GFS 的核心设计。</p>
+<h3 id="1-1-前提与假设"><a href="#1-1-前提与假设" class="headerlink" title="1.1 前提与假设"></a>1.1 前提与假设</h3><p>GFS 在设计之初就明确了其与众不同的假设条件，这些假设决定了 GFS 很多与传统文件系统截然不同的设计决策：</p>
+<ul>
+<li><strong>节点&#x2F;组件失效是常态</strong>：廉价的商用服务器随时可能故障，因此监控、异常检测、容错和自动恢复是系统必备特性，而非可选增强</li>
+<li><strong>存储文件尺寸较大，通常是 GB 级别</strong>：IO 操作和 block size 需要针对大文件重新设计</li>
+<li><strong>写文件主要是 append 操作，随机写几乎不存在；读文件主要是顺序读，随机读较少</strong>：需要关注写的原子性，并针对 append 进行深度性能优化</li>
+<li><strong>系统设计主要关注高吞吐量（throughput），而不是低响应延迟（latency）</strong>：批量数据处理场景下吞吐量远比单次延迟重要</li>
+</ul>
+<h3 id="1-2-系统架构"><a href="#1-2-系统架构" class="headerlink" title="1.2 系统架构"></a>1.2 系统架构</h3><p><img src="/distributed/image-20200127153256454.png" alt="image-20200127153256454"></p>
+<p>GFS 集群由一个 <strong>Master</strong> 和多个 <strong>Chunkserver</strong> 组成，被多个 <strong>Client</strong> 访问。文件被分割为固定大小的 <strong>chunk</strong>。</p>
+<ul>
+<li><strong>chunk</strong>：文件存储在固定大小的 chunk 中，每个 chunk 由一个全局唯一的 64 位 chunk handle 标识</li>
+<li><strong>Master</strong>：维护文件系统的所有元数据，包括 namespace（文件命名空间）、access control 信息、文件到 chunk 的映射、所有 chunk 的当前位置。同时控制系统活动，包括 chunk lease management（租约管理）、孤立 chunk 的垃圾回收、chunkserver 之间的 chunk 迁移。Master 与 chunkserver 之间通过 HeartBeat 心跳信息进行通信，包括下达指令和收集状态</li>
+<li><strong>Chunkserver</strong>：出于可靠性的考虑，chunk 一般在多个 chunkserver 上进行 3 副本存储。Chunkserver 不缓存文件——因为 Linux 系统的 buffer cache 已经缓存了热点数据，在 chunkserver 上再做一层缓存没有额外收益</li>
+<li><strong>Client</strong>：客户端不针对文件进行缓存，只对元数据进行缓存。原因：大部分应用需要扫描大文件，太大无法缓存；不做缓存也自然避免了缓存一致性问题</li>
+</ul>
+<h4 id="1-2-1-Chunk-Size"><a href="#1-2-1-Chunk-Size" class="headerlink" title="1.2.1 Chunk Size"></a>1.2.1 Chunk Size</h4><p>GFS 的 chunk size 为 <strong>64MB</strong>，远大于典型文件系统的 block size。利用 lazy space allocation（延迟空间分配）避免了内部碎片造成的空间浪费。</p>
+<p>较大的 chunk size 提供了以下好处：</p>
+<ul>
+<li>减少 Client 与 Master 的交互次数（一次交互可获取更大的操作范围）</li>
+<li>Client 与 Chunkserver 保持较长的 TCP 持久连接，减少连接建立开销</li>
+<li>减小 Master 上存储的元数据体积，使元数据可以全部存储在内存中，带来极快的查找性能</li>
+</ul>
+<p>副作用：一个小文件可能仅占用一个 chunk，当多客户端同时访问该文件时，承载该 chunk 的 chunkserver 会成为热点。</p>
+<h4 id="1-2-2-元数据（Metadata）"><a href="#1-2-2-元数据（Metadata）" class="headerlink" title="1.2.2 元数据（Metadata）"></a>1.2.2 元数据（Metadata）</h4><p>Master 存储三种类型的元数据：</p>
+<ol>
+<li>文件和 chunk 的 namespace</li>
+<li>文件到 chunk 的映射</li>
+<li>每个 chunk 的副本位置</li>
+</ol>
+<p>前两种元数据通过 <strong>operation log</strong> 持久化存储在 Master 的本地磁盘，并备份到远程机器上。</p>
+<h5 id="Chunk-Locations"><a href="#Chunk-Locations" class="headerlink" title="Chunk Locations"></a>Chunk Locations</h5><p>Master 不持久化存储 chunk 位置信息——而是在启动时以及 chunkserver 加入集群时，通过询问 chunkserver 来获取其持有的 chunk 列表。这种设计避免了 Master 与 chunkserver 之间因为保持 chunk 位置信息一致而带来的复杂性（chunkserver 自身就是 chunk 位置的最权威信息源）。</p>
+<h5 id="Operation-Log"><a href="#Operation-Log" class="headerlink" title="Operation Log"></a>Operation Log</h5><p>operation log 不仅是元数据的唯一持久化存储，也定义了并发操作的逻辑时间线——文件和 chunk 以及它们的版本都可以通过逻辑创建时间来唯一确定。</p>
+<p>元数据的变更需要在对客户端可见之前完成持久化（写入本地磁盘并同步到远程机器），Master 通过批量收集日志记录来减少对系统吞吐量的影响。</p>
+<p>Master 通过<strong>重放 operation log</strong> 来恢复文件系统状态。为缩短恢复时间，当 operation log 超过特定大小时，Master 会保存一个 <strong>checkpoint</strong>——恢复时只需加载最近的 checkpoint 并重放其后的 log。Checkpoint 以类似 B 树的形式组织，能够直接映射到内存中并且不需要额外解析就能用于 namespace 查找。生成 checkpoint 时，Master 切换到新的 operation log 文件，并在单独线程中异步创建 checkpoint；恢复时会验证 checkpoint 的完整性，跳过不完整的 checkpoint。</p>
+<h3 id="1-3-一致性模型"><a href="#1-3-一致性模型" class="headerlink" title="1.3 一致性模型"></a>1.3 一致性模型</h3><h4 id="1-3-1-保障（Guarantees）"><a href="#1-3-1-保障（Guarantees）" class="headerlink" title="1.3.1 保障（Guarantees）"></a>1.3.1 保障（Guarantees）</h4><p>文件 namespace 的修改（例如文件的创建）保证原子性——这些操作全部由 Master 处理：namespace 加锁保证原子性和正确性，operation log 定义了这些操作的全局总序。</p>
+<p>文件块在修改之后的状态取决于修改的类型、是否成功、是否是并发操作。下表总结了各种情况下的结果：</p>
+<p><img src="/distributed/image-20200127205351882.png" alt="image-20200127205351882"></p>
+<p>其中 <strong>defined</strong> 表示文件块是一致的，并且对其的修改是完整可见的。随机写由于可能覆盖原有数据，因此在并发的情况下不能保证每次操作的可见性（可能出现 <strong>consistent but undefined</strong> 的状态——所有客户端看到相同的内容，但内容可能是多次写入的交错混合）。</p>
+<p>GFS 通过以下两点来保证文件块在一系列成功修改之后的可见性，并保证包含最后一次修改：</p>
+<ol>
+<li>在其所有副本上按照<strong>相同的顺序</strong>应用修改</li>
+<li>使用 <strong>chunk version number</strong> 检测过期副本（版本号不匹配），过期副本会很快被垃圾回收清除</li>
+</ol>
+<p>GFS 通过 Master 与所有 chunkserver 之间的定期握手检测失效的 chunkserver，并通过 <strong>checksum</strong> 检测数据损坏。一旦问题被发现，数据会从有效副本中恢复。只有在所有副本在 GFS 响应之前都丢失的情况下数据才算真正丢失（时间窗口通常为几分钟），并且 GFS 不会返回损坏的数据，而是返回明确的错误。</p>
+<h4 id="1-3-2-对应用层的启示"><a href="#1-3-2-对应用层的启示" class="headerlink" title="1.3.2 对应用层的启示"></a>1.3.2 对应用层的启示</h4><p>GFS 的一致性模型是”弱化版”的——它不保证所有场景下的强一致性，而是将部分责任上移到应用层：</p>
+<ul>
+<li>尽量使用 <strong>append</strong> 写操作（而非随机写），append 的原子性保证每条记录至少被原子地写入一次</li>
+<li>应用层采用 <strong>checkpoint 机制</strong>来标记一致的数据点</li>
+<li>应用层的记录应能 <strong>自我验证（checksum）</strong> 和 <strong>自我识别（unique identifier）</strong>，以检测和去除重复或损坏的数据</li>
+</ul>
+<p>这种”放宽文件系统一致性要求、由应用层承担部分责任”的设计哲学，是 GFS 能够在廉价硬件上实现高吞吐的核心原因之一。</p>
+<h3 id="1-4-系统交互"><a href="#1-4-系统交互" class="headerlink" title="1.4 系统交互"></a>1.4 系统交互</h3><h4 id="1-4-1-主副本及写顺序"><a href="#1-4-1-主副本及写顺序" class="headerlink" title="1.4.1 主副本及写顺序"></a>1.4.1 主副本及写顺序</h4><p>Master 从一个 chunk 的所有副本中选择一个发放 <strong>lease（租约）</strong>，该副本称为<strong>主副本（Primary）</strong>。主副本对所有对该 chunk 的写操作选择一个序列化顺序，所有副本按此顺序执行写操作。Master 发放给主副本的 lease 初始超时时间为 60s，后续主副本通过 chunkserver 与 Master 之间的心跳信息发送延长租约的请求。</p>
+<p>下图展示了一次写操作的控制流与数据流：</p>
+<p><img src="/distributed/image-20200127213256584.png" alt="image-20200127213256584"></p>
+<ul>
+<li><strong>步骤 1</strong>：Client 向 Master 询问 chunk 的主副本及所有次副本的位置。如当前没有主副本（lease 已过期），Master 选择一个副本下发 lease，使其成为新的主副本</li>
+<li><strong>步骤 2</strong>：Master 响应主副本及次副本的位置，Client 缓存该信息。此后只有当主副本无法访问或主副本响应为不再持有 lease 时，Client 才需要再次访问 Master</li>
+<li><strong>步骤 3</strong>：Client 向<strong>所有</strong>副本推送数据（以任意顺序），Chunkserver 将数据缓存在 LRU buffer 中</li>
+<li><strong>步骤 4</strong>：Client 发送写请求到主副本，主副本为它收到的所有写操作分配一个连续的序列号，按序列号顺序应用到本地</li>
+<li><strong>步骤 5</strong>：主副本将写请求转发给次副本，次副本按主副本指定的序列号顺序应用</li>
+<li><strong>步骤 6</strong>：次副本响应主副本写入完成</li>
+<li><strong>步骤 7</strong>：主副本响应 Client。若有任何副本写入出错，错误上报给 Client，由 Client 发起重试</li>
+</ul>
+<p>注意：过大的写操作或跨越 chunk 边界的写操作，GFS Client 会将其拆分为多个独立的写操作——因此并发写操作可能导致文件块中混杂来自不同 Client 的数据片段。</p>
+<h4 id="1-4-2-数据流解耦"><a href="#1-4-2-数据流解耦" class="headerlink" title="1.4.2 数据流解耦"></a>1.4.2 数据流解耦</h4><p>GFS 一个关键设计是<strong>数据流与控制流的解耦</strong>：控制流从 Client → 主副本 → 次副本传递，而数据流以**数据管道（pipeline）**的形式在一条精心选择的 chunkserver 链路上线性传输。这种设计充分利用了每台机器的网络带宽，避开网络瓶颈和高延迟链路，最大化全双工带宽利用率，最小化推送数据的总延迟。</p>
+<h3 id="1-5-Master-的操作"><a href="#1-5-Master-的操作" class="headerlink" title="1.5 Master 的操作"></a>1.5 Master 的操作</h3><h4 id="1-5-1-Namespace-管理与锁"><a href="#1-5-1-Namespace-管理与锁" class="headerlink" title="1.5.1 Namespace 管理与锁"></a>1.5.1 Namespace 管理与锁</h4><p>Master 通过 namespace 锁保证文件操作的原子性和正确性，operation log 定义操作的全局顺序。GFS 的 namespace 是扁平的，没有传统文件系统的目录层级概念——路径只是逻辑上的命名约定，不对应物理目录结构。</p>
+<h3 id="1-6-容错与诊断"><a href="#1-6-容错与诊断" class="headerlink" title="1.6 容错与诊断"></a>1.6 容错与诊断</h3><p>GFS 在容错方面依赖于三个核心机制：</p>
+<ul>
+<li><strong>Master 高可用</strong>：Master 元数据通过 operation log 持久化到本地磁盘并远程备份，配合 shadow master（只读副本）在主 Master 故障时提供只读服务</li>
+<li><strong>Chunk 多副本</strong>：chunk 默认 3 副本存储在不同机架的不同 chunkserver 上，任何单点故障不影响数据可用性</li>
+<li><strong>数据完整性检测</strong>：通过 checksum 检测数据损坏并自动从正常副本恢复；通过 chunk version number 检测并回收过期的陈旧副本</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/gossip-protocol/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/gossip-protocol/" class="post-title-link" itemprop="url">Gossip 协议</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Gossip 是一种去中心化的信息传播协议，节点随机选择邻居进行信息交换，最终使信息在整个集群中传播。其本质模仿人类社会中的流言传播（epidemic protocol），适用于<strong>最终一致性</strong>场景。</p>
+<p>Gossip 的核心特点：</p>
+<ul>
+<li><strong>去中心化</strong>：没有中心协调节点，所有节点地位对等，任何节点都可以发起信息交换</li>
+<li><strong>容错性极强</strong>：即使部分节点故障或网络丢包，信息通过多条路径最终仍能到达所有健康节点</li>
+<li><strong>可扩展</strong>：节点数增加时传播延迟呈对数增长，不存在单点瓶颈</li>
+<li><strong>冗余通信</strong>：信息会通过多个路径重复传播，带来一定的带宽冗余——这是去中心化的代价</li>
+</ul>
+<p>单次 Gossip 通信通常包含三种模式：</p>
+<ul>
+<li><strong>Push</strong>：节点 A 将自身数据推送给节点 B</li>
+<li><strong>Pull</strong>：节点 A 从节点 B 拉取数据</li>
+<li><strong>Push-Pull</strong>：节点 A 和 B 互相交换数据（效率最高，收敛最快）</li>
+</ul>
+<p>典型实现：Cassandra 集群节点状态检测（Gossip 协议维护成员列表）、Consul 的 Serf 成员管理、Redis Cluster 的节点间通信</p>
+<p>推荐阅读：<a target="_blank" rel="noopener" href="https://www.nosuchfield.com/2019/03/12/Gossip-protocol-from-epidemics/">Gossip 协议：从流行病说起</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/grpc-protobuf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/grpc-protobuf/" class="post-title-link" itemprop="url">gRPC 与 Protocol Buffers</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/RPC/" itemprop="url" rel="index"><span itemprop="name">RPC</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="一、Protocol-Buffers-基础"><a href="#一、Protocol-Buffers-基础" class="headerlink" title="一、Protocol Buffers 基础"></a>一、Protocol Buffers 基础</h3><p>Protocol Buffers 的介绍文档：</p>
+<p><a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/overview">https://developers.google.com/protocol-buffers/docs/overview</a></p>
+<h4 id="1-1-proto3"><a href="#1-1-proto3" class="headerlink" title="1.1 proto3"></a>1.1 proto3</h4><p>gRPC 使用的是 Protocol Buffers 的 proto3 版本。</p>
+<p><a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/proto3">https://developers.google.com/protocol-buffers/docs/proto3</a></p>
+<p>Java 语言使用 Protocol Buffers 的教程如下：</p>
+<p><a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/javatutorial#compiling-your-protocol-buffers">https://developers.google.com/protocol-buffers/docs/javatutorial#compiling-your-protocol-buffers</a></p>
+<h3 id="二、gRPC-服务定义与四种-RPC-类型"><a href="#二、gRPC-服务定义与四种-RPC-类型" class="headerlink" title="二、gRPC 服务定义与四种 RPC 类型"></a>二、gRPC 服务定义与四种 RPC 类型</h3><h4 id="2-1-服务定义"><a href="#2-1-服务定义" class="headerlink" title="2.1 服务定义"></a>2.1 服务定义</h4><figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">service </span><span class="title class_">HelloService</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> SayHello (HelloRequest) <span class="keyword">returns</span> (HelloResponse)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">HelloRequest</span> &#123;</span><br><span class="line">  <span class="type">string</span> greeting = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">HelloResponse</span> &#123;</span><br><span class="line">  <span class="type">string</span> reply = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-四种-RPC-类型"><a href="#2-2-四种-RPC-类型" class="headerlink" title="2.2 四种 RPC 类型"></a>2.2 四种 RPC 类型</h4><ul>
+<li><p><strong>Unary RPC</strong>：一元调用，客户端发送一个请求，服务端返回一个响应。</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">rpc</span> SayHello(HelloRequest) <span class="keyword">returns</span> (HelloResponse) </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Server streaming RPC</strong>：服务端流式 RPC，客户端发送一个请求，服务端返回一个流。</p>
+<figure class="highlight proto"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">rpc</span> LotsOfReplies(HelloRequest) <span class="keyword">returns</span> (stream HelloResponse) </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Client streaming RPC</strong>：客户端流式 RPC，客户端发送一个流，服务端返回一个响应。</p>
+<figure class="highlight proto"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">rpc</span> LotsOfGreetings(stream HelloRequest) <span class="keyword">returns</span> (HelloResponse) </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Bidirectional streaming RPC</strong>：双向流式 RPC，客户端和服务端都可以发送流。</p>
+<figure class="highlight proto"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">rpc</span> BidiHello(stream HelloRequest) <span class="keyword">returns</span> (stream HelloResponse) </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="三、gRPC-认证"><a href="#三、gRPC-认证" class="headerlink" title="三、gRPC 认证"></a>三、gRPC 认证</h3><ul>
+<li><strong>Credentials</strong>：channel credentials &#x2F; call credentials</li>
+<li><strong>SSL&#x2F;TLS</strong></li>
+<li><strong>Token-based authentication with Google</strong></li>
+</ul>
+<h3 id="四、gRPC-核心特性"><a href="#四、gRPC-核心特性" class="headerlink" title="四、gRPC 核心特性"></a>四、gRPC 核心特性</h3><p>使用场景：</p>
+<ul>
+<li>微服务架构</li>
+<li>边缘计算：边缘设备连接到后端服务，移动设备、浏览器、IoT</li>
+<li>生成高效的客户端</li>
+</ul>
+<p>核心特性：</p>
+<ul>
+<li>Idiomatic client libraries in 10 languages</li>
+<li>Highly efficient on wire and with a simple service definition framework</li>
+<li>Bi-directional streaming with HTTP&#x2F;2 based transport</li>
+<li>Pluggable auth, tracing, load balancing and health checking</li>
+</ul>
+<h4 id="4-1-HTTP-2-与双向-streaming"><a href="#4-1-HTTP-2-与双向-streaming" class="headerlink" title="4.1 HTTP&#x2F;2 与双向 streaming"></a>4.1 HTTP&#x2F;2 与双向 streaming</h4><p>gRPC 基于 HTTP&#x2F;2 传输，天然支持双向流式通信。HTTP&#x2F;2 的多路复用特性使得单个连接上可以同时进行多个请求和响应，避免了 HTTP&#x2F;1.1 的 head-of-line blocking 问题。这为 gRPC 的四种 RPC 类型提供了高效的底层传输能力。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/heap-and-priority-queue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/heap-and-priority-queue/" class="post-title-link" itemprop="url">堆 (Heap) 与 TopK</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>优先队列不是 FIFO——每次取出的都是<strong>优先级最高</strong>的元素，而”优先级最高”由比较器定义。底层通常是<strong>堆 (Heap)</strong> 实现。</p>
+<p><strong>定时任务调度：</strong> Java <code>ScheduledThreadPoolExecutor</code> 内部使用 <code>DelayedWorkQueue</code>（小顶堆实现），堆顶永远是最近需要执行的任务。每次 <code>take()</code> 时检查堆顶任务的到期时间：</p>
+<ul>
+<li>如果已到期 → 立即执行</li>
+<li>如果未到期 → <code>awaitNanos(delay)</code> 等待</li>
+</ul>
+<p>但是存在一个问题：如果在等待期间插入了一个更早的任务怎么办？新插入的任务触发 <code>siftUp</code>，如果它比当前等待的堆顶更早，会调用 <code>leader</code> 线程的 <code>interrupt()</code> 重新排队。</p>
+<p><strong>时间轮 (HashedWheelTimer)：</strong> Netty 使用时间轮实现高性能定时器，解决大量定时任务场景下堆的 O(log n) 插入复杂度问题。时间轮把时间分成多个格子（bucket），每个格子是一个任务链表，指针按 tick 转动。插入 O(1)，但精度受 tick 间隔限制。</p>
+<p><strong>Dijkstra 最短路径：</strong> 用优先队列（最小堆）维护”当前已知最短距离的节点”，每次弹出最小距离节点进行松弛操作——这是在链路追踪、路由选择中的核心算法，详见第 7 章。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/incremental-rehash/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/incremental-rehash/" class="post-title-link" itemprop="url">渐进式 Rehash (Redis dict)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Redis 的核心数据结构 <code>dict</code> 在以下场景广为使用：全局 key 空间、Hash 类型底层、Set 类型（小集合用 ziplist，大集合用 dict）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Redis dict 结构 (redis/src/dict.h)</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">    dictType *type;</span><br><span class="line">    dictEntry **ht_table[<span class="number">2</span>];    <span class="comment">// 两个哈希表：ht[0] 正常使用，ht[1] 用于 rehash</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ht_used[<span class="number">2</span>];</span><br><span class="line">    <span class="type">long</span> rehashidx;             <span class="comment">// -1 表示无 rehash 进行中，≥0 表示正在 rehash</span></span><br><span class="line">    <span class="type">int</span> iterators;</span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure>
+
+<p><strong>渐进式 Rehash：</strong> Redis 是单线程的，如果一次性把 <code>ht[0]</code> 所有 bucket 拷贝到 <code>ht[1]</code>，大 key 场景下会长时间阻塞。Redis 的做法是分步搬迁：</p>
+<ol>
+<li>创建 <code>ht[1]</code>（容量为 <code>ht[0]</code> 的 2 倍）</li>
+<li>设置 <code>rehashidx = 0</code></li>
+<li>每次对 dict 的<strong>增删改查</strong>操作时，顺手把 <code>rehashidx</code> 指向的那个 bucket 从 <code>ht[0]</code> 搬迁到 <code>ht[1]</code>，然后 <code>rehashidx++</code></li>
+<li>所有 bucket 搬迁完毕，<code>ht[1]</code> 变成新的 <code>ht[0]</code>，销毁旧的</li>
+</ol>
+<p>在渐进式 rehash 期间，新增操作只写到 <code>ht[1]</code>，查询&#x2F;删除&#x2F;更新需要同时查两个表。</p>
+<p>两个触发 Rehash 的条件（负载因子 &#x3D; <code>used / size</code>）：</p>
+<ul>
+<li><strong>扩容</strong>：负载因子 ≥ 1 且无 <code>BGSAVE</code>&#x2F;<code>BGREWRITEAOF</code> 子进程；或负载因子 &gt; 5（此时不管有没有子进程，强制扩容）</li>
+<li><strong>缩容</strong>：负载因子 &lt; 0.1</li>
+</ul>
+<blockquote>
+<p>更详细的 Redis 内部结构分析参见 <a href="..%5Cdata%5Credis.md">Redis 深度解析</a>。</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-aqs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/java-aqs/" class="post-title-link" itemprop="url">AQS 原理与应用</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E5%B9%B6%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">并发</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-AQS原理"><a href="#1-AQS原理" class="headerlink" title="1. AQS原理"></a>1. AQS原理</h3><img src="/java/concurrency/aqsuml.png" alt="aqs" style="zoom: 50%;" />
+
+<p>上面在讲ReentrantLock等的过程中说到它是基于AQS实现的。AQS提供了一个框架，该框架可用于实现基于FIFO队列的阻塞锁或相关同步器(semaphores, events, etc)。由于只是提供了一个框架，其子类需要提供具体实现，一般来说子类应该被定义为non-public的内部辅助类（例如ReentrantLock类内部的Sync类，如上面类图所示），用于实现其外部类的同步性质。AQS框架支持独占模式和共享模式，供具体实现来选择。下面列出其子类需要具体实现的方法列表。</p>
+<table>
+<thead>
+<tr>
+<th>需要子类实现的方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>tryAcquire</td>
+<td>尝试在互斥模式下acquire</td>
+</tr>
+<tr>
+<td>tryRelease</td>
+<td>尝试在互斥模式下release</td>
+</tr>
+<tr>
+<td>tryAcquireShared</td>
+<td>尝试在共享模式下acquire</td>
+</tr>
+<tr>
+<td>tryReleaseShared</td>
+<td>尝试在共享模式下acquire</td>
+</tr>
+<tr>
+<td>isHeldExclusively</td>
+<td>判断是否被当前线程独占</td>
+</tr>
+</tbody></table>
+<p>子类通过实现上面这些方法决定了同步器在获取同步时的行为。</p>
+<p>下面来解释一下AQS的运行机制。</p>
+<h4 id="1-1-Node类"><a href="#1-1-Node类" class="headerlink" title="1.1 Node类"></a>1.1 Node类</h4><p>从上面的类图可以看到AQS类内部有一个Node类，该类用于实现一个双向链表，表示等待获取的线程队列，该类有5个成员变量</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>waitStatus</td>
+<td>该节点的状态：CANCELLED(acquire取消，在锁的场景下可以理解为取消加锁), SIGNAL(等待唤醒), CONDITION(等待一个condition的唤醒), PROPAGATE(共享模式下), 0(初始状态)</td>
+</tr>
+<tr>
+<td>thread</td>
+<td>该等待节点对应的线程</td>
+</tr>
+<tr>
+<td>prev</td>
+<td>等待队列的前一个节点</td>
+</tr>
+<tr>
+<td>next</td>
+<td>等待队列的后一个节点</td>
+</tr>
+<tr>
+<td>nextWaiter</td>
+<td>若该节点在等待一个condition，则nextWaiter指向等待该condition的下一个节点</td>
+</tr>
+</tbody></table>
+<h4 id="1-2-ConditionObject类"><a href="#1-2-ConditionObject类" class="headerlink" title="1.2 ConditionObject类"></a>1.2 ConditionObject类</h4><p>ConditionObject类实现了Condition接口，Condition一般是配合Lock使用，这里ConditionObject用于配合AQS实现类似的效果，例如，可以创建多个ConditionObject类表示不同的条件，满足某一个条件则唤醒该ConditionObject对应的等待队列中的节点，并将其加入AQS的等待队列，去尝试获取锁。</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>firstWaiter</td>
+<td>该ConditionObject的等待队列的头节点</td>
+</tr>
+<tr>
+<td>nextWaiter</td>
+<td>该ConditionObject的等待队列的尾节点</td>
+</tr>
+</tbody></table>
+<h4 id="1-3-AQS类"><a href="#1-3-AQS类" class="headerlink" title="1.3 AQS类"></a>1.3 AQS类</h4><p>有3个成员变量</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>state</td>
+<td>保存状态的变量，在锁的场景下可以是锁的状态，如0表示未加锁，1表示加锁；或者可重入锁的情况下保存锁重入的次数，0表示未加锁，3表示已加锁并重入了3次</td>
+</tr>
+<tr>
+<td>head</td>
+<td>等待获取锁的队列的头节点</td>
+</tr>
+<tr>
+<td>tail</td>
+<td>等待获取锁的队列的尾节点</td>
+</tr>
+</tbody></table>
+<p>通过上面对3个类以及AQS源码的分析，我们可以得出AQS的运行时数据结构，当尝试获取锁时，将对应线程加入等待队列，释放锁时，将其移出队列。若要支持Condition，则可以利用ConditionObject，ConditionObject实现了条件队列。</p>
+<img src="/java/concurrency/aqs.png" alt="aqs" style="zoom: 50%;" />
+
+
+
+<h4 id="1-4-基于AQS实现的锁及其他同步器"><a href="#1-4-基于AQS实现的锁及其他同步器" class="headerlink" title="1.4 基于AQS实现的锁及其他同步器"></a>1.4 基于AQS实现的锁及其他同步器</h4><p>基于AQS实现的锁及其他同步器如下：</p>
+<table>
+<thead>
+<tr>
+<th>使用了AQS的同步器实现</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ReentrantLock</td>
+<td>可重入锁，类似synchronized</td>
+</tr>
+<tr>
+<td>ReentrantReadWriteLock</td>
+<td>读写锁，适用于需要加锁的读多写少的场景</td>
+</tr>
+<tr>
+<td>Semaphore</td>
+<td>信号量，用于控制并发量</td>
+</tr>
+<tr>
+<td>CountdownLatch</td>
+<td>闭锁，让线程等待其他线程的完成</td>
+</tr>
+</tbody></table>
+<h3 id="2-ReentrantLock"><a href="#2-ReentrantLock" class="headerlink" title="2. ReentrantLock"></a>2. ReentrantLock</h3><p>ReentrantLock的特性如下：</p>
+<ul>
+<li><p>可重入：同一个线程最大重入次数2147483647</p>
+</li>
+<li><p>支持公平锁与非公平锁：公平锁是指线程获取锁时要先判断当前排队的线程队列是否为空，为空则直接通过CAS机制尝试获取锁，不为空则排队；非公平锁是指线程获取锁时先尝试获取锁，失败则再次尝试获取锁（自旋），再次失败则进入排队队列，进入排队队列后，所有线程都排队，死循环至获取锁成功或中断。</p>
+</li>
+</ul>
+<p>ReentrantLock是利用AQS实现的，具体的分析可以查看美团技术团队的这篇文章</p>
+<p><a target="_blank" rel="noopener" href="https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html[^2]">https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html[^2]</a></p>
+<p>非常详细，示意图清晰。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-completablefuture/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/java-completablefuture/" class="post-title-link" itemprop="url">CompletableFuture 详解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E5%BC%82%E6%AD%A5/" itemprop="url" rel="index"><span itemprop="name">异步</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>首先，CompletableFuture 是 Future，意味着它支持任务异步执行。在此基础上，它还支持异步任务之间的依赖关系、异步任务的回调等。对于日常业务逻辑，使用 CompletableFuture 能够通过将业务逻辑异步化，来提升 cpu 利用率、缩短响应时间，达到提升性能的目的。</p>
+<p>那么 CompletableFuture 和响应式编程的区别是什么呢？</p>
+<p>关键区别在于 <strong>Stream</strong> 这个概念上，CompletableFuture 描述的是单次执行的结果，尽管可以通过异步任务之间的依赖关系构建一串异步任务组成的执行图，本质上面向的是单次操作，例如一次 rpc 请求的处理[^1]。</p>
+<img src="/java/rpc-async/image-blog-body-completablefuture2.jpg" alt="Java CompletableFuture API Example Invoice Path" style="zoom:67%;" />
+
+<p>响应式编程则面向的是 Stream，或者说叫”流”，也即是数据或事件的序列，有点类似 JAVA 的 Stream API。</p>
+<p>当然用 CompletableFuture 也能够实现对数据&#x2F;事件流的处理，但是有一个关键的特性是响应式编程具备而 CompletableFuture 则需要重新实现的，并且实现起来很复杂，那就是 <strong>back pressure</strong>。back pressure 就是在下游无法承载上游的压力时，采取一些措施。</p>
+<p>至于 Java 中提供的 CallBack、Future 机制在实现响应式编程中的问题和缺点，例如”callback hell”、不支持 lazy computation 等，可以从 <a target="_blank" rel="noopener" href="https://projectreactor.io/docs/core/release/reference/#getting-started">https://projectreactor.io/docs/core/release/reference/#getting-started</a> 中找到答案。</p>
+<p>所以，我们需要一套框架或者说类库来更好的实现响应式编程，需要具备以下特性：</p>
+<ul>
+<li>支持异步任务的封装及组装，需要 API 来对异步任务进行包装，并且需要很多种算子来对异步任务进行组装，包括过滤、组装、异常处理等算子</li>
+<li>减少异步任务的嵌套，减少代码的复杂性，增加可读性，避免”callback hell”等复杂度很高的代码</li>
+<li>支持背压 back pressure，也就是下游和上游之间能协商数据流的速度</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-concurrenthashmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/java-concurrenthashmap/" class="post-title-link" itemprop="url">ConcurrentHashMap 深度解析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E9%9B%86%E5%90%88/" itemprop="url" rel="index"><span itemprop="name">集合</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-1-JDK-7-Segment-分段锁"><a href="#1-1-JDK-7-Segment-分段锁" class="headerlink" title="1.1 JDK 7: Segment 分段锁"></a>1.1 JDK 7: Segment 分段锁</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap</span><br><span class="line">  └── Segment<span class="selector-attr">[]</span> (固定数量, 默认 <span class="number">16</span>, 不支持扩容)</span><br><span class="line">        ├── Segment&lt;K,V&gt; extends ReentrantLock</span><br><span class="line">        │     ├── count (volatile)</span><br><span class="line">        │     └── HashEntry&lt;K,V&gt;<span class="selector-attr">[]</span> <span class="selector-tag">table</span> (segment 内部小 HashMap)</span><br><span class="line">        └── Segment&lt;K,V&gt; ...</span><br></pre></td></tr></table></figure>
+
+<p>每个 Segment 持有一把独立的 ReentrantLock, 写操作只需锁对应 Segment, 并发度 &#x3D; segment 数量:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">put</span><span class="params">(K key, V value)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (hash &gt;&gt;&gt; segmentShift) &amp; segmentMask;</span><br><span class="line">    Segment&lt;K,V&gt; s = segments[j];</span><br><span class="line">    <span class="keyword">return</span> s.put(key, hash, value, <span class="literal">false</span>);   <span class="comment">// Segment.put 内 tryLock() 或 lock()</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>size() 妥协</strong>: 先无锁尝试 3 次 (通过 modCount 检查并发修改), 失败后才锁全部 Segment 统计。</p>
+<p><strong>缺陷</strong>: Segment 数量固定, 粒度有限; 跨 Segment 操作需全锁。</p>
+<h3 id="1-2-JDK-8-CAS-synchronized-—-为什么重构"><a href="#1-2-JDK-8-CAS-synchronized-—-为什么重构" class="headerlink" title="1.2 JDK 8: CAS + synchronized — 为什么重构?"></a>1.2 JDK 8: CAS + synchronized — 为什么重构?</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>JDK 7</th>
+<th>JDK 8</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据结构</td>
+<td>Segment[] + HashEntry[]</td>
+<td>Node[] + 链表 + 红黑树</td>
+</tr>
+<tr>
+<td>锁粒度</td>
+<td>Segment 级</td>
+<td><strong>桶级</strong> (synchronized 锁桶头节点)</td>
+</tr>
+<tr>
+<td>锁机制</td>
+<td>ReentrantLock</td>
+<td>CAS(无冲突) + synchronized(有冲突)</td>
+</tr>
+<tr>
+<td>扩容</td>
+<td>Segment 独立扩容</td>
+<td><strong>多线程协同扩容</strong></td>
+</tr>
+<tr>
+<td>计数</td>
+<td>Segment.count</td>
+<td>CounterCell[] + baseCount (LongAdder 方案)</td>
+</tr>
+</tbody></table>
+<p><strong>为什么弃用 ReentrantLock?</strong></p>
+<ol>
+<li>JDK 6 起 synchronized 做了偏向锁→轻量级→重量级的逐步升级, 低竞争场景性能接近 ReentrantLock</li>
+<li>锁粒度缩小到桶级后, 如果用 ReentrantLock, 最坏情况每个桶一个 AQS 队列, 内存不可接受</li>
+<li>CAS 用于无锁插入空桶, synchronized 仅用于冲突时锁桶头, 两种机制互补</li>
+</ol>
+<h3 id="1-3-put-流程"><a href="#1-3-put-流程" class="headerlink" title="1.3 put 流程"></a>1.3 put 流程</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> V <span class="title function_">putVal</span><span class="params">(K key, V value, <span class="type">boolean</span> onlyIfAbsent)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> spread(key.hashCode());   <span class="comment">// (h ^ (h&gt;&gt;&gt;16)) &amp; HASH_BITS</span></span><br><span class="line">    <span class="keyword">for</span> (Node&lt;K,V&gt;[] tab = table;;) &#123;    <span class="comment">// ******* 自旋 CAS 循环</span></span><br><span class="line">        Node&lt;K,V&gt; f; <span class="type">int</span> n, i, fh;</span><br><span class="line">        <span class="comment">// (1) table 未初始化 → CAS 初始化 (sizeCtl=-1 表示初始化中)</span></span><br><span class="line">        <span class="keyword">if</span> (tab == <span class="literal">null</span> || (n = tab.length) == <span class="number">0</span>) tab = initTable();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// (2) 桶为空 → CAS 插入 (无锁)</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((f = tabAt(tab, i = (n-<span class="number">1</span>)&amp;hash)) == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (casTabAt(tab, i, <span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">Node</span>&lt;K,V&gt;(hash,key,value,<span class="literal">null</span>))) <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// (3) ForwardingNode (hash==MOVED) → 当前在扩容, 协助扩容</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((fh = f.hash) == MOVED) tab = helpTransfer(tab, f);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// (4) 桶非空且不在扩容 → synchronized 锁桶头节点</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (f) &#123;           <span class="comment">// 只锁当前桶的头节点!</span></span><br><span class="line">                <span class="keyword">if</span> (tabAt(tab, i) == f) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (fh &gt;= <span class="number">0</span>) &#123;       <span class="comment">// 链表遍历/尾插</span></span><br><span class="line">                        <span class="keyword">for</span> (Node&lt;K,V&gt; e = f;; ++binCount) &#123; <span class="comment">/* 查找 key, 尾插 */</span> &#125;</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (f <span class="keyword">instanceof</span> TreeBin) &#123;  <span class="comment">// 红黑树</span></span><br><span class="line">                        ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key, value);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD) treeifyBin(tab, i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    addCount(<span class="number">1L</span>, binCount);    <span class="comment">// 计数 +1, 可能触发扩容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>sizeCtl 状态机</strong> — 一个字段控制所有状态:</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sizeCtl =  <span class="number">0</span>       : 默认初始容量</span><br><span class="line">sizeCtl = 正数      : <span class="type">threshold</span> (扩容阈值 = capacity * <span class="number">0.75</span>)</span><br><span class="line">sizeCtl = -<span class="number">1</span>       : 正在初始化 <span class="type">table</span></span><br><span class="line">sizeCtl = -(<span class="number">1</span>+n)   : 正在扩容, 低16位表示 (<span class="type">n</span>-<span class="number">1</span>) 个线程参与</span><br><span class="line">                     例如 -<span class="number">3</span> → <span class="number">2</span> 个线程正在协助扩容</span><br></pre></td></tr></table></figure>
+
+<p><code>initTable</code> 源码关键部分:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> ((tab = table) == <span class="literal">null</span> || tab.length == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> ((sc = sizeCtl) &lt; <span class="number">0</span>) Thread.<span class="keyword">yield</span>();     <span class="comment">// 其他线程在初始化</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (U.compareAndSwapInt(<span class="built_in">this</span>, SIZECTL, sc, -<span class="number">1</span>)) &#123;  <span class="comment">// CAS 抢初始化权</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// ...创建 table, 设置 sizeCtl = n - (n&gt;&gt;&gt;2) = 0.75n</span></span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123; sizeCtl = sc; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-多线程协同扩容-transfer"><a href="#1-4-多线程协同扩容-transfer" class="headerlink" title="1.4 多线程协同扩容 (transfer)"></a>1.4 多线程协同扩容 (transfer)</h3><p>JDK 8 最大亮点 — 多个写线程一起参与扩容:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心: CAS 抢迁移任务区间 [transferIndex-stride, transferIndex)</span></span><br><span class="line"><span class="type">int</span> <span class="variable">stride</span> <span class="operator">=</span> Math.max((n &gt;&gt;&gt; <span class="number">3</span>) / NCPU, MIN_TRANSFER_STRIDE); <span class="comment">// 每线程步长最小 16</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// transferIndex 从 n 开始递减 (从旧表末尾向前推进)</span></span><br><span class="line"><span class="comment">// 线程 CAS 抢区间:</span></span><br><span class="line"><span class="keyword">if</span> (U.compareAndSwapInt(<span class="built_in">this</span>, TRANSFERINDEX, nextIndex,</span><br><span class="line">         nextBound = (nextIndex &gt; stride ? nextIndex - stride : <span class="number">0</span>))) &#123;</span><br><span class="line">    bound = nextBound;</span><br><span class="line">    i = nextIndex - <span class="number">1</span>;   <span class="comment">// 从区间末尾开始迁移</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>扩容过程</strong>:</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">旧 table (n=64), stride=16:</span></span><br><span class="line"><span class="section">+-----------------------------------------------------------+</span></span><br><span class="line"><span class="section">| 0..15 | 16..31 | 32..47 | 48..63 |</span></span><br><span class="line"><span class="section">+-----------------------------------------------------------+</span></span><br><span class="line"><span class="code">   ↑        ↑        ↑        ↑</span></span><br><span class="line"><span class="code">  线程C    线程B    线程A    (transferIndex 从 64→0)</span></span><br><span class="line"></span><br><span class="line">线程迁移完每个桶后放置 ForwardingNode (hash==MOVED):</span><br><span class="line"><span class="code">  其他线程访问到此桶 → 调用 helpTransfer 协助扩容</span></span><br><span class="line"><span class="code">  其他线程 get 此桶   → ForwardingNode.find() 去 nextTable 查找</span></span><br><span class="line"></span><br><span class="line">所有桶迁移完成 → 替换 table = nextTable, sizeCtl = 1.5n</span><br></pre></td></tr></table></figure>
+
+<p><strong>线程退出机制</strong>: 每个线程完成所分配区间后 CAS 递减 sizeCtl 中记录的参与线程数, 最后一个退出线程负责 <code>finishing</code> 收尾 (替换 table, 更新 sizeCtl)。</p>
+<h3 id="1-5-CounterCell-计数方案"><a href="#1-5-CounterCell-计数方案" class="headerlink" title="1.5 CounterCell 计数方案"></a>1.5 CounterCell 计数方案</h3><p>基于 <code>Striped64</code> (LongAdder 模板):</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@sun</span>.misc.Contended</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">CounterCell</span> &#123; <span class="keyword">volatile</span> <span class="type">long</span> value; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> <span class="type">long</span> baseCount;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> CounterCell[] counterCells;</span><br><span class="line"></span><br><span class="line"><span class="comment">// size ≈ baseCount + sum(counterCells[i].value)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>addCount</code> 流程: 先 CAS <code>baseCount</code>, 失败则 CAS 更新某个 <code>CounterCell</code>, 多次失败后扩容 <code>counterCells</code> (2倍), 最终使用 <code>ThreadLocalRandom.getProbe()</code> 分散到不同 Cell。</p>
+<p><code>size()</code> 返回的是<strong>近似快照</strong>, 非精确值 — 统计期间可能有并发修改。</p>
+<h3 id="1-6-get-为什么不需要加锁"><a href="#1-6-get-为什么不需要加锁" class="headerlink" title="1.6 get 为什么不需要加锁?"></a>1.6 get 为什么不需要加锁?</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">get</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> spread(key.hashCode());</span><br><span class="line">    <span class="keyword">if</span> ((e = tabAt(tab, (n - <span class="number">1</span>) &amp; h)) != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (e.hash == h &amp;&amp; key.equals(e.key)) <span class="keyword">return</span> e.val;     <span class="comment">// 头匹配</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (e.hash &lt; <span class="number">0</span>) <span class="keyword">return</span> e.find(h, key).val; <span class="comment">// TreeBin / ForwardingNode</span></span><br><span class="line">        <span class="keyword">else</span> &#123; <span class="keyword">while</span> ((e = e.next) != <span class="literal">null</span>) &#123; <span class="comment">/* 链表遍历 */</span> &#125; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>无锁读的保证:</p>
+<ol>
+<li><code>Node.val</code> 和 <code>Node.next</code> 都是 <code>volatile</code> 修饰</li>
+<li><code>table</code> 数组 <code>volatile</code> 修饰, <code>tabAt</code> 通过 <code>U.getObjectVolatile</code> 读取保证每次读主存最新值</li>
+<li>扩容用尾插法, 已存在节点不被修改; <code>ForwardingNode.find()</code> 去 <code>nextTable</code> 查找</li>
+<li>迭代器是<strong>弱一致性</strong> (weakly consistent), 不抛 <code>ConcurrentModificationException</code></li>
+</ol>
+<h3 id="1-7-线程安全-Map-对比"><a href="#1-7-线程安全-Map-对比" class="headerlink" title="1.7 线程安全 Map 对比"></a>1.7 线程安全 Map 对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Hashtable</th>
+<th>synchronizedMap</th>
+<th>ConcurrentHashMap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>锁机制</td>
+<td>全方法 synchronized</td>
+<td>mutex 全表锁</td>
+<td>CAS + volatile + synchronized(桶级)</td>
+</tr>
+<tr>
+<td>读并发度</td>
+<td>1</td>
+<td>1</td>
+<td>极高 (几乎无锁)</td>
+</tr>
+<tr>
+<td>写并发度</td>
+<td>1</td>
+<td>1</td>
+<td>高 (桶级锁)</td>
+</tr>
+<tr>
+<td>null 键&#x2F;值</td>
+<td>不支持</td>
+<td>委托底层 Map</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>迭代器</td>
+<td>fail-fast</td>
+<td>fail-fast</td>
+<td>弱一致性</td>
+</tr>
+<tr>
+<td>性能(高并发)</td>
+<td>极差</td>
+<td>极差</td>
+<td>极好</td>
+</tr>
+</tbody></table>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-fork-join/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/java-fork-join/" class="post-title-link" itemprop="url">Fork/Join 框架与工作窃取</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E5%B9%B6%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">并发</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Java 7 引入了 Fork&#x2F;Join 框架，通过 RecursiveTask 和 RecursiveAction 这两个类可以方便地实现 Fork&#x2F;Join 模式：</p>
+<ul>
+<li><strong>RecursiveTask</strong>：用于有返回值的计算任务，继承自 ForkJoinTask，需要实现 <code>compute()</code> 方法并返回结果</li>
+<li><strong>RecursiveAction</strong>：用于无返回值的计算任务，同样继承自 ForkJoinTask，需要实现 <code>compute()</code> 方法，无返回值</li>
+</ul>
+<p>Fork&#x2F;Join 框架的异常处理：任务在执行过程中如果抛出异常，可以通过 ForkJoinTask 的 <code>get()</code> 方法获取到（<code>get()</code> 会将异常包装为 ExecutionException 抛出），也可以通过 <code>isCompletedAbnormally()</code> 和 <code>getException()</code> 方法来检查。</p>
+<p>使用 Fork&#x2F;Join 框架时需要特别注意任务切分的方式。JDK 用来执行 Fork&#x2F;Join 任务的工作线程池大小默认等于 CPU 核心数，在一个 4 核 CPU 上，最多可以同时执行 4 个子任务。但是如果切分不当，执行时间可能会超出预期。</p>
+<p>这是因为执行 <code>compute()</code> 方法的线程本身也是一个 Worker 线程，当对两个子任务分别调用 <code>fork()</code> 时，这个 Worker 线程会把两个子任务都分派给其他 Worker，而自己则停下来等待结果——白白浪费了 Fork&#x2F;Join 线程池中的一个 Worker 线程。这导致原本 4 个子任务至少需要 7 个线程才能并发执行，反而增加了额外开销。</p>
+<p>正确的做法是使用 <code>invokeAll()</code> 方法：查看 JDK 的 <code>invokeAll()</code> 方法源码可以发现，对于 N 个任务，其中 N-1 个任务会使用 <code>fork()</code> 交给其他线程异步执行，而 <code>invokeAll()</code> 会保留一个任务由当前线程直接调用 <code>compute()</code> 同步执行。这样充分利用了线程池，确保没有空闲的线程。</p>
+<h2 id="一、ForkJoinPool"><a href="#一、ForkJoinPool" class="headerlink" title="一、ForkJoinPool"></a>一、ForkJoinPool</h2><p>ForkJoinPool 是专门为运行 ForkJoinTask 任务而实现的 ExecutorService，同样提供了管理和监控功能。与一般的 ExecutorService（如 ThreadPoolExecutor）相比，ForkJoinPool 的核心区别在于采用了 <strong>work-stealing（工作窃取）</strong> 算法，这正是它能够高效执行 Fork&#x2F;Join 类型任务的关键所在。</p>
+<h5 id="2-1-1-ForkJoinWorkerThreadFactory"><a href="#2-1-1-ForkJoinWorkerThreadFactory" class="headerlink" title="2.1.1 ForkJoinWorkerThreadFactory"></a>2.1.1 ForkJoinWorkerThreadFactory</h5><p>ForkJoinWorkerThreadFactory 是 ForkJoinPool 的静态成员内部接口，用于为指定的 ForkJoinPool 创建 ForkJoinWorkerThread 工作线程。默认实现是 DefaultForkJoinWorkerThreadFactory，一般情况下直接使用默认实现即可。</p>
+<h5 id="2-1-2-work-stealing-工作窃取算法"><a href="#2-1-2-work-stealing-工作窃取算法" class="headerlink" title="2.1.2 work-stealing 工作窃取算法"></a>2.1.2 work-stealing 工作窃取算法</h5><p>工作窃取算法的核心思想是：池中的每个工作线程都拥有一个双端队列（WorkQueue），用于存放待执行的任务。当线程完成自身队列中的所有任务后，会尝试从其他繁忙线程的队列尾部”窃取”任务来执行，而不是空闲等待。</p>
+<p>具体来说：</p>
+<ul>
+<li>每个 Worker 线程维护一个双端队列，新任务添加到队列头部</li>
+<li>Worker 线程从自身队列头部取出任务执行（LIFO，后进先出），这样有利于局部性和缓存命中</li>
+<li>当 Worker 线程的队列为空时，它会随机选择一个其他 Worker 的队列，从队列的<strong>尾部</strong>窃取任务（FIFO，先进先出）</li>
+<li>被窃取的通常是较大的、拆分较早的任务，这有助于保持工作负载的均衡</li>
+</ul>
+<p>这种”自己从头取、别人从尾偷”的双端队列设计，最大程度地减少了窃取线程与被窃取线程之间的竞争，因为两者操作的是双端队列的不同端。</p>
+<p>对应于第一节 3.4 中提到的双端队列概念，Fork&#x2F;Join 框架正是工作窃取算法最经典的应用场景。</p>
+<h5 id="2-1-3-ForkJoinWorkerThread"><a href="#2-1-3-ForkJoinWorkerThread" class="headerlink" title="2.1.3 ForkJoinWorkerThread"></a>2.1.3 ForkJoinWorkerThread</h5><p>ForkJoinWorkerThread 是由 ForkJoinWorkerThreadFactory 创建的线程，每个线程都绑定到 ForkJoinPool 中的一个 WorkQueue。线程在运行时会不断地从自己的队列或者通过工作窃取从其他队列获取并执行 ForkJoinTask。</p>
+<h5 id="2-1-4-WorkQueue"><a href="#2-1-4-WorkQueue" class="headerlink" title="2.1.4 WorkQueue"></a>2.1.4 WorkQueue</h5><p>WorkQueue 是 ForkJoinPool 内部的双端队列实现，用于存放 ForkJoinTask。Pool 中所有线程都会尝试从各自队列或其他队列中寻找并执行任务，当找不到任何可执行的任务时，线程会阻塞等待新的任务到来。</p>
+<h5 id="2-1-5-ForkJoinTask"><a href="#2-1-5-ForkJoinTask" class="headerlink" title="2.1.5 ForkJoinTask"></a>2.1.5 ForkJoinTask</h5><p>ForkJoinTask 是 Fork&#x2F;Join 框架中任务的抽象基类，RecursiveTask 和 RecursiveAction 均继承自它。ForkJoinTask 提供了 <code>fork()</code> 方法用于异步执行任务（将任务放入当前线程的 WorkQueue 中排队），以及 <code>join()</code> 方法用于等待任务执行完成并获取结果。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/posts/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/posts/">1</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/posts/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/16/">16</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/posts/page/11/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

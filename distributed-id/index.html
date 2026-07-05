@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 为什么需要分布式 ID在单库系统中，数据库自增主键可以满足 ID 生成的唯一性需求。但分库分表后，多个数据库独立增长会导致 ID 冲突；而业务 ID 通常需要全局唯一、趋势递增（利于索引），因此需要专门的分布式 ID 生成方案。 1.2 UUID1550e8400-e29b-41d4-a716-446655440000     优点 缺点    本地生成，零网络开销 非自增、字符串占空间大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式 ID 生成方案">
+<meta property="og:url" content="http://pclhahaha.github.io/distributed-id/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 为什么需要分布式 ID在单库系统中，数据库自增主键可以满足 ID 生成的唯一性需求。但分库分表后，多个数据库独立增长会导致 ID 冲突；而业务 ID 通常需要全局唯一、趋势递增（利于索引），因此需要专门的分布式 ID 生成方案。 1.2 UUID1550e8400-e29b-41d4-a716-446655440000     优点 缺点    本地生成，零网络开销 非自增、字符串占空间大">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="分布式ID">
+<meta property="article:tag" content="Snowflake">
+<meta property="article:tag" content="Leaf">
+<meta property="article:tag" content="UUID">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/distributed-id/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/distributed-id/","path":"distributed-id/","title":"分布式 ID 生成方案"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式 ID 生成方案 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%88%86%E5%B8%83%E5%BC%8F-ID"><span class="nav-number">1.</span> <span class="nav-text">1.1 为什么需要分布式 ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-UUID"><span class="nav-number">2.</span> <span class="nav-text">1.2 UUID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%87%AA%E5%A2%9EID"><span class="nav-number">3.</span> <span class="nav-text">1.3 数据库自增ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E5%8F%B7%E6%AE%B5%E6%A8%A1%E5%BC%8F%EF%BC%88Leaf-segment%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">1.4 号段模式（Leaf-segment）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Snowflake%EF%BC%88%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">1.5 Snowflake（雪花算法）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%92%9F%E5%9B%9E%E6%8B%A8%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">5.1.</span> <span class="nav-text">时钟回拨问题及解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-Redis-%E8%87%AA%E5%A2%9E"><span class="nav-number">6.</span> <span class="nav-text">1.6 Redis 自增</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-%E5%90%84%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94"><span class="nav-number">7.</span> <span class="nav-text">1.7 各方案对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-%E7%BE%8E%E5%9B%A2-Leaf-%E4%B8%8E%E7%99%BE%E5%BA%A6-UidGenerator"><span class="nav-number">8.</span> <span class="nav-text">1.8 美团 Leaf 与百度 UidGenerator</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/distributed-id/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式 ID 生成方案 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式 ID 生成方案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-为什么需要分布式-ID"><a href="#1-1-为什么需要分布式-ID" class="headerlink" title="1.1 为什么需要分布式 ID"></a>1.1 为什么需要分布式 ID</h3><p>在单库系统中，数据库自增主键可以满足 ID 生成的唯一性需求。但分库分表后，多个数据库独立增长会导致 ID 冲突；而业务 ID 通常需要全局唯一、趋势递增（利于索引），因此需要专门的分布式 ID 生成方案。</p>
+<h3 id="1-2-UUID"><a href="#1-2-UUID" class="headerlink" title="1.2 UUID"></a>1.2 UUID</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">550e8400</span>-e29b-<span class="number">41</span>d4-a716-<span class="number">446655440000</span></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本地生成，零网络开销</td>
+<td>非自增、字符串占空间大（36字符）</td>
+</tr>
+<tr>
+<td>全局唯一，无单点</td>
+<td>作为 InnoDB 聚簇索引时页分裂严重</td>
+</tr>
+<tr>
+<td>实现简单</td>
+<td>不包含时间信息，不可排序</td>
+</tr>
+</tbody></table>
+<p>适用场景：非主键的唯一标识（如日志 traceId、临时 token）。</p>
+<h3 id="1-3-数据库自增ID"><a href="#1-3-数据库自增ID" class="headerlink" title="1.3 数据库自增ID"></a>1.3 数据库自增ID</h3><p>通过独立的 ID 生成表（或号段表）获取全局自增 ID：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> id_generator (</span><br><span class="line">    biz_tag <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">PRIMARY KEY</span>,</span><br><span class="line">    max_id  <span class="type">BIGINT</span> <span class="keyword">NOT NULL</span>,</span><br><span class="line">    step    <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">1000</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 批量获取号段（原子操作）</span></span><br><span class="line"><span class="keyword">UPDATE</span> id_generator <span class="keyword">SET</span> max_id <span class="operator">=</span> max_id <span class="operator">+</span> step <span class="keyword">WHERE</span> biz_tag <span class="operator">=</span> <span class="string">&#x27;order&#x27;</span>;</span><br><span class="line"><span class="keyword">SELECT</span> max_id <span class="keyword">FROM</span> id_generator <span class="keyword">WHERE</span> biz_tag <span class="operator">=</span> <span class="string">&#x27;order&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>问题</strong>：DB 成为单点瓶颈。一次 DB 交互只能获取 <code>step</code> 个 ID，用完后再请求。</p>
+<h3 id="1-4-号段模式（Leaf-segment）"><a href="#1-4-号段模式（Leaf-segment）" class="headerlink" title="1.4 号段模式（Leaf-segment）"></a>1.4 号段模式（Leaf-segment）</h3><p>美团 Leaf 的号段模式是对数据库方案的升级：</p>
+<ul>
+<li>客户端先批量获取一个号段（如 [0, 1000]），缓存在本地</li>
+<li>本地内存中基于号段分配 ID，无需每次访问 DB</li>
+<li><strong>双 buffer 优化</strong>：当前号段消费到 10% 时，异步预加载下一个号段到备用 buffer，号段切换时无缝衔接</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 双 buffer 号段模式核心</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SegmentBuffer</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Segment[] segments = <span class="keyword">new</span> <span class="title class_">Segment</span>[<span class="number">2</span>];  <span class="comment">// 双 buffer</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="type">int</span> currentPos;              <span class="comment">// 当前使用的 segment 索引</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span> <span class="title function_">getId</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">id</span> <span class="operator">=</span> segments[currentPos].nextId();</span><br><span class="line">        <span class="keyword">if</span> (segments[currentPos].usageRate() &gt; <span class="number">0.9</span>) &#123;</span><br><span class="line">            <span class="comment">// 异步预加载备用 buffer</span></span><br><span class="line">            asyncLoadSegment(<span class="number">1</span> - currentPos);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (segments[currentPos].isExhausted()) &#123;</span><br><span class="line">            currentPos = <span class="number">1</span> - currentPos;  <span class="comment">// 切换 buffer</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优点：解决了 DB 的性能瓶颈，可实现 10w+ QPS；缺点：ID 不是严格全局自增（多实例各自消耗号段，时间线可能交错）。</p>
+<h3 id="1-5-Snowflake（雪花算法）"><a href="#1-5-Snowflake（雪花算法）" class="headerlink" title="1.5 Snowflake（雪花算法）"></a>1.5 Snowflake（雪花算法）</h3><p>Twitter 开源的经典方案，ID 为 64 位长整型：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">┌─┬───────────────────────────────────────┬──────────┬────────────────┐</span><br><span class="line">│<span class="number">0</span>│           <span class="number">41</span>-<span class="type">bit</span> <span class="type">timestamp</span>            │<span class="number">10</span>-<span class="type">bit</span>    │   <span class="number">12</span>-<span class="type">bit</span>       │</span><br><span class="line">│ │           (毫秒，约<span class="number">69</span>年)              │ workerId │  <span class="keyword">sequence</span>      │</span><br><span class="line">└─┴───────────────────────────────────────┴──────────┴────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>每毫秒单机可生成 4096 个 ID，整体趋势递增。</p>
+<h4 id="时钟回拨问题及解决方案"><a href="#时钟回拨问题及解决方案" class="headerlink" title="时钟回拨问题及解决方案"></a>时钟回拨问题及解决方案</h4><p>Snowflake 严重依赖机器时钟。时钟回拨会导致 ID 重复：</p>
+<p><strong>方案一：抛异常</strong>（Leaf-snowflake 默认）：</p>
+<ul>
+<li>检测到回拨后拒绝服务，等待时钟追上</li>
+</ul>
+<p><strong>方案二：使用历史时间戳</strong>：</p>
+<ul>
+<li>回拨发生时，沿用之前的时间戳生成 sequence，直到时钟追上</li>
+</ul>
+<p><strong>方案三：扩展位 + 防重</strong>：</p>
+<ul>
+<li>在 ID 中增加 1-bit clock-back 标识，记录回拨事件</li>
+</ul>
+<p><strong>方案四：借用未来时间</strong>（百度 UidGenerator）：</p>
+<ul>
+<li>基于 RingBuffer 预生成 ID，缓存最近一段时间的时间戳，回拨时直接使用缓存</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 时钟回拨检测核心逻辑</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="type">long</span> <span class="title function_">nextId</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">currentTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">    <span class="keyword">if</span> (currentTime &lt; lastTimestamp) &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">offset</span> <span class="operator">=</span> lastTimestamp - currentTime;</span><br><span class="line">        <span class="keyword">if</span> (offset &lt;= MAX_BACKWARD_MS) &#123;  <span class="comment">// 容忍小范围回拨（&lt; 5ms）</span></span><br><span class="line">            <span class="comment">// 等待时钟追上</span></span><br><span class="line">            Thread.sleep(offset);</span><br><span class="line">            currentTime = System.currentTimeMillis();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ClockBackwardsException</span>(<span class="string">&quot;Clock moved backwards: &quot;</span> + offset);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (currentTime == lastTimestamp) &#123;</span><br><span class="line">        sequence = (sequence + <span class="number">1</span>) &amp; SEQUENCE_MASK;</span><br><span class="line">        <span class="keyword">if</span> (sequence == <span class="number">0</span>) &#123;</span><br><span class="line">            currentTime = waitNextMillis(lastTimestamp);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        sequence = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    lastTimestamp = currentTime;</span><br><span class="line">    <span class="keyword">return</span> (currentTime - EPOCH) &lt;&lt; TIMESTAMP_SHIFT</span><br><span class="line">         | workerId &lt;&lt; WORKER_ID_SHIFT</span><br><span class="line">         | sequence;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-6-Redis-自增"><a href="#1-6-Redis-自增" class="headerlink" title="1.6 Redis 自增"></a>1.6 Redis 自增</h3><p>利用 Redis 单线程特性与 <code>INCR</code> &#x2F; <code>INCRBY</code> 命令：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">INCR</span> order_id      → 返回 <span class="number">1001</span></span><br><span class="line"><span class="attribute">INCRBY</span> order_id <span class="number">10</span> → 返回 <span class="number">1011</span>（预取号段）</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>高性能、天然递增</td>
+<td>依赖 Redis 持久化（RDB&#x2F;AOF），宕机可能丢失</td>
+</tr>
+<tr>
+<td>实现极简</td>
+<td>非严格趋势递增（主从切换后可能回退）</td>
+</tr>
+<tr>
+<td>可横向扩展（分段 key）</td>
+<td>需额外维护 Redis 集群</td>
+</tr>
+</tbody></table>
+<h3 id="1-7-各方案对比"><a href="#1-7-各方案对比" class="headerlink" title="1.7 各方案对比"></a>1.7 各方案对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>趋势递增</th>
+<th>高可用</th>
+<th>性能</th>
+<th>依赖</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UUID</td>
+<td>否</td>
+<td>极高</td>
+<td>极高</td>
+<td>无</td>
+<td>日志 traceId</td>
+</tr>
+<tr>
+<td>DB 自增</td>
+<td>是</td>
+<td>低</td>
+<td>低</td>
+<td>DB</td>
+<td>小规模</td>
+</tr>
+<tr>
+<td>Leaf-segment</td>
+<td>近似</td>
+<td>高</td>
+<td>极高</td>
+<td>DB + 自有服务</td>
+<td>大规模分库分表</td>
+</tr>
+<tr>
+<td>Snowflake</td>
+<td>近似（时间序）</td>
+<td>高</td>
+<td>极高</td>
+<td>无（本地生成）</td>
+<td>通用高并发</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>是</td>
+<td>中</td>
+<td>高</td>
+<td>Redis</td>
+<td>已有 Redis 的中小规模</td>
+</tr>
+</tbody></table>
+<h3 id="1-8-美团-Leaf-与百度-UidGenerator"><a href="#1-8-美团-Leaf-与百度-UidGenerator" class="headerlink" title="1.8 美团 Leaf 与百度 UidGenerator"></a>1.8 美团 Leaf 与百度 UidGenerator</h3><p><strong>美团 Leaf</strong>：双模式架构——号段模式 + Snowflake 模式，通过 ZooKeeper 注册 workerId 并做心跳续约。</p>
+<p><strong>百度 UidGenerator</strong>：</p>
+<ul>
+<li><strong>DefaultUidGenerator</strong>：标准 Snowflake 实现，基于数据库表分配 workerId</li>
+<li><strong>CachedUidGenerator</strong>：基于 RingBuffer（Disruptor 思想），提前批量生成 ID 并缓存在环形队列中，消除 Snowflake 的 synchronized 竞争；支持容忍时钟回拨</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8FID/" rel="tag"># 分布式ID</a>
+              <a href="/tags/Snowflake/" rel="tag"># Snowflake</a>
+              <a href="/tags/Leaf/" rel="tag"># Leaf</a>
+              <a href="/tags/UUID/" rel="tag"># UUID</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/distributed-tracing/" rel="prev" title="分布式链路追踪">
+                  <i class="fa fa-angle-left"></i> 分布式链路追踪
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/distributed-locks/" rel="next" title="分布式锁 — Redis&#x2F;ZK&#x2F;DB">
+                  分布式锁 — Redis/ZK/DB <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

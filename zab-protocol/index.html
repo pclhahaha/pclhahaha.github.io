@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="ZAB（ZooKeeper Atomic Broadcast）是 ZooKeeper 内部使用的共识协议，专门为 ZooKeeper 的”主从架构 + 高性能写入”场景设计。与 Raft 和 Paxos 同为共识协议，但 ZAB 更侧重写入性能和顺序保证。 一、协议概述ZAB 协议包括两个模式：    模式 说明 触发条件    崩溃恢复 (Leader Election) 选举新 Leader">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZAB 协议 (ZooKeeper)">
+<meta property="og:url" content="http://pclhahaha.github.io/zab-protocol/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="ZAB（ZooKeeper Atomic Broadcast）是 ZooKeeper 内部使用的共识协议，专门为 ZooKeeper 的”主从架构 + 高性能写入”场景设计。与 Raft 和 Paxos 同为共识协议，但 ZAB 更侧重写入性能和顺序保证。 一、协议概述ZAB 协议包括两个模式：    模式 说明 触发条件    崩溃恢复 (Leader Election) 选举新 Leader">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="ZooKeeper">
+<meta property="article:tag" content="ZAB">
+<meta property="article:tag" content="原子广播">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/zab-protocol/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/zab-protocol/","path":"zab-protocol/","title":"ZAB 协议 (ZooKeeper)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ZAB 协议 (ZooKeeper) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%8D%8F%E8%AE%AE%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">一、协议概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%B6%88%E6%81%AF%E5%B9%BF%E6%92%AD%EF%BC%88%E6%AD%A3%E5%B8%B8%E8%BF%90%E8%A1%8C%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">二、消息广播（正常运行）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%B4%A9%E6%BA%83%E6%81%A2%E5%A4%8D%EF%BC%88Leader-%E9%80%89%E4%B8%BE%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">三、崩溃恢复（Leader 选举）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E9%80%89%E4%B8%BE%E6%B5%81%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 选举流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%81%A2%E5%A4%8D%E9%98%B6%E6%AE%B5"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 恢复阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81ZAB-%E4%B8%8E-Raft-%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="nav-number">4.</span> <span class="nav-text">四、ZAB 与 Raft 的对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">5.</span> <span class="nav-text">五、典型应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">六、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/zab-protocol/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ZAB 协议 (ZooKeeper) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ZAB 协议 (ZooKeeper)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>ZAB（ZooKeeper Atomic Broadcast）是 ZooKeeper 内部使用的共识协议，专门为 ZooKeeper 的”主从架构 + 高性能写入”场景设计。与 Raft 和 Paxos 同为共识协议，但 ZAB 更侧重写入性能和顺序保证。</p>
+<h2 id="一、协议概述"><a href="#一、协议概述" class="headerlink" title="一、协议概述"></a>一、协议概述</h2><p>ZAB 协议包括两个模式：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>说明</th>
+<th>触发条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>崩溃恢复</strong> (Leader Election)</td>
+<td>选举新 Leader</td>
+<td>Leader 宕机或集群启动</td>
+</tr>
+<tr>
+<td><strong>消息广播</strong> (Atomic Broadcast)</td>
+<td>Leader 将写请求原子广播给所有 Follower</td>
+<td>正常运行期间</td>
+</tr>
+</tbody></table>
+<p>ZooKeeper 将所有写请求转发给 Leader，Leader 通过 ZAB 协议将写操作作为事务（Proposal）原子广播给所有 Follower。</p>
+<h2 id="二、消息广播（正常运行）"><a href="#二、消息广播（正常运行）" class="headerlink" title="二、消息广播（正常运行）"></a>二、消息广播（正常运行）</h2><p>消息广播是 ZAB 的稳态模式，流程如下：</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Client 写请求 → <span class="built_in">Leader</span> → 生成 Proposal → 广播给所有 Follower</span><br><span class="line"></span><br><span class="line"><span class="built_in">Leader</span>    Follower1   Follower2</span><br><span class="line">  │           │           │</span><br><span class="line">  ├─Propose──→│           │     <span class="number">1</span>. <span class="built_in">Leader</span> 生成 Proposal 并广播</span><br><span class="line">  │           │           │</span><br><span class="line">  │←──ACK────┤           │     <span class="number">2</span>. Follower 将 Proposal 写入磁盘并返回 ACK</span><br><span class="line">  │           ├──ACK─────→│</span><br><span class="line">  │           │           │</span><br><span class="line">  ├─Commit───→│           │     <span class="number">3</span>. <span class="built_in">Leader</span> 收到超过半数的 ACK</span><br><span class="line">  │           │           │       向所有 Follower 广播 Commit</span><br><span class="line">  │           ├──Commit──→│</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Proposal</strong>：Leader 为每个写请求生成一个全局唯一、单调递增的 <code>zxid</code>（ZooKeeper Transaction ID）。zxid 的高 32 位是 epoch（Leader 任期号），低 32 位是递增计数器。</li>
+<li><strong>ACK</strong>：Follower 接收到 Proposal 后写入本地事务日志，然后回复 ACK。</li>
+<li><strong>Commit</strong>：Leader 收到超过半数的 ACK 后，向所有 Follower 发送 Commit 消息，Follower 将事务应用到内存数据中。</li>
+</ul>
+<h2 id="三、崩溃恢复（Leader-选举）"><a href="#三、崩溃恢复（Leader-选举）" class="headerlink" title="三、崩溃恢复（Leader 选举）"></a>三、崩溃恢复（Leader 选举）</h2><p>当 Leader 宕机时，Follower 进入崩溃恢复模式：</p>
+<h3 id="3-1-选举流程"><a href="#3-1-选举流程" class="headerlink" title="3.1 选举流程"></a>3.1 选举流程</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 所有 Follower 转变为 LOOKING 状态</span><br><span class="line"><span class="bullet">2.</span> 每个节点投票给自己（投给 zxid 最大的节点）</span><br><span class="line"><span class="bullet">3.</span> 收到其他人的投票后，与自己的投票比较：</span><br><span class="line">   └→ 如果对方 zxid 更大 → 改投对方</span><br><span class="line">   └→ 如果 zxid 相同 → 投 myid 较大的</span><br><span class="line"><span class="bullet">4.</span> 某个节点获得超过半数选票 → 成为新 Leader</span><br><span class="line"><span class="bullet">5.</span> 新 Leader 通知所有 Follower 进入消息广播模式</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-恢复阶段"><a href="#3-2-恢复阶段" class="headerlink" title="3.2 恢复阶段"></a>3.2 恢复阶段</h3><p>新 Leader 当选后，需要确保所有 Follower 的数据一致：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Leader 找出所有 Follower 中最新的 zxid（记为 max_zxid）</span><br><span class="line">Leader 向所有 Follower 发起同步：</span><br><span class="line">  ├→ Follower A: 我最后提交到 <span class="attribute">zxid</span>=100</span><br><span class="line">  ├→ Follower B: 我最后提交到 <span class="attribute">zxid</span>=98</span><br><span class="line">  └→ Leader: 把 101~max_zxid 的事务发给 B，补全差距</span><br><span class="line"></span><br><span class="line">只有当集群中超过半数节点完成同步后，Leader 才开始处理新的写请求</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、ZAB-与-Raft-的对比"><a href="#四、ZAB-与-Raft-的对比" class="headerlink" title="四、ZAB 与 Raft 的对比"></a>四、ZAB 与 Raft 的对比</h2><p>ZAB 和 Raft 都实现了主从复制 + 原子广播，但设计侧重点不同：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>ZAB</th>
+<th>Raft</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>设计目标</strong></td>
+<td>ZooKeeper 专用</td>
+<td>通用共识协议</td>
+</tr>
+<tr>
+<td><strong>写入模式</strong></td>
+<td>Leader 处理所有写操作</td>
+<td>Leader 处理所有写操作</td>
+</tr>
+<tr>
+<td><strong>Leader 选举</strong></td>
+<td>zxid 最大 + myid 最大</td>
+<td>Term 最大 + 日志最新</td>
+</tr>
+<tr>
+<td><strong>Follower 落后处理</strong></td>
+<td>Leader 主动同步</td>
+<td>Leader 发送 AppendEntries</td>
+</tr>
+<tr>
+<td><strong>读操作</strong></td>
+<td>默认从 Follower 读（可能旧数据）</td>
+<td>默认从 Leader 读（强一致性）</td>
+</tr>
+<tr>
+<td><strong>提交条件</strong></td>
+<td>过半 ACK</td>
+<td>过半 ACK</td>
+</tr>
+</tbody></table>
+<p>ZAB 的选举条件（优先事务最新提交最多的节点，其次选择 ID 大的节点）与 Raft 有微妙差异——ZAB 更侧重”数据最新”，而 Raft 则综合考量”Term 最新 + 日志长度”，对安全性提供更强的理论保障。</p>
+<h2 id="五、典型应用场景"><a href="#五、典型应用场景" class="headerlink" title="五、典型应用场景"></a>五、典型应用场景</h2><p>由于 ZAB 专为 ZooKeeper 设计，它的所有应用都通过 ZooKeeper 暴露：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>分布式锁</strong></td>
+<td>利用 ZK 的临时顺序节点实现互斥锁</td>
+</tr>
+<tr>
+<td><strong>服务注册与发现</strong></td>
+<td>利用 ZK 的 Watcher 机制通知服务上下线</td>
+</tr>
+<tr>
+<td><strong>配置中心</strong></td>
+<td>利用 ZK 的统一配置存储</td>
+</tr>
+<tr>
+<td><strong>Leader 选举</strong></td>
+<td>利用 ZK 的临时节点争夺</td>
+</tr>
+</tbody></table>
+<h2 id="六、小结"><a href="#六、小结" class="headerlink" title="六、小结"></a>六、小结</h2><p>ZAB 是专为 ZooKeeper 场景优化的共识协议。相比 Raft 的通用性，ZAB 在选举效率和读写分离方面有针对性优化。理解 ZAB 的两个模式（消息广播和崩溃恢复）就理解了 ZooKeeper 如何在高吞吐写入和强一致性之间取得平衡。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/ZooKeeper/" rel="tag"># ZooKeeper</a>
+              <a href="/tags/ZAB/" rel="tag"># ZAB</a>
+              <a href="/tags/%E5%8E%9F%E5%AD%90%E5%B9%BF%E6%92%AD/" rel="tag"># 原子广播</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/api-gateway/" rel="prev" title="API 网关">
+                  <i class="fa fa-angle-left"></i> API 网关
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/whatsapp-architecture-case-study/" rel="next" title="WhatsApp 日处理400亿消息的架构">
+                  WhatsApp 日处理400亿消息的架构 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

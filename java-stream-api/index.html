@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. Stream 接口概述Stream 表示支持串行或并行的聚合操作的元素序列，除了 Stream 接口之外，还有 IntStream、LongStream、DoubleStream，都符合 Stream 的定义。 Stream 的计算操作可以被组装为 Stream 管道操作，如下代码示例： 1234int sum &#x3D; widgets.stream()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java Stream API 深度解析">
+<meta property="og:url" content="http://pclhahaha.github.io/java-stream-api/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1. Stream 接口概述Stream 表示支持串行或并行的聚合操作的元素序列，除了 Stream 接口之外，还有 IntStream、LongStream、DoubleStream，都符合 Stream 的定义。 Stream 的计算操作可以被组装为 Stream 管道操作，如下代码示例： 1234int sum &#x3D; widgets.stream()">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Stream API">
+<meta property="article:tag" content="函数式编程">
+<meta property="article:tag" content="并行流">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/java-stream-api/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/java-stream-api/","path":"java-stream-api/","title":"Java Stream API 深度解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java Stream API 深度解析 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Stream-%E6%8E%A5%E5%8F%A3%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">1. Stream 接口概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Collection-%E6%8E%A5%E5%8F%A3%E7%9A%84-stream-%E4%B8%8E-parallelStream-%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">2. Collection 接口的 stream() 与 parallelStream() 方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Stream-%E6%8E%A5%E5%8F%A3%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0-ReferencePipeline"><span class="nav-number">3.</span> <span class="nav-text">3. Stream 接口及其实现 ReferencePipeline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%94%9F%E6%88%90%E5%99%A8"><span class="nav-number">4.</span> <span class="nav-text">4. 生成器</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-stream-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java Stream API 深度解析 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java Stream API 深度解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-Stream-接口概述"><a href="#1-Stream-接口概述" class="headerlink" title="1. Stream 接口概述"></a>1. Stream 接口概述</h3><p>Stream 表示支持串行或并行的聚合操作的元素序列，除了 <code>Stream</code> 接口之外，还有 <code>IntStream</code>、<code>LongStream</code>、<code>DoubleStream</code>，都符合 Stream 的定义。</p>
+<p>Stream 的计算操作可以被组装为 Stream 管道操作，如下代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> widgets.stream()</span><br><span class="line">                      .filter(w -&gt; w.getColor() == RED)</span><br><span class="line">                      .mapToInt(w -&gt; w.getWeight())</span><br><span class="line">                      .sum();</span><br></pre></td></tr></table></figure>
+
+<p>包括一个 source（可以是数组 array、集合 collection、生成器函数 generator function、I&#x2F;O channel 等），&gt;&#x3D;0 个中间操作（将一个 Stream 转换为另一个 Stream，例如 <code>filter</code>），以及一个结束操作（产生一个结果或副作用 side-effect，例如 <code>count()</code> 或 <code>forEach()</code>）。只有当结束操作存在，对 Stream 的计算才会开始，source 的元素只有在需要时才会被消费。</p>
+<p>Stream 和 Collection 的实现目的是不同的，Collections 主要关心的是如何管理和访问其中的元素，Streams 不提供直接访问元素的方式，而是关注如何声明式地描述其 source 以及针对 source 的计算。不过 Stream 也提供了遍历元素的操作：<code>iterator()</code>、<code>spliterator()</code>。</p>
+<p>一般来说，针对 source 的操作不能修改 source，除非 source 被明确设计为能够支持并发操作，否则会产生无法预测的甚至错误的后果。大部分操作接受的参数是用户指定的行为，例如 lambda 表达式，对这些表示行为的参数，一般的要求是：1. 不修改 source；2. 无状态。一般来说，这样的参数是函数式接口的实现，例如：lambda 表达式、方法引用，并且一般不能为 <code>null</code>。</p>
+<p><strong>注意事项：</strong></p>
+<ol>
+<li>一个 Stream 只能被使用一次。</li>
+<li>Stream 实现了 <code>AutoCloseable</code> 接口并有一个 <code>close()</code> 方法，一般只有当 source 是 I&#x2F;O channel 的 Streams 才需要关闭，这种情况下可放在 <code>try-with-resources</code> 中声明。</li>
+<li>Stream 管道操作可以串行或并行执行。</li>
+</ol>
+<h3 id="2-Collection-接口的-stream-与-parallelStream-方法"><a href="#2-Collection-接口的-stream-与-parallelStream-方法" class="headerlink" title="2. Collection 接口的 stream() 与 parallelStream() 方法"></a>2. Collection 接口的 stream() 与 parallelStream() 方法</h3><p><code>Collection</code> 接口，即各种集合类的最上层接口，支持通过 <code>stream()</code>、<code>parallelStream()</code> 方法产生 Stream。源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> Stream&lt;E&gt; <span class="title function_">stream</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> StreamSupport.stream(spliterator(), <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">default</span> Stream&lt;E&gt; <span class="title function_">parallelStream</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> StreamSupport.stream(spliterator(), <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>spliterator()</code> 返回 <code>Spliterator</code> 接口，该接口用于对 Collection 进行遍历或分片（<code>parallelStream</code> 的情况下）。</p>
+<h3 id="3-Stream-接口及其实现-ReferencePipeline"><a href="#3-Stream-接口及其实现-ReferencePipeline" class="headerlink" title="3. Stream 接口及其实现 ReferencePipeline"></a>3. Stream 接口及其实现 ReferencePipeline</h3><p><code>Stream</code> 接口支持一系列操作，包括 <code>filter</code>、<code>map</code>、<code>distinct</code>、<code>sorted</code>、<code>peek</code>、<code>limit</code>、<code>skip</code> 等方法，这些方法仍然返回 <code>Stream</code> 接口；还支持 <code>reduce</code>、<code>forEach</code>、<code>min</code>、<code>max</code>、<code>collect</code>、<code>count</code>、<code>toArray</code> 等方法，这些方法不再返回 <code>Stream</code> 接口，是对流式操作的结束操作，是 TerminalOp。</p>
+<p><code>Stream</code> 接口的具体实现是 <code>ReferencePipeline</code> 类，执行具体的操作。</p>
+<p>对于 <code>parallelStream</code>，不同的操作有不同的实现，各自的实现会决定是否真正并行操作。例如，<code>reduce</code> 操作会调用 <code>ReduceOps</code> 执行具体操作，<code>ReduceOps</code> 中 <code>ReduceOp</code> 类的部分源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;P_IN&gt; R <span class="title function_">evaluateParallel</span><span class="params">(PipelineHelper&lt;T&gt; helper,</span></span><br><span class="line"><span class="params">                                 Spliterator&lt;P_IN&gt; spliterator)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ReduceTask</span>&lt;&gt;(<span class="built_in">this</span>, helper, spliterator).invoke().get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>ReduceTask</code> 实现了 <code>ForkJoinTask</code>，表明它是通过 fork&#x2F;join 框架实现的并行处理。</p>
+<blockquote>
+<p>关于 Stream API 原理的更多细节可参考文末参考文献。[^3][^4]</p>
+</blockquote>
+<h3 id="4-生成器"><a href="#4-生成器" class="headerlink" title="4. 生成器"></a>4. 生成器</h3><p>Stream 为生成器的创建提供了便捷，生成器的好处是只有在你需要的时候才生成数据或对象，不需要提前生成。</p>
+<p>例如，<code>IntStream</code> 的 <code>generate()</code> 方法就生成一个流，可以无限调用生成整数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> IntStream <span class="title function_">generate</span><span class="params">(IntSupplier s)</span> &#123;</span><br><span class="line">    Objects.requireNonNull(s);</span><br><span class="line">    <span class="keyword">return</span> StreamSupport.intStream(</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">StreamSpliterators</span>.InfiniteSupplyingSpliterator.OfInt(Long.MAX_VALUE, s), <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/Stream-API/" rel="tag"># Stream API</a>
+              <a href="/tags/%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" rel="tag"># 函数式编程</a>
+              <a href="/tags/%E5%B9%B6%E8%A1%8C%E6%B5%81/" rel="tag"># 并行流</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/jvm-classloader/" rel="prev" title="JVM 类加载器与双亲委派">
+                  <i class="fa fa-angle-left"></i> JVM 类加载器与双亲委派
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/java-object-header/" rel="next" title="Java 对象头与锁升级">
+                  Java 对象头与锁升级 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

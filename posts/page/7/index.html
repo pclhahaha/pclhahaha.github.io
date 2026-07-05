@@ -1,0 +1,2461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:type" content="website">
+<meta property="og:title" content="个人笔记">
+<meta property="og:url" content="http://pclhahaha.github.io/posts/page/7/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="pcl">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/posts/page/7/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"posts/page/7/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">个人笔记</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/s3-data-lake-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/s3-data-lake-guide/" class="post-title-link" itemprop="url">S3 数据湖最佳实践</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>S3 是现代数据湖的默认存储底座。但它不是文件系统——把 HDFS 的使用习惯搬到 S3 上会踩坑。这篇文章聚焦数据工程师日常面对的 S3 问题。</p>
+<h2 id="一、S3-不是文件系统"><a href="#一、S3-不是文件系统" class="headerlink" title="一、S3 不是文件系统"></a>一、S3 不是文件系统</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>HDFS</th>
+<th>S3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>一致性</td>
+<td>强一致（写入立即可见）</td>
+<td>最终一致（写入后有短暂延迟，已大幅改善）</td>
+</tr>
+<tr>
+<td>Rename</td>
+<td>原子操作，O(1)</td>
+<td>Copy + Delete，O(N)，非原子</td>
+</tr>
+<tr>
+<td>List</td>
+<td>快（本地目录结构）</td>
+<td>慢（HTTP LIST 请求，按请求数计费）</td>
+</tr>
+<tr>
+<td>追加写</td>
+<td>支持</td>
+<td>不支持（对象不可变）</td>
+</tr>
+<tr>
+<td>适合模式</td>
+<td>流式写、追加</td>
+<td>一次写多次读、不可变</td>
+</tr>
+</tbody></table>
+<h2 id="二、分区设计"><a href="#二、分区设计" class="headerlink" title="二、分区设计"></a>二、分区设计</h2><p>好的分区是 S3 性能的基石：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">s3:<span class="operator">//</span>bucket<span class="operator">/</span>events<span class="symbol">/</span></span><br><span class="line">  <span class="attr">dt</span><span class="operator">=</span><span class="number">202</span>6-<span class="number">0</span>7-<span class="number">01</span><span class="symbol">/</span></span><br><span class="line">    <span class="attr">hour</span><span class="operator">=</span><span class="number">00</span><span class="symbol">/</span></span><br><span class="line">    <span class="attr">hour</span><span class="operator">=</span><span class="number">01</span><span class="symbol">/</span></span><br><span class="line">  <span class="attr">dt</span><span class="operator">=</span><span class="number">202</span>6-<span class="number">0</span>7-<span class="number">02</span><span class="symbol">/</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p><strong>分区粒度</strong>：</p>
+<ul>
+<li>太粗（按年）→ 单分区数据量过大，查询要扫全量</li>
+<li>太细（按分钟）→ 数百万分区，LIST 操作成为瓶颈</li>
+<li>推荐：按天分区，高流量加按小时子分区</li>
+</ul>
+<p><strong>分区下推</strong>（Partition Pruning）：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- ✅ 好：Spark 只会 LIST dt=2026-07-05/ 下的文件</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> events <span class="keyword">WHERE</span> dt <span class="operator">=</span> <span class="string">&#x27;2026-07-05&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- ❌ 坏：无法下推分区，需要扫全部 dt 分区</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> events <span class="keyword">WHERE</span> date_format(event_time, <span class="string">&#x27;yyyy-MM-dd&#x27;</span>) <span class="operator">=</span> <span class="string">&#x27;2026-07-05&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、文件大小与格式"><a href="#三、文件大小与格式" class="headerlink" title="三、文件大小与格式"></a>三、文件大小与格式</h2><p><strong>小文件是第一大性能杀手</strong>。S3 的 LIST 操作收费且慢，每个文件都需要一次 HEAD 请求获取元数据。</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">推荐：256MB<span class="string">-1</span>GB/文件</span><br><span class="line">最小：&gt; 50MB/文件（低于此阈值考虑合并）</span><br></pre></td></tr></table></figure>
+
+<p><strong>压缩格式选择</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>可分割</th>
+<th>压缩率</th>
+<th>适合</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Parquet + Snappy</td>
+<td>✅</td>
+<td>中等</td>
+<td>Spark 查询首选</td>
+</tr>
+<tr>
+<td>Parquet + ZSTD</td>
+<td>✅</td>
+<td>高</td>
+<td>存储优化</td>
+</tr>
+<tr>
+<td>gzip</td>
+<td>❌</td>
+<td>高</td>
+<td>小文件归档</td>
+</tr>
+<tr>
+<td>ORC + ZLIB</td>
+<td>✅</td>
+<td>高</td>
+<td>Hive 查询</td>
+</tr>
+</tbody></table>
+<p><strong>可分割（Splittable）很重要</strong>：gzip 压缩的文件不能分割——一个 10GB 的 gzip 文件只能由一个 Task 处理，无法并行读取，导致单 Task 执行过慢甚至 OOM。Parquet&#x2F;ORC 天然支持按 Row Group&#x2F;Stripe 并行读取。</p>
+<h2 id="四、Iceberg——表格式管理"><a href="#四、Iceberg——表格式管理" class="headerlink" title="四、Iceberg——表格式管理"></a>四、Iceberg——表格式管理</h2><p>原始 parquet 文件缺少表语义——没有 schema 演化、没有 ACID、不知道哪些文件属于哪个分区。</p>
+<p>Iceberg 在 Parquet 之上添加了表元数据层：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">s3</span>://bucket/warehouse/events/</span><br><span class="line">  <span class="attribute">metadata</span>/</span><br><span class="line">    <span class="attribute">v1</span>.json       ← 表结构 + 快照</span><br><span class="line">    <span class="attribute">v2</span>.json       ← 新增分区信息</span><br><span class="line">    <span class="attribute">snap</span>-*.avro   ← 文件清单</span><br><span class="line">  <span class="attribute">data</span>/</span><br><span class="line">    <span class="attribute">dt</span>=<span class="number">2026</span>-<span class="number">07</span>-<span class="number">01</span>/</span><br><span class="line">      <span class="attribute">file</span>-<span class="number">1</span>.parquet</span><br><span class="line">      <span class="attribute">file</span>-<span class="number">2</span>.parquet</span><br></pre></td></tr></table></figure>
+
+<p>核心能力：</p>
+<ul>
+<li><strong>时间旅行</strong>：<code>SELECT * FROM events FOR SYSTEM_VERSION AS OF &#39;2026-07-01&#39;</code></li>
+<li><strong>Schema 演化</strong>：加列、改列类型（部分兼容），不需要重建表</li>
+<li><strong>分区演化</strong>：修改分区策略，元数据更新即可，无需重写数据文件</li>
+<li><strong>ACID</strong>：通过乐观并发控制支持多写入者、多读取者</li>
+</ul>
+<h2 id="五、存储分层"><a href="#五、存储分层" class="headerlink" title="五、存储分层"></a>五、存储分层</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">S3</span> Standard → S3 Infrequent Access → S3 Glacier</span><br><span class="line">   热数据         温数据（<span class="number">30</span>天+）       冷归档（<span class="number">90</span>天+）</span><br><span class="line">   ~<span class="variable">$0</span>.<span class="number">023</span>/GB      ~<span class="variable">$0</span>.<span class="number">012</span>/GB          ~<span class="variable">$0</span>.<span class="number">004</span>/GB</span><br></pre></td></tr></table></figure>
+
+<p>用 S3 生命周期策略自动迁移：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;Rules&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;archive-old-data&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Prefix&quot;</span><span class="punctuation">:</span> <span class="string">&quot;dt=2025/&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Transitions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      <span class="punctuation">&#123;</span><span class="attr">&quot;Days&quot;</span><span class="punctuation">:</span> <span class="number">30</span><span class="punctuation">,</span>  <span class="attr">&quot;StorageClass&quot;</span><span class="punctuation">:</span> <span class="string">&quot;STANDARD_IA&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="punctuation">&#123;</span><span class="attr">&quot;Days&quot;</span><span class="punctuation">:</span> <span class="number">90</span><span class="punctuation">,</span>  <span class="attr">&quot;StorageClass&quot;</span><span class="punctuation">:</span> <span class="string">&quot;GLACIER&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：查询 Glacier 数据前需要先恢复（Restore），耗时数分钟到数小时。</p>
+<h2 id="六、成本优化"><a href="#六、成本优化" class="headerlink" title="六、成本优化"></a>六、成本优化</h2><table>
+<thead>
+<tr>
+<th>优化</th>
+<th>节省</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>合并小文件</td>
+<td>减少 LIST&#x2F;PUT 请求（$0.005&#x2F;1000次）</td>
+</tr>
+<tr>
+<td>用 S3 Select 而非全量下载</td>
+<td>只传输需要的数据</td>
+</tr>
+<tr>
+<td>S3 Transfer Acceleration</td>
+<td>远距离上传提速（按加速流量收费）</td>
+</tr>
+<tr>
+<td>VPC Endpoint</td>
+<td>免去 NAT 网关的数据传输费</td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>S3 数据湖的核心实践：按天分区 + 256MB 以上 Parquet 文件 + Iceberg 表管理 + 生命周期自动分层。做好这四点，性能和成本都能控制住。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/search-engine-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/search-engine-design/" class="post-title-link" itemprop="url">搜索引擎系统设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>设计一个像 Google 那样的通用搜索引擎，核心链路分为三阶段：<strong>爬取 → 索引 → 查询排序</strong>。每一阶段都是独立的分布式系统。</p>
+<h2 id="一、爬虫系统-Web-Crawler"><a href="#一、爬虫系统-Web-Crawler" class="headerlink" title="一、爬虫系统 (Web Crawler)"></a>一、爬虫系统 (Web Crawler)</h2><h3 id="1-1-爬虫架构"><a href="#1-1-爬虫架构" class="headerlink" title="1.1 爬虫架构"></a>1.1 爬虫架构</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">          <span class="selector-attr">[URL Frontier 队列]</span></span><br><span class="line">                 │</span><br><span class="line">    ┌────────────┼────────────┐</span><br><span class="line">    │            │            │</span><br><span class="line"><span class="selector-attr">[爬虫节点1]</span> <span class="selector-attr">[爬虫节点2]</span> <span class="selector-attr">[爬虫节点3]</span></span><br><span class="line">    │            │            │</span><br><span class="line">    ├─ DNS 解析 ─┤────────────┤</span><br><span class="line">    ├─ HTTP 请求 ─┤───────────┤</span><br><span class="line">    ├─ 解析 <span class="selector-tag">HTML</span> ─┤───────────┤</span><br><span class="line">    └─ 提取链接 → URL Frontier</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-URL-Frontier"><a href="#1-2-URL-Frontier" class="headerlink" title="1.2 URL Frontier"></a>1.2 URL Frontier</h3><p>URL Frontier 是爬虫的调度核心，负责管理待抓取 URL 的优先级和去重。</p>
+<p><strong>设计要点</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>要点</th>
+<th>方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>去重</strong></td>
+<td>Bloom Filter 过滤已爬取的 URL</td>
+</tr>
+<tr>
+<td><strong>优先级</strong></td>
+<td>PageRank 预估值、域名热度、更新频率综合排序</td>
+</tr>
+<tr>
+<td><strong>礼貌性</strong></td>
+<td>同一域名两次请求间隔 ≥ 1 秒（robots.txt）</td>
+</tr>
+<tr>
+<td><strong>分布式</strong></td>
+<td>按域名一致性哈希分配到不同爬虫节点，避免同一域名被多节点同时抓取</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-去重策略"><a href="#1-3-去重策略" class="headerlink" title="1.3 去重策略"></a>1.3 去重策略</h3><p>URL 数量是百亿级别的，不能用 HashSet 全量存储。布隆过滤器是标准的 URL 去重方案：</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">新 <span class="built_in">URL</span> → <span class="variable">BloomFilter</span><span class="operator">.</span><span class="variable">mightContain</span><span class="punctuation">(</span><span class="variable">url</span><span class="punctuation">)</span> → </span><br><span class="line">    <span class="built_in">False</span> → 一定未爬取过 → 加入队列并插入 <span class="variable">BloomFilter</span></span><br><span class="line">    <span class="built_in">True</span> → 可能已爬取 → 跳过（容忍少量漏抓）</span><br></pre></td></tr></table></figure>
+
+<p><strong>误判率控制</strong>：100 亿 URL，误判率 0.01% → 约 24GB Bloom Filter，漏抓约 100 万条，可接受。</p>
+<h2 id="二、文档处理与索引构建"><a href="#二、文档处理与索引构建" class="headerlink" title="二、文档处理与索引构建"></a>二、文档处理与索引构建</h2><h3 id="2-1-文档处理流程"><a href="#2-1-文档处理流程" class="headerlink" title="2.1 文档处理流程"></a>2.1 文档处理流程</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">原始 <span class="selector-tag">HTML</span> → 清洗(Tag去除) → 分词 → 停用词过滤 → 词干提取 → </span><br><span class="line">    ┌→ <span class="selector-attr">[正排索引]</span> 文档ID → 标题/正文/URL/时间</span><br><span class="line">    └→ <span class="selector-attr">[倒排索引]</span> 词 → &#123;文档ID列表, 词频, 位置&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-倒排索引"><a href="#2-2-倒排索引" class="headerlink" title="2.2 倒排索引"></a>2.2 倒排索引</h3><p>倒排索引是搜索引擎的核心数据结构：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">词(<span class="symbol">Term</span>)    →   倒排列表(<span class="symbol">Posting</span> <span class="symbol">List</span>)</span><br><span class="line">─────────────────────────────────────</span><br><span class="line"><span class="string">&quot;系统设计&quot;</span>   →   [doc<span class="number">-1</span>: tf=<span class="number">3</span>, pos=[<span class="number">5</span>,<span class="number">12</span>,<span class="number">28</span>]], </span><br><span class="line">                  [doc<span class="number">-5</span>: tf=<span class="number">1</span>, pos=[<span class="number">42</span>]], </span><br><span class="line">                  [doc<span class="number">-12</span>: tf=<span class="number">2</span>, pos=[<span class="number">8</span>,<span class="number">19</span>]]</span><br><span class="line"><span class="string">&quot;分布式&quot;</span>    →   [doc<span class="number">-1</span>: tf=<span class="number">1</span>, pos=[<span class="number">15</span>]],</span><br><span class="line">                  [doc<span class="number">-8</span>: tf=<span class="number">4</span>, pos=[<span class="number">3</span>,<span class="number">11</span>,<span class="number">20</span>,<span class="number">35</span>]]</span><br></pre></td></tr></table></figure>
+
+<p><strong>存储优化</strong>：</p>
+<ul>
+<li><strong>压缩</strong>：倒排列表使用 Variable Byte &#x2F; PForDelta 压缩，节省 60-80% 存储</li>
+<li><strong>跳表加速</strong>：在倒排列表中加入跳表指针，加速多词 AND 查询时的求交操作</li>
+</ul>
+<h3 id="2-3-索引分片"><a href="#2-3-索引分片" class="headerlink" title="2.3 索引分片"></a>2.3 索引分片</h3><p>百亿级文档，索引无法放在单机上。采用<strong>文档分片 + 查询扇出</strong>策略：</p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">查询 <span class="string">&quot;分布式 系统设计&quot;</span></span><br><span class="line">    │</span><br><span class="line">[查询路由器]</span><br><span class="line">    │</span><br><span class="line">    ├→ [索引分片<span class="number">1</span>: <span class="meta">doc</span>-<span class="number">0</span> ~ <span class="meta">doc</span>-<span class="number">1</span>亿]</span><br><span class="line">    ├→ [索引分片<span class="number">2</span>: <span class="meta">doc</span>-<span class="number">1</span>亿 ~ <span class="meta">doc</span>-<span class="number">2</span>亿]</span><br><span class="line">    └→ [索引分片N: <span class="meta">doc</span>-(N-<span class="number">1</span>)亿 ~ <span class="meta">doc</span>-N亿]</span><br><span class="line">    │</span><br><span class="line">[合并排序 Top-<span class="number">100</span>]</span><br><span class="line">    │</span><br><span class="line">  返回结果</span><br></pre></td></tr></table></figure>
+
+<p>每个分片独立存储完整的倒排索引，查询时<strong>扇出到所有分片</strong>，各分片返回 Top-K 结果后合并排序。</p>
+<h2 id="三、查询处理"><a href="#三、查询处理" class="headerlink" title="三、查询处理"></a>三、查询处理</h2><h3 id="3-1-查询流程"><a href="#3-1-查询流程" class="headerlink" title="3.1 查询流程"></a>3.1 查询流程</h3><figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">用户输入 <span class="string">&quot;分布式系统设计&quot;</span></span><br><span class="line">    │</span><br><span class="line">[查询解析] → 分词 → <span class="string">&quot;分布式&quot;</span> <span class="string">&quot;系统&quot;</span> <span class="string">&quot;设计&quot;</span></span><br><span class="line">    │</span><br><span class="line">[查询改写] → 纠错、扩展（<span class="string">&quot;设计&quot;</span> → <span class="string">&quot;设计模式&quot;</span> <span class="string">&quot;系统架构&quot;</span>）</span><br><span class="line">    │</span><br><span class="line">[索引查询] → 并行查所有索引分片</span><br><span class="line">    │</span><br><span class="line">[相关性排序] → <span class="symbol">BM25</span> / <span class="symbol">TF</span>-<span class="symbol">IDF</span> / 点击率 / 时效性</span><br><span class="line">    │</span><br><span class="line">[<span class="symbol">Top</span>-<span class="symbol">K</span> 合并] → 取各分片的 <span class="symbol">Top</span><span class="number">-100</span>，全局排序返回前 <span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-排序模型"><a href="#3-2-排序模型" class="headerlink" title="3.2 排序模型"></a>3.2 排序模型</h3><p>早期搜索引擎使用 TF-IDF 和 BM25 等基于词频的统计模型。现代搜索引擎引入了数百个排序特征，使用机器学习模型（如 LambdaMART）进行学习排序。</p>
+<p>关键排序特征：</p>
+<ul>
+<li><strong>文本相关性</strong>：BM25 得分、标题匹配度</li>
+<li><strong>质量信号</strong>：PageRank、域名权威度</li>
+<li><strong>用户行为</strong>：点击率、停留时间、跳出率</li>
+<li><strong>时效性</strong>：发布时间、内容新鲜度</li>
+<li><strong>个性化</strong>：用户搜索历史、地理位置</li>
+</ul>
+<h3 id="3-3-分页优化"><a href="#3-3-分页优化" class="headerlink" title="3.3 分页优化"></a>3.3 分页优化</h3><p>“搜索千万结果，用户只看前两页”——所以分页是性能优化的关键。</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>深分页</strong></td>
+<td>不实际查询第 1000 页，限制最多展示前 50 页</td>
+</tr>
+<tr>
+<td><strong>速度</strong></td>
+<td>各分片只返回前 100 条，合并后取 Top-100</td>
+</tr>
+<tr>
+<td><strong>一致性</strong></td>
+<td>搜索过程中索引可能正在更新，结果轻微波动可接受</td>
+</tr>
+<tr>
+<td><strong>缓存</strong></td>
+<td>热门搜索词的结果缓存到 Redis（TTL 5-30 分钟）</td>
+</tr>
+</tbody></table>
+<h2 id="四、搜索建议与自动补全"><a href="#四、搜索建议与自动补全" class="headerlink" title="四、搜索建议与自动补全"></a>四、搜索建议与自动补全</h2><p>搜索建议（Autocomplete&#x2F;Suggester）需要在用户输入每个字符时实时返回建议。</p>
+<h3 id="4-1-Trie-树实现"><a href="#4-1-Trie-树实现" class="headerlink" title="4.1 Trie 树实现"></a>4.1 Trie 树实现</h3><p>关键词前缀查询适合用 <strong>Trie 树</strong>（字典树）：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">root</span><br><span class="line">├─ d</span><br><span class="line">│  └─ <span class="selector-tag">i</span></span><br><span class="line">│     └─ s</span><br><span class="line">│        └─ t</span><br><span class="line">│           └─ <span class="attribute">r</span> (<span class="string">&quot;分布式&quot;</span>)</span><br><span class="line">│              └─ <span class="selector-tag">i</span></span><br><span class="line">│                 └─ <span class="selector-tag">b</span> (<span class="string">&quot;分布式&quot;</span>)</span><br><span class="line">├─ j</span><br><span class="line">│  └─ <span class="selector-tag">a</span></span><br><span class="line">│     └─ v (<span class="string">&quot;Java&quot;</span>)</span><br><span class="line">│        └─ <span class="selector-tag">a</span> (<span class="string">&quot;Java&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>每个节点存储 Top-10 最热门的完整查询词，查询时遍历到对应前缀节点直接返回。</p>
+<h3 id="4-2-生产级优化"><a href="#4-2-生产级优化" class="headerlink" title="4.2 生产级优化"></a>4.2 生产级优化</h3><ul>
+<li><strong>FST (有限状态转换器)</strong>：比 Trie 节省 90% 内存，ES 和 Lucene 均使用 FST 实现 Term Index</li>
+<li><strong>热度排序</strong>：每个节点按搜索频率排序 Top-K，存储 Top-10</li>
+<li><strong>实时更新</strong>：通过 Kafka 消费搜索日志，在线更新前缀树节点的 Top-K</li>
+</ul>
+<h2 id="五、系统总览"><a href="#五、系统总览" class="headerlink" title="五、系统总览"></a>五、系统总览</h2><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">                  ┌──────────────┐</span><br><span class="line">                  │   用户搜索    │</span><br><span class="line">                  └──────┬───────┘</span><br><span class="line">                         │</span><br><span class="line">       ┌─────────────────┼─────────────────┐</span><br><span class="line">       │                 │                 │</span><br><span class="line">  <span class="selector-attr">[搜索建议]</span>       <span class="selector-attr">[查询路由器]</span>        <span class="selector-attr">[广告引擎]</span></span><br><span class="line">  (Trie/FST)          │              (独立系统)</span><br><span class="line">                      │</span><br><span class="line">       ┌──────────────┼──────────────┐</span><br><span class="line">       │              │              │</span><br><span class="line">  <span class="selector-attr">[索引分片1]</span>    <span class="selector-attr">[索引分片2]</span>    <span class="selector-attr">[索引分片N]</span></span><br><span class="line">       │              │              │</span><br><span class="line">       └──────────────┼──────────────┘</span><br><span class="line">                      │</span><br><span class="line">               <span class="selector-attr">[合并排序层]</span></span><br><span class="line">                      │</span><br><span class="line">                  <span class="selector-attr">[返回结果]</span></span><br><span class="line"></span><br><span class="line">后端离线链路：</span><br><span class="line"><span class="selector-attr">[爬虫]</span> → <span class="selector-attr">[文档处理]</span> → <span class="selector-attr">[索引构建]</span> → <span class="selector-attr">[索引分发]</span> → <span class="selector-attr">[Ranking模型训练]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、容量估算"><a href="#六、容量估算" class="headerlink" title="六、容量估算"></a>六、容量估算</h2><p>假设 1000 亿网页：</p>
+<ul>
+<li>平均每页 10KB 文本 → 1000亿 × 10KB &#x3D; 1PB 原始文本</li>
+<li>倒排索引约为原文本的 20%，压缩后 → ~200TB</li>
+<li>正排索引存储标题&#x2F;摘要 → ~50TB</li>
+<li>每台机器 256GB 内存，需要 ~1000 台索引服务器</li>
+</ul>
+<p>Google 的实际规模远超这个数量级，通过定制的 Colossus 文件系统、Spanner 数据库和自研 TPU 训练排序模型支撑。</p>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>搜索引擎的设计精髓在于”空间换时间”——用海量预处理（爬取、索引）换取查询时的毫秒级响应。核心数据结构（倒排索引、FST、跳表、Bloom Filter）的选择直接决定了性能边界。在实践中，Google 和 Elasticsearch 选择了不同的路线：Google 走全栈自研，ES 基于 Lucene 提供开箱即用的分布式搜索引擎。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/service-discovery/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/service-discovery/" class="post-title-link" itemprop="url">服务注册与发现</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>注册中心是微服务架构的通信中枢——没有它，服务 A 不知道服务 B 在哪台机器上。一个合格的注册中心需要解决：服务怎么注册、怎么发现、怎么知道对方还活着、怎么处理故障。</p>
+<h2 id="一、注册中心核心能力"><a href="#一、注册中心核心能力" class="headerlink" title="一、注册中心核心能力"></a>一、注册中心核心能力</h2><table>
+<thead>
+<tr>
+<th>能力</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>注册</td>
+<td>服务启动时向注册中心注册自身信息（IP&#x2F;端口&#x2F;元数据）</td>
+</tr>
+<tr>
+<td>心跳</td>
+<td>定期发送心跳维持租约，注册中心据此判断服务存活</td>
+</tr>
+<tr>
+<td>注销</td>
+<td>服务正常下线时主动注销；异常下线时心跳超时被动剔除</td>
+</tr>
+<tr>
+<td>订阅</td>
+<td>消费者订阅服务列表，注册中心推送变更通知</td>
+</tr>
+<tr>
+<td>通知</td>
+<td>服务列表变更时通知所有订阅者（增量或全量）</td>
+</tr>
+</tbody></table>
+<p><strong>CAP 视角下的注册中心</strong>：注册中心本质上是一个分布式协调系统。你在设计时必须做个选择——要一致性还是可用性：</p>
+<ul>
+<li><strong>CP</strong>：宁可短暂不可用，也不返回过期数据（Zookeeper）</li>
+<li><strong>AP</strong>：宁可返回过期数据，也保证服务正常响应（Eureka）</li>
+<li><strong>CP+AP 混合</strong>：不同场景不同策略（Nacos）</li>
+</ul>
+<h2 id="二、Zookeeper（CP）"><a href="#二、Zookeeper（CP）" class="headerlink" title="二、Zookeeper（CP）"></a>二、Zookeeper（CP）</h2><p>Zookeeper 使用 ZAB 协议保证 CP——网络分区时牺牲可用性。Leader 宕机后重新选举需 30~120 秒，选举期间整个集群不可用。</p>
+<p><strong>ZK 不适合大规模微服务注册的原因</strong>：</p>
+<ol>
+<li><strong>写压力大</strong>：每个服务实例定期心跳是写操作，所有写都要通过 Leader</li>
+<li><strong>选主期间不可用</strong>：服务无法注册&#x2F;发现，新节点加入失败</li>
+<li><strong>无健康检查</strong>：ZK 只关心连接存活，端口还活着但业务线程全阻塞，ZK 不会剔除</li>
+<li><strong>存储膨胀</strong>：大量临时节点和 watcher 导致性能下降</li>
+</ol>
+<p><strong>结论</strong>：ZK 适合分布式锁、配置管理、选主等<strong>低频 + 强一致</strong>场景，不适合做<strong>高频 + 海量临时节点</strong>的注册中心。</p>
+<h2 id="三、Eureka（AP）"><a href="#三、Eureka（AP）" class="headerlink" title="三、Eureka（AP）"></a>三、Eureka（AP）</h2><p>Eureka 是 Netflix 开发的服务发现组件，设计哲学是”宁可返回过期数据，也绝不拒绝服务”。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Eureka 集群（Peer-<span class="selector-tag">to</span>-Peer）：</span><br><span class="line">   Eureka-<span class="selector-tag">A</span> ←→ Eureka-<span class="selector-tag">B</span> ←→ Eureka-C</span><br><span class="line">       ↑           ↑           ↑</span><br><span class="line">   Service-<span class="number">1</span>   Service-<span class="number">2</span>   Service-<span class="number">3</span></span><br><span class="line">   (注册+心跳)  (注册+心跳)  (注册+心跳)</span><br></pre></td></tr></table></figure>
+
+<p><strong>自我保护模式</strong>：当 Eureka 检测到大量心跳超时（可能因为网络分区），它进入自我保护模式，<strong>不再剔除任何服务实例</strong>。理由是”可能是网络问题而非服务挂了，剔除会导致可用实例被误杀”。</p>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">正常模式：<span class="number">15</span> 分钟内 <span class="number">85</span><span class="comment">% 以上的心跳正常 → 按心跳剔除</span></span><br><span class="line">自我保护：心跳失败比例 &gt; <span class="number">15</span><span class="comment">% → 冻结剔除，保留所有实例</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Eureka 的取舍</strong>：</p>
+<ul>
+<li>优点：极端网络故障下仍可用（AP 优先）</li>
+<li>缺点：可能返回已宕机的实例（调用方需要自己容错，如重试+熔断）</li>
+<li>适用场景：对一致性要求不高的微服务环境</li>
+</ul>
+<p>Eureka 2.0 已停止维护，新项目推荐 Nacos 或 Consul。</p>
+<h2 id="四、Nacos（CP-AP-混合）"><a href="#四、Nacos（CP-AP-混合）" class="headerlink" title="四、Nacos（CP+AP 混合）"></a>四、Nacos（CP+AP 混合）</h2><p>Nacos 是阿里开源的服务发现和配置管理平台，目标是同时支持 AP（服务发现）和 CP（配置管理）。</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">┌────────────────── Nacos Server ──────────────────┐</span><br><span class="line">│  ┌─────────────────┐  ┌──────────────────────┐   │</span><br><span class="line">│  │  服务发现(AP)    │  │   配置管理(CP)        │   │</span><br><span class="line">│  │  Distro 协议     │  │   Raft 协议           │   │</span><br><span class="line">│  │  最终一致性      │  │   强一致性            │   │</span><br><span class="line">│  └─────────────────┘  └──────────────────────┘   │</span><br><span class="line">└──────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>AP 模式（临时实例）</strong>：基于 Distro 协议，节点间异步复制，分区时各节点独立提供服务。心跳 5s 上报一次，15s 无心跳标记不健康，30s 剔除。</p>
+<p><strong>CP 模式（持久实例）</strong>：基于 Raft 协议，选举期间不可写但可读。适用于期望强一致的服务发现场景。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nacos 客户端配置</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="string">production</span></span><br><span class="line">        <span class="attr">ephemeral:</span> <span class="literal">true</span>    <span class="comment"># true=AP临时实例, false=CP持久实例</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、Consul（CP-健康检查）"><a href="#五、Consul（CP-健康检查）" class="headerlink" title="五、Consul（CP+健康检查）"></a>五、Consul（CP+健康检查）</h2><p>Consul 是 HashiCorp 开发的服务发现和配置中心，内置健康检查（HTTP&#x2F;TCP&#x2F;gRPC&#x2F;脚本），原生支持多数据中心。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Consul 架构：</span><br><span class="line">  ┌──────────┐   ┌──────────┐</span><br><span class="line">  │ Consul-<span class="selector-tag">A</span> │   │ Consul-<span class="selector-tag">B</span> │  ← Server (Raft 选主，<span class="number">3</span>-<span class="number">5</span> 个)</span><br><span class="line">  └────┬─────┘   └────┬─────┘</span><br><span class="line">       │               │</span><br><span class="line">  ┌────┴───────────────┴────┐</span><br><span class="line">  │    Consul Client 集群    │  ← 每个节点运行 Agent</span><br><span class="line">  │   (注册 + 健康检查)       │</span><br><span class="line">  └─────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>健康检查</strong>是 Consul 的亮点——支持 HTTP&#x2F;TCP&#x2F;GRPC&#x2F;Script 多种检查方式，比单纯的心跳更可靠。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;port&quot;</span><span class="punctuation">:</span> <span class="number">8080</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;check&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;http&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http://localhost:8080/health&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;interval&quot;</span><span class="punctuation">:</span> <span class="string">&quot;10s&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;timeout&quot;</span><span class="punctuation">:</span> <span class="string">&quot;3s&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、客户端-vs-服务端发现"><a href="#六、客户端-vs-服务端发现" class="headerlink" title="六、客户端 vs 服务端发现"></a>六、客户端 vs 服务端发现</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>客户端发现 (Ribbon)</th>
+<th>服务端发现 (K8s Service)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>实现方式</td>
+<td>客户端从注册中心拉取服务列表，本地负载均衡</td>
+<td>请求先到负载均衡器，由其转发到后端实例</td>
+</tr>
+<tr>
+<td>优点</td>
+<td>无中间代理，少一跳</td>
+<td>客户端简单，无需感知注册中心</td>
+</tr>
+<tr>
+<td>缺点</td>
+<td>客户端需要集成服务发现逻辑</td>
+<td>多一跳，负载均衡器成为瓶颈</td>
+</tr>
+<tr>
+<td>代表</td>
+<td>Netflix Ribbon, Spring Cloud LoadBalancer</td>
+<td>K8s Service, AWS ELB</td>
+</tr>
+</tbody></table>
+<p>Kubernetes 中，<code>kube-proxy</code> + <code>CoreDNS</code> 提供了服务端发现模式，客户端只需要通过 Service 名称访问——IP 变化对客户端完全透明。</p>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>选型建议：</p>
+<ul>
+<li><strong>新项目首选 Nacos</strong>：功能最全、AP+CP 灵活、Spring Cloud 官方推荐</li>
+<li><strong>多数据中心用 Consul</strong>：健康检查强、跨机房原生支持</li>
+<li><strong>Netflix 遗留项目用 Eureka</strong>：Spring Cloud 配套但已停维护</li>
+<li><strong>ZK 不要用作注册中心</strong>：设计初衷是 CP 协调服务，不适合高频注册发现</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/snowflake-bigquery/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/snowflake-bigquery/" class="post-title-link" itemprop="url">Snowflake vs BigQuery 对比</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Snowflake 和 BigQuery 是云原生数仓的两极——一个跨云中立，一个深度绑定 GCP。Redshift 用户常会想”要不要换”。</p>
+<h2 id="一、核心差异"><a href="#一、核心差异" class="headerlink" title="一、核心差异"></a>一、核心差异</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Snowflake</th>
+<th>BigQuery</th>
+<th>Redshift</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>架构</td>
+<td>存算分离（共享存储）</td>
+<td>存算分离（完全无服务器）</td>
+<td>存算耦合（RA3 部分分离）</td>
+</tr>
+<tr>
+<td>计算</td>
+<td>Virtual Warehouse（需选规格）</td>
+<td>Slots（自动弹性，按需付费）</td>
+<td>固定集群（需手动扩缩）</td>
+</tr>
+<tr>
+<td>扩展</td>
+<td>手动扩缩 Warehouse</td>
+<td>自动弹性（无感）</td>
+<td>手动添加&#x2F;移除节点</td>
+</tr>
+<tr>
+<td>计费</td>
+<td>计算 + 存储 分开</td>
+<td>按扫描数据量 或 按 Slot</td>
+<td>按 EC2 实例</td>
+</tr>
+<tr>
+<td>跨云</td>
+<td>AWS&#x2F;Azure&#x2F;GCP</td>
+<td>仅 GCP</td>
+<td>AWS</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>标准 SQL + 扩展</td>
+<td>标准 SQL (ANSI兼容)</td>
+<td>PostgreSQL 变体</td>
+</tr>
+</tbody></table>
+<h2 id="二、Snowflake-架构"><a href="#二、Snowflake-架构" class="headerlink" title="二、Snowflake 架构"></a>二、Snowflake 架构</h2><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│         Cloud Services Layer         │</span><br><span class="line">│   (认证、查询优化、元数据管理)        │</span><br><span class="line">└─────────────┬───────────────────────┘</span><br><span class="line">              │</span><br><span class="line">┌─────────────▼───────────────────────┐</span><br><span class="line">│     Virtual Warehouse (计算层)       │</span><br><span class="line">│  XS<span class="regexp">/S/</span>M<span class="regexp">/L/</span>XL (<span class="number">1</span>-<span class="number">128</span> 节点)           │</span><br><span class="line">│  可独立扩缩、暂停/恢复               │</span><br><span class="line">└─────────────┬───────────────────────┘</span><br><span class="line">              │</span><br><span class="line">┌─────────────▼───────────────────────┐</span><br><span class="line">│      Storage Layer (存储层)          │</span><br><span class="line">│  列式压缩、自动分区（微分区）         │</span><br><span class="line">│  S3<span class="regexp">/GCS/</span>Azure Blob 持久化            │</span><br><span class="line">└─────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>关键特性：</p>
+<ul>
+<li><strong>Zero-Copy Cloning</strong>：瞬间克隆 TB 级数据库（只复制元数据，共享底层文件）</li>
+<li><strong>Time Travel</strong>：最多回溯 90 天（企业版）</li>
+<li><strong>Data Sharing</strong>：跨账户共享数据（无需复制数据）</li>
+<li><strong>微分区</strong>：自动将数据切分为 50-500MB 的微分区，无需手动设计分区键</li>
+</ul>
+<h2 id="三、BigQuery-架构"><a href="#三、BigQuery-架构" class="headerlink" title="三、BigQuery 架构"></a>三、BigQuery 架构</h2><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│         BigQuery Engine              │</span><br><span class="line">│   (Dremel 查询引擎 + Colossus 存储)   │</span><br><span class="line">│   完全 Serverless，无需管理资源        │</span><br><span class="line">└─────────────┬───────────────────────┘</span><br><span class="line">              │</span><br><span class="line">┌─────────────▼───────────────────────┐</span><br><span class="line">│         Colossus (Google 分布式 FS)   │</span><br><span class="line">│  列式存储 + Capacitor 文件格式         │</span><br><span class="line">│  自动分区 + 自动集群                  │</span><br><span class="line">└─────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>关键特性：</p>
+<ul>
+<li><strong>完全 Serverless</strong>：无 Warehouse 概念，无需选择规格</li>
+<li><strong>Slot 自动弹性</strong>：按需分配 Slot 计算资源（最大可到数千 Slot）</li>
+<li><strong>BI Engine</strong>：内存加速层，亚秒级查询</li>
+<li><strong>BigLake</strong>：直接在 GCS&#x2F;S3&#x2F;Azure 上查 Iceberg 表</li>
+<li><strong>ML 集成</strong>：BigQuery ML（直接 SQL 建模型），Vertex AI 连接器</li>
+</ul>
+<h2 id="四、成本对比"><a href="#四、成本对比" class="headerlink" title="四、成本对比"></a>四、成本对比</h2><h3 id="Snowflake"><a href="#Snowflake" class="headerlink" title="Snowflake"></a>Snowflake</h3><ul>
+<li>计算：$2-4&#x2F;Snowflake Credit&#x2F;小时（按 Warehouse 规格 × 运行时间）</li>
+<li>存储：~$23&#x2F;TB&#x2F;月（压缩后）</li>
+<li>典型月费（10TB）：计算 $3000-5000 + 存储 $230</li>
+</ul>
+<h3 id="BigQuery"><a href="#BigQuery" class="headerlink" title="BigQuery"></a>BigQuery</h3><ul>
+<li>按扫描：$5&#x2F;TB 扫描（适合临时查询）</li>
+<li>按 Slot：$2000&#x2F;100 Slots&#x2F;月（适合固定工作负载）</li>
+<li>存储：~$20&#x2F;TB&#x2F;月（活跃），$10&#x2F;TB&#x2F;月（长期）</li>
+<li>典型月费（10TB）：固定分析 $2000-4000 + 存储 $200</li>
+</ul>
+<h3 id="Redshift"><a href="#Redshift" class="headerlink" title="Redshift"></a>Redshift</h3><ul>
+<li>EC2 实例费：~$1000-5000&#x2F;月（RA3 集群）</li>
+<li>存储：Redshift Managed Storage 按 S3 计费 + 本地缓存</li>
+<li>典型月费（10TB）：~$3000-8000</li>
+</ul>
+<h2 id="五、选型建议"><a href="#五、选型建议" class="headerlink" title="五、选型建议"></a>五、选型建议</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>已在 AWS，需要跨云中立</td>
+<td>Snowflake</td>
+</tr>
+<tr>
+<td>已在 GCP，追求 Serverless</td>
+<td>BigQuery</td>
+</tr>
+<tr>
+<td>已在 AWS，成本敏感</td>
+<td>Redshift (RA3 + Spectrum)</td>
+</tr>
+<tr>
+<td>高峰低谷明显的分析</td>
+<td>BigQuery (自动弹性)</td>
+</tr>
+<tr>
+<td>需要数据共享给合作伙伴</td>
+<td>Snowflake (Data Sharing)</td>
+</tr>
+<tr>
+<td>需要内置 ML 能力</td>
+<td>BigQuery (BigQuery ML)</td>
+</tr>
+</tbody></table>
+<h2 id="六、小结"><a href="#六、小结" class="headerlink" title="六、小结"></a>六、小结</h2><p>三者都是优秀的云数仓。Snowflake 赢在跨云和生态成熟度，BigQuery 赢在完全 Serverless 和 GCP 深度集成，Redshift 赢在 AWS 生态内成本优化。换数仓的最大成本不是软件费，而是迁移——在现有基础设施上优化通常比迁移更划算。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/spark-emr-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/spark-emr-guide/" class="post-title-link" itemprop="url">Apache Spark 深度解析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="一、Spark-架构概览"><a href="#一、Spark-架构概览" class="headerlink" title="一、Spark 架构概览"></a>一、Spark 架构概览</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Driver Program</span><br><span class="line">    │</span><br><span class="line">SparkContext</span><br><span class="line">    │</span><br><span class="line">Cluster Manager (YARN <span class="regexp">/ K8s /</span> Standalone)</span><br><span class="line">    │</span><br><span class="line">┌───┴───┬───────┬───────┐</span><br><span class="line">Worker  Worker  Worker  Worker</span><br><span class="line">│       │       │       │</span><br><span class="line">Executor Executor Executor Executor</span><br><span class="line">(<span class="keyword">Task</span>)  (<span class="keyword">Task</span>)  (<span class="keyword">Task</span>)  (<span class="keyword">Task</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Driver</strong>：运行 main 方法，解析用户代码，生成 DAG，调度 Task</li>
+<li><strong>Executor</strong>：运行在 Worker 节点上，执行 Task，缓存 RDD&#x2F;DataFrame</li>
+<li><strong>Cluster Manager</strong>：资源调度器。在 EMR 上通常是 YARN</li>
+</ul>
+<h2 id="二、RDD-vs-DataFrame-vs-Dataset"><a href="#二、RDD-vs-DataFrame-vs-Dataset" class="headerlink" title="二、RDD vs DataFrame vs Dataset"></a>二、RDD vs DataFrame vs Dataset</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>RDD</th>
+<th>DataFrame</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>类型安全</td>
+<td>是（编译时）</td>
+<td>否（运行时）</td>
+<td>是（编译时）</td>
+</tr>
+<tr>
+<td>优化</td>
+<td>无</td>
+<td>Catalyst 优化器</td>
+<td>Catalyst 优化器</td>
+</tr>
+<tr>
+<td>序列化</td>
+<td>Java&#x2F;Kryo</td>
+<td>Tungsten 二进制</td>
+<td>Encoder</td>
+</tr>
+<tr>
+<td>API</td>
+<td>函数式</td>
+<td>声明式 SQL</td>
+<td>两者兼具</td>
+</tr>
+<tr>
+<td>推荐度</td>
+<td>仅底层操作</td>
+<td><strong>首选</strong></td>
+<td>需要类型安全时</td>
+</tr>
+</tbody></table>
+<p><strong>现在写 Spark 首选 DataFrame API</strong>——它在 Spark 2.0 后是主力 API，Catalyst 优化器能自动做谓词下推、列裁剪、常量折叠等优化。</p>
+<h2 id="三、Spark-作业执行流程"><a href="#三、Spark-作业执行流程" class="headerlink" title="三、Spark 作业执行流程"></a>三、Spark 作业执行流程</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用户代码 → <span class="selector-attr">[逻辑计划]</span> → <span class="selector-attr">[Catalyst 优化]</span> → <span class="selector-attr">[物理计划]</span> → <span class="selector-attr">[DAG]</span> → <span class="selector-attr">[Stage]</span> → <span class="selector-attr">[Task]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="DAG-与-Shuffle"><a href="#DAG-与-Shuffle" class="headerlink" title="DAG 与 Shuffle"></a>DAG 与 Shuffle</h3><p>Spark 将作业划分为 Stage，Stage 的边界是 <strong>宽依赖（Shuffle）</strong> 操作：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 读取 → filter (窄依赖) → groupBy (宽依赖，触发 Shuffle) → count</span></span><br><span class="line">df = spark.read.parquet(<span class="string">&quot;s3://bucket/events/&quot;</span>)</span><br><span class="line">df.<span class="built_in">filter</span>(col(<span class="string">&quot;status&quot;</span>) == <span class="string">&quot;active&quot;</span>) \</span><br><span class="line">  .groupBy(<span class="string">&quot;user_id&quot;</span>) \</span><br><span class="line">  .count() \</span><br><span class="line">  .show()</span><br></pre></td></tr></table></figure>
+
+<p>宽依赖操作的代价：数据在网络上全量重新分区（Shuffle Write → Shuffle Read），是 Spark 作业中最慢的环节。</p>
+<h2 id="四、Spark-on-EMR"><a href="#四、Spark-on-EMR" class="headerlink" title="四、Spark on EMR"></a>四、Spark on EMR</h2><p>在 AWS EMR 上跑 Spark 的核心配置：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;Classification&quot;</span><span class="punctuation">:</span> <span class="string">&quot;spark-defaults&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;Properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;spark.executor.memory&quot;</span><span class="punctuation">:</span> <span class="string">&quot;8g&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;spark.executor.cores&quot;</span><span class="punctuation">:</span> <span class="string">&quot;4&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;spark.executor.instances&quot;</span><span class="punctuation">:</span> <span class="string">&quot;20&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;spark.dynamicAllocation.enabled&quot;</span><span class="punctuation">:</span> <span class="string">&quot;true&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;spark.sql.adaptive.enabled&quot;</span><span class="punctuation">:</span> <span class="string">&quot;true&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;spark.sql.adaptive.coalescePartitions.enabled&quot;</span><span class="punctuation">:</span> <span class="string">&quot;true&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="关键调优参数"><a href="#关键调优参数" class="headerlink" title="关键调优参数"></a>关键调优参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>建议值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>spark.sql.adaptive.enabled</code></td>
+<td>true</td>
+<td>AQE 自适应优化，Spark 3.0 后必开</td>
+</tr>
+<tr>
+<td><code>spark.sql.adaptive.coalescePartitions.enabled</code></td>
+<td>true</td>
+<td>自动合并小分区</td>
+</tr>
+<tr>
+<td><code>spark.sql.shuffle.partitions</code></td>
+<td>executor数×cores×2~3</td>
+<td>Shuffle 分区数，过大会产生大量小文件</td>
+</tr>
+<tr>
+<td><code>spark.executor.memoryOverhead</code></td>
+<td>max(384MB, 0.1×executor.memory)</td>
+<td>off-heap 内存，避免 YARN 杀容器</td>
+</tr>
+</tbody></table>
+<h3 id="Shuffle-倾斜处理"><a href="#Shuffle-倾斜处理" class="headerlink" title="Shuffle 倾斜处理"></a>Shuffle 倾斜处理</h3><p>数据倾斜是 Spark 第一大性能杀手——某个 partition 的数据量远大于其他 partition，导致一个 Task 拖慢整个 Stage。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方案1：加盐打散</span></span><br><span class="line">df.withColumn(<span class="string">&quot;salted_key&quot;</span>, concat(col(<span class="string">&quot;key&quot;</span>), lit(<span class="string">&quot;_&quot;</span>), (rand() * <span class="number">10</span>).cast(<span class="string">&quot;int&quot;</span>))) \</span><br><span class="line">  .groupBy(<span class="string">&quot;salted_key&quot;</span>).agg(...) \</span><br><span class="line">  .groupBy(substring(<span class="string">&quot;salted_key&quot;</span>, <span class="number">1</span>, -<span class="number">2</span>)).agg(...)  <span class="comment"># 去盐二次聚合</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 方案2：AQE 自动处理（Spark 3.2+ 默认开启）</span></span><br><span class="line"><span class="comment"># spark.sql.adaptive.skewJoin.enabled = true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、S3-最佳实践"><a href="#五、S3-最佳实践" class="headerlink" title="五、S3 最佳实践"></a>五、S3 最佳实践</h2><h3 id="小文件问题"><a href="#小文件问题" class="headerlink" title="小文件问题"></a>小文件问题</h3><p>Spark 写 S3 最大的坑是小文件——每个 Task 输出一个文件，1000 个 Task &#x3D; 1000 个文件。S3 的 LIST 操作按请求数计费，小文件会严重影响后续读取性能。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 写入前先 coalesce 或 repartition</span></span><br><span class="line">df.coalesce(<span class="number">10</span>).write.parquet(<span class="string">&quot;s3://bucket/output/&quot;</span>)  <span class="comment"># 只输出 10 个文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 或使用分区写入</span></span><br><span class="line">df.write.partitionBy(<span class="string">&quot;dt&quot;</span>).parquet(<span class="string">&quot;s3://bucket/output/&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>S3 写入机制</strong>：Spark 写 S3 先写临时文件，rename 操作在 S3 上不是原子的（实际上是 copy + delete），大文件 rename 很慢。使用 <strong>EMRFS</strong> 或 <strong>S3A Committer</strong> 可以优化：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">--conf</span> spark<span class="selector-class">.hadoop</span><span class="selector-class">.fs</span><span class="selector-class">.s3a</span><span class="selector-class">.committer</span>.name=magic</span><br><span class="line"><span class="attr">--conf</span> spark<span class="selector-class">.sql</span><span class="selector-class">.sources</span>.commitProtocolClass=org<span class="selector-class">.apache</span><span class="selector-class">.spark</span><span class="selector-class">.internal</span><span class="selector-class">.io</span><span class="selector-class">.cloud</span>.PathOutputCommitProtocol</span><br></pre></td></tr></table></figure>
+
+<h3 id="文件格式选择"><a href="#文件格式选择" class="headerlink" title="文件格式选择"></a>文件格式选择</h3><table>
+<thead>
+<tr>
+<th>格式</th>
+<th>特点</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Parquet</strong></td>
+<td>列存、压缩率高、谓词下推</td>
+<td>Spark&#x2F;Hive 查询首选</td>
+</tr>
+<tr>
+<td><strong>ORC</strong></td>
+<td>列存、Hive 原生支持好</td>
+<td>Hive 为主的场景</td>
+</tr>
+<tr>
+<td><strong>Avro</strong></td>
+<td>行存、Schema 演化</td>
+<td>CDC 日志、Kafka 消息</td>
+</tr>
+<tr>
+<td><strong>Delta Lake &#x2F; Iceberg &#x2F; Hudi</strong></td>
+<td>表格式、ACID、时间旅行</td>
+<td>数据湖上的表管理</td>
+</tr>
+</tbody></table>
+<h2 id="六、EMR-作业提交"><a href="#六、EMR-作业提交" class="headerlink" title="六、EMR 作业提交"></a>六、EMR 作业提交</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过 Airflow 或 Step Functions 提交</span></span><br><span class="line">aws emr add-steps \</span><br><span class="line">  --cluster-id j-XXXX \</span><br><span class="line">  --steps Type=Spark,Name=<span class="string">&quot;Daily ETL&quot;</span>,\</span><br><span class="line">    ActionOnFailure=CONTINUE,\</span><br><span class="line">    Args=[<span class="string">&quot;--class&quot;</span>,<span class="string">&quot;com.example.ETLJob&quot;</span>,\</span><br><span class="line">          <span class="string">&quot;s3://bucket/jars/app.jar&quot;</span>,\</span><br><span class="line">          <span class="string">&quot;--date&quot;</span>,<span class="string">&quot;2026-07-05&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<p><strong>成本优化</strong>：</p>
+<ul>
+<li>非高峰期用 Spot 实例（省 60-90%）</li>
+<li>核心节点（HDFS&#x2F;元数据）用 On-Demand，Task 节点用 Spot</li>
+<li>使用 EMR Auto Scaling 根据 YARN 队列自动扩缩</li>
+<li>配合 Instance Fleets 混合多种实例类型提高 Spot 可用性</li>
+</ul>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>Spark on EMR 的核心挑战：Shuffle 调优（分区数、倾斜处理）、S3 文件管理（小文件、提交协议）、以及成本控制（Spot + Auto Scaling）。DataFrame API + Catalyst 优化器在多数场景下已足够高效，除非你需要更底层的控制才退回 RDD。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/spring-bean-lifecycle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/spring-bean-lifecycle/" class="post-title-link" itemprop="url">Spring Bean 完整生命周期</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Spring Bean 的生命周期是 Spring 框架最核心的概念之一。从 Bean 的定义加载，到实例化、属性填充、初始化，再到最终销毁，Spring 在每个阶段都提供了扩展点。理解这些扩展点，是在 Spring 框架中做深度定制的关键。</p>
+<h2 id="一、生命周期全景"><a href="#一、生命周期全景" class="headerlink" title="一、生命周期全景"></a>一、生命周期全景</h2><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> BeanDefinition 加载（XML/@Component/@Bean）</span><br><span class="line"><span class="bullet">2.</span> BeanFactoryPostProcessor 处理（修改 BeanDefinition）</span><br><span class="line"><span class="bullet">3.</span> 实例化（反射调用构造器）</span><br><span class="line"><span class="bullet">4.</span> 属性填充（@Autowired 注入）</span><br><span class="line"><span class="bullet">5.</span> Aware 回调（BeanNameAware → BeanFactoryAware → ApplicationContextAware）</span><br><span class="line"><span class="bullet">6.</span> BeanPostProcessor.postProcessBeforeInitialization()</span><br><span class="line"><span class="bullet">7.</span> @PostConstruct / InitializingBean.afterPropertiesSet()</span><br><span class="line"><span class="bullet">8.</span> init-method（XML 中指定或 @Bean 的 initMethod 属性）</span><br><span class="line"><span class="bullet">9.</span> BeanPostProcessor.postProcessAfterInitialization() ← AOP 在此处生成代理</span><br><span class="line"><span class="bullet">10.</span> Bean 就绪，可被使用</span><br><span class="line"><span class="bullet">11.</span> @PreDestroy / DisposableBean.destroy()</span><br><span class="line"><span class="bullet">12.</span> destroy-method（XML 中指定或 @Bean 的 destroyMethod 属性）</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、关键扩展点详解"><a href="#二、关键扩展点详解" class="headerlink" title="二、关键扩展点详解"></a>二、关键扩展点详解</h2><h3 id="2-1-BeanFactoryPostProcessor"><a href="#2-1-BeanFactoryPostProcessor" class="headerlink" title="2.1 BeanFactoryPostProcessor"></a>2.1 BeanFactoryPostProcessor</h3><p>在 Bean 实例化之前修改 BeanDefinition：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyBeanFactoryPostProcessor</span> <span class="keyword">implements</span> <span class="title class_">BeanFactoryPostProcessor</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">postProcessBeanFactory</span><span class="params">(ConfigurableListableBeanFactory beanFactory)</span> &#123;</span><br><span class="line">        <span class="comment">// 可以修改任意 Bean 的定义元数据</span></span><br><span class="line">        <span class="type">BeanDefinition</span> <span class="variable">bd</span> <span class="operator">=</span> beanFactory.getBeanDefinition(<span class="string">&quot;userService&quot;</span>);</span><br><span class="line">        bd.setScope(BeanDefinition.SCOPE_PROTOTYPE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring 内部的关键实现是 <code>ConfigurationClassPostProcessor</code>——它扫描 <code>@Configuration</code> 类，解析 <code>@Bean</code> 方法，并注册相应的 BeanDefinition。这是 Spring 能识别 <code>@Configuration</code> 注解的基础。</p>
+<h3 id="2-2-BeanPostProcessor"><a href="#2-2-BeanPostProcessor" class="headerlink" title="2.2 BeanPostProcessor"></a>2.2 BeanPostProcessor</h3><p>在 Bean 实例化后、初始化前后进行拦截，是 Spring 最强大的扩展机制。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title class_">BeanPostProcessor</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> MyService) &#123;</span><br><span class="line">            System.out.println(beanName + <span class="string">&quot; 初始化前&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> bean;  <span class="comment">// 可以返回原始 bean 或包装后的 bean</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (bean.getClass().isAnnotationPresent(MyAnnotation.class)) &#123;</span><br><span class="line">            <span class="comment">// 为特定 Bean 创建代理</span></span><br><span class="line">            <span class="keyword">return</span> Proxy.newProxyInstance(...);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring AOP 的实现正是基于 <code>BeanPostProcessor</code>——<code>AnnotationAwareAspectJAutoProxyCreator</code> 在 <code>postProcessAfterInitialization</code> 中为目标 Bean 生成代理对象。</p>
+<h3 id="2-3-Aware-接口"><a href="#2-3-Aware-接口" class="headerlink" title="2.3 Aware 接口"></a>2.3 Aware 接口</h3><p>Aware 接口让 Bean 可以注入 Spring 容器内部对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyService</span> <span class="keyword">implements</span> <span class="title class_">ApplicationContextAware</span>, BeanNameAware &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ApplicationContext ctx;</span><br><span class="line">    <span class="keyword">private</span> String beanName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setApplicationContext</span><span class="params">(ApplicationContext ctx)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.ctx = ctx;</span><br><span class="line">        <span class="comment">// 现在可以通过 ctx 获取其他 Bean</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setBeanName</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.beanName = name;</span><br><span class="line">        <span class="comment">// beanName = &quot;myService&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>常见的 Aware 接口：</p>
+<table>
+<thead>
+<tr>
+<th>Aware 接口</th>
+<th>注入对象</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BeanNameAware</td>
+<td>Bean 的名称</td>
+<td>记录日志、标识</td>
+</tr>
+<tr>
+<td>BeanFactoryAware</td>
+<td>BeanFactory</td>
+<td>手动获取 Bean</td>
+</tr>
+<tr>
+<td>ApplicationContextAware</td>
+<td>ApplicationContext</td>
+<td>获取上下文、发布事件</td>
+</tr>
+<tr>
+<td>EnvironmentAware</td>
+<td>Environment</td>
+<td>读取环境配置</td>
+</tr>
+<tr>
+<td>ResourceLoaderAware</td>
+<td>ResourceLoader</td>
+<td>加载资源文件</td>
+</tr>
+</tbody></table>
+<h2 id="三、初始化与销毁"><a href="#三、初始化与销毁" class="headerlink" title="三、初始化与销毁"></a>三、初始化与销毁</h2><h3 id="3-1-三种初始化方式"><a href="#3-1-三种初始化方式" class="headerlink" title="3.1 三种初始化方式"></a>3.1 三种初始化方式</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>示例</th>
+<th>优先级</th>
+<th>推荐度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>@PostConstruct</code></td>
+<td>方法上标注</td>
+<td>最先执行</td>
+<td>推荐</td>
+</tr>
+<tr>
+<td><code>InitializingBean.afterPropertiesSet()</code></td>
+<td>实现接口</td>
+<td>其次</td>
+<td>不推荐（耦合 Spring）</td>
+</tr>
+<tr>
+<td><code>init-method</code></td>
+<td>XML&#x2F;@Bean 属性</td>
+<td>最后</td>
+<td>推荐（解耦）</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyService</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">init</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;1. @PostConstruct 执行&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者</span></span><br><span class="line"><span class="meta">@Bean(initMethod = &quot;init&quot;)</span></span><br><span class="line"><span class="keyword">public</span> MyService <span class="title function_">myService</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">MyService</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>三种方式的执行顺序：<code>@PostConstruct</code> → <code>afterPropertiesSet()</code> → <code>init-method</code>。</p>
+<h3 id="3-2-三种销毁方式"><a href="#3-2-三种销毁方式" class="headerlink" title="3.2 三种销毁方式"></a>3.2 三种销毁方式</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>@PreDestroy</code></td>
+<td>最先</td>
+</tr>
+<tr>
+<td><code>DisposableBean.destroy()</code></td>
+<td>其次</td>
+</tr>
+<tr>
+<td><code>destroy-method</code></td>
+<td>最后</td>
+</tr>
+</tbody></table>
+<p>Spring 容器优雅关闭时会调用这些销毁回调。</p>
+<h2 id="四、循环依赖与三级缓存"><a href="#四、循环依赖与三级缓存" class="headerlink" title="四、循环依赖与三级缓存"></a>四、循环依赖与三级缓存</h2><h3 id="4-1-什么是循环依赖"><a href="#4-1-什么是循环依赖" class="headerlink" title="4.1 什么是循环依赖"></a>4.1 什么是循环依赖</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span> <span class="keyword">private</span> B b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">B</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span> <span class="keyword">private</span> A a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring 通过<strong>三级缓存</strong>解决单例 Bean 的循环依赖：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">singletonObjects               ← 一级缓存：完全创建好的 <span class="keyword">Bean</span></span><br><span class="line"><span class="keyword"></span>earlySingletonObjects           ← 二级缓存：提前暴露的 <span class="keyword">Bean </span>引用</span><br><span class="line">singletonFactories              ← 三级缓存：生成提前引用的工厂（ObjectFactory）</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-解决流程"><a href="#4-2-解决流程" class="headerlink" title="4.2 解决流程"></a>4.2 解决流程</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. 创建 <span class="selector-tag">A</span> → 放入三级缓存（singletonFactories）</span><br><span class="line"><span class="number">2</span>. 填充 <span class="selector-tag">A</span> 的属性 → 发现需要 <span class="selector-tag">B</span> → 去创建 <span class="selector-tag">B</span></span><br><span class="line"><span class="number">3</span>. 创建 <span class="selector-tag">B</span> → 放入三级缓存</span><br><span class="line"><span class="number">4</span>. 填充 <span class="selector-tag">B</span> 的属性 → 发现需要 <span class="selector-tag">A</span> → 从三级缓存中获取 <span class="selector-tag">A</span> 的提前引用（ObjectFactory<span class="selector-class">.getObject</span>()）</span><br><span class="line">   → 将 <span class="selector-tag">A</span> 移入二级缓存（earlySingletonObjects）</span><br><span class="line"><span class="number">5</span>. <span class="selector-tag">B</span> 创建完成 → 放入一级缓存</span><br><span class="line"><span class="number">6</span>. 继续填充 <span class="selector-tag">A</span> 的属性（现在 <span class="selector-tag">B</span> 可用了）</span><br><span class="line"><span class="number">7</span>. <span class="selector-tag">A</span> 创建完成 → 放入一级缓存</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-为什么需要三级缓存"><a href="#4-3-为什么需要三级缓存" class="headerlink" title="4.3 为什么需要三级缓存"></a>4.3 为什么需要三级缓存</h3><p>一级缓存（singletonObjects）存储完全初始化完成的 Bean；二级缓存（earlySingletonObjects）存储提前暴露但未完成的 Bean引用；三级缓存（singletonFactories）存储能生成提前Bean引用的工厂。三级缓存中存的是 <code>ObjectFactory</code> 而非直接的 Bean 引用，是为了支持 AOP——在获取提前引用时，<code>ObjectFactory.getObject()</code> 可以先检查是否需要为这个 Bean 生成代理，如果需要，返回代理对象而非原始对象。这正是 AOP 和循环依赖可以共存的保障。</p>
+<h3 id="4-4-限制条件"><a href="#4-4-限制条件" class="headerlink" title="4.4 限制条件"></a>4.4 限制条件</h3><ul>
+<li>只有单例 Bean 支持循环依赖（prototype 不行）</li>
+<li>构造器注入无法解决循环依赖（因为构造器执行时 Bean 还未暴露）</li>
+<li>建议尽量避免循环依赖——它通常暗示设计问题</li>
+</ul>
+<h2 id="五、小结"><a href="#五、小结" class="headerlink" title="五、小结"></a>五、小结</h2><p>Spring Bean 的生命周期是一个精心设计的扩展架构——从 BeanDefinition 加载到最终的销毁，每个阶段都有对应的扩展点。BeanFactoryPostProcessor 修改元数据，BeanPostProcessor 拦截 Bean 实例，Aware 注入容器资源，三级缓存解决循环依赖——这些机制共同构成了 Spring 高度可扩展的 IOC 容器骨架。理解这张”扩展地图”，是在 Spring 上做框架级定制的第一课。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/spring-boot-autoconfig/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/spring-boot-autoconfig/" class="post-title-link" itemprop="url">Spring Boot 自动配置原理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Spring Boot 最核心的特性是”自动配置”——你引入 <code>spring-boot-starter-web</code>，Web 环境就自动配置好了；引入 <code>spring-boot-starter-data-redis</code>，Redis 连接自动就绪。这一切的背后的机制并不复杂：注解驱动 + SPI 配置。</p>
+<h2 id="一、-SpringBootApplication-入口"><a href="#一、-SpringBootApplication-入口" class="headerlink" title="一、@SpringBootApplication 入口"></a>一、@SpringBootApplication 入口</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Application</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@SpringBootApplication</code> 是一个组合注解，包含三个核心注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@SpringBootConfiguration</span>    <span class="comment">// 等同于 @Configuration</span></span><br><span class="line"><span class="meta">@EnableAutoConfiguration</span>    <span class="comment">// 自动配置的核心</span></span><br><span class="line"><span class="meta">@ComponentScan(excludeFilters = &#123; ... &#125;)</span>  <span class="comment">// 组件扫描</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> SpringBootApplication &#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>@EnableAutoConfiguration</code> 是自动配置的入口。</p>
+<h2 id="二、-EnableAutoConfiguration-的工作原理"><a href="#二、-EnableAutoConfiguration-的工作原理" class="headerlink" title="二、@EnableAutoConfiguration 的工作原理"></a>二、@EnableAutoConfiguration 的工作原理</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Import(AutoConfigurationImportSelector.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableAutoConfiguration &#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>关键在 <code>@Import(AutoConfigurationImportSelector.class)</code>。<code>AutoConfigurationImportSelector</code> 实现了 <code>DeferredImportSelector</code> 接口，在 Spring 容器 refresh 过程中被调用。</p>
+<p>其核心逻辑：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AutoConfigurationImportSelector.getCandidateConfigurations()</span></span><br><span class="line"><span class="keyword">protected</span> List&lt;String&gt; <span class="title function_">getCandidateConfigurations</span><span class="params">(AnnotationMetadata metadata, </span></span><br><span class="line"><span class="params">                                                   AnnotationAttributes attributes)</span> &#123;</span><br><span class="line">    <span class="comment">// 1. 读取 META-INF/spring/xxx.imports 文件（Spring Boot 3.x）</span></span><br><span class="line">    <span class="comment">//    或 META-INF/spring.factories 文件（Spring Boot 2.x）</span></span><br><span class="line">    List&lt;String&gt; configurations = SpringFactoriesLoader.loadFactoryNames(</span><br><span class="line">        getSpringFactoriesLoaderFactoryClass(), getBeanClassLoader());</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 2. 去重、排序（@AutoConfigureOrder, @AutoConfigureBefore/After）</span></span><br><span class="line">    <span class="comment">// 3. 按 @Conditional 过滤</span></span><br><span class="line">    <span class="keyword">return</span> configurations;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、spring-factories-与-xxx-imports"><a href="#三、spring-factories-与-xxx-imports" class="headerlink" title="三、spring.factories 与 xxx.imports"></a>三、spring.factories 与 xxx.imports</h2><h3 id="Spring-Boot-2-x：META-INF-spring-factories"><a href="#Spring-Boot-2-x：META-INF-spring-factories" class="headerlink" title="Spring Boot 2.x：META-INF/spring.factories"></a>Spring Boot 2.x：<code>META-INF/spring.factories</code></h3><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># spring-boot-autoconfigure.jar!/META-INF/spring.factories</span></span><br><span class="line"><span class="attr">org.springframework.boot.autoconfigure.EnableAutoConfiguration</span>=<span class="string">\</span></span><br><span class="line"><span class="string">org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration,\</span></span><br><span class="line"><span class="string">org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration,\</span></span><br><span class="line"><span class="string">org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,\</span></span><br><span class="line"><span class="string">org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,\</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure>
+
+<p>每个 starter 在自己的 <code>spring.factories</code> 文件中声明它提供的自动配置类。Spring Boot 启动时加载所有 jar 中的这个文件，汇总所有自动配置类名。</p>
+<h3 id="Spring-Boot-3-x：META-INF-spring-org-springframework-boot-autoconfigure-AutoConfiguration-imports"><a href="#Spring-Boot-3-x：META-INF-spring-org-springframework-boot-autoconfigure-AutoConfiguration-imports" class="headerlink" title="Spring Boot 3.x：META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"></a>Spring Boot 3.x：<code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code></h3><p>Spring Boot 3.x 改用更简洁的格式：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># <span class="keyword">META</span>-<span class="keyword">INF</span>/spring/org.springframework.<span class="keyword">boot</span>.autoconfigure.AutoConfiguration.imports</span><br><span class="line">org.springframework.<span class="keyword">boot</span>.autoconfigure.web.servlet.WebMvcAutoConfiguration</span><br><span class="line">org.springframework.<span class="keyword">boot</span>.autoconfigure.jdbc.DataSourceAutoConfiguration</span><br></pre></td></tr></table></figure>
+
+<p>每行一个自动配置类全限定名，不再需要 Key-Value 格式。</p>
+<h2 id="四、条件注解——精准控制配置生效时机"><a href="#四、条件注解——精准控制配置生效时机" class="headerlink" title="四、条件注解——精准控制配置生效时机"></a>四、条件注解——精准控制配置生效时机</h2><p>自动配置类不一定会生效。每个自动配置类上都标注了 <code>@ConditionalOnXxx</code> 注解，只有当条件满足时才会被加载：</p>
+<table>
+<thead>
+<tr>
+<th>注解</th>
+<th>行为</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>@ConditionalOnClass</code></td>
+<td>类路径中有特定类</td>
+<td><code>RedisAutoConfiguration</code> 要求 <code>RedisConnection</code> 类存在</td>
+</tr>
+<tr>
+<td><code>@ConditionalOnMissingBean</code></td>
+<td>容器中没有该类型的 Bean</td>
+<td>用户可以自己定义 Bean 覆盖默认配置</td>
+</tr>
+<tr>
+<td><code>@ConditionalOnProperty</code></td>
+<td>配置文件中存在特定属性</td>
+<td><code>spring.redis.enabled=true</code></td>
+</tr>
+<tr>
+<td><code>@ConditionalOnBean</code></td>
+<td>容器中存在该类型的 Bean</td>
+<td>只在某个 Bean 已注册时才生效</td>
+</tr>
+<tr>
+<td><code>@ConditionalOnJava</code></td>
+<td>Java 版本匹配</td>
+<td>特定版本优化的配置</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(RedisOperations.class)</span>                 <span class="comment">// classpath 有 Redis</span></span><br><span class="line"><span class="meta">@EnableConfigurationProperties(RedisProperties.class)</span>      <span class="comment">// 绑定配置属性</span></span><br><span class="line"><span class="meta">@ConditionalOnMissingBean(name = &quot;redisTemplate&quot;)</span>          <span class="comment">// 用户未自定义</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RedisAutoConfiguration</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> RedisTemplate&lt;Object, Object&gt; <span class="title function_">redisTemplate</span><span class="params">(...)</span> &#123;</span><br><span class="line">        RedisTemplate&lt;Object, Object&gt; template = <span class="keyword">new</span> <span class="title class_">RedisTemplate</span>&lt;&gt;();</span><br><span class="line">        template.setConnectionFactory(redisConnectionFactory);</span><br><span class="line">        <span class="keyword">return</span> template;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个自动配置类的生效条件是：classpath 中存在 <code>RedisOperations</code> 类（即用户引入了 redis starter）、用户没有自定义 <code>redisTemplate</code> Bean。</p>
+<h2 id="五、自定义-Starter"><a href="#五、自定义-Starter" class="headerlink" title="五、自定义 Starter"></a>五、自定义 Starter</h2><p>创建一个自定义 Starter 只需要三步：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">my-spring-boot-starter<span class="symbol">/</span></span><br><span class="line">├── pom.xml</span><br><span class="line">├── src<span class="operator">/</span>main<span class="operator">/</span>java<span class="symbol">/</span></span><br><span class="line">│   └── com<span class="operator">/</span>example<span class="symbol">/</span></span><br><span class="line">│       ├── MyAutoConfiguration.java       <span class="comment"># 自动配置类</span></span><br><span class="line">│       └── MyProperties.java              <span class="comment"># 配置属性</span></span><br><span class="line">└── src<span class="operator">/</span>main<span class="operator">/</span>resources<span class="symbol">/</span></span><br><span class="line">    └── META-INF<span class="operator">/</span>spring<span class="symbol">/</span></span><br><span class="line">        └── org.springframework.boot.autoconfigure.AutoConfiguration.imports</span><br></pre></td></tr></table></figure>
+
+<p><strong>Step 1：定义配置属性</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ConfigurationProperties(prefix = &quot;myapp&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyProperties</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> <span class="string">&quot;default&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">timeout</span> <span class="operator">=</span> <span class="number">5000</span>;</span><br><span class="line">    <span class="comment">// getters and setters</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Step 2：编写自动配置类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AutoConfiguration</span></span><br><span class="line"><span class="meta">@EnableConfigurationProperties(MyProperties.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnProperty(prefix = &quot;myapp&quot;, name = &quot;enabled&quot;, matchIfMissing = true)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyAutoConfiguration</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConditionalOnMissingBean</span></span><br><span class="line">    <span class="keyword">public</span> MyService <span class="title function_">myService</span><span class="params">(MyProperties properties)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">MyService</span>(properties.getName(), properties.getTimeout());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Step 3：注册到自动配置</strong></p>
+<p>在 <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code> 中添加一行：</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">com</span>.example.MyAutoConfiguration</span><br></pre></td></tr></table></figure>
+
+<p>完成。用户在 <code>application.yml</code> 中就可以配置了：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">myapp:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">production</span></span><br><span class="line">  <span class="attr">timeout:</span> <span class="number">3000</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、自动配置执行顺序"><a href="#六、自动配置执行顺序" class="headerlink" title="六、自动配置执行顺序"></a>六、自动配置执行顺序</h2><p>Spring Boot 在 <code>AbstractApplicationContext.refresh()</code> 过程中处理自动配置：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. <span class="built_in">invokeBeanFactoryPostProcessors</span>(beanFactory)</span><br><span class="line">   └─ ConfigurationClassPostProcessor 处理 <span class="keyword">@Configuration</span> 类</span><br><span class="line">       └─ AutoConfigurationImportSelector 加载所有自动配置类</span><br><span class="line">           │</span><br><span class="line"><span class="number">2</span>. 过滤：按 <span class="keyword">@Conditional</span> 条件筛选，只保留满足条件的配置类</span><br><span class="line">           │</span><br><span class="line"><span class="number">3</span>. 排序：按 <span class="keyword">@AutoConfigureOrder</span> 和 <span class="keyword">@AutoConfigureBefore</span>/After 排序</span><br><span class="line">           │</span><br><span class="line"><span class="number">4</span>. 加载：将选中的 <span class="keyword">@Configuration</span> 类中的 <span class="keyword">@Bean</span> 方法注册到容器</span><br><span class="line">           │</span><br><span class="line"><span class="number">5</span>. 用户自定义配置覆盖自动配置（条件注解 + Order 保证）</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>Spring Boot 自动配置的原理可以归纳为：”约定大于配置 + SPI 机制 + 条件注解”：</p>
+<ul>
+<li><strong>约定大于配置</strong>：引入 starter → 自动获得最佳实践配置</li>
+<li><strong>SPI 机制</strong>：<code>spring.factories</code> &#x2F; <code>.imports</code> 文件让所有 jar 声明自己能提供的配置</li>
+<li><strong>条件注解</strong>：<code>@ConditionalOnXxx</code> 保证只在合适的场景下启用配置</li>
+<li><strong>可覆盖</strong>：用户自定义的 Bean 优先于自动配置的 Bean</li>
+</ul>
+<p>理解了这三个机制，你就理解了为什么 Spring Boot 能”开箱即用”——它并没有魔法，只是精心设计了配置的发现、筛选和加载流程。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/system-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/system-design/" class="post-title-link" itemprop="url">系统设计方法论与案例</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>系统设计是高级工程师的核心能力，也是面试和日常工作中最考验综合素养的环节。本文不堆砌术语，而是聚焦<strong>思考过程</strong>与<strong>权衡逻辑</strong>——为什么选 A 而不是 B，在什么条件下可以打破常规。</p>
+<p>读完本文，你将掌握一套可复用的分析框架，并理解四个经典场景下的架构演进路径。</p>
+<hr>
+<h2 id="一、系统设计方法论"><a href="#一、系统设计方法论" class="headerlink" title="一、系统设计方法论"></a>一、系统设计方法论</h2><h3 id="1-1-需求分析：先问”为谁解决什么问题”"><a href="#1-1-需求分析：先问”为谁解决什么问题”" class="headerlink" title="1.1 需求分析：先问”为谁解决什么问题”"></a>1.1 需求分析：先问”为谁解决什么问题”</h3><p>接到一个系统设计题时，大多数人的第一反应是画架构图。但在此之前，必须先回答两个问题：</p>
+<p><strong>功能性需求（Functional Requirements）</strong></p>
+<ul>
+<li>用户是谁？核心使用场景是什么？</li>
+<li>系统的输入和输出分别是什么？</li>
+<li>是否有隐含的业务约束（如短链不可重复、库存不可超卖）？</li>
+</ul>
+<p><strong>非功能性需求（Non-Functional Requirements）</strong></p>
+<ul>
+<li>可用性：几个 9？（99.9% → 年宕机 8.76h，99.99% → 52.56min）</li>
+<li>一致性：强一致还是最终一致？</li>
+<li>延迟：P99 延迟需要控制在多少毫秒内？</li>
+<li>扩展性：未来 3 年的用户增长预期是多少？</li>
+</ul>
+<blockquote>
+<p><strong>一个好的系统设计，60% 的时间花在澄清需求上，30% 花在分析瓶颈上，10% 才真正画图。</strong></p>
+</blockquote>
+<p>通用分析框架——<strong>场景七问</strong>：</p>
+<ol>
+<li>用户是谁？有多少？</li>
+<li>用户在什么场景下使用？</li>
+<li>读写比例是多少？</li>
+<li>数据量有多大？增长曲线如何？</li>
+<li>有没有热点数据或热点用户？</li>
+<li>能容忍多长的延迟？</li>
+<li>能容忍多长的不一致窗口？</li>
+</ol>
+<hr>
+<h3 id="1-2-容量估算：数字不会说谎"><a href="#1-2-容量估算：数字不会说谎" class="headerlink" title="1.2 容量估算：数字不会说谎"></a>1.2 容量估算：数字不会说谎</h3><p>容量估算是方案可行性的第一道关卡。核心公式：</p>
+<p><strong>QPS（Queries Per Second）</strong></p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">QPS</span> <span class="operator">=</span> DAU × 人均请求次数 / <span class="number">86400</span> × 峰谷比</span><br></pre></td></tr></table></figure>
+<ul>
+<li>峰谷比一般取 3~5（假设一天请求的 80% 集中在 20% 时间）</li>
+<li>例：1000 万 DAU，人均 20 次请求，峰谷比 5</li>
+<li>QPS ≈ 10M × 20 &#x2F; 86400 × 5 ≈ <strong>11,574</strong></li>
+</ul>
+<p><strong>存储估算</strong></p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">存储量 <span class="operator">=</span> 单条数据大小 × 日新增量 × 保留天数 × 副本数</span><br></pre></td></tr></table></figure>
+<ul>
+<li>单条数据大小 &#x3D; 业务字段 + 索引空间 + 元数据开销（通常 ×1.5 ~ ×2）</li>
+<li>副本：数据库主从 ×2、消息队列持久化 ×3、对象存储 ×3</li>
+</ul>
+<p><strong>带宽估算</strong></p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">带宽 <span class="operator">=</span> QPS × 单次响应大小</span><br></pre></td></tr></table></figure>
+<ul>
+<li>例：QPS 10000，单次响应 5KB，带宽 ≈ 50MB&#x2F;s ≈ 400Mbps</li>
+</ul>
+<p><strong>实践经验</strong>：</p>
+<ul>
+<li>不要追求精确数字，估算的精度在 ±50% 以内即可</li>
+<li>关注数量级：是 MB 还是 GB，是 Mbps 还是 Gbps</li>
+<li><strong>瓶颈一定在最贵或最慢的组件上</strong>：磁盘 IO、网络带宽、数据库连接数</li>
+</ul>
+<hr>
+<h3 id="1-3-数据模型设计：SQL-vs-NoSQL-的抉择"><a href="#1-3-数据模型设计：SQL-vs-NoSQL-的抉择" class="headerlink" title="1.3 数据模型设计：SQL vs NoSQL 的抉择"></a>1.3 数据模型设计：SQL vs NoSQL 的抉择</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>SQL (MySQL&#x2F;PostgreSQL)</th>
+<th>NoSQL (MongoDB&#x2F;Cassandra)</th>
+<th>KV (Redis&#x2F;DynamoDB)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Schema</td>
+<td>严格，DDL 变更需审批</td>
+<td>灵活，文档级扩展</td>
+<td>Key-Value，无 Schema</td>
+</tr>
+<tr>
+<td>事务</td>
+<td>ACID，成熟</td>
+<td>有限支持</td>
+<td>Redis 有 Lua 原子操作</td>
+</tr>
+<tr>
+<td>查询</td>
+<td>复杂 JOIN、子查询</td>
+<td>聚合管道</td>
+<td>仅按 Key 查</td>
+</tr>
+<tr>
+<td>扩展</td>
+<td>垂直扩展为主，分库分表复杂</td>
+<td>天然支持水平扩展</td>
+<td>天然支持分片</td>
+</tr>
+<tr>
+<td>一致性</td>
+<td>强一致</td>
+<td>最终一致（可调）</td>
+<td>主从有延迟</td>
+</tr>
+</tbody></table>
+<p><strong>选择策略</strong>：</p>
+<ol>
+<li>需要<strong>事务 + 复杂关联查询</strong> → SQL</li>
+<li>需要<strong>海量写入 + 灵活 Schema</strong> → NoSQL</li>
+<li>需要<strong>超高并发读 + 简单 KV 访问</strong> → Redis</li>
+<li>需要<strong>全文搜索 + 聚合分析</strong> → Elasticsearch</li>
+<li><strong>混合方案是常态</strong>：MySQL 做存储层，Redis 做缓存层，ES 做搜索层</li>
+</ol>
+<hr>
+<h3 id="1-4-架构图绘制原则"><a href="#1-4-架构图绘制原则" class="headerlink" title="1.4 架构图绘制原则"></a>1.4 架构图绘制原则</h3><p>好的架构图是<strong>沟通工具</strong>，而不是艺术品。四项原则：</p>
+<ol>
+<li><strong>分层清晰</strong>：客户端 → CDN → 网关 → 业务服务 → 数据层，自上而下</li>
+<li><strong>标注流向</strong>：箭头 + 协议（HTTP&#x2F;gRPC&#x2F;MySQL Protocol&#x2F;Redis Protocol）</li>
+<li><strong>区分核心与辅助</strong>：核心链路用实线，辅助链路（监控&#x2F;日志&#x2F;配置）用虚线</li>
+<li><strong>同步 vs 异步</strong>：同步调用用实线，异步消息用虚线 + 队列图标</li>
+</ol>
+<p>典型的分层架构：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────┐</span><br><span class="line">│  客户端层：App <span class="symbol">/</span> Web <span class="symbol">/</span> SDK                       │</span><br><span class="line">├───────────┬─────────────────────────────────────┤</span><br><span class="line">│  接入层   │  CDN <span class="symbol">/</span> DNS 智能解析 <span class="symbol">/</span> 负载均衡        │</span><br><span class="line">├───────────┴─────────────────────────────────────┤</span><br><span class="line">│  网关层   │  API Gateway <span class="symbol">/</span> 限流 <span class="symbol">/</span> 认证 <span class="symbol">/</span> 路由      │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  服务层   │  微服务集群 <span class="symbol">/</span> 无状态 <span class="symbol">/</span> 水平可扩展       │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  中间件层  │  MQ <span class="symbol">/</span> Cache <span class="symbol">/</span> 分布式协调              │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  数据层   │  DB 主从 <span class="symbol">/</span> 冷热分离 <span class="symbol">/</span> 读写分离         │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  基础设施  │  K8s <span class="symbol">/</span> 监控 <span class="symbol">/</span> 日志 <span class="symbol">/</span> CI-CD            │</span><br><span class="line">└─────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-5-扩展模式：从单机到分布式"><a href="#1-5-扩展模式：从单机到分布式" class="headerlink" title="1.5 扩展模式：从单机到分布式"></a>1.5 扩展模式：从单机到分布式</h3><p><strong>垂直扩展（Scale Up）</strong></p>
+<ul>
+<li>优点：实现简单，无需改代码</li>
+<li>缺点：硬件有上限，单点故障风险</li>
+<li>适用：初创期、数据量 &lt; 100GB、QPS &lt; 1000</li>
+</ul>
+<p><strong>水平扩展（Scale Out）</strong></p>
+<ul>
+<li>优点：理论上无限扩展，容错性强</li>
+<li>缺点：引入分布式复杂度（一致性问题、数据分片、服务发现）</li>
+<li>适用：成长期以后的所有阶段</li>
+</ul>
+<p><strong>缓存策略梯度</strong></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">本地缓存（Caffeine）→ 分布式缓存（Redis <span class="keyword">Cluster</span>）→ 多级缓存（近端 + 远端）</span><br><span class="line">命中率递减 ←──────────────────── 延迟递增 ────────────────────→</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据库读写分离</strong></p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">写入 → <span class="keyword">Master</span> <span class="title">→ Binlog</span> 同步 → <span class="literal">Slave</span> → 读取</span><br><span class="line">      └── 延迟窗口（通常 <span class="tag">&lt; 1s，网络抖动时可能 &gt;</span> <span class="number">10s</span>）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>问题：主从延迟导致的”写后立刻读”不一致</li>
+<li>解决：关键业务强制读主库，或通过缓存标记”刚写入的 Key”</li>
+</ul>
+<p><strong>异步化</strong></p>
+<ul>
+<li>任何非核心链路的操作都应该异步化：发通知、记日志、统计分析</li>
+<li>核心思想：<strong>先返回成功，再慢慢做</strong></li>
+</ul>
+<p><strong>CDN 加速</strong></p>
+<ul>
+<li>静态资源（图片&#x2F;视频&#x2F;JS&#x2F;CSS）推送到 CDN，距离用户最近的边缘节点响应</li>
+<li>动态内容可以通过 CDN 的边缘计算（Edge Functions）做部分逻辑</li>
+</ul>
+<hr>
+<h3 id="1-6-非功能性设计"><a href="#1-6-非功能性设计" class="headerlink" title="1.6 非功能性设计"></a>1.6 非功能性设计</h3><p><strong>高可用（High Availability）</strong></p>
+<ul>
+<li>消除单点故障：主从、多副本、多机房</li>
+<li>自动故障转移：主从切换 &lt; 30s（MySQL MHA &#x2F; Orchestrator）</li>
+<li>健康检查 + 自动摘除：一致性 Hash + 虚拟节点</li>
+</ul>
+<p><strong>一致性（Consistency）</strong></p>
+<ul>
+<li>强一致：分布式事务（2PC &#x2F; TCC &#x2F; Saga）</li>
+<li>最终一致：本地消息表 + 定时补偿</li>
+<li>缓解策略：读主库、版本号校验、CAS 操作</li>
+</ul>
+<p><strong>可扩展（Scalability）</strong></p>
+<ul>
+<li>无状态设计：Session 外置到 Redis，服务实例可任意扩缩</li>
+<li>分库分表：按业务维度（订单库&#x2F;用户库）→ 按数据维度（用户 ID Hash）</li>
+<li>数据迁移方案：双写 + 灰度切流 + 数据校验</li>
+</ul>
+<p><strong>可维护（Maintainability）</strong></p>
+<ul>
+<li>可观测性三件套：Logging（日志） + Metrics（指标） + Tracing（链路追踪）</li>
+<li>配置中心（Apollo &#x2F; Nacos）：动态配置，无需重启</li>
+<li>灰度发布 &#x2F; 蓝绿部署：低风险上线</li>
+</ul>
+<p><strong>安全性（Security）</strong></p>
+<ul>
+<li>防刷：验证码 + IP 限流 + 设备指纹 + 行为分析</li>
+<li>数据安全：传输加密（TLS）、存储加密（AES）、脱敏展示</li>
+<li>权限控制：最小权限原则，API 级别的 RBAC</li>
+</ul>
+<hr>
+<hr>
+<h2 id="六、常用组件选型速查"><a href="#六、常用组件选型速查" class="headerlink" title="六、常用组件选型速查"></a>六、常用组件选型速查</h2><h3 id="6-1-缓存"><a href="#6-1-缓存" class="headerlink" title="6.1 缓存"></a>6.1 缓存</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>适用场景</th>
+<th>关键特性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Redis Cluster</td>
+<td>分布式缓存 &#x2F; 分布式锁 &#x2F; 排行榜 &#x2F; 计数器</td>
+<td>单线程 10 万 QPS，支持 16384 槽位</td>
+</tr>
+<tr>
+<td>Redis Sentinel</td>
+<td>高可用缓存</td>
+<td>自动故障转移，至少 3 节点</td>
+</tr>
+<tr>
+<td>Caffeine</td>
+<td>JVM 本地缓存</td>
+<td>极低延迟，&lt; 1μs，LRU&#x2F;W-TinyLFU</td>
+</tr>
+<tr>
+<td>Memcached</td>
+<td>纯 KV 缓存</td>
+<td>多线程，简单可靠，不支持持久化</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>绝大多数场景选 Redis，生态成熟</li>
+<li>追求极致延迟且数据量小 → Caffeine 本地缓存</li>
+<li>简单 KV 且无需持久化 → Memcached</li>
+</ul>
+<hr>
+<h3 id="6-2-消息队列"><a href="#6-2-消息队列" class="headerlink" title="6.2 消息队列"></a>6.2 消息队列</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>吞吐量</th>
+<th>延迟</th>
+<th>可靠性</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kafka</td>
+<td>百万 QPS</td>
+<td>毫秒级</td>
+<td>极高</td>
+<td>日志&#x2F;埋点&#x2F;大数据管道</td>
+</tr>
+<tr>
+<td>RocketMQ</td>
+<td>十万 QPS</td>
+<td>毫秒级</td>
+<td>极高</td>
+<td>电商交易&#x2F;分布式事务</td>
+</tr>
+<tr>
+<td>Pulsar</td>
+<td>百万 QPS</td>
+<td>毫秒级</td>
+<td>极高</td>
+<td>多租户&#x2F;云原生</td>
+</tr>
+<tr>
+<td>RabbitMQ</td>
+<td>万级 QPS</td>
+<td>微秒级</td>
+<td>高</td>
+<td>低延迟路由&#x2F;复杂拓扑</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>大数据 &#x2F; 日志采集 → Kafka（业务和日志 MQ 必须隔离）</li>
+<li>电商交易 &#x2F; 金融 → RocketMQ（阿里系首选）</li>
+<li>复杂路由（多 exchange → 多 queue）→ RabbitMQ</li>
+<li>新技术栈用 Pulsar（存算分离，灵活）</li>
+</ul>
+<hr>
+<h3 id="6-3-数据库"><a href="#6-3-数据库" class="headerlink" title="6.3 数据库"></a>6.3 数据库</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>类型</th>
+<th>适用场景</th>
+<th>扩展方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MySQL</td>
+<td>关系型</td>
+<td>通用 OLTP 业务</td>
+<td>分库分表 &#x2F; 读写分离</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>关系型</td>
+<td>复杂查询 &#x2F; GIS &#x2F; 分析</td>
+<td>分区表 &#x2F; FDW</td>
+</tr>
+<tr>
+<td>TiDB</td>
+<td>NewSQL</td>
+<td>MySQL 无法分表的场景</td>
+<td>自动分片（Raft）</td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td>文档型</td>
+<td>灵活 Schema &#x2F; 日志存储</td>
+<td>自动分片</td>
+</tr>
+<tr>
+<td>HBase</td>
+<td>列式</td>
+<td>海量稀疏数据 &#x2F; 时序</td>
+<td>Region 分裂</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>90% 的业务场景 MySQL 足够</li>
+<li>Schema 不固定、快速迭代 → MongoDB</li>
+<li>大数据量 + 分布式的强需求 → TiDB</li>
+<li>海量时序数据 → HBase 或专门时序库（InfluxDB&#x2F;TDengine）</li>
+</ul>
+<hr>
+<h3 id="6-4-搜索"><a href="#6-4-搜索" class="headerlink" title="6.4 搜索"></a>6.4 搜索</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>核心能力</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Elasticsearch</td>
+<td>全文搜索 + 聚合分析</td>
+<td>站内搜索、日志分析、多维排行</td>
+</tr>
+<tr>
+<td>Solr</td>
+<td>全文搜索</td>
+<td>传统企业搜索</td>
+</tr>
+<tr>
+<td>Lucene</td>
+<td>底层库</td>
+<td>需自建搜索服务的场景</td>
+</tr>
+</tbody></table>
+<p><strong>Elasticsearch 使用要点</strong>：</p>
+<ul>
+<li>主分片数在创建 Index 时确定，后期不可改（只能 Reindex）</li>
+<li>每天数据量较大时，按天建 Index：<code>logs-2026.07.05</code></li>
+<li>Refresh 间隔默认 1s，近实时（写入后最多 1s 可搜到）</li>
+<li>内存分配给 JVM 不超过 32GB（压缩指针优化阈值）</li>
+<li>堆内存不超过机器内存的 50%，剩余给 OS 文件缓存（Lucene 依赖）</li>
+</ul>
+<hr>
+<h3 id="6-5-分布式协调"><a href="#6-5-分布式协调" class="headerlink" title="6.5 分布式协调"></a>6.5 分布式协调</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>一致性协议</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZooKeeper</td>
+<td>ZAB</td>
+<td>成熟稳定，CP 系统，Java 生态标配</td>
+</tr>
+<tr>
+<td>etcd</td>
+<td>Raft</td>
+<td>简洁，Go 编写，K8s 标配</td>
+</tr>
+<tr>
+<td>Consul</td>
+<td>Raft</td>
+<td>内置健康检查 + DNS 服务发现</td>
+</tr>
+<tr>
+<td>Nacos</td>
+<td>Raft (CP) &#x2F; Distro (AP)</td>
+<td>阿里开源，配置 + 服务发现一体</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>与 K8s 配合 → etcd</li>
+<li>传统 Java 微服务（Dubbo）→ ZooKeeper 或 Nacos</li>
+<li>简单 KV 配置 + 服务发现 → Nacos（功能最全）</li>
+<li>多数据中心 → Consul</li>
+</ul>
+<hr>
+<h3 id="6-6-其他常用组件"><a href="#6-6-其他常用组件" class="headerlink" title="6.6 其他常用组件"></a>6.6 其他常用组件</h3><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>推荐组件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>对象存储</td>
+<td>腾讯云 COS &#x2F; 阿里云 OSS &#x2F; MinIO</td>
+<td>图片、视频、文件存储，CDN 分发</td>
+</tr>
+<tr>
+<td>网关</td>
+<td>Kong &#x2F; Nginx &#x2F; OpenResty</td>
+<td>API 限流、鉴权、路由</td>
+</tr>
+<tr>
+<td>RPC 框架</td>
+<td>gRPC &#x2F; Dubbo &#x2F; Thrift</td>
+<td>服务间通信</td>
+</tr>
+<tr>
+<td>配置中心</td>
+<td>Apollo &#x2F; Nacos</td>
+<td>动态配置、灰度发布</td>
+</tr>
+<tr>
+<td>监控</td>
+<td>Prometheus + Grafana</td>
+<td>指标采集与可视化</td>
+</tr>
+<tr>
+<td>链路追踪</td>
+<td>Jaeger &#x2F; SkyWalking</td>
+<td>分布式调用链追踪</td>
+</tr>
+<tr>
+<td>日志中心</td>
+<td>ELK (ES + Logstash + Kibana)</td>
+<td>日志收集、检索、分析</td>
+</tr>
+<tr>
+<td>容器编排</td>
+<td>Kubernetes (K8s)</td>
+<td>服务部署与调度</td>
+</tr>
+<tr>
+<td>CI&#x2F;CD</td>
+<td>Jenkins &#x2F; GitLab CI &#x2F; GitHub Actions</td>
+<td>持续集成与部署</td>
+</tr>
+<tr>
+<td>定时任务</td>
+<td>XXL-JOB &#x2F; Elastic-Job</td>
+<td>分布式定时任务调度</td>
+</tr>
+</tbody></table>
+<h2 id="七、经典案例索引"><a href="#七、经典案例索引" class="headerlink" title="七、经典案例索引"></a>七、经典案例索引</h2><p>以下案例是方法论的具体应用，每篇独立成文：</p>
+<table>
+<thead>
+<tr>
+<th>案例</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="/url-shortener-design/">短链系统</a></td>
+<td>Base62 编码、301&#x2F;302 重定向、过期策略</td>
+</tr>
+<tr>
+<td><a href="/flash-sale-design/">秒杀系统</a></td>
+<td>Redis 原子库存预扣、Kafka 异步削峰、熔断降级</td>
+</tr>
+<tr>
+<td><a href="/feed-stream-design/">Feed 流</a></td>
+<td>推拉模型、Timeline 聚合、大 V 扩散优化</td>
+</tr>
+<tr>
+<td><a href="/leaderboard-design/">排行榜</a></td>
+<td>Redis ZSet 实时排行、分片归并、多维过滤</td>
+</tr>
+<tr>
+<td><a href="/instant-messaging-design/">即时通讯</a></td>
+<td>WebSocket 长连接、消息可靠性、写扩散 vs 读扩散</td>
+</tr>
+<tr>
+<td><a href="/video-streaming-design/">视频流</a></td>
+<td>CDN 分层缓存、自适应码率、直播 vs 点播</td>
+</tr>
+<tr>
+<td><a href="/object-storage-design/">对象存储</a></td>
+<td>扁平 Key-Value 模型、纠删码、11 个 9 持久性</td>
+</tr>
+<tr>
+<td><a href="/search-engine-design/">搜索引擎</a></td>
+<td>爬虫→倒排索引→分片查询→BM25 排序</td>
+</tr>
+<tr>
+<td><a href="/payment-system-design/">支付系统</a></td>
+<td>幂等设计、TCC 分布式事务、对账系统</td>
+</tr>
+<tr>
+<td><a href="/location-service-design/">地理位置</a></td>
+<td>GeoHash 空间索引、司机匹配算法、ETA 预估</td>
+</tr>
+<tr>
+<td><a href="/notification-system-design/">通知系统</a></td>
+<td>Push&#x2F;短信&#x2F;邮件&#x2F;站内信、优先级分级、防打扰</td>
+</tr>
+<tr>
+<td><a href="/web-crawler-design/">分布式爬虫</a></td>
+<td>Bloom Filter 去重、礼貌性调度、URL 规范化</td>
+</tr>
+</tbody></table>
+<h2 id="八、总结"><a href="#八、总结" class="headerlink" title="八、总结"></a>八、总结</h2><h3 id="系统设计的核心思维"><a href="#系统设计的核心思维" class="headerlink" title="系统设计的核心思维"></a>系统设计的核心思维</h3><ol>
+<li><strong>先澄清，后设计</strong>：不理解需求就画图，是工程师常犯的错误</li>
+<li><strong>先估算，后架构</strong>：数字能帮你快速否决不可行的方案</li>
+<li><strong>先简单，后复杂</strong>：从单机 → 缓存 → MQ → 微服务，别一上来就分布式</li>
+<li><strong>先核心，后优化</strong>：主线跑通再谈缓存、限流、降级</li>
+<li><strong>先业务，后技术</strong>：技术选型服务于业务需求，而非反过来</li>
+</ol>
+<h3 id="四个案例的共通模式"><a href="#四个案例的共通模式" class="headerlink" title="四个案例的共通模式"></a>四个案例的共通模式</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────┐</span><br><span class="line">│  需求分析     │ ← 搞清楚读写比例、数据量、延迟要求</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  容量估算     │ ← 算出 QPS、存储、带宽的数量级</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  核心瓶颈识别  │ ← 是读瓶颈？写瓶颈？热点？数据倾斜？</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  架构设计     │ ← 分层 + 组件选型 + 数据流设计</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  优化演进     │ ← 缓存 → MQ → 读写分离 → 分库分表 → 微服务</span><br><span class="line">└──────────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="最后的话"><a href="#最后的话" class="headerlink" title="最后的话"></a>最后的话</h3><p>系统设计不是背诵方案，而是<strong>在约束条件下做权衡</strong>。关键能力不是知道 Reddit 或 Twitter 用什么架构（那都是事后总结），而是面对一个模糊的需求和现实的资源限制时，能够推导出合适的方案。</p>
+<p>记住：<strong>没有完美的架构，只有适合当前阶段的架构。</strong> Trade-off 永远是系统设计的核心关键词——在一致性、可用性、分区容忍性之间取舍，在性能与成本之间平衡，在开发效率与运维复杂度之间抉择。</p>
+<p>这篇文章覆盖的系统设计方法，是为了帮你建立一套思考框架。真正掌握它，需要在项目中反复实践与复盘。共勉。</p>
+<hr>
+<p><em>全文完。如需讨论或指正，欢迎在评论区留言。</em></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/testing-system/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/testing-system/" class="post-title-link" itemprop="url">后端测试体系</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">工程实践</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>测试不是”有时间就写”的可选任务，而是保障系统质量的工程纪律。一个成熟的后端测试体系应该覆盖从代码到生产的每一层。</p>
+<h2 id="一、测试金字塔"><a href="#一、测试金字塔" class="headerlink" title="一、测试金字塔"></a>一、测试金字塔</h2><figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">   ┌─────────┐</span><br><span class="line">   │  E2E    │  少量（关键业务流程）</span><br><span class="line">   │ <span class="number">5</span><span class="comment">%      │</span></span><br><span class="line">  ┌┴─────────┴┐</span><br><span class="line">  │ 集成测试   │  中等（跨服务/跨模块）</span><br><span class="line">  │  <span class="number">15</span><span class="comment">%      │</span></span><br><span class="line"> ┌┴───────────┴┐</span><br><span class="line"> │  单元测试    │  最多（单函数/单类）</span><br><span class="line"> │    <span class="number">80</span><span class="comment">%      │</span></span><br><span class="line">└─────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>金字塔的核心思想：<strong>越底层的测试越多、越快、越稳定</strong>。E2E 测试虽然价值高，但慢且脆弱，只覆盖核心流程。</p>
+<h2 id="二、单元测试"><a href="#二、单元测试" class="headerlink" title="二、单元测试"></a>二、单元测试</h2><h3 id="2-1-什么值得测"><a href="#2-1-什么值得测" class="headerlink" title="2.1 什么值得测"></a>2.1 什么值得测</h3><table>
+<thead>
+<tr>
+<th>应该测</th>
+<th>不用测</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>业务逻辑（计算、校验、状态转换）</td>
+<td>getter&#x2F;setter</td>
+</tr>
+<tr>
+<td>工具类方法（字符串处理、格式转换）</td>
+<td>框架代码（Controller 路由映射）</td>
+</tr>
+<tr>
+<td>复杂条件分支</td>
+<td>简单的一行委托调用</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ✅ 值得测试</span></span><br><span class="line"><span class="keyword">public</span> Money <span class="title function_">calculateDiscount</span><span class="params">(Order order)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (order.getTotal().greaterThan(<span class="keyword">new</span> <span class="title class_">Money</span>(<span class="string">&quot;1000&quot;</span>))) &#123;</span><br><span class="line">        <span class="keyword">return</span> order.getTotal().multiply(<span class="number">0.1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Money.ZERO;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ❌ 不值得专门测试</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setOrder</span><span class="params">(Order order)</span> &#123; <span class="built_in">this</span>.order = order; &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Mock-vs-Stub"><a href="#2-2-Mock-vs-Stub" class="headerlink" title="2.2 Mock vs Stub"></a>2.2 Mock vs Stub</h3><table>
+<thead>
+<tr>
+<th>技术</th>
+<th>用途</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Stub</strong></td>
+<td>返回预设值，不验证调用</td>
+<td><code>when(repo.findById(1L)).thenReturn(user)</code></td>
+</tr>
+<tr>
+<td><strong>Mock</strong></td>
+<td>验证是否调用、调用几次、参数正确</td>
+<td><code>verify(repo, times(1)).save(any())</code></td>
+</tr>
+</tbody></table>
+<p>过度使用 Mock 会让测试变成”Mock 的实现测试”而非”业务逻辑测试”。优先用真实对象测试纯粹的业务逻辑，只在需要隔离的外部依赖（数据库、RPC、消息队列）时用 Mock。</p>
+<h3 id="2-3-JUnit-5-Mockito-示例"><a href="#2-3-JUnit-5-Mockito-示例" class="headerlink" title="2.3 JUnit 5 + Mockito 示例"></a>2.3 JUnit 5 + Mockito 示例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ExtendWith(MockitoExtension.class)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OrderServiceTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Mock</span> OrderRepository orderRepo;</span><br><span class="line">    <span class="meta">@Mock</span> PaymentGateway paymentGateway;</span><br><span class="line">    <span class="meta">@InjectMocks</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldCreateOrderWhenPaymentSucceeds</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// Given</span></span><br><span class="line">        <span class="type">var</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CreateOrderRequest</span>(<span class="number">1L</span>, <span class="string">&quot;item-123&quot;</span>, <span class="keyword">new</span> <span class="title class_">Money</span>(<span class="string">&quot;100&quot;</span>));</span><br><span class="line">        <span class="type">var</span> <span class="variable">payment</span> <span class="operator">=</span> Payment.success();</span><br><span class="line">        <span class="keyword">when</span>(paymentGateway.charge(any())).thenReturn(payment);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// When</span></span><br><span class="line">        <span class="type">var</span> <span class="variable">order</span> <span class="operator">=</span> orderService.createOrder(request);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Then</span></span><br><span class="line">        assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);</span><br><span class="line">        verify(orderRepo).save(any(Order.class));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldMarkFailedWhenPaymentDeclined</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">when</span>(paymentGateway.charge(any())).thenReturn(Payment.failed());</span><br><span class="line"></span><br><span class="line">        assertThrows(PaymentFailedException.class,</span><br><span class="line">            () -&gt; orderService.createOrder(request));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、集成测试"><a href="#三、集成测试" class="headerlink" title="三、集成测试"></a>三、集成测试</h2><p>集成测试验证多个组件协作是否正确——数据库连接、消息队列、外部 API。</p>
+<h3 id="3-1-数据库测试"><a href="#3-1-数据库测试" class="headerlink" title="3.1 数据库测试"></a>3.1 数据库测试</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="meta">@AutoConfigureTestDatabase(replace = Replace.NONE)</span></span><br><span class="line"><span class="meta">@Testcontainers</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserRepositoryTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Container</span></span><br><span class="line">    <span class="keyword">static</span> PostgreSQLContainer&lt;?&gt; postgres = </span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">PostgreSQLContainer</span>&lt;&gt;(<span class="string">&quot;postgres:16-alpine&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span> UserRepository repo;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldPersistAndRetrieve</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">var</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;test@example.com&quot;</span>, <span class="string">&quot;Test&quot;</span>);</span><br><span class="line">        repo.save(user);</span><br><span class="line"></span><br><span class="line">        <span class="type">var</span> <span class="variable">found</span> <span class="operator">=</span> repo.findByEmail(<span class="string">&quot;test@example.com&quot;</span>);</span><br><span class="line">        assertThat(found).isPresent();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 <strong>Testcontainers</strong> 启动真实的数据库容器，比 H2 内存数据库更能暴露兼容性问题（如 MySQL&#x2F;PostgreSQL 语法差异）。测试完成后容器自动销毁，不污染环境。</p>
+<h3 id="3-2-API-测试"><a href="#3-2-API-测试" class="headerlink" title="3.2 API 测试"></a>3.2 API 测试</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest(webEnvironment = RANDOM_PORT)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserControllerTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span> TestRestTemplate rest;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldReturn200ForValidUser</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">var</span> <span class="variable">response</span> <span class="operator">=</span> rest.getForEntity(<span class="string">&quot;/users/1&quot;</span>, UserDTO.class);</span><br><span class="line">        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);</span><br><span class="line">        assertThat(response.getBody().getName()).isEqualTo(<span class="string">&quot;pcl&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-契约测试"><a href="#3-3-契约测试" class="headerlink" title="3.3 契约测试"></a>3.3 契约测试</h3><p>当服务 A 调用服务 B 时，A 需要知道 B 的 API 格式。Pact 等契约测试工具可以验证 A 的期望与 B 的实际输出一致——在微服务环境下比端到端的 E2E 测试更轻量、更可靠。</p>
+<h2 id="四、性能测试"><a href="#四、性能测试" class="headerlink" title="四、性能测试"></a>四、性能测试</h2><h3 id="4-1-压力测试"><a href="#4-1-压力测试" class="headerlink" title="4.1 压力测试"></a>4.1 压力测试</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wrk -t8 -c200 -d30s https:<span class="regexp">//</span>api.example.com<span class="regexp">/users/</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>关注指标：</p>
+<ul>
+<li>QPS 峰值</li>
+<li>P50&#x2F;P99 延迟</li>
+<li>错误率（&lt; 0.1%）</li>
+<li>CPU&#x2F;内存&#x2F;网络使用率</li>
+</ul>
+<h3 id="4-2-基准测试"><a href="#4-2-基准测试" class="headerlink" title="4.2 基准测试"></a>4.2 基准测试</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@BenchmarkMode(Mode.Throughput)</span></span><br><span class="line"><span class="meta">@OutputTimeUnit(TimeUnit.SECONDS)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SerializationBenchmark</span> &#123;</span><br><span class="line">    <span class="meta">@Benchmark</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">byte</span>[] protobuf() &#123; <span class="keyword">return</span> protoSerializer.serialize(obj); &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Benchmark</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">byte</span>[] json() &#123; <span class="keyword">return</span> jsonSerializer.write(obj); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 JMH 对关键路径做微基准测试，量化优化效果。</p>
+<h2 id="五、测试覆盖率"><a href="#五、测试覆盖率" class="headerlink" title="五、测试覆盖率"></a>五、测试覆盖率</h2><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>行覆盖率</td>
+<td>&gt; 80%</td>
+</tr>
+<tr>
+<td>分支覆盖率</td>
+<td>&gt; 70%</td>
+</tr>
+<tr>
+<td>核心业务路径</td>
+<td>100%</td>
+</tr>
+</tbody></table>
+<p>覆盖率不是目标，暴露未测试的风险代码才是。高覆盖率 + 差断言 &#x3D; 假安全感。</p>
+<h2 id="六、CI-中的测试策略"><a href="#六、CI-中的测试策略" class="headerlink" title="六、CI 中的测试策略"></a>六、CI 中的测试策略</h2><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">push</span> → [单元测试(<span class="number">2</span><span class="built_in">min</span>)] → [集成测试(<span class="number">5</span><span class="built_in">min</span>)] → [代码扫描(<span class="number">3</span><span class="built_in">min</span>)] → deploy to staging → [E2E测试(<span class="number">15</span><span class="built_in">min</span>)]</span><br><span class="line">      失败阻断             失败阻断           警告             自动部署            失败阻断</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>单元测试和集成测试在 PR 阶段运行，失败阻断合并</li>
+<li>E2E 测试通常在 staging 环境运行，避免阻塞开发者</li>
+<li>每层测试耗时尽量控制在 15 分钟内</li>
+</ul>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>后端测试体系的核心原则：<strong>底层多写、上层少写、核心路径全覆盖</strong>。80% 的单元测试保证快反馈，15% 的集成验证组件协作，5% 的 E2E 保障关键链路。测试不是为了数字，是为了在半夜被 PagerDuty 叫醒时，你的第一反应是”哪个依赖又挂了”而非”是不是我上周的提交搞坏了”。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/transformer-architecture/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/transformer-architecture/" class="post-title-link" itemprop="url">Transformer 架构详解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Transformer 是当前所有大语言模型（GPT、Claude、Llama、Gemini）的底层架构。2017 年 Google 在《Attention Is All You Need》论文中提出它时，目标是解决机器翻译问题，但它的自注意力机制展现出惊人的通用性，最终彻底取代了 RNN&#x2F;LSTM，成为 NLP 乃至多模态领域的主导架构。</p>
+<h2 id="一、为什么需要-Transformer"><a href="#一、为什么需要-Transformer" class="headerlink" title="一、为什么需要 Transformer"></a>一、为什么需要 Transformer</h2><p>在 Transformer 之前，序列建模的主流方案是 RNN&#x2F;LSTM。它们的核心问题：</p>
+<ul>
+<li><strong>串行计算</strong>：处理第 N 个词必须等前 N-1 个词处理完——无法并行，训练慢</li>
+<li><strong>长程依赖衰减</strong>：处理 1000 个 token 的文本时，第 1 个 token 的信息经过 1000 步传递后衰减严重</li>
+<li><strong>梯度消失&#x2F;爆炸</strong>：反向传播经过几十步后梯度趋近于零或无穷大</li>
+</ul>
+<p>Transformer 用自注意力机制一举解决了这三个问题。</p>
+<h2 id="二、核心架构"><a href="#二、核心架构" class="headerlink" title="二、核心架构"></a>二、核心架构</h2><p>Transformer 由编码器（Encoder）和解码器（Decoder）堆叠而成，但 GPT 只用了 Decoder，BERT 只用了 Encoder。</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">输入文本 → <span class="punctuation">[</span><span class="built_in">Input</span> <span class="variable">Embedding</span> <span class="operator">+</span> <span class="variable">Positional</span> <span class="variable">Encoding</span><span class="punctuation">]</span></span><br><span class="line">              ↓</span><br><span class="line">    ┌─────────────────────────┐</span><br><span class="line">    │  <span class="variable">Multi</span><span class="operator">-</span><span class="built_in">Head</span> <span class="variable">Attention</span>   │ ← 自注意力：每个词关注所有词</span><br><span class="line">    │  <span class="variable">Add</span> <span class="operator">&amp;</span> <span class="built_in">Norm</span>             │</span><br><span class="line">    │  <span class="variable">Feed</span> <span class="built_in">Forward</span> <span class="punctuation">(</span><span class="variable">MLP</span><span class="punctuation">)</span>     │</span><br><span class="line">    │  <span class="variable">Add</span> <span class="operator">&amp;</span> <span class="built_in">Norm</span>             │</span><br><span class="line">    └─────────────────────────┘</span><br><span class="line">              ↓ <span class="punctuation">(</span>× <span class="built_in">N</span> 层堆叠<span class="punctuation">)</span></span><br><span class="line">         输出向量 → 下游任务</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、自注意力机制"><a href="#三、自注意力机制" class="headerlink" title="三、自注意力机制"></a>三、自注意力机制</h2><p>自注意力（Self-Attention）是 Transformer 的灵魂。核心公式：</p>
+<p>$$\text{Attention}(Q, K, V) &#x3D; \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$</p>
+<p>对每个 token，生成三个向量：</p>
+<ul>
+<li><strong>Q（Query）</strong>：我在找什么？</li>
+<li><strong>K（Key）</strong>：我能提供什么？</li>
+<li><strong>V（Value）</strong>：我的实际内容是什么？</li>
+</ul>
+<p>计算过程：</p>
+<ol>
+<li>计算 Q 和所有 K 的点积，得到注意力分数矩阵</li>
+<li>除以 $\sqrt{d_k}$（缩放因子，防止点积过大导致 softmax 梯度消失）</li>
+<li>Softmax 归一化为概率分布</li>
+<li>用概率分布对 V 加权求和——得到当前 token 的”上下文感知”表示</li>
+</ol>
+<p><strong>实际例子</strong>：处理句子”我昨天在书店买了一本关于分布式系统的书”时，token”书”的注意力权重分布中，”买”和”书店”的权重会很高，而”昨天”、”关于”的权重相对低——模型学会了关注语义相关的词。</p>
+<h2 id="四、多头注意力"><a href="#四、多头注意力" class="headerlink" title="四、多头注意力"></a>四、多头注意力</h2><p>单头注意力只能捕捉一种关系模式。多头注意力并行运行多个注意力头，每个头关注不同的语义维度：</p>
+<ul>
+<li>Head 1：关注语法结构（主谓宾）</li>
+<li>Head 2：关注指代关系（代词→先行词）</li>
+<li>Head 3：关注语义相似性</li>
+<li>Head N：关注位置邻近关系</li>
+</ul>
+<p>不同头关注不同维度，最终拼接起来通过线性层融合——这使得模型能同时捕捉多种语言特征。</p>
+<h2 id="五、位置编码"><a href="#五、位置编码" class="headerlink" title="五、位置编码"></a>五、位置编码</h2><p>自注意力本身是<strong>位置无关</strong>的——“我爱你”和”你爱我”在注意力机制下完全等价（只是 token 顺序不同，但注意力权重对称）。因此需要额外注入位置信息。</p>
+<p><strong>正弦位置编码</strong>（原论文方案）：</p>
+<p>$$PE_{(pos, 2i)} &#x3D; \sin\left(\frac{pos}{10000^{2i&#x2F;d_{model}}}\right)$$</p>
+<p>$$PE_{(pos, 2i+1)} &#x3D; \cos\left(\frac{pos}{10000^{2i&#x2F;d_{model}}}\right)$$</p>
+<p>偶数维度用正弦，奇数维度用余弦。这种设计使得模型可以外推到训练时未见过的序列长度。</p>
+<p>现代模型（GPT-3+、Llama）多使用<strong>可学习位置编码</strong>或 <strong>RoPE（旋转位置编码）</strong>——RoPE 通过旋转变换将位置信息编码到注意力计算中，在长文本外推方面表现更好。</p>
+<h2 id="六、关键变体"><a href="#六、关键变体" class="headerlink" title="六、关键变体"></a>六、关键变体</h2><table>
+<thead>
+<tr>
+<th>架构</th>
+<th>使用部分</th>
+<th>代表模型</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Encoder-only</td>
+<td>仅编码器</td>
+<td>BERT</td>
+<td>双向注意力，适合理解任务</td>
+</tr>
+<tr>
+<td>Decoder-only</td>
+<td>仅解码器</td>
+<td>GPT 系列、Llama</td>
+<td>单向（因果）注意力，适合生成任务</td>
+</tr>
+<tr>
+<td>Encoder-Decoder</td>
+<td>完整架构</td>
+<td>T5、BART</td>
+<td>适合翻译、摘要等 Seq2Seq 任务</td>
+</tr>
+</tbody></table>
+<p>GPT 系列之所以只用 Decoder，是因为它的核心任务是”预测下一个 token”——这是一个自回归生成任务，只需要单向注意力（每个 token 只能看到它之前的 token，不能看到未来的 token）。</p>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>Transformer 的突破不在于复杂——它的结构出奇简单（注意力 + 前馈网络 + 残差连接 + LayerNorm，堆叠 N 层）。突破在于<strong>可并行性</strong>（所有 token 同时计算注意力，不需要像 RNN 那样串行等待）和<strong>长程依赖建模</strong>（任意两个 token 之间的注意力路径长度为 O(1)，而非 RNN 的 O(N)）。这两点使得 Transformer 可以训练到千亿甚至万亿参数的规模——而这正是大语言模型能力涌现的基础。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/posts/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/posts/">1</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/posts/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/16/">16</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/posts/page/8/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

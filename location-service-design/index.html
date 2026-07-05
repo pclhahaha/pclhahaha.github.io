@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Uber 每天在全球处理数千万次行程，核心技术挑战包括：司机&#x2F;乘客实时位置上报、附近车辆搜索、高效的匹配算法和精准的 ETA 预估。所有这些问题的解决都离不开对地理空间数据的有效组织和查询。 一、核心需求   需求 说明    司机位置上报 司机端每 4 秒上报一次 GPS 坐标   附近车辆搜索 乘客叫车时找到附近可用车辆（500m-2km）   高效匹配 根据距离、司机评分、接单意愿">
+<meta property="og:type" content="article">
+<meta property="og:title" content="地理位置服务设计 (Uber&#x2F;滴滴)">
+<meta property="og:url" content="http://pclhahaha.github.io/location-service-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Uber 每天在全球处理数千万次行程，核心技术挑战包括：司机&#x2F;乘客实时位置上报、附近车辆搜索、高效的匹配算法和精准的 ETA 预估。所有这些问题的解决都离不开对地理空间数据的有效组织和查询。 一、核心需求   需求 说明    司机位置上报 司机端每 4 秒上报一次 GPS 坐标   附近车辆搜索 乘客叫车时找到附近可用车辆（500m-2km）   高效匹配 根据距离、司机评分、接单意愿">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="地理位置">
+<meta property="article:tag" content="GeoHash">
+<meta property="article:tag" content="Uber">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/location-service-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/location-service-design/","path":"location-service-design/","title":"地理位置服务设计 (Uber/滴滴)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>地理位置服务设计 (Uber/滴滴) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A0%B8%E5%BF%83%E9%9C%80%E6%B1%82"><span class="nav-number">1.</span> <span class="nav-text">一、核心需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">二、技术选型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%A9%BA%E9%97%B4%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 空间索引方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Redis-Geohash"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Redis Geohash</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81GeoHash-%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">三、GeoHash 原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E7%BC%96%E7%A0%81%E8%BF%87%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 编码过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E7%B2%BE%E5%BA%A6%E4%B8%8E%E9%95%BF%E5%BA%A6"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 精度与长度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 边界问题与解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BD%8D%E7%BD%AE%E4%B8%8A%E6%8A%A5%E4%B8%8E%E6%9B%B4%E6%96%B0"><span class="nav-number">4.</span> <span class="nav-text">四、位置上报与更新</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E6%9E%B6%E6%9E%84"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%86%99%E5%85%A5%E4%BC%98%E5%8C%96"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 写入优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%8F%B8%E6%9C%BA%E5%8C%B9%E9%85%8D"><span class="nav-number">5.</span> <span class="nav-text">五、司机匹配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E5%8C%B9%E9%85%8D%E6%B5%81%E7%A8%8B"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 匹配流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E5%8C%B9%E9%85%8D%E8%AF%84%E5%88%86%E7%AE%97%E6%B3%95"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 匹配评分算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E9%98%B2%E6%AD%A2%E6%97%A0%E6%95%88%E5%8C%B9%E9%85%8D"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 防止无效匹配</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81ETA-%E9%A2%84%E4%BC%B0"><span class="nav-number">6.</span> <span class="nav-text">六、ETA 预估</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%95%B0%E6%8D%AE%E6%9E%B6%E6%9E%84"><span class="nav-number">7.</span> <span class="nav-text">七、数据架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">八、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/location-service-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="地理位置服务设计 (Uber&#x2F;滴滴) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          地理位置服务设计 (Uber/滴滴)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Uber 每天在全球处理数千万次行程，核心技术挑战包括：司机&#x2F;乘客实时位置上报、附近车辆搜索、高效的匹配算法和精准的 ETA 预估。所有这些问题的解决都离不开对地理空间数据的有效组织和查询。</p>
+<h2 id="一、核心需求"><a href="#一、核心需求" class="headerlink" title="一、核心需求"></a>一、核心需求</h2><table>
+<thead>
+<tr>
+<th>需求</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>司机位置上报</strong></td>
+<td>司机端每 4 秒上报一次 GPS 坐标</td>
+</tr>
+<tr>
+<td><strong>附近车辆搜索</strong></td>
+<td>乘客叫车时找到附近可用车辆（500m-2km）</td>
+</tr>
+<tr>
+<td><strong>高效匹配</strong></td>
+<td>根据距离、司机评分、接单意愿等匹配最优司机</td>
+</tr>
+<tr>
+<td><strong>ETA 预估</strong></td>
+<td>预估司机到达时间（结合实时路况）</td>
+</tr>
+<tr>
+<td><strong>行程追踪</strong></td>
+<td>实时显示司机位置、预计到达时间</td>
+</tr>
+</tbody></table>
+<h2 id="二、技术选型"><a href="#二、技术选型" class="headerlink" title="二、技术选型"></a>二、技术选型</h2><h3 id="2-1-空间索引方案"><a href="#2-1-空间索引方案" class="headerlink" title="2.1 空间索引方案"></a>2.1 空间索引方案</h3><p>查询”距离我 2km 内的所有可用车辆”是经典的空间范围查询。以下是常用方案对比：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>原理</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GeoHash</strong></td>
+<td>经纬度编码为字符串，前缀匹配可做范围查询</td>
+<td>简单、Redis 原生支持</td>
+<td>边界问题需要查周围 8 个格子</td>
+</tr>
+<tr>
+<td><strong>四叉树 (QuadTree)</strong></td>
+<td>递归将地图分为四个象限</td>
+<td>自适应密度</td>
+<td>实现复杂、更新代价高</td>
+</tr>
+<tr>
+<td><strong>Google S2</strong></td>
+<td>希尔伯特曲线映射到球面</td>
+<td>精度高、覆盖全球</td>
+<td>学习成本高</td>
+</tr>
+<tr>
+<td><strong>H3 (Uber)</strong></td>
+<td>六边形网格</td>
+<td>邻域查询更均匀</td>
+<td>生态不如 GeoHash</td>
+</tr>
+</tbody></table>
+<h3 id="2-2-Redis-Geohash"><a href="#2-2-Redis-Geohash" class="headerlink" title="2.2 Redis Geohash"></a>2.2 Redis Geohash</h3><p>Redis 原生 GEO 命令基于 GeoHash + ZSet 实现：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 更新司机位置</span></span><br><span class="line"><span class="attribute">GEOADD</span> drivers <span class="number">121</span>.<span class="number">4737</span> <span class="number">31</span>.<span class="number">2304</span> driver:<span class="number">1001</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询上海外滩 2km 范围内的司机</span></span><br><span class="line"><span class="attribute">GEORADIUS</span> drivers <span class="number">121</span>.<span class="number">49</span> <span class="number">31</span>.<span class="number">24</span> <span class="number">2</span> km WITHDIST COUNT <span class="number">20</span> ASC</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算两个位置之间的距离</span></span><br><span class="line"><span class="attribute">GEODIST</span> drivers driver:<span class="number">1001</span> driver:<span class="number">2002</span> km</span><br></pre></td></tr></table></figure>
+
+<p>底层实现：Redis 将 GeoHash 值（52 位整数）作为 ZSet 的 score 存储。范围查询等价于在 ZSet 上对 GeoHash 前缀做范围扫描。</p>
+<h2 id="三、GeoHash-原理"><a href="#三、GeoHash-原理" class="headerlink" title="三、GeoHash 原理"></a>三、GeoHash 原理</h2><h3 id="3-1-编码过程"><a href="#3-1-编码过程" class="headerlink" title="3.1 编码过程"></a>3.1 编码过程</h3><p>GeoHash 将二维经纬度编码为一维字符串。核心原理是二分逼近：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">以纬度 <span class="number">31.23</span> 为例：</span><br><span class="line">  区间 [<span class="number">-90</span>, <span class="number">90</span>] → <span class="number">31.23</span> 在右半区 → 编码 <span class="number">1</span></span><br><span class="line">  区间 [<span class="number">0</span>, <span class="number">90</span>] → <span class="number">31.23</span> 在左半区 → 编码 <span class="number">0</span></span><br><span class="line">  区间 [<span class="number">0</span>, <span class="number">45</span>] → <span class="number">31.23</span> 在右半区 → 编码 <span class="number">1</span></span><br><span class="line">  区间 [<span class="number">22.5</span>, <span class="number">45</span>] → <span class="number">31.23</span> 在左半区 → 编码 <span class="number">0</span></span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+
+<p>经度和纬度交替编码，最终得到一串二进制位，每 5 位映射为一个 base32 字符，形成 GeoHash 字符串。</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">上海坐标 (121.47, 31.23) → GeoHash</span><span class="punctuation">:</span> <span class="string">wtw3s</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-精度与长度"><a href="#3-2-精度与长度" class="headerlink" title="3.2 精度与长度"></a>3.2 精度与长度</h3><table>
+<thead>
+<tr>
+<th>GeoHash 长度</th>
+<th>区域大小</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>5 位</td>
+<td>4.9km × 4.9km</td>
+<td>城市级</td>
+</tr>
+<tr>
+<td>6 位</td>
+<td>1.2km × 0.6km</td>
+<td>区级</td>
+</tr>
+<tr>
+<td>7 位</td>
+<td>153m × 153m</td>
+<td>街道级</td>
+</tr>
+<tr>
+<td>8 位</td>
+<td>38m × 19m</td>
+<td>精确位置</td>
+</tr>
+</tbody></table>
+<h3 id="3-3-边界问题与解决方案"><a href="#3-3-边界问题与解决方案" class="headerlink" title="3.3 边界问题与解决方案"></a>3.3 边界问题与解决方案</h3><p>GeoHash 的缺陷：两个地理位置可能很近，但 GeoHash 前缀不同——因为它们在网格边界两侧。</p>
+<p>例如，上海人民广场附近的两个点，一个在网格 A 的右边缘，一个在网格 B 的左边缘，虽然距离 50 米，但 GeoHash 可能完全不同。</p>
+<p><strong>解决方案</strong>：查询时同时检查目标网格 + 周围 8 个相邻网格：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">查询网格 <span class="string">&quot;wtw3s&quot;</span> 及周围 <span class="number">8</span> 个邻居：</span><br><span class="line">  wtw3k  wtw3m  wtw3t</span><br><span class="line">  wtw3<span class="built_in">h</span>  wtw3s  wtw3u</span><br><span class="line">  wtw35  wtw3e  wtw3g</span><br></pre></td></tr></table></figure>
+
+<p>Redis GEORADIUS 内部已经自动处理了这个边界问题。</p>
+<h2 id="四、位置上报与更新"><a href="#四、位置上报与更新" class="headerlink" title="四、位置上报与更新"></a>四、位置上报与更新</h2><h3 id="4-1-架构"><a href="#4-1-架构" class="headerlink" title="4.1 架构"></a>4.1 架构</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">司机端 (每<span class="number">4</span>秒上报GPS)</span><br><span class="line">    │</span><br><span class="line"><span class="selector-attr">[WebSocket Gateway]</span></span><br><span class="line">    │</span><br><span class="line"><span class="selector-attr">[位置更新服务]</span></span><br><span class="line">    │</span><br><span class="line">    ├─ 更新 Redis GEO (实时查询用)</span><br><span class="line">    ├─ 写入 Kafka (持久化数据流)</span><br><span class="line">    │      └─ <span class="selector-attr">[消费者]</span> → HBase/Cassandra (历史位置存储)</span><br><span class="line">    └─ 通知匹配服务 (有新司机可用)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-写入优化"><a href="#4-2-写入优化" class="headerlink" title="4.2 写入优化"></a>4.2 写入优化</h3><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>批量写入</strong></td>
+<td>聚合多辆车的更新，一次 Redis pipeline 写入</td>
+</tr>
+<tr>
+<td><strong>有条件更新</strong></td>
+<td>位置变动 &lt; 10 米时不更新，避免无意义写入</td>
+</tr>
+<tr>
+<td><strong>异步化</strong></td>
+<td>位置更新是异步的，接受短暂延迟</td>
+</tr>
+</tbody></table>
+<h2 id="五、司机匹配"><a href="#五、司机匹配" class="headerlink" title="五、司机匹配"></a>五、司机匹配</h2><h3 id="5-1-匹配流程"><a href="#5-1-匹配流程" class="headerlink" title="5.1 匹配流程"></a>5.1 匹配流程</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">乘客叫车</span><br><span class="line">    │</span><br><span class="line"><span class="selector-attr">[GeoRadius]</span> 查询 <span class="number">2</span>km 内可用司机 → <span class="selector-attr">[司机列表]</span></span><br><span class="line">    │</span><br><span class="line"><span class="selector-attr">[过滤]</span> 排除低分司机、已有订单的司机、距离太远的司机</span><br><span class="line">    │</span><br><span class="line"><span class="selector-attr">[排序]</span> 按综合得分排序</span><br><span class="line">    │</span><br><span class="line"><span class="selector-attr">[派单]</span> 向 <span class="attribute">Top</span>-<span class="number">3</span> 司机推送订单（<span class="number">30s</span> 内无人接单则扩大范围）</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-匹配评分算法"><a href="#5-2-匹配评分算法" class="headerlink" title="5.2 匹配评分算法"></a>5.2 匹配评分算法</h3><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Score</span> = w1 × f(<span class="built_in">distance</span>) + w2 × f(<span class="built_in">rating</span>) + w3 × f(acceptance_rate) + ...</span><br><span class="line"></span><br><span class="line">其中 f(<span class="built_in">distance</span>) = <span class="number">1</span> / (<span class="number">1</span> + <span class="built_in">distance</span>/<span class="number">1000</span>)  # 近距离加权更高</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-防止无效匹配"><a href="#5-3-防止无效匹配" class="headerlink" title="5.3 防止无效匹配"></a>5.3 防止无效匹配</h3><ul>
+<li>推送订单前检查司机是否在线（心跳机制）</li>
+<li>30 秒超时 → 自动取消推送给其他司机</li>
+<li>司机端防作弊：检测模拟位置、异常轨迹</li>
+</ul>
+<h2 id="六、ETA-预估"><a href="#六、ETA-预估" class="headerlink" title="六、ETA 预估"></a>六、ETA 预估</h2><p>ETA（预计到达时间）的精度直接影响用户体验，需要综合以下因素：</p>
+<ul>
+<li><strong>路径距离</strong>：OpenStreetMap &#x2F; 高德地图提供的路径规划</li>
+<li><strong>实时路况</strong>：GPS 数据分析实时车速</li>
+<li><strong>历史数据</strong>：同一时段、同一路段的平均耗时</li>
+<li><strong>特殊因素</strong>：天气、事故、道路封闭</li>
+</ul>
+<p>简单做法：路径距离 ÷ 预估速度。精度取决于路况数据的实时性。</p>
+<p>地图和路径规划通常依赖第三方服务（高德&#x2F;百度&#x2F;Google Maps），业务层只需要调用 API 获取路径距离和预估值即可。</p>
+<h2 id="七、数据架构"><a href="#七、数据架构" class="headerlink" title="七、数据架构"></a>七、数据架构</h2><table>
+<thead>
+<tr>
+<th>数据</th>
+<th>存储</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>实时位置</td>
+<td>Redis GEO</td>
+<td>TTL 1 分钟，超时自动清除</td>
+</tr>
+<tr>
+<td>司机状态</td>
+<td>Redis Hash</td>
+<td>在线&#x2F;离线&#x2F;接单中，心跳保活</td>
+</tr>
+<tr>
+<td>历史轨迹</td>
+<td>HBase&#x2F;Cassandra</td>
+<td>按 driver_id + timestamp 排序存储</td>
+</tr>
+<tr>
+<td>订单数据</td>
+<td>MySQL&#x2F;PostgreSQL</td>
+<td>强一致性的订单状态</td>
+</tr>
+<tr>
+<td>路况数据</td>
+<td>内存网格</td>
+<td>将地图切为 1km×1km 网格，实时计算每网格平均车速</td>
+</tr>
+</tbody></table>
+<h2 id="八、小结"><a href="#八、小结" class="headerlink" title="八、小结"></a>八、小结</h2><p>地理位置服务的核心技术：<strong>GeoHash 空间索引</strong>实现快速”附近搜索”，<strong>ZSet + 范围查询</strong>在 Redis 中高效实现，<strong>流式位置更新</strong>通过 Kafka 管道处理海量 GPS 数据。Uber 进一步自研了 H3 六边形网格系统来优化匹配公平性，这体现了在特定领域深耕带来的技术创新。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/%E5%9C%B0%E7%90%86%E4%BD%8D%E7%BD%AE/" rel="tag"># 地理位置</a>
+              <a href="/tags/GeoHash/" rel="tag"># GeoHash</a>
+              <a href="/tags/Uber/" rel="tag"># Uber</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/mcp-protocol-guide/" rel="prev" title="MCP 协议详解">
+                  <i class="fa fa-angle-left"></i> MCP 协议详解
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/llm-training-pipeline/" rel="next" title="预训练 &#x2F; SFT &#x2F; RLHF 详解">
+                  预训练 / SFT / RLHF 详解 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

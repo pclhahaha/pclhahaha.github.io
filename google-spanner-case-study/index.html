@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Google Spanner 是全球最知名的 NewSQL 数据库，管理着万亿行数据并提供 99.999%（五个9）的可用性。它是第一个在全球范围内提供外部一致性的分布式数据库——这意味着不论数据在世界的哪个角落被修改，所有用户看到的顺序都是一致的。 一、解决的问题传统数据库在可扩展性和一致性之间需要做取舍：    方案 一致性 可扩展性 代表    单机 SQL 强一致 差 PostgreSQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Google Spanner 架构——万亿行数据五个9的高可用">
+<meta property="og:url" content="http://pclhahaha.github.io/google-spanner-case-study/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Google Spanner 是全球最知名的 NewSQL 数据库，管理着万亿行数据并提供 99.999%（五个9）的可用性。它是第一个在全球范围内提供外部一致性的分布式数据库——这意味着不论数据在世界的哪个角落被修改，所有用户看到的顺序都是一致的。 一、解决的问题传统数据库在可扩展性和一致性之间需要做取舍：    方案 一致性 可扩展性 代表    单机 SQL 强一致 差 PostgreSQL">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="Google">
+<meta property="article:tag" content="Spanner">
+<meta property="article:tag" content="NewSQL">
+<meta property="article:tag" content="分布式数据库">
+<meta property="article:tag" content="TrueTime">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/google-spanner-case-study/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/google-spanner-case-study/","path":"google-spanner-case-study/","title":"Google Spanner 架构——万亿行数据五个9的高可用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Google Spanner 架构——万亿行数据五个9的高可用 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">一、解决的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">二、核心架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E9%83%A8%E7%BD%B2%E6%8B%93%E6%89%91"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 部署拓扑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 数据分片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E8%AF%BB%E5%86%99%E8%B7%AF%E5%BE%84"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 读写路径</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81TrueTime%E2%80%94%E2%80%94%E5%A4%96%E9%83%A8%E4%B8%80%E8%87%B4%E6%80%A7%E7%9A%84%E5%9F%BA%E7%9F%B3"><span class="nav-number">3.</span> <span class="nav-text">三、TrueTime——外部一致性的基石</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%97%B6%E9%97%B4%E4%B8%8D%E7%A1%AE%E6%80%A7"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 时间不确性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%A6%82%E4%BD%95%E7%94%A8%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7%E4%BF%9D%E8%AF%81%E7%A1%AE%E5%AE%9A%E6%80%A7"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 如何用不确定性保证确定性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Paxos-%E5%89%AF%E6%9C%AC%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6"><span class="nav-number">4.</span> <span class="nav-text">四、Paxos 副本与数据复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Schema-%E8%AE%BE%E8%AE%A1"><span class="nav-number">5.</span> <span class="nav-text">五、Schema 设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">六、性能优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/google-spanner-case-study/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Google Spanner 架构——万亿行数据五个9的高可用 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Google Spanner 架构——万亿行数据五个9的高可用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Google Spanner 是全球最知名的 NewSQL 数据库，管理着万亿行数据并提供 99.999%（五个9）的可用性。它是第一个在全球范围内提供外部一致性的分布式数据库——这意味着不论数据在世界的哪个角落被修改，所有用户看到的顺序都是一致的。</p>
+<h2 id="一、解决的问题"><a href="#一、解决的问题" class="headerlink" title="一、解决的问题"></a>一、解决的问题</h2><p>传统数据库在可扩展性和一致性之间需要做取舍：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>一致性</th>
+<th>可扩展性</th>
+<th>代表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单机 SQL</td>
+<td>强一致</td>
+<td>差</td>
+<td>PostgreSQL</td>
+</tr>
+<tr>
+<td>分库分表</td>
+<td>最终一致</td>
+<td>好</td>
+<td>MySQL 分片</td>
+</tr>
+<tr>
+<td>NoSQL</td>
+<td>最终一致</td>
+<td>极好</td>
+<td>Cassandra</td>
+</tr>
+<tr>
+<td><strong>NewSQL</strong></td>
+<td><strong>强一致</strong></td>
+<td><strong>极好</strong></td>
+<td><strong>Spanner</strong></td>
+</tr>
+</tbody></table>
+<p>Spanner 的目标：在一个全球分布的环境下，提供关系型数据库的 ACID 事务保证，同时具备 NoSQL 的水平扩展能力。</p>
+<h2 id="二、核心架构"><a href="#二、核心架构" class="headerlink" title="二、核心架构"></a>二、核心架构</h2><h3 id="2-1-部署拓扑"><a href="#2-1-部署拓扑" class="headerlink" title="2.1 部署拓扑"></a>2.1 部署拓扑</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-attr">[全球 Paxos 集群]</span></span><br><span class="line">┌─────────────────┐</span><br><span class="line">│   Spanner 集群   │</span><br><span class="line">│  (Zone <span class="selector-tag">A</span>)        │</span><br><span class="line">│  ┌───────────┐   │</span><br><span class="line">│  │ Paxos 副本 │   │</span><br><span class="line">│  │ 强一致读/写 │   │</span><br><span class="line">│  └───────────┘   │</span><br><span class="line">└─────────────────┘</span><br><span class="line">         │</span><br><span class="line">┌─────────────────┐</span><br><span class="line">│   Spanner 集群   │</span><br><span class="line">│  (Zone <span class="selector-tag">B</span>)        │</span><br><span class="line">│  ┌───────────┐   │</span><br><span class="line">│  │ Paxos 副本 │   │</span><br><span class="line">│  └───────────┘   │</span><br><span class="line">└─────────────────┘</span><br><span class="line">         │</span><br><span class="line">┌─────────────────┐</span><br><span class="line">│   Spanner 集群   │</span><br><span class="line">│  (Zone C)        │</span><br><span class="line">│  ┌───────────┐   │</span><br><span class="line">│  │ Paxos 副本 │   │</span><br><span class="line">│  └───────────┘   │</span><br><span class="line">└─────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>每个 Spanner 部署被称为一个 <strong>Universe</strong>，每个 Universe 包含多个 Zone。每个 Zone 内有一组 Paxos 副本提供读写服务。</p>
+<h3 id="2-2-数据分片"><a href="#2-2-数据分片" class="headerlink" title="2.2 数据分片"></a>2.2 数据分片</h3><p>数据被切分成 <strong>Split</strong>，每个 Split 包含一系列连续的主键范围：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Split A:  [<span class="keyword">user</span>:<span class="number">000000</span>, <span class="keyword">user</span>:<span class="number">500000</span>)</span><br><span class="line">Split B:  [<span class="keyword">user</span>:<span class="number">500000</span>, <span class="keyword">user</span>:<span class="number">999999</span>)</span><br><span class="line">Split C:  [<span class="keyword">user</span>:<span class="number">1000000</span>, <span class="keyword">user</span>:<span class="number">1499999</span>)</span><br></pre></td></tr></table></figure>
+
+<p>每个 Split 由一个 Paxos 组管理，Paxos 组的多个副本分布在不同 Zone，保证容灾能力。</p>
+<h3 id="2-3-读写路径"><a href="#2-3-读写路径" class="headerlink" title="2.3 读写路径"></a>2.3 读写路径</h3><p><strong>写操作</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 客户端 → 找到 Split 的 Paxos Leader</span><br><span class="line"><span class="bullet">2.</span> Leader → 通过 Paxos 协议写入日志</span><br><span class="line"><span class="bullet">3.</span> 多数派确认 → 写入成功 → 返回客户端</span><br><span class="line"><span class="bullet">4.</span> Leader 异步应用到存储引擎</span><br></pre></td></tr></table></figure>
+
+<p><strong>读操作</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 客户端 → 找到 Split 的 Paxos Leader 或 Follower</span><br><span class="line"><span class="bullet">2.</span> 如果读 Follower：检查本地时间戳是否 ≥ 读请求的时间戳</span><br><span class="line">   ├─ 是 → 直接返回（外部一致）</span><br><span class="line">   └─ 否 → 等待到足够的时间戳后返回</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、TrueTime——外部一致性的基石"><a href="#三、TrueTime——外部一致性的基石" class="headerlink" title="三、TrueTime——外部一致性的基石"></a>三、TrueTime——外部一致性的基石</h2><p>Spanner 最独特的设计是 <strong>TrueTime</strong>：一个全球精密的时钟同步系统。传统分布式系统不可能实现完全一致的时间同步，Spanner 使用 GPS 和原子钟为每个数据中心提供精确的时间参考。</p>
+<h3 id="3-1-时间不确性"><a href="#3-1-时间不确性" class="headerlink" title="3.1 时间不确性"></a>3.1 时间不确性</h3><p>即使有 GPS 和原子钟，时钟同步也存在不确定性。TrueTime 不报告一个准确的时间点，而是报告一个时间区间：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TT.now() → [earliest, latest]</span><br><span class="line"></span><br><span class="line">例如: [<span class="number">2026-07-05</span> <span class="number">10</span>:<span class="number">00:00.000</span>, <span class="number">2026-07-05</span> <span class="number">10</span>:<span class="number">00:00.007</span>]</span><br></pre></td></tr></table></figure>
+
+<p>这意味着真实时间有 99.9999% 的置信度落在 [earliest, latest] 区间内，区间宽度通常 &lt; 7 毫秒。</p>
+<h3 id="3-2-如何用不确定性保证确定性"><a href="#3-2-如何用不确定性保证确定性" class="headerlink" title="3.2 如何用不确定性保证确定性"></a>3.2 如何用不确定性保证确定性</h3><p>提交等待（Commit Wait）协议是 Spanner 保证外部一致性的关键：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">事务 T 的提交时间戳: s</span><br><span class="line">提交等待: 在提交后等待，直到 TT<span class="selector-class">.now</span>()<span class="selector-class">.earliest</span> &gt; s</span><br><span class="line"></span><br><span class="line">也就是说，等待一段时间确保<span class="string">&quot;任何比 s 大的时间戳都已经在真实世界中过去了&quot;</span>。</span><br></pre></td></tr></table></figure>
+
+<p>这样保证了：如果事务 A 的提交时间戳 &lt; 事务 B 的提交时间戳，那么 A 在所有节点上都发生在 B 之前。这提供了一种近似完美的外部一致性，概率满足。</p>
+<h2 id="四、Paxos-副本与数据复制"><a href="#四、Paxos-副本与数据复制" class="headerlink" title="四、Paxos 副本与数据复制"></a>四、Paxos 副本与数据复制</h2><p>Spanner 使用 Paxos 协议管理每个 Split 的数据复制。Paxos 组的成员分布在多个数据中心：</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Split A 的 Paxos 组 (3 副本)</span><span class="punctuation">:</span></span><br><span class="line">  <span class="attribute">Zone A</span><span class="punctuation">:</span> <span class="string">Leader (处理所有写 + 强一致读)</span></span><br><span class="line">  <span class="attribute">Zone B</span><span class="punctuation">:</span> <span class="string">Follower (只读，复制延迟 ~10ms)</span></span><br><span class="line">  <span class="attribute">Zone C</span><span class="punctuation">:</span> <span class="string">Follower (只读，复制延迟 ~50ms)</span></span><br></pre></td></tr></table></figure>
+
+<p>当 Leader 所在的 Zone 故障时，Paxos 协议保证剩余的副本能在秒级选出新 Leader，满足 5 个 9 的可用性要求。</p>
+<h2 id="五、Schema-设计"><a href="#五、Schema-设计" class="headerlink" title="五、Schema 设计"></a>五、Schema 设计</h2><p>Spanner 支持标准 SQL 并且扩展了分布式特有的功能：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> Users (</span><br><span class="line">  user_id   INT64 <span class="keyword">NOT NULL</span>,</span><br><span class="line">  name      STRING(<span class="number">100</span>),</span><br><span class="line">  email     STRING(<span class="number">100</span>),</span><br><span class="line">  created_at <span class="type">TIMESTAMP</span>,</span><br><span class="line">) <span class="keyword">PRIMARY KEY</span> (user_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 交错表：子表与父表共享主键前缀，数据物理上相邻</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> UserOrders (</span><br><span class="line">  user_id   INT64 <span class="keyword">NOT NULL</span>,</span><br><span class="line">  order_id  INT64 <span class="keyword">NOT NULL</span>,</span><br><span class="line">  amount    FLOAT64,</span><br><span class="line">) <span class="keyword">PRIMARY KEY</span> (user_id, order_id),</span><br><span class="line">  INTERLEAVE <span class="keyword">IN</span> PARENT Users;</span><br></pre></td></tr></table></figure>
+
+<p>**交错表（Interleaving）**是 Spanner 特有的设计：将父子表的数据物理上存储在一起，使得”根据用户查其所有订单”只需要一次磁盘扫描，而不需要分布式 JOIN。</p>
+<h2 id="六、性能优化"><a href="#六、性能优化" class="headerlink" title="六、性能优化"></a>六、性能优化</h2><table>
+<thead>
+<tr>
+<th>优化策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>交错表</strong></td>
+<td>消除分布式 JOIN</td>
+</tr>
+<tr>
+<td><strong>只读副本</strong></td>
+<td>Follower 可以处理只读事务，分散读压力</td>
+</tr>
+<tr>
+<td><strong>批量写入</strong></td>
+<td>聚合多个小写入为一次 Paxos 提交</td>
+</tr>
+<tr>
+<td><strong>客户端路由</strong></td>
+<td>客户端智能路由到最近的 Follower 读取</td>
+</tr>
+<tr>
+<td><strong>热点检测</strong></td>
+<td>自动检测并分裂热点 Split</td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>Google Spanner 解决了分布式数据库的”圣杯问题”：在保持 SQL 语义和 ACID 保证的前提下实现全球级扩展性。这得益于两项创新：TrueTime 使用物理时间（GPS&#x2F;原子钟）取代逻辑时钟，为分布式事务提供了确定性的时间参考；Paxos 副本 + 交错表则在高可用和高性能之间找到平衡。</p>
+<p>Spanner 的开源等价物包括 CockroachDB 和 TiDB——它们都受到 Spanner 论文的启发，但使用混合逻辑时钟（HLC）代替 GPS 时钟，在易部署性和一致性之间做出不同的取舍。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/Google/" rel="tag"># Google</a>
+              <a href="/tags/Spanner/" rel="tag"># Spanner</a>
+              <a href="/tags/NewSQL/" rel="tag"># NewSQL</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 分布式数据库</a>
+              <a href="/tags/TrueTime/" rel="tag"># TrueTime</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/hive-trino-guide/" rel="prev" title="Hive 与 Presto&#x2F;Trino 实战">
+                  <i class="fa fa-angle-left"></i> Hive 与 Presto/Trino 实战
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/function-calling-guide/" rel="next" title="Function Calling 与 Tool Use">
+                  Function Calling 与 Tool Use <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

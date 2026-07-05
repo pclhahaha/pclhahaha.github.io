@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:type" content="website">
+<meta property="og:title" content="个人笔记">
+<meta property="og:url" content="http://pclhahaha.github.io/posts/page/13/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="pcl">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/posts/page/13/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"posts/page/13/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">个人笔记</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/observer-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/observer-pattern/" class="post-title-link" itemprop="url">观察者模式 — Spring Event / MQ</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>意图</strong>：定义对象间的一对多依赖，当一个对象状态变化时，所有依赖者自动得到通知。</p>
+<p><strong>UML 简述</strong>：Subject 持有多个 Observer，状态变化时通知所有已注册的 Observer 调用其 update 方法。</p>
+<p><strong>JDK 内置实现</strong>：<code>Observable</code> + <code>Observer</code>，Java 9+ 已弃用——类而非接口、线程不安全、违背组合优于继承。现代 Java 中观察者模式通过事件机制落地。</p>
+<p><strong>Spring Event 机制</strong></p>
+<p>Spring 的事件机制是观察者模式在 IoC 容器中的标准实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 事件</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderPaidEvent</span> <span class="keyword">extends</span> <span class="title class_">ApplicationEvent</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Long orderId;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">OrderPaidEvent</span><span class="params">(Object source, Long orderId)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(source);</span><br><span class="line">        <span class="built_in">this</span>.orderId = orderId;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 监听器（观察者）</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SmsListener</span> &#123;</span><br><span class="line">    <span class="meta">@EventListener</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handle</span><span class="params">(OrderPaidEvent event)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;发送短信, 订单: &quot;</span> + event.getOrderId());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CouponListener</span> &#123;</span><br><span class="line">    <span class="meta">@EventListener</span> <span class="meta">@Async</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handle</span><span class="params">(OrderPaidEvent event)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;发放优惠券, 订单: &quot;</span> + event.getOrderId());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 发布事件</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderService</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span> <span class="keyword">private</span> ApplicationEventPublisher publisher;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">(Long orderId)</span> &#123;</span><br><span class="line">        publisher.publishEvent(<span class="keyword">new</span> <span class="title class_">OrderPaidEvent</span>(<span class="built_in">this</span>, orderId));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring Event 核心流程：<code>publisher.publishEvent()</code> → <code>ApplicationEventMulticaster.multicastEvent()</code> → 遍历匹配的 Listener → 同步&#x2F;异步调用。加 <code>@Async</code> + <code>@EnableAsync</code> 即可异步执行。</p>
+<p><strong>MQ 发布订阅 —— 跨进程的观察者</strong>：MQ 将观察者模式扩展到分布式环境——Publisher → MQ Broker → Subscriber 1 &#x2F; Subscriber 2，解决了单进程内 Subject-Observer 的耦合问题。</p>
+<p><strong>三种观察者实现对比</strong></p>
+<table>
+<thead>
+<tr>
+<th>实现方式</th>
+<th>耦合度</th>
+<th>可靠性</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JDK Observable</td>
+<td>紧耦合（同线程）</td>
+<td>低</td>
+<td>几乎不用</td>
+</tr>
+<tr>
+<td>Spring Event</td>
+<td>松耦合（同容器）</td>
+<td>中</td>
+<td>单应用内业务解耦</td>
+</tr>
+<tr>
+<td>MQ 发布订阅</td>
+<td>无耦合（跨进程）</td>
+<td>高（持久化+重试）</td>
+<td>跨服务异步解耦</td>
+</tr>
+</tbody></table>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/paxos-algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/paxos-algorithm/" class="post-title-link" itemprop="url">Paxos 算法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Paxos 是 Leslie Lamport 提出的经典共识算法，是分布式一致性理论的基础。Paxos 包含三个角色：</p>
+<ul>
+<li><strong>Proposer（提议者）</strong>：提出提案，推动共识达成</li>
+<li><strong>Acceptor（接受者）</strong>：对提案进行投票，决定是否接受</li>
+<li><strong>Learner（学习者）</strong>：学习最终被选中的值，不参与投票</li>
+</ul>
+<p><strong>Basic Paxos 两阶段协议</strong>：</p>
+<p><strong>Phase 1 — Prepare（准备阶段）</strong>：</p>
+<ol>
+<li>Proposer 选择一个全局唯一的提案编号 N</li>
+<li>Proposer 向超过半数的 Acceptor 发送 Prepare(N) 请求</li>
+<li>Acceptor 收到 Prepare(N) 请求后：如果 N 大于之前见过的所有编号，则做出两个承诺——不再接受编号小于 N 的任何 Prepare 请求，不再接受编号小于 N 的任何 Accept 请求——同时返回已经接受过的最大编号的提案值（如果有的话）</li>
+</ol>
+<p><strong>Phase 2 — Accept（接受阶段）</strong>：</p>
+<ol>
+<li>如果 Proposer 收到了超过半数的 Acceptor 对 Prepare 的响应，则向这些 Acceptor 发送 Accept(N, V) 请求，其中 V 是响应中编号最大的提案的值（如果所有响应都没有已接受的提案，Proposer 可以自由决定 V）</li>
+<li>Acceptor 收到 Accept 请求后，只要自己遵守了对 N 的承诺（即没有见过比 N 更大的 Prepare 编号），就接受该提案</li>
+<li>当提案被多数派 Acceptor 接受后，该提案被选中（Chosen），Learner 学习该值</li>
+</ol>
+<p><strong>Multi-Paxos</strong>：Basic Paxos 每次达成共识都需要两轮通信（Prepare + Accept），Multi-Paxos 通过选举一个稳定的 Leader 来优化——一旦 Leader 被选举出来，后续提案可以跳过 Prepare 阶段，直接进入 Accept 阶段，将复杂度从两轮降为一轮。</p>
+<p>Paxos 相关变种包括：</p>
+<ul>
+<li><strong>Zab</strong>：ZooKeeper 使用的原子广播协议，基于 Paxos 思想设计</li>
+<li><strong>Raft</strong>：以可理解性为核心设计目标的共识算法</li>
+<li><strong>EPaxos</strong>：无 Leader 的 Paxos 变体，适合广域网部署</li>
+</ul>
+<p>实现案例：ZooKeeper（基于 Zab 协议）</p>
+<blockquote>
+<p>📖 独立文章：<a href="/raft-algorithm/">Raft 共识算法详解</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/proxy-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/proxy-pattern/" class="post-title-link" itemprop="url">代理模式 — JDK动态代理 vs CGLIB</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>意图</strong>：为另一个对象提供一个替身或占位符，以控制对原对象的访问。</p>
+<p><strong>为什么重要</strong>：代理是 Spring AOP 的底层基石，是理解 Spring 框架最关键的几个模式之一。</p>
+<p><strong>UML 简述</strong>：代理持有真实对象的引用，实现相同的接口，在调用前后添加额外逻辑。</p>
+<p><strong>JDK 动态代理 vs CGLIB</strong></p>
+<p>这是面试中的高频问题。两者的本质区别在于实现机制：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>JDK 动态代理</th>
+<th>CGLIB 代理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>机制</td>
+<td>基于接口，运行时生成 <code>$Proxy</code> 类实现目标接口</td>
+<td>基于继承，运行时生成目标类的子类</td>
+</tr>
+<tr>
+<td>要求</td>
+<td>目标类必须实现接口</td>
+<td>目标类不能是 final，方法不能是 final</td>
+</tr>
+<tr>
+<td>创建方式</td>
+<td><code>Proxy.newProxyInstance()</code></td>
+<td><code>Enhancer.create()</code></td>
+</tr>
+<tr>
+<td>invoke 方式</td>
+<td><code>InvocationHandler.invoke()</code></td>
+<td><code>MethodInterceptor.intercept()</code></td>
+</tr>
+<tr>
+<td>性能</td>
+<td>JDK 6 后优化明显，性能接近 CGLIB</td>
+<td>早期比 JDK 代理快，现在差距很小</td>
+</tr>
+<tr>
+<td>Spring 默认</td>
+<td>目标有接口时默认使用</td>
+<td>目标无接口时使用</td>
+</tr>
+</tbody></table>
+<p><strong>JDK 动态代理示例</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(User user)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;保存用户: &quot;</span> + user.getName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 代理处理器</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LogHandler</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object target;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">LogHandler</span><span class="params">(Object target)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.target = target;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;&gt;&gt;&gt; 开始调用: &quot;</span> + method.getName());</span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> method.invoke(target, args);</span><br><span class="line">        <span class="type">long</span> <span class="variable">cost</span> <span class="operator">=</span> System.currentTimeMillis() - start;</span><br><span class="line">        System.out.println(<span class="string">&quot;&gt;&gt;&gt; 调用完成: &quot;</span> + method.getName() + <span class="string">&quot;, 耗时: &quot;</span> + cost + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建代理</span></span><br><span class="line"><span class="type">UserService</span> <span class="variable">proxy</span> <span class="operator">=</span> (UserService) Proxy.newProxyInstance(</span><br><span class="line">    UserService.class.getClassLoader(),</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;UserService.class&#125;,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">LogHandler</span>(<span class="keyword">new</span> <span class="title class_">UserServiceImpl</span>())</span><br><span class="line">);</span><br><span class="line">proxy.save(<span class="keyword">new</span> <span class="title class_">User</span>());  <span class="comment">// 所有调用都会被 LogHandler 拦截</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Spring AOP 代理选择策略</strong></p>
+<p>Spring 的代理选择是一个典型的”策略 + 工厂”组合：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">如果目标类实现了接口 → 默认使用 <span class="keyword">JDK </span>动态代理</span><br><span class="line">否则 → 使用 CGLIB 代理</span><br><span class="line">Spring <span class="keyword">Boot </span><span class="number">2</span>.x 起默认使用 CGLIB（因为更少限制）</span><br></pre></td></tr></table></figure>
+
+<p>可以强制指定：<code>@EnableAspectJAutoProxy(proxyTargetClass = true)</code> —— 始终使用 CGLIB。</p>
+<p><strong>AOP 核心链路</strong>（以 <code>@Transactional</code> 为例）：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. Bean 初始化后的 postProcessAfterInitialization </span><br><span class="line">   → 创建代理对象（JDK/CGLIB）</span><br><span class="line">2. 调用代理对象的方法</span><br><span class="line">   → TransactionInterceptor.invoke()</span><br><span class="line">3. 开启事务 →<span class="built_in"> invoke </span>目标方法 → 提交/回滚事务</span><br><span class="line">4. 返回结果给调用者</span><br></pre></td></tr></table></figure>
+
+<p>理解这个过程是排查 AOP 失效问题的前提。最常见的问题场景：</p>
+<ul>
+<li><strong>同类方法调用</strong>：<code>this.methodB()</code> 不经过代理，AOP 不生效</li>
+<li><strong>私有方法</strong>：代理无法拦截 private 方法</li>
+<li><strong>static&#x2F;final 方法</strong>：CGLIB 无法代理</li>
+</ul>
+<p><strong>代理模式的变体</strong></p>
+<table>
+<thead>
+<tr>
+<th>变体</th>
+<th>用途</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>远程代理</td>
+<td>为远程对象提供本地代表</td>
+<td>RMI Stub, Feign 接口</td>
+</tr>
+<tr>
+<td>虚拟代理</td>
+<td>延迟加载开销大的对象</td>
+<td>Hibernate Lazy Loading</td>
+</tr>
+<tr>
+<td>保护代理</td>
+<td>控制访问权限</td>
+<td>Spring Security 方法级权限</td>
+</tr>
+<tr>
+<td>缓存代理</td>
+<td>缓存计算结果</td>
+<td><code>@Cacheable</code></td>
+</tr>
+</tbody></table>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/raft-algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/raft-algorithm/" class="post-title-link" itemprop="url">Raft 共识算法详解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Raft 是 Diego Ongaro 和 John Ousterhout 于 2013 年提出的共识算法，核心设计目标是功能与 Paxos 等价但更易于理解和工程实现。Raft 将共识问题分解为三个相对独立的子问题：<strong>领导者选举（Leader Election）</strong>、<strong>日志复制（Log Replication）</strong>、<strong>安全性（Safety）</strong>。</p>
+<h3 id="1-1-基础概念"><a href="#1-1-基础概念" class="headerlink" title="1.1 基础概念"></a>1.1 基础概念</h3><ul>
+<li><strong>节点状态</strong>：每个节点在任何时刻处于三种状态之一——<strong>Leader</strong>（最多一个，处理所有客户端请求）、<strong>Follower</strong>（被动响应 Leader 和 Candidate 的 RPC）、<strong>Candidate</strong>（竞选 Leader 的中间状态）</li>
+<li><strong>Term（任期）</strong>：逻辑时钟概念，用连续递增的整数表示。每个 Term 最多产生一个 Leader，如果选举失败（选票分散），该 Term 以无 Leader 结束，进入下一个 Term</li>
+<li><strong>心跳机制</strong>：Leader 周期性向所有 Follower 发送 AppendEntries RPC（即使没有新的日志要复制），Follower 收到心跳后重置选举超时计时器——心跳压制了 Follower 发起选举的冲动</li>
+</ul>
+<h4 id="7-2-2-Leader-Election（领导者选举）"><a href="#7-2-2-Leader-Election（领导者选举）" class="headerlink" title="7.2.2 Leader Election（领导者选举）"></a>7.2.2 Leader Election（领导者选举）</h4><ol>
+<li>所有节点以 <strong>Follower</strong> 身份启动</li>
+<li>Follower 在 <strong>election timeout</strong>（随机 150–300ms）内未收到 Leader 的心跳 → 自身变为 <strong>Candidate</strong>，将当前 Term +1</li>
+<li>Candidate 先给自己投一票，然后并行向所有其他节点发送 <strong>RequestVote RPC</strong></li>
+<li>三种可能的结果：<ul>
+<li><strong>赢得选举</strong>：在一个 Term 内获得超过半数选票 → 成为 Leader，立即向所有节点发送心跳（空的 AppendEntries）建立权威，阻止新的选举</li>
+<li><strong>其他节点成为 Leader</strong>：收到来自新 Leader 的心跳，且心跳中的 Term ≥ 自身 Term → 承认新 Leader，退回 Follower 状态</li>
+<li><strong>选票分散（Split Vote）</strong>：无人获得多数票 → 超时后 Term +1，重新发起选举。随机超时机制（每个 Candidate 的选举超时独立随机）极大降低了反复分散的概率</li>
+</ul>
+</li>
+</ol>
+<h4 id="7-2-3-Log-Replication（日志复制）"><a href="#7-2-3-Log-Replication（日志复制）" class="headerlink" title="7.2.3 Log Replication（日志复制）"></a>7.2.3 Log Replication（日志复制）</h4><ol>
+<li>Leader 接收客户端写请求，将命令封装为日志条目追加到本地日志中</li>
+<li>Leader 并行向所有 Follower 发送 <strong>AppendEntries RPC</strong>，携带需要复制的日志条目</li>
+<li>当某条日志条目被<strong>超过半数</strong>的节点安全写入后，Leader 将该条目标记为 <strong>committed</strong>，然后应用到状态机（执行命令），并将结果返回客户端</li>
+<li>Leader 在后续的 AppendEntries 中携带 <strong>leaderCommit</strong> 索引，通知各 Follower 哪些条目已被提交——Follower 据此将对应条目应用到自己的状态机</li>
+</ol>
+<p>Raft 的日志复制保证了 Log Matching Property（日志匹配特性）：如果不同日志中两条条目拥有相同的 Index 和 Term，则它们存储的命令相同、且该 Index 之前的所有条目也完全一致。这是 Raft 安全性保证的基石。</p>
+<h4 id="7-2-4-安全性保证"><a href="#7-2-4-安全性保证" class="headerlink" title="7.2.4 安全性保证"></a>7.2.4 安全性保证</h4><ul>
+<li><strong>Election Restriction</strong>：Candidate 的日志必须至少和大多数节点一样”新”（比较最后一个日志条目的 Term 和 Index），否则不会被选为 Leader。这保证了已提交的日志不会在新 Leader 上任后被覆盖</li>
+<li><strong>Commitment Rule</strong>：Leader 只能通过计数副本数来提交<strong>当前 Term</strong> 的日志条目，历史 Term 的条目通过”连带提交”（Leader 提交了一条当前 Term 的日志后，所有之前的日志也随之提交）</li>
+<li><strong>Configuration Change</strong>：使用 Joint Consensus（联合共识）在两阶段中安全地变更集群成员</li>
+</ul>
+<p>实现案例：etcd、Consul、TiKV、CockroachDB</p>
+<p>推荐阅读：Raft 论文（《In Search of an Understandable Consensus Algorithm》）、Raft 官网的可视化动画、MIT 6.824 课程的 Raft 实验</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/rate-limiting-algorithms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/rate-limiting-algorithms/" class="post-title-link" itemprop="url">限流算法对比</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>在分布式系统中，限流是保护服务不被突发流量击垮的关键手段。核心目标是：在保证系统承载能力的前提下，尽可能多地处理请求。</p>
+<h3 id="1-1-计数器（固定窗口）"><a href="#1-1-计数器（固定窗口）" class="headerlink" title="1.1 计数器（固定窗口）"></a>1.1 计数器（固定窗口）</h3><p>最简单的方式：在固定的时间窗口内计数，超过阈值则拒绝。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">窗口: [12:00:00 - 12:00:01)</span><br><span class="line">计数器:<span class="number"> 0 </span>→<span class="number"> 1 </span>→<span class="number"> 2 </span>→ ... →<span class="number"> 100 </span>→ 拒绝</span><br><span class="line">12:00:01: 计数器重置为 0</span><br></pre></td></tr></table></figure>
+
+<p><strong>临界问题</strong>：在窗口边界处（如 12:00:00.900 - 12:00:01.100），两个窗口各允许 100 次，实际通过了 200 次——是期望值的两倍。</p>
+<h3 id="1-2-滑动窗口"><a href="#1-2-滑动窗口" class="headerlink" title="1.2 滑动窗口"></a>1.2 滑动窗口</h3><p>固定窗口的改进版，将大窗口切分为多个小格子：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">将 <span class="number">1</span> 秒窗口切分为 <span class="number">10</span> 个格子（每个 <span class="number">100m</span>s）</span><br><span class="line">当前时间: <span class="number">12</span>:<span class="number">00:01.350</span></span><br><span class="line">计算范围: [<span class="number">12</span>:<span class="number">00:00.350</span>, <span class="number">12</span>:<span class="number">00:01.350</span>] 内命中 <span class="number">10</span> 个格子中的计数</span><br></pre></td></tr></table></figure>
+
+<p>滑动窗口更平滑，基本消除了固定窗口的临界突变问题，是生产环境的常用方案。</p>
+<h3 id="1-3-漏桶（Leaky-Bucket）"><a href="#1-3-漏桶（Leaky-Bucket）" class="headerlink" title="1.3 漏桶（Leaky Bucket）"></a>1.3 漏桶（Leaky Bucket）</h3><p>漏桶算法的核心：</p>
+<ul>
+<li>请求以任意速率到达，先放入<strong>固定容量的桶</strong>（队列）</li>
+<li>桶以<strong>恒定速率</strong>漏出（处理）请求</li>
+<li>桶满后，新请求被丢弃</li>
+</ul>
+<p><strong>特点</strong>：强制输出速率恒定，能有效应对突发流量（突发请求由桶容量缓存），但峰值处理能力被严格限制。适合需要平滑输出的场景（如消息队列生产速率控制）。</p>
+<h3 id="1-4-令牌桶（Token-Bucket）"><a href="#1-4-令牌桶（Token-Bucket）" class="headerlink" title="1.4 令牌桶（Token Bucket）"></a>1.4 令牌桶（Token Bucket）</h3><p>令牌桶是漏桶的”逆操作”，也是 Guava RateLimiter 和 Sentinel 限流的基础：</p>
+<ul>
+<li>系统以<strong>固定速率</strong>向桶中放入令牌</li>
+<li>桶有最大容量（<code>maxTokens</code>），满后丢弃多余令牌</li>
+<li>请求到达时从桶中取令牌，取到则通过，否则拒绝或等待</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Guava RateLimiter 令牌桶实现</span></span><br><span class="line"><span class="type">RateLimiter</span> <span class="variable">limiter</span> <span class="operator">=</span> RateLimiter.create(<span class="number">10.0</span>);  <span class="comment">// 每秒 10 个许可</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handleRequest</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (limiter.tryAcquire(<span class="number">100</span>, TimeUnit.MILLISECONDS)) &#123;</span><br><span class="line">        <span class="comment">// 处理请求</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 限流</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RateLimitException</span>(<span class="string">&quot;too many requests&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 预热模式：启动时低速率，逐步增加到稳定速率</span></span><br><span class="line"><span class="type">RateLimiter</span> <span class="variable">warmupLimiter</span> <span class="operator">=</span> RateLimiter.create(<span class="number">10.0</span>, <span class="number">5</span>, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure>
+
+<h4 id="SmoothBursty-vs-SmoothWarmingUp"><a href="#SmoothBursty-vs-SmoothWarmingUp" class="headerlink" title="SmoothBursty vs SmoothWarmingUp"></a>SmoothBursty vs SmoothWarmingUp</h4><p>Guava RateLimiter 提供两种令牌获取模式：</p>
+<ul>
+<li><strong>SmoothBursty</strong>：默认模式，允许突发流量——桶中的令牌可以一次性取完，然后进入等待</li>
+<li><strong>SmoothWarmingUp</strong>：预热模式——系统刚启动时令牌生成速率较低，逐步增加到稳定值，适合需要预热的系统（如缓存冷启动）</li>
+</ul>
+<h3 id="1-5-Sentinel"><a href="#1-5-Sentinel" class="headerlink" title="1.5 Sentinel"></a>1.5 Sentinel</h3><p>Sentinel 是阿里巴巴开源的流量治理组件，以”流量为切入点”提供：</p>
+<ul>
+<li><strong>限流</strong>：支持 QPS&#x2F;并发线程数&#x2F;关联资源限流，基于滑动窗口统计</li>
+<li><strong>熔断</strong>：基于响应时间&#x2F;异常比例&#x2F;异常数熔断</li>
+<li><strong>热点参数限流</strong>：对”热点”参数值（如爆款商品 ID）进行更细粒度的限流</li>
+<li><strong>系统自适应限流</strong>：根据系统 Load、CPU 使用率、平均 RT 等自动调整阈值</li>
+</ul>
+<p>Sentinel 的限流算法基于改进的滑动窗口（LeapArray），使用环形数组存储各时间窗口的统计数据，滑动时只更新头尾两个窗口，时间复杂度 O(1)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Sentinel 限流规则配置</span></span><br><span class="line"><span class="type">FlowRule</span> <span class="variable">rule</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FlowRule</span>();</span><br><span class="line">rule.setResource(<span class="string">&quot;orderService&quot;</span>);</span><br><span class="line">rule.setGrade(RuleConstant.FLOW_GRADE_QPS);</span><br><span class="line">rule.setCount(<span class="number">100</span>);  <span class="comment">// QPS 上限 100</span></span><br><span class="line">FlowRuleManager.loadRules(Collections.singletonList(rule));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="type">Entry</span> <span class="variable">entry</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    entry = SphU.entry(<span class="string">&quot;orderService&quot;</span>);</span><br><span class="line">    <span class="comment">// 业务逻辑</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (BlockException e) &#123;</span><br><span class="line">    <span class="comment">// 被限流或熔断</span></span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (entry != <span class="literal">null</span>) entry.exit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-6-限流算法对比"><a href="#1-6-限流算法对比" class="headerlink" title="1.6 限流算法对比"></a>1.6 限流算法对比</h3><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>平滑度</th>
+<th>突发容忍</th>
+<th>实现复杂度</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>固定窗口</td>
+<td>低</td>
+<td>否</td>
+<td>极低</td>
+<td>简单场景</td>
+</tr>
+<tr>
+<td>滑动窗口</td>
+<td>中</td>
+<td>否</td>
+<td>低</td>
+<td>通用限流</td>
+</tr>
+<tr>
+<td>漏桶</td>
+<td>高</td>
+<td>是（由桶容量）</td>
+<td>低</td>
+<td>流量整型、消息队列</td>
+</tr>
+<tr>
+<td>令牌桶</td>
+<td>中高</td>
+<td>是</td>
+<td>中</td>
+<td>突发流量场景、网关</td>
+</tr>
+<tr>
+<td>Sentinel</td>
+<td>高</td>
+<td>可配置</td>
+<td>中</td>
+<td>生产级流量治理</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>数据完整性检测</strong>：通过 checksum 检测数据损坏并自动从正常副本恢复；通过 chunk version number 检测并回收过期的陈旧副本</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/reactive-programming/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/reactive-programming/" class="post-title-link" itemprop="url">响应式编程 — RxJava / Reactor</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E5%BC%82%E6%AD%A5/" itemprop="url" rel="index"><span itemprop="name">异步</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Q：响应式编程带来了什么好处？</p>
+<p>A：当并发连接增加，很多时候我们是通过多线程、线程池的方式来提升性能，然而线程数增加后系统开销也增加了，而且很多场景下线程大部分是执行 IO 操作，其大部分时间是处于 idle 状态的，资源利用率不高。响应式编程通过引入非阻塞 non-blocking 的特性，实现了线程资源的充分利用。</p>
+<p>这是一幅盗来的图[^1]，展示了响应式编程的发展历程，尤其是在 JVM 或者说 JAVA 领域。这里面比较核心的就是 Reactive Streams 规范、ReactiveX 项目及其包含的 RxJava、Project Reactor 项目、JAVA方面的 CompletableFuture API 和 Flow API。</p>
+<img src="/java/rpc-async/image-blog-body-completablefuture3.jpg" alt="CompletableFuture API and Reactive Programming Timeline" style="zoom: 67%;" />
+
+
+<ul>
+<li>支持背压 back pressure，也就是下游和上游之间能协商数据流的速度</li>
+</ul>
+<h3 id="一、响应式编程——从-ReactiveX-到-RxJava"><a href="#一、响应式编程——从-ReactiveX-到-RxJava" class="headerlink" title="一、响应式编程——从 ReactiveX 到 RxJava"></a>一、响应式编程——从 ReactiveX 到 RxJava</h3><p>项目主页：<a target="_blank" rel="noopener" href="http://reactivex.io/">http://reactivex.io/</a></p>
+<p>github：<a target="_blank" rel="noopener" href="https://github.com/ReactiveX?page=2">https://github.com/ReactiveX?page=2</a></p>
+<p>官网定义如下：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://reactivex.io/">ReactiveX</a> is a collection of open source projects. The content of this page is licensed under Creative Commons Attribution 3.0 License, and code samples are licensed under the BSD License.</p>
+</blockquote>
+<blockquote>
+<p>ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern, and functional programming</p>
+</blockquote>
+<blockquote>
+<p>ReactiveX is a library for composing asynchronous and event-based programs by using observable sequences.</p>
+</blockquote>
+<p>ReactiveX 基于观察者模式、迭代者模式和函数式编程的组合，为构建异步的基于事件的应用提供了一套类库，并且它是一个多语言的项目，例如，JAVA 中对应的就是 RxJava 类库。</p>
+<h4 id="6-1-核心概念"><a href="#6-1-核心概念" class="headerlink" title="6.1 核心概念"></a>6.1 核心概念</h4><h5 id="6-1-1-Observable-2"><a href="#6-1-1-Observable-2" class="headerlink" title="6.1.1 Observable[^2]"></a>6.1.1 Observable[^2]</h5><img src="/java/rpc-async/legend.png" alt="img" style="zoom: 50%;" />
+
+<p>如上图所示，一个 Observable 其实就是一个产生数据流的对象，它能够转换为另一个 Observable。</p>
+<p>Observable 可以被 Observer 订阅（subscribe），一个完整的 Observer 订阅 Observable 的例子的伪代码如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> myOnNext     = &#123; item -&gt; <span class="comment">/* do something useful with item */</span> &#125;;</span><br><span class="line"><span class="keyword">def</span> myError      = &#123; throwable -&gt; <span class="comment">/* react sensibly to a failed call */</span> &#125;;</span><br><span class="line"><span class="keyword">def</span> myComplete   = &#123; <span class="comment">/* clean up after the final response */</span> &#125;;</span><br><span class="line"><span class="keyword">def</span> myObservable = someMethod(itsParameters);</span><br><span class="line">myObservable.subscribe(myOnNext, myError, myComplete);</span><br><span class="line"><span class="comment">// go on about my business</span></span><br></pre></td></tr></table></figure>
+
+<p>其中 onNext、onError、onComplete 三个方法是 Observer 需要实现的，分别用于对数据流的正常处理、异常处理、完成操作。</p>
+<h5 id="6-1-2-Observable-的各种算子（Operator）"><a href="#6-1-2-Observable-的各种算子（Operator）" class="headerlink" title="6.1.2 Observable 的各种算子（Operator）"></a>6.1.2 Observable 的各种算子（Operator）</h5><p>算子可用于连接 Observable，或者改变 Observable 的行为。Operator 能够将 Observable 串联起来，形成一条 chain。</p>
+<p>ReactiveX 支持的算子数量较多，这里就不展开了，可以到 <a target="_blank" rel="noopener" href="http://reactivex.io/documentation/operators.html">http://reactivex.io/documentation/operators.html</a> 这里查看。</p>
+<h5 id="6-1-3-Single"><a href="#6-1-3-Single" class="headerlink" title="6.1.3 Single"></a>6.1.3 Single</h5><p>Single 是 RxJava 中引进的类似 Observable，但只产生一个数据的对象，因此订阅它的 Observer 只需要实现 onSuccess、onError 方法即可。</p>
+<p>Single 也有很多对应的算子，可用于创建 Single、对 Single 进行转换、组装、连接、延时等，具体可查看：<a target="_blank" rel="noopener" href="http://reactivex.io/documentation/single.html">http://reactivex.io/documentation/single.html</a></p>
+<h5 id="6-1-4-Subject"><a href="#6-1-4-Subject" class="headerlink" title="6.1.4 Subject"></a>6.1.4 Subject</h5><p><a target="_blank" rel="noopener" href="http://reactivex.io/documentation/subject.html">http://reactivex.io/documentation/subject.html</a></p>
+<p>一个 Subject 既是 Observable，又是 Observer，表明它既可以订阅一个或多个 Observable，又可以作为 Observable 将其订阅到的数据流重新发出，因此它类似一种桥梁或者说代理。</p>
+<h5 id="6-1-5-Scheduler"><a href="#6-1-5-Scheduler" class="headerlink" title="6.1.5 Scheduler"></a>6.1.5 Scheduler</h5><p><a target="_blank" rel="noopener" href="http://reactivex.io/documentation/scheduler.html">http://reactivex.io/documentation/scheduler.html</a></p>
+<p>Rx 默认是单线程的，整条链路上的调用都在 subscribe 方法被调用的线程中执行。不过一些算子接收 Scheduler 作为参数，控制算子在哪个 Scheduler 上执行，这里可以认为 Scheduler 是某种线程池，提供了多线程资源。</p>
+<ul>
+<li><strong>SubscribeOn</strong> 算子指定 Observable 开始执行的线程，而 SubscribeOn 算子在链路的什么地方被调用并不重要。</li>
+<li><strong>ObserveOn</strong> 算子指定了从该调用开始往后的算子所在的执行线程，如果要改变线程，则需要重新调用 ObserveOn，指定一个新的 Scheduler。</li>
+</ul>
+<h4 id="6-2-RxJava"><a href="#6-2-RxJava" class="headerlink" title="6.2 RxJava"></a>6.2 RxJava</h4><p>github：<a target="_blank" rel="noopener" href="https://github.com/ReactiveX/RxJava">https://github.com/ReactiveX/RxJava</a></p>
+<p>github wiki：<a target="_blank" rel="noopener" href="https://github.com/ReactiveX/RxJava/wiki">https://github.com/ReactiveX/RxJava/wiki</a></p>
+<p>RxJava 是 ReactiveX 项目的一部分，它也遵守 Reactive Streams 规范。不要以为 RxJava 是只针对 Java 语言的，RxJava 本身也是支持多语言的，支持一堆基于 JVM 的语言。下面是 RxJava 的最最最入门级 demo，包括 Observable 的创建、组装、订阅：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RxJavaDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">RxJavaDemo</span> <span class="variable">demo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RxJavaDemo</span>();</span><br><span class="line">        demo.hello(<span class="string">&quot;pcl&quot;</span>, <span class="string">&quot;j&quot;</span>);</span><br><span class="line">        demo.customObservableBlocking().subscribe(s -&gt; System.out.println(s));</span><br><span class="line">        demo.customObservableNonBlocking().subscribe(s -&gt; System.out.println(s));</span><br><span class="line">        demo.simpleComposition();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * hello world</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> args</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">(String... args)</span> &#123;</span><br><span class="line">        Flowable.fromArray(args).subscribe(s -&gt; System.out.println(<span class="string">&quot;Hello &quot;</span> + s + <span class="string">&quot;!&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Creating an Observable from an Existing Data Structure</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">createObservables</span><span class="params">()</span> &#123;</span><br><span class="line">        Observable&lt;String&gt; o1 = Observable.fromArray(<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>&#125;);</span><br><span class="line"></span><br><span class="line">        Integer[] list = &#123;<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>&#125;;</span><br><span class="line">        Observable&lt;Integer&gt; o2 = Observable.fromArray(list);</span><br><span class="line"></span><br><span class="line">        Observable&lt;String&gt; o3 = Observable.just(<span class="string">&quot;one object&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * This example shows a custom Observable that blocks</span></span><br><span class="line"><span class="comment">     * when subscribed to (does not spawn an extra thread).</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Observable&lt;String&gt; <span class="title function_">customObservableBlocking</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Observable.&lt;String&gt;create(emitter -&gt; &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">50</span>; i++) &#123;</span><br><span class="line">                emitter.onNext(<span class="string">&quot;count_&quot;</span> + i);</span><br><span class="line">            &#125;</span><br><span class="line">            emitter.onComplete();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建一个非阻塞的Observable</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Observable&lt;String&gt; <span class="title function_">customObservableNonBlocking</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Observable.&lt;String&gt;create(emitter -&gt; &#123;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">Thread</span>() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">50</span>; i++) &#123;</span><br><span class="line">                        emitter.onNext(<span class="string">&quot;count_&quot;</span> + i);</span><br><span class="line">                    &#125;</span><br><span class="line">                    emitter.onComplete();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;.start();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 用算子对Observable进行组装，或者转变</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">simpleComposition</span><span class="params">()</span> &#123;</span><br><span class="line">        customObservableNonBlocking().skip(<span class="number">10</span>).take(<span class="number">5</span>)</span><br><span class="line">                .map(stringValue -&gt; &#123;<span class="keyword">return</span> stringValue + <span class="string">&quot;_xform&quot;</span>;&#125;)</span><br><span class="line">                .subscribe(s -&gt; System.out.println(<span class="string">&quot;onNext =&gt; &quot;</span> + s));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 simpleComposition() 方法的 marble diagram 如下图所示[^3]，在 reactive 编程模型中，常常用 marble diagram 表示数据流的流转。</p>
+<img src="/java/rpc-async/Composition.1.png" alt="img" style="zoom:25%;" />
+
+<h5 id="6-2-1-异常处理"><a href="#6-2-1-异常处理" class="headerlink" title="6.2.1 异常处理"></a>6.2.1 异常处理</h5><p>Observable 一般不抛出异常，而是发出一个 onError 通知，不过有些情况下，例如调用 onError() 方法本身失败的话，会抛出 RuntimeException、OnErrorFailedException、OnErrorNotImplementedException 异常。</p>
+<p>可以使用异常处理算子来处理 onError() 方法通知的异常。subscribe 的时候可以传入第二个方法处理异常。</p>
+<h5 id="6-2-2-RxJava-的算子"><a href="#6-2-2-RxJava-的算子" class="headerlink" title="6.2.2 RxJava 的算子"></a>6.2.2 RxJava 的算子</h5><p>只能说 RxJava 支持的算子很多，就不多说了，当然你也可以自己写新的算子，这就属于比较难的操作了。</p>
+<h5 id="6-2-3-Back-Pressure"><a href="#6-2-3-Back-Pressure" class="headerlink" title="6.2.3 Back Pressure"></a>6.2.3 Back Pressure</h5><p>其实从上面一路写下来，有没有发现 RxJava 和 Stream API 非常相似，我是这么觉得的。但是这里就要说一说 RxJava 所具备的背压这一特性，是响应式编程的非常重要的一个特性。</p>
+<p>back pressure 就是在下游无法承载上游的压力时，采取一些措施，通知上游放慢速度。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span><br><span class="line"></span><br><span class="line">source</span><br><span class="line">.observeOn(Schedulers.computation())</span><br><span class="line">.subscribe(v -&gt; compute(v), Throwable::printStackTrace);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span><br><span class="line">    source.onNext(i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Thread.sleep(<span class="number">10_000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这段代码会抛出 MissingBackpressureException 异常，因为 PublishProcessor 不支持背压，而 observeOn 算子内部的 buffer 是有边界的，当 PublishProcessor 产生数据的速度超过计算的速度时，数据会存在 observeOn 的内部 buffer 中，当溢出时就抛出 MissingBackpressureException 异常。</p>
+<p>如果改成下面的代码则可以正常运行，因为 Flowable.range 支持背压，range 可以和 observeOn 之间通过类似协程的机制，协商应该以什么样的速度产生数据。具体的机制是，range 通过调用 observeOn 的 onSubscribe 方法发送一个 callback 方法（org.reactivestreams.Subscription 接口的实现）给订阅者，observeOn 回调 Subscription.request(n) 方法告诉 range 产生 n 个数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Flowable.range(<span class="number">1</span>, <span class="number">1_000_000</span>)</span><br><span class="line">.observeOn(Schedulers.computation())</span><br><span class="line">.subscribe(v -&gt; compute(v), Throwable::printStackTrace);</span><br><span class="line"></span><br><span class="line">Thread.sleep(<span class="number">10_000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>下面通过一个更显式的例子来说明，先调用 onStart 方法要求 range 发送一个数据，然后异步调用 onNext 方法进行数据计算，并再发一个 request 要求一个数据。注意 onStart 中 request 执行完后，range 就会发送数据，会异步触发 onNext，若此时 onStart 中初始化操作尚未完成，则可能产生异常：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Flowable.range(<span class="number">1</span>, <span class="number">1_000_000</span>)</span><br><span class="line">        .subscribe(<span class="keyword">new</span> <span class="title class_">DisposableSubscriber</span>&lt;Integer&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onStart</span><span class="params">()</span> &#123;</span><br><span class="line">                request(<span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onNext</span><span class="params">(Integer v)</span> &#123;</span><br><span class="line">                v = v * <span class="number">2</span>;</span><br><span class="line">                System.out.println(v);</span><br><span class="line">                request(<span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onError</span><span class="params">(Throwable ex)</span> &#123;</span><br><span class="line">                ex.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onComplete</span><span class="params">()</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Done!&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+
+<h5 id="6-2-4-解决背压问题"><a href="#6-2-4-解决背压问题" class="headerlink" title="6.2.4 解决背压问题"></a>6.2.4 解决背压问题</h5><p><strong>方案一：增加 buffer size</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span><br><span class="line"></span><br><span class="line">source.observeOn(Schedulers.computation(), <span class="number">1024</span> * <span class="number">1024</span>)</span><br><span class="line">      .subscribe(e -&gt; &#123; &#125;, Throwable::printStackTrace);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span><br><span class="line">    source.onNext(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>仍然有机会产生 MissingBackpressureException。</p>
+<p><strong>方案二：批量算子 &#x2F; 采样算子</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span><br><span class="line"></span><br><span class="line">source</span><br><span class="line">      .buffer(<span class="number">1024</span>)</span><br><span class="line">      .observeOn(Schedulers.computation(), <span class="number">1024</span>)</span><br><span class="line">      .subscribe(list -&gt; &#123;</span><br><span class="line">          list.parallelStream().map(e -&gt; e * e).first();</span><br><span class="line">      &#125;, Throwable::printStackTrace);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span><br><span class="line">    source.onNext(i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PublishProcessor&lt;Integer&gt; source = PublishProcessor.create();</span><br><span class="line"></span><br><span class="line">source</span><br><span class="line">      .sample(<span class="number">1</span>, TimeUnit.MILLISECONDS)</span><br><span class="line">      .observeOn(Schedulers.computation(), <span class="number">1024</span>)</span><br><span class="line">      .subscribe(v -&gt; compute(v), Throwable::printStackTrace);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span><br><span class="line">    source.onNext(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>仍然有机会产生 MissingBackpressureException。</p>
+<p><strong>方案三：onBackpressureXXX 算子</strong></p>
+<ul>
+<li><code>onBackpressureBuffer()</code></li>
+<li><code>onBackpressureBuffer(int capacity)</code></li>
+<li><code>onBackpressureBuffer(int capacity, Action onOverflow)</code></li>
+<li><code>onBackpressureBuffer(int capacity, Action onOverflow, BackpressureOverflowStrategy strategy)</code></li>
+<li><code>onBackpressureDrop()</code></li>
+<li><code>onBackpressureLatest()</code></li>
+</ul>
+<p>还有一个办法是创建支持背压的数据源。</p>
+<h3 id="二、响应式编程——从-Reactive-Streams-到-Project-Reactor"><a href="#二、响应式编程——从-Reactive-Streams-到-Project-Reactor" class="headerlink" title="二、响应式编程——从 Reactive Streams 到 Project Reactor"></a>二、响应式编程——从 Reactive Streams 到 Project Reactor</h3><p>上文提到 RxJava 属于 ReactiveX 项目，也遵守 Reactive Streams 规范，这里就介绍一下 Reactive Streams 规范，以及在其基础上的 Project Reactor。</p>
+<h4 id="7-1-Reactive-Streams"><a href="#7-1-Reactive-Streams" class="headerlink" title="7.1 Reactive Streams"></a>7.1 Reactive Streams</h4><p>主页：<a target="_blank" rel="noopener" href="https://www.reactive-streams.org/">https://www.reactive-streams.org/</a></p>
+<blockquote>
+<p>Reactive Streams is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols.</p>
+</blockquote>
+<p>Reactive Streams 是一套规范，为异步流处理及非阻塞的背压提供了标准。</p>
+<p>对于 Java 程序员，Reactive Streams 是一个 API。Reactive Streams 为我们提供了 Java 中的 Reactive Programming 的通用 API。<code>Reactive Streams API</code> 中仅仅包含了如下四个接口[^4]：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//发布者</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Publisher</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">subscribe</span><span class="params">(Subscriber&lt;? <span class="built_in">super</span> T&gt; s)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//订阅者</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Subscriber</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onSubscribe</span><span class="params">(Subscription s)</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onNext</span><span class="params">(T t)</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onError</span><span class="params">(Throwable t)</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onComplete</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//表示Subscriber消费Publisher发布的一个消息的生命周期</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Subscription</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">request</span><span class="params">(<span class="type">long</span> n)</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">cancel</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//处理器，表示一个处理阶段，它既是订阅者也是发布者，并且遵守两者的契约</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Processor</span>&lt;T, R&gt; <span class="keyword">extends</span> <span class="title class_">Subscriber</span>&lt;T&gt;, Publisher&lt;R&gt; &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/reactive-streams/reactive-streams-jvm">https://github.com/reactive-streams/reactive-streams-jvm</a> 定义了 Reactive Streams 的 JVM 规范。</p>
+<p><strong>Java 9 中 Flow 类下的内容与 Reactive Streams 完全一致，这部分留到后面研究。</strong></p>
+<p>其他还有 AKKA Streams 支持 Reactive Streams。</p>
+<p>Publisher-Subscriber 接口既有观察者模式，又包含了迭代器模式。Subscriber 通过订阅的方式实现了观察者模式。由 Publisher 通过 push 元素实现对元素的迭代，而相应的 Java 中的 Iterator 是通过 pull 的方式实现迭代。push 的方式是响应式编程的关键，Publisher 通过调用 Subscriber 的 onNext 方法通知 Subscriber 下一个元素，通过 onError 通知异常，通过 onComplete 通知完成。</p>
+<h4 id="7-2-Project-Reactor"><a href="#7-2-Project-Reactor" class="headerlink" title="7.2 Project Reactor"></a>7.2 Project Reactor</h4><p>主页：<a target="_blank" rel="noopener" href="https://projectreactor.io/">https://projectreactor.io/</a></p>
+<blockquote>
+<p>Reactor is a fourth-generation reactive library, based on the <a target="_blank" rel="noopener" href="https://github.com/reactive-streams/reactive-streams-jvm">Reactive Streams</a> specification, for building non-blocking applications on the JVM</p>
+</blockquote>
+<p>Reactor 文档：</p>
+<p><a target="_blank" rel="noopener" href="https://projectreactor.io/docs/core/release/reference/">https://projectreactor.io/docs/core/release/reference/</a></p>
+<p>Reactor Core 运行需要 Java 8+ 环境，可以直接和 Java 8 的函数式 API 交互，包括 CompletableFuture、Stream 和 Duration。它实现了 Reactive Streams 规范，并提供 <strong>Flux</strong> 和 <strong>Mono</strong> 两个异步序列 API——Flux 是支持 N 个元素的序列，Mono 是支持 0 个或 1 个的序列（类似 RxJava 中的 Single）。<strong>reactor-netty</strong> 项目支持非阻塞的 IPC (inter-process communication)，它还提供了支持 HTTP (包括 WebSockets)、TCP、UDP 协议的带有背压特性的网络引擎，支持响应式的编解码，适合微服务框架。</p>
+<p>Reactor 实现了 Reactive Streams 规范，因此实现了 Publisher、Subscriber 接口。需要注意的一点是 Publisher 创建后，并不开始产生数据，各种算子对 Publisher 的包装也不会导致数据开始产生，只有当调用链由 Subscriber 订阅后，内部调用 request 方法才会触发数据开始流动。</p>
+<p>Reactor 背压的实现机制和 RxJava 类似，也是通过上面提到的 request 机制来进行协商。</p>
+<h5 id="7-2-1-Flux-与-Mono"><a href="#7-2-1-Flux-与-Mono" class="headerlink" title="7.2.1 Flux 与 Mono"></a>7.2.1 Flux 与 Mono</h5><p>Flux 与 Mono 是 Publisher 的实现，其创建代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">createFluxMono</span><span class="params">()</span> &#123;</span><br><span class="line">    Flux&lt;String&gt; seq1 = Flux.just(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foobar&quot;</span>);</span><br><span class="line"></span><br><span class="line">    List&lt;String&gt; iterable = Arrays.asList(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foobar&quot;</span>);</span><br><span class="line">    Flux&lt;String&gt; seq2 = Flux.fromIterable(iterable);</span><br><span class="line"></span><br><span class="line">    Mono&lt;String&gt; noData = Mono.empty();</span><br><span class="line"></span><br><span class="line">    Mono&lt;String&gt; data = Mono.just(<span class="string">&quot;foo&quot;</span>);</span><br><span class="line"></span><br><span class="line">    Flux&lt;Integer&gt; numbersFromFiveToSeven = Flux.range(<span class="number">5</span>, <span class="number">3</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其 subscribe 代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">subscribe</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">//最后一个函数表示对每一个元素执行的操作</span></span><br><span class="line">    Flux&lt;Integer&gt; ints1 = Flux.range(<span class="number">1</span>, <span class="number">3</span>);</span><br><span class="line">    ints1.subscribe(i -&gt; System.out.println(i));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//最后一个函数表示异常时执行的操作</span></span><br><span class="line">    Flux&lt;Integer&gt; ints2 = Flux.range(<span class="number">1</span>, <span class="number">4</span>)</span><br><span class="line">            .map(i -&gt; &#123;</span><br><span class="line">                <span class="keyword">if</span> (i &lt;= <span class="number">3</span>) <span class="keyword">return</span> i;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;Got to 4&quot;</span>);</span><br><span class="line">            &#125;);</span><br><span class="line">    ints2.subscribe(i -&gt; System.out.println(i),</span><br><span class="line">            error -&gt; System.err.println(<span class="string">&quot;Error: &quot;</span> + error));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//最后一个函数表示完成时执行的操作</span></span><br><span class="line">    Flux&lt;Integer&gt; ints3 = Flux.range(<span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line">    ints3.subscribe(i -&gt; System.out.println(i),</span><br><span class="line">            error -&gt; System.err.println(<span class="string">&quot;Error &quot;</span> + error),</span><br><span class="line">            () -&gt; System.out.println(<span class="string">&quot;Done&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//最后一个函数表示订阅时执行的操作</span></span><br><span class="line">    Flux&lt;Integer&gt; ints4 = Flux.range(<span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line">    ints4.subscribe(i -&gt; System.out.println(i),</span><br><span class="line">            error -&gt; System.err.println(<span class="string">&quot;Error &quot;</span> + error),</span><br><span class="line">            () -&gt; System.out.println(<span class="string">&quot;Done&quot;</span>),</span><br><span class="line">            sub -&gt; sub.request(<span class="number">2</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上是 Reactor 的一些基操，其他部分的内容包括算子的使用、背压的实现、异步的实现、异常处理、测试、Debug 以及一些高级特性等，建议还是看官方文档，不是一篇文章能讲完的。</p>
+<p>总的来说，Reactor 的实现和 RxJava 在很多方面是相似的。</p>
+<h3 id="三、Spring-WebFlux"><a href="#三、Spring-WebFlux" class="headerlink" title="三、Spring WebFlux"></a>三、Spring WebFlux</h3><img src="/java/rpc-async/diagram-reactive-1290533f3f01ec9c57baf2cc9ea9fa2f-20200306130014908.svg" alt="Spring Reactive diagram"  />
+
+<p>在 Project Reactor 提供的类库的基础上，Spring 构建了自己的 reactive 技术栈。Spring WebFlux 可以运行在 Netty、Undertow 服务器上或者 Servlet 3.1+ 的 web 容器中。</p>
+<p>再一次推荐官方文档：</p>
+<p><a target="_blank" rel="noopener" href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux">https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux</a></p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/red-black-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/red-black-tree/" class="post-title-link" itemprop="url">红黑树 (Red-Black Tree)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>红黑树是一种<strong>自平衡二叉搜索树</strong>，通过 5 条性质保证树”近似平衡”——最长路径不超过最短路径的 2 倍，确保查找&#x2F;插入&#x2F;删除都是 O(log n)。</p>
+<p><strong>5 条性质：</strong></p>
+<ol>
+<li>节点是红色或黑色</li>
+<li>根节点是黑色</li>
+<li>叶子节点 (NIL) 是黑色</li>
+<li>红色节点的两个子节点必须是黑色（不能两红相邻）</li>
+<li>从任意节点到其叶子节点的所有路径上，黑色节点数相同（黑高相等）</li>
+</ol>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">红黑树示例:</span><br><span class="line">                    [● <span class="number">10</span>]          ← 黑</span><br><span class="line">                   <span class="regexp">/       \</span></span><br><span class="line"><span class="regexp">              [● 5]        [● 20]   ← 黑</span></span><br><span class="line"><span class="regexp">             /</span>    \        /    \</span><br><span class="line">           <span class="literal">nil</span>    <span class="literal">nil</span>  [R <span class="number">15</span>] [R <span class="number">25</span>] ← 红</span><br><span class="line">                      <span class="regexp">/  \   /</span>  \</span><br><span class="line">                    <span class="literal">nil</span> <span class="literal">nil</span> <span class="literal">nil</span> <span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>自平衡三连：左旋 + 右旋 + 变色。</strong> 旋转：儿子变爹，爹变儿子。插入时默认插入红色节点，然后根据叔叔节点 (uncle) 的颜色分三种情况处理：</p>
+<ul>
+<li>叔叔红 → 父黑、叔黑、爷红 → 递归处理爷爷</li>
+<li>叔叔黑 + 当前是父的右子 → 绕父左旋 → 变成第三种情况</li>
+<li>叔叔黑 + 当前是父的左子 → 父黑、爷红 → 绕爷右旋</li>
+</ul>
+<p><strong>在 Java 中的应用：</strong></p>
+<ul>
+<li><strong>HashMap</strong>：链表长度 ≥ 8 且数组 ≥ 64 时树化为红黑树 (<code>final void treeifyBin(Node&lt;K,V&gt;[] tab, int hash)</code>)</li>
+<li><strong>TreeMap</strong>：底层就是红黑树，<code>put</code>、<code>get</code>、<code>remove</code> 都是 O(log n)</li>
+<li><strong>TreeSet</strong>：基于 TreeMap 实现</li>
+</ul>
+<p><strong>为什么 HashMap 选红黑树而不是 AVL？</strong> AVL 树更严格（平衡因子 ≤ 1），查找更快但对插入删除的旋转次数更多。HashMap 的树化场景下插入频率高，红黑树的”松散平衡”更合适。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/singleton-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/singleton-pattern/" class="post-title-link" itemprop="url">单例模式 — DCL/枚举/Holder</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>意图</strong>：保证一个类只有一个实例，并提供一个全局访问点。核心思路：构造器私有 + 静态方法返回唯一实例。</p>
+<p><strong>实现方式对比</strong></p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>线程安全</th>
+<th>懒加载</th>
+<th>反序列化安全</th>
+<th>反射安全</th>
+<th>推荐度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>饿汉式</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✗</td>
+<td>★★</td>
+</tr>
+<tr>
+<td>懒汉式(synchronized)</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>★★</td>
+</tr>
+<tr>
+<td>DCL + volatile</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td>静态内部类</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td>枚举</td>
+<td>✓</td>
+<td>✗(类加载时)</td>
+<td>✓</td>
+<td>✓</td>
+<td>★★★★★</td>
+</tr>
+</tbody></table>
+<p><strong>1) DCL（双重检查锁定）+ volatile</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DclSingleton</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> DclSingleton instance; <span class="comment">// volatile 防止指令重排序</span></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">DclSingleton</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> DclSingleton <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (DclSingleton.class) &#123;</span><br><span class="line">                <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">                    instance = <span class="keyword">new</span> <span class="title class_">DclSingleton</span>();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为什么需要 <code>volatile</code>？<code>new DclSingleton()</code> 不是原子操作，JVM 会将其分解为三步：</p>
+<ol>
+<li>分配内存空间</li>
+<li>初始化对象</li>
+<li>将引用指向内存地址</li>
+</ol>
+<p>JIT 可能将步骤 2 和 3 重排序。如果线程 A 执行到步骤 3 但未执行步骤 2，线程 B 在第一次检查时发现 <code>instance != null</code>，直接返回一个未初始化完毕的对象——这就是著名的<strong>指令重排序问题</strong>。<code>volatile</code> 通过内存屏障禁止这种重排序。</p>
+<p><strong>2) 静态内部类（Holder 模式）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HolderSingleton</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">HolderSingleton</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Holder</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">HolderSingleton</span> <span class="variable">INSTANCE</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HolderSingleton</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> HolderSingleton <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Holder.INSTANCE;  <span class="comment">// 首次访问 Holder 类时才触发加载</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用了 JVM 类加载机制的延迟初始化——<code>Holder</code> 类只有在 <code>getInstance()</code> 首次被调用时才会被加载和初始化，天然线程安全。</p>
+<p><strong>3) 枚举（推荐方式）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">EnumSingleton</span> &#123;</span><br><span class="line">    INSTANCE;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 业务逻辑</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>枚举是 Java 中实现单例的最佳方式：</p>
+<ul>
+<li>序列化安全：JVM 保证反序列化时不会创建新实例</li>
+<li>反射安全：<code>Constructor.newInstance()</code> 源码中对枚举类型直接抛出 <code>IllegalArgumentException</code></li>
+<li>但注意：枚举实例在类加载时创建，不支持懒加载</li>
+</ul>
+<p><strong>破坏与防御</strong></p>
+<ol>
+<li><strong>反射破坏</strong>：<code>setAccessible(true)</code> 调用私有构造器。防御：构造器中判断 instance 已存在则抛异常。</li>
+<li><strong>序列化破坏</strong>：反序列化时通过 <code>readResolve()</code> 返回已有实例。枚举天然免疫上述两种破坏。</li>
+</ol>
+<p><strong>框架中的位置</strong></p>
+<ul>
+<li>Spring Bean 默认 Scope 是 <code>singleton</code>，IoC 容器中每个 BeanDefinition 对应唯一实例</li>
+<li>JDK <code>java.lang.Runtime</code> 是饿汉式单例</li>
+<li>Logback&#x2F;Log4j2 的 LoggerFactory 内部使用单例</li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/skip-list/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/skip-list/" class="post-title-link" itemprop="url">跳表 (SkipList)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>跳表是多层的链表——每层的节点指向同层的下一个节点，上层节点跨越多层，实现”跳跃”查找。</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">跳表结构 (Redis ZSet 实现):</span><br><span class="line">Level 3:  <span class="comment">[head]</span> ───────────────────────────→ <span class="comment">[30]</span> ──────────→ NULL</span><br><span class="line">Level 2:  <span class="comment">[head]</span> ──────────→ <span class="comment">[15]</span> ──────────→ <span class="comment">[30]</span> ──────────→ NULL</span><br><span class="line">Level 1:  <span class="comment">[head]</span> ──→ <span class="comment">[5]</span> ──→ <span class="comment">[15]</span> ──→ <span class="comment">[21]</span> ──→ <span class="comment">[30]</span> ──→ <span class="comment">[42]</span> → NULL</span><br><span class="line">Level 0:  <span class="comment">[head]</span>→<span class="comment">[2]</span>→<span class="comment">[5]</span>→<span class="comment">[12]</span>→<span class="comment">[15]</span>→<span class="comment">[18]</span>→<span class="comment">[21]</span>→<span class="comment">[27]</span>→<span class="comment">[30]</span>→<span class="comment">[35]</span>→<span class="comment">[42]</span>→NULL</span><br><span class="line">                          ↑ 底层包含全部元素</span><br></pre></td></tr></table></figure>
+
+<p><strong>查找过程 (找 key&#x3D;21)：</strong> 从最高层 Level 3 开始 → 30 &gt; 21，退到 Level 2 → 15 &lt; 21 → 跳到 15 → 30 &gt; 21，退到 Level 1 → 从 15 走到 21 → 命中！整个过程跳过了 Level 0 的多个节点，复杂度 O(log n)。</p>
+<p><strong>时间复杂度分析：</strong></p>
+<ul>
+<li>查找：O(log n)（概率期望，与红黑树相同）</li>
+<li>插入：O(log n)（随机生成层数，期望 O(log n)）</li>
+<li>删除：O(log n)</li>
+<li>空间复杂度：O(n)（每层节点的期望比例为 1&#x2F;2，总节点数 ≈ 2n）</li>
+</ul>
+<p><strong>Redis ZSet 为什么选跳表而不是红黑树？</strong></p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>跳表</th>
+<th>红黑树</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>实现复杂度</td>
+<td>简单（300-400 行 C）</td>
+<td>复杂（旋转&#x2F;变色逻辑繁琐）</td>
+</tr>
+<tr>
+<td>范围查询</td>
+<td>O(log n + k)，天然支持链表遍历</td>
+<td>需要中序遍历（递归&#x2F;栈）</td>
+</tr>
+<tr>
+<td>并发支持</td>
+<td>容易实现无锁（每层独立的链表）</td>
+<td>几乎不可能无锁（旋转影响多个节点）</td>
+</tr>
+<tr>
+<td>内存占用</td>
+<td>略大（多指针）</td>
+<td>较小（两个子节点指针 + 颜色）</td>
+</tr>
+<tr>
+<td>查询性能</td>
+<td>稍慢（概率均衡，常数因子更大）</td>
+<td>稍快（确定性平衡）</td>
+</tr>
+</tbody></table>
+<p>Redis 的 ZSet 需要频繁做 <code>ZRANGEBYSCORE</code> 范围查询——跳表的底层 Level 0 就是一条完整的有序链表，直接遍历即可，而红黑树需要中序遍历做栈或递归。此外，Redis 是单线程的，不需要锁，但跳表的简单性对于 C 代码的可维护性有天然优势。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Redis 跳表节点 (redis/src/server.h)</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> &#123;</span></span><br><span class="line">    sds ele;                       <span class="comment">// 成员 (sds 字符串)</span></span><br><span class="line">    <span class="type">double</span> score;                  <span class="comment">// 分值（排序依据）</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">backward</span>;</span> <span class="comment">// 后退指针（仅 Level 0 使用）</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistLevel</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">forward</span>;</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span> span;        <span class="comment">// 跨度（用于计算 rank）</span></span><br><span class="line">    &#125; level[];                     <span class="comment">// 柔性数组</span></span><br><span class="line">&#125; zskiplistNode;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/sliding-window/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/sliding-window/" class="post-title-link" itemprop="url">滑动窗口算法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>TCP 滑动窗口 (流控)：</strong></p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TCP 发送窗口:</span><br><span class="line">                  ← 已发送已确认 → ← 已发送未确认 → ← 未发送可发送 → ← 不可发送 →</span><br><span class="line">                  |<span class="type">_______________</span>|<span class="type">_________________</span>|<span class="type">_________________</span>|<span class="type">_____________</span>|</span><br><span class="line">                  <span class="type">↑               ↑                 ↑                 ↑</span></span><br><span class="line"><span class="type">                 left</span>          SND.UNA           SND.NXT       SND.UNA + snd_wnd</span><br></pre></td></tr></table></figure>
+
+<p>TCP 的流量控制核心就是滑动窗口——接收方通过 ACK 告诉发送方 <code>rwnd</code> (接收窗口大小)，发送方控制未确认的字节数不超过这个窗口。</p>
+<p><strong>分布式限流滑动窗口：</strong></p>
+<p>固定窗口计数器最大的问题是<strong>边界突刺</strong>——09:59:59 和 10:00:01 两秒内可能发送两倍限流量的请求。滑动窗口解决这个问题：</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">滑动窗口限流 (窗口 = 60s, 粒度 = <span class="number">6</span> 格每 10s):</span><br><span class="line">        ┌───┬───┬───┬───┬───┬───┐</span><br><span class="line">  now → │<span class="built_in">g0</span> │<span class="built_in">g1</span> │g2 │g3 │g4 │g5 │  ← 每格记录该 <span class="built_in">time</span> slot 内的请求数</span><br><span class="line">        └───┴───┴───┴───┴───┴───┘</span><br><span class="line">        ↑ 窗口覆盖范围 (过去 <span class="number">60</span> 秒)</span><br><span class="line"></span><br><span class="line">当前窗口计数 = <span class="built_in">g0</span>+<span class="built_in">g1</span>+g2+g3+g4+g5</span><br><span class="line">下一时刻: 指针前进 → 覆盖范围右移 → 最左边格清零 → 新格开始计数</span><br></pre></td></tr></table></figure>
+
+<p>实现可以用数组 + 指针循环移动，也可以用 Redis <code>ZSET</code>（score 为时间戳，<code>ZREMRANGEBYSCORE</code> 删除过期元素，<code>ZCARD</code> 获取窗口内计数）。Sentinel&#x2F;Gateway 的限流模块广泛使用滑动窗口算法。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/posts/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/posts/">1</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/posts/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/16/">16</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/posts/page/14/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

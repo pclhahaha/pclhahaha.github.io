@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="a. GC Roots可达性分析 a.虚拟机栈(栈桢中的本地变量表)中的引用的对象 b.方法区中的类静态属性引用的对象 c.方法区中的常量引用的对象 d.本地方法栈中JNI的引用的对象 1.System Class ———-Class loaded by bootstrap&#x2F;system class loader. For example, everything from the rt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM GC 算法与收集器 (CMS&#x2F;G1&#x2F;ZGC)">
+<meta property="og:url" content="http://pclhahaha.github.io/jvm-gc-algorithms/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="a. GC Roots可达性分析 a.虚拟机栈(栈桢中的本地变量表)中的引用的对象 b.方法区中的类静态属性引用的对象 c.方法区中的常量引用的对象 d.本地方法栈中JNI的引用的对象 1.System Class ———-Class loaded by bootstrap&#x2F;system class loader. For example, everything from the rt">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/gc1.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/generation_collect.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/generation_collect1.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/gc_collectors.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/cms_collector-7367423.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/g1_collector1.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/g1_collector2.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/g1_collector3.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/collection_sets.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/old_gc1.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/old_gc2.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/old_gc3.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/old_gc4.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/old_gc5.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/jvm/zgc-pointer%E7%9A%84%E5%89%AF%E6%9C%AC.png">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="GC">
+<meta property="article:tag" content="CMS">
+<meta property="article:tag" content="G1">
+<meta property="article:tag" content="ZGC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://pclhahaha.github.io/java/jvm/gc1.png">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/jvm-gc-algorithms/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/jvm-gc-algorithms/","path":"jvm-gc-algorithms/","title":"JVM GC 算法与收集器 (CMS/G1/ZGC)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JVM GC 算法与收集器 (CMS/G1/ZGC) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#a-GC-Roots"><span class="nav-number">1.</span> <span class="nav-text">a. GC Roots</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-%E5%B8%B8%E7%94%A8GC%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">b. 常用GC算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#c-GC%E5%9B%9E%E6%94%B6%E5%99%A8%E7%9A%84%E5%90%84%E7%A7%8D%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">c. GC回收器的各种实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#d-GC%E6%97%A5%E5%BF%97-%E5%8F%82%E6%95%B0%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">d. GC日志, 参数与优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#e-Object-finalize-%E6%96%B9%E6%B3%95%E4%B8%8E-Finalizer-%E7%B1%BB"><span class="nav-number">5.</span> <span class="nav-text">e. Object.finalize() 方法与 Finalizer 类</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/jvm-gc-algorithms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="JVM GC 算法与收集器 (CMS&#x2F;G1&#x2F;ZGC) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JVM GC 算法与收集器 (CMS/G1/ZGC)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/java/jvm/gc1.png" alt="gc1"></p>
+<h4 id="a-GC-Roots"><a href="#a-GC-Roots" class="headerlink" title="a. GC Roots"></a>a. GC Roots</h4><p>可达性分析</p>
+<p>a.虚拟机栈(栈桢中的本地变量表)中的引用的对象</p>
+<p>b.方法区中的类静态属性引用的对象</p>
+<p>c.方法区中的常量引用的对象</p>
+<p>d.本地方法栈中JNI的引用的对象</p>
+<p>1.System Class ———-Class loaded by bootstrap&#x2F;system class loader. For example, everything from the rt.jar like java.util.* . </p>
+<p>2.JNI Local ———-Local variable in native code, such as user defined JNI code or JVM internal code. </p>
+<p>3.JNI Global ———-Global variable in native code, such as user defined JNI code or JVM internal code. 4.Thread Block ———-Object referred to from a currently active thread block. Thread ———-A started, but not stopped, thread. </p>
+<p>5.Busy Monitor ———-Everything that has called wait() or notify() or that is synchronized. For example, by calling synchronized(Object) or by entering a synchronized method. Static method means class, non-static method means object. </p>
+<p>6.Java Local ———-Local variable. For example, input parameters or locally created objects of methods that are still in the stack of a thread. </p>
+<p>7.Native Stack ———-In or out parameters in native code, such as user defined JNI code or JVM internal code. This is often the case as many methods have native parts and the objects handled as method parameters become GC roots. For example, parameters used for file&#x2F;network I&#x2F;O methods or reflection. 7.Finalizable ———-An object which is in a queue awaiting its finalizer to be run. </p>
+<p>8.Unfinalized ———-An object which has a finalize method, but has not been finalized and is not yet on the finalizer queue. </p>
+<p>9.Unreachable ———-An object which is unreachable from any other root, but has been marked as a root by MAT to retain objects which otherwise would not be included in the analysis. </p>
+<p>10.Java Stack Frame ———-A Java stack frame, holding local variables. Only generated when the dump is parsed with the preference set to treat Java stack frames as objects. </p>
+<p>11.Unknown ———-An object of unknown root type. Some dumps, such as IBM Portable Heap Dump files, do not have root information. For these dumps the MAT parser marks objects which are have no inbound references or are unreachable from any other root as roots of this type. This ensures that MAT retains all the objects in the dump.</p>
+<h4 id="b-常用GC算法"><a href="#b-常用GC算法" class="headerlink" title="b. 常用GC算法"></a>b. 常用GC算法</h4><h5 id="1-mark-sweep-标记清除法"><a href="#1-mark-sweep-标记清除法" class="headerlink" title="1. mark-sweep 标记清除法"></a>1. mark-sweep 标记清除法</h5><p>简单快速，易产生内存碎片</p>
+<h5 id="2-mark-copy-标记复制法"><a href="#2-mark-copy-标记复制法" class="headerlink" title="2. mark-copy 标记复制法"></a>2. mark-copy 标记复制法</h5><p>避免内存碎片，浪费50%内存</p>
+<h5 id="3-mark-compact-标记-整理（也称标记-压缩）法"><a href="#3-mark-compact-标记-整理（也称标记-压缩）法" class="headerlink" title="3. mark-compact 标记 - 整理（也称标记 - 压缩）法"></a>3. mark-compact 标记 - 整理（也称标记 - 压缩）法</h5><p>效率低</p>
+<h5 id="4-generation-collect-分代收集算法"><a href="#4-generation-collect-分代收集算法" class="headerlink" title="4. generation-collect 分代收集算法"></a>4. generation-collect 分代收集算法</h5><p>以 Hotspot 为例（JDK 7）：</p>
+<p><img src="/java/jvm/generation_collect.png" alt="generation_collect"></p>
+<p>将内存分成了三大块：年青代（Young Genaration），老年代（Old Generation）, 永久代（Permanent Generation），其中 Young Genaration 更是又细为分 eden，S0，S1 三个区。</p>
+<p>结合我们经常使用的一些 jvm 调优参数后，一些参数能影响的各区域内存大小值，示意图如下：</p>
+<p><img src="/java/jvm/generation_collect1.png" alt="generation_collect1"></p>
+<p>注：jdk8 开始，用 MetaSpace 区取代了 Perm 区（永久代），所以相应的 jvm 参数变成 -XX:MetaspaceSize 及 -XX:MaxMetaspaceSize。</p>
+<h4 id="c-GC回收器的各种实现"><a href="#c-GC回收器的各种实现" class="headerlink" title="c. GC回收器的各种实现"></a>c. GC回收器的各种实现</h4><p><img src="/java/jvm/gc_collectors.png" alt="gc_collectors"></p>
+<h5 id="1-Serial-收集器"><a href="#1-Serial-收集器" class="headerlink" title="1. Serial 收集器"></a>1. Serial 收集器</h5><p>  单线程用标记 - 复制算法，快刀斩乱麻，单线程的好处避免上下文切换，早期的机器，大多是单核，也比较实用。但执行期间，会发生 STW（Stop The World）。</p>
+<h5 id="2-ParNew-收集器"><a href="#2-ParNew-收集器" class="headerlink" title="2. ParNew 收集器"></a>2. ParNew 收集器</h5><p>  Serial 的多线程版本，同样会 STW，在多核机器上会更适用。</p>
+<h5 id="3-Parallel-Scavenge-收集器"><a href="#3-Parallel-Scavenge-收集器" class="headerlink" title="3. Parallel Scavenge 收集器"></a>3. Parallel Scavenge 收集器</h5><p>  ParNew 的升级版本，主要区别在于提供了两个参数：-XX:MaxGCPauseMillis 最大垃圾回收停顿时间；-XX:GCTimeRatio 垃圾回收时间与总时间占比，通过这 2 个参数，可以适当控制回收的节奏，更关注于吞吐率，即总时间与垃圾回收时间的比例。</p>
+<h5 id="4-Serial-Old-收集器"><a href="#4-Serial-Old-收集器" class="headerlink" title="4. Serial Old 收集器"></a>4. Serial Old 收集器</h5><p>  因为老年代的对象通常比较多，占用的空间通常也会更大，如果采用复制算法，得留 50% 的空间用于复制，相当不划算，而且因为对象多，从 1 个区，复制到另 1 个区，耗时也会比较长，所以老年代的收集，通常会采用”标记 - 整理”法。从名字就可以看出来，这是单线程（串行）的， 依然会有 STW。</p>
+<h5 id="5-Parallel-Old-收集器"><a href="#5-Parallel-Old-收集器" class="headerlink" title="5. Parallel Old 收集器"></a>5. Parallel Old 收集器</h5><p>  一句话：Serial Old 的多线程版本。</p>
+<h5 id="6-CMS-收集器"><a href="#6-CMS-收集器" class="headerlink" title="6. CMS 收集器"></a>6. CMS 收集器</h5><p>   <img src="/java/jvm/cms_collector-7367423.png" alt="cms_collector"></p>
+<h5 id="7-G1回收器"><a href="#7-G1回收器" class="headerlink" title="7. G1回收器"></a>7. G1回收器</h5><p><img src="/java/jvm/g1_collector1.png" alt="g1_collector1"></p>
+<p><strong>G1 Young GC</strong><br>young GC 前：</p>
+<p><img src="/java/jvm/g1_collector2.png" alt="g1_collector2"></p>
+<p>young GC 后：</p>
+<p><img src="/java/jvm/g1_collector3.png" alt="g1_collector3"></p>
+<p>由于 region 与 region 之间并不要求连续，而使用 G1 的场景通常是大内存，比如 64G 甚至更大，为了提高扫描根对象和标记的效率，G1 使用了二个新的辅助存储结构：<br>Remembered Sets：简称 RSets，用于根据每个 region 里的对象，是从哪指向过来的（即：谁引用了我），每个 Region 都有独立的 RSets。（Other Region -&gt; Self Region）。<br>Collection Sets ：简称 CSets，记录了等待回收的 Region 集合，GC 时这些 Region 中的对象会被回收（copied or moved）。</p>
+<p><img src="/java/jvm/collection_sets.png" alt="collection_sets"></p>
+<p>RSets 的引入，在 YGC 时，将年青代 Region 的 RSets 做为根对象，可以避免扫描老年代的 region，能大大减轻 GC 的负担。注：在老年代收集 Mixed GC 时，RSets 记录了 Old-&gt;Old 的引用，也可以避免扫描所有 Old 区。</p>
+<p><strong>Old Generation Collection（也称为 Mixed GC）</strong></p>
+<p>按 oracle 官网文档描述分为 5 个阶段：Initial Mark(STW) -&gt; Root Region Scan -&gt; Cocurrent Marking -&gt; Remark(STW) -&gt; Copying&#x2F;Cleanup(STW &amp;&amp; Concurrent)</p>
+<p>注：也有很多文章会把 Root Region Scan 省略掉，合并到 Initial Mark 里，变成 4 个阶段。</p>
+<p><img src="/java/jvm/old_gc1.png" alt="old_gc1"></p>
+<p>存活对象的”初始标记”依赖于 Young GC，GC 日志中会记录成 young 字样。</p>
+<p><img src="/java/jvm/old_gc2.png" alt="old_gc2"></p>
+<p>并发标记过程中，如果发现某些 region 全是空的，会被直接清除。</p>
+<p><img src="/java/jvm/old_gc3.png" alt="old_gc3"></p>
+<p><img src="/java/jvm/old_gc4.png" alt="old_gc4"></p>
+<p>并发复制 &#x2F; 清查阶段。这个阶段，Young 区和 Old 区的对象有可能会被同时清理。GC 日志中，会记录为 mixed 字段，这也是 G1 的老年代收集，也称为 Mixed GC 的原因。</p>
+<p><img src="/java/jvm/old_gc5.png" alt="old_gc5"></p>
+<p>上图是，老年代收集完后的示意图。</p>
+<p>通过这几个阶段的分析，虽然看上去很多阶段仍然会发生 STW，但是 G1 提供了一个预测模型，通过统计方法，根据历史数据来预测本次收集，需要选择多少个 Region 来回收，尽量满足用户的预期停顿值（-XX:MaxGCPauseMillis 参数可指定预期停顿值）。</p>
+<p>注：如果 Mixed GC 仍然效果不理想，跟不上新对象分配内存的需求，会使用 Serial Old GC（Full GC）强制收集整个 Heap。</p>
+<p>小结：与 CMS 相比，G1 有内存整理过程（标记 - 压缩），避免了内存碎片；STW 时间可控（能预测 GC 停顿时间）。</p>
+<h5 id="8-ZGC-5"><a href="#8-ZGC-5" class="headerlink" title="8. ZGC[^5]"></a>8. ZGC[^5]</h5><p>Java11引进了ZGC，可通过-XX:+UnlockExperimentalVMOptions -XX:+UseZGC参数打开。ZGC分为3个阶段：</p>
+<ol>
+<li>第一阶段stop-the-world，标记GC roots。由于GC roots一般数量较少，这个阶段耗时较少。</li>
+<li>第二阶段并发从GC roots出发标记可达对象。</li>
+<li>最后一个阶段stop-the-world，处理边界情况，例如weak reference。</li>
+</ol>
+<h6 id="指针染色-reference-coloring"><a href="#指针染色-reference-coloring" class="headerlink" title="指针染色 reference coloring"></a>指针染色 reference coloring</h6><p><img src="/java/jvm/zgc-pointer%E7%9A%84%E5%89%AF%E6%9C%AC.png" alt="zgc-pointer"></p>
+<p>指针指向OS虚拟内存中的位置，由于32位指针只能寻址4G的堆内存，而现在的应用一般都需要更多的堆内存，因此ZGC必须使用64位指针。</p>
+<p>ZGC指针使用42 bit进行寻址，因此可以寻址4TB的堆内存。除此之外，还有4bit用于存储指针的状态。</p>
+<ul>
+<li><strong>finalizable</strong> bit – 说明该对象只能通过finalizer可达</li>
+<li><strong>remap</strong> bit – 指针指向当前对象存储的位置并处于最新状态</li>
+<li><strong>marked0</strong> and <strong>marked1</strong> bits – 用于标记可达的对象</li>
+</ul>
+<p>这些bits也称为metadata bits。ZGC中这些metadata bits中有且仅有一个为1。</p>
+<h6 id="Relocation-内存块迁移"><a href="#Relocation-内存块迁移" class="headerlink" title="Relocation 内存块迁移"></a>Relocation 内存块迁移</h6><p>ZGC中，relocation分为以下阶段:</p>
+<ol>
+<li>并发阶段：寻找需要迁移的内存块，保存到relocation set。</li>
+<li>stop-the-world阶段：迁移在relocation set中的所有GC roots并更新他们的引用，即指针指向的地址。</li>
+<li>并发阶段：迁移relocation set中剩余的对象，并保存旧的和新的地址之间的映射关系到forwarding table中。注意，此时并没有完成新的地址更新到指针中。 </li>
+<li>剩余的引用的新的地址的重写发生在下一个标记阶段。这样，我们就不用遍历两遍对象树。load barriers也可以实现这个步骤。</li>
+</ol>
+<h6 id="Remapping-and-Load-Barriers"><a href="#Remapping-and-Load-Barriers" class="headerlink" title="Remapping and Load Barriers"></a>Remapping and Load Barriers</h6><p>在迁移阶段，并没有将新的迁移后的地址更新到指针&#x2F;引用中。因此，通过那些引用是无法访问到正确的对象的，甚至可能访问到垃圾。ZGC 通过使用load barriers来解决这个问题. <strong>Load barriers通过remapping技术实现将指针&#x2F;引用指向迁移后的新的地址 。</strong></p>
+<p>当应用加载一个引用时，触发load barrier通过以下步骤返回正确的地址：</p>
+<ol>
+<li>检查<em>remap</em> bit是否设为1，如果是说明已经指向最新地址，可直接返回。</li>
+<li>然后检查引用的对象是否在relocation set中，如果不在说明不需要迁移它，为防止下次再检查，将该引用&#x2F;指针的<em>remap</em> bit设为1，并返回该引用。</li>
+<li>到这一步就知道引用的对象需要迁移，如果迁移是否已完成，则跳到下一步，如果没完成则在forwarding table中创建一个entry，保存迁移后的新地址。</li>
+<li>到这一步目标对象已经迁移完成。我们更新引用使其指向新的地址，设置<em>remap</em> bit为1，并返回该引用。</li>
+</ol>
+<p>由于每次加载一个引用都会触发load barrier，因此会有一点性能上的损失，尤其是第一次访问一个迁移的对象时，这是为了获得更短的暂停时间而付出的代价。不过由于这些步骤都很快，因此对应用的性能不会有太大影响。</p>
+<h4 id="d-GC日志-参数与优化"><a href="#d-GC日志-参数与优化" class="headerlink" title="d. GC日志, 参数与优化"></a>d. GC日志, 参数与优化</h4><p>GC优化相关经验不多，可以参考下面这篇文章。</p>
+<p><a target="_blank" rel="noopener" href="https://tech.meituan.com/2017/12/29/jvm-optimize.html">https://tech.meituan.com/2017/12/29/jvm-optimize.html</a></p>
+<h4 id="e-Object-finalize-方法与-Finalizer-类"><a href="#e-Object-finalize-方法与-Finalizer-类" class="headerlink" title="e. Object.finalize() 方法与 Finalizer 类"></a>e. Object.finalize() 方法与 Finalizer 类</h4><p>这部分内容属于GC相关的内容，可以参考 <a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9d2788fffd5f">https://www.jianshu.com/p/9d2788fffd5f</a> [^9]，此文写的比较深入，涉及到了hotspot的源码，强烈推荐。</p>
+<h5 id="finalize-方法-8"><a href="#finalize-方法-8" class="headerlink" title="finalize() 方法[^8]"></a>finalize() 方法[^8]</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FinalizerDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="type">AtomicInteger</span> <span class="variable">aliveCount</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AtomicInteger</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    FinalizerDemo() &#123;</span><br><span class="line">        aliveCount.incrementAndGet();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">finalize</span><span class="params">()</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        FinalizerDemo.aliveCount.decrementAndGet();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String args[])</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; ; i++) &#123;</span><br><span class="line">            <span class="type">FinalizerDemo</span> <span class="variable">f</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FinalizerDemo</span>();</span><br><span class="line">            <span class="keyword">if</span> ((i % <span class="number">100_000</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">                System.out.format(<span class="string">&quot;After creating %d objects, %d are still alive.%n&quot;</span>, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;i, FinalizerDemo.aliveCount.get()&#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行这段代码，加上-XX:+PrintGCDetails参数查看GC详情，可以发现很快就开始full gc，而去掉对finalize()方法的重写则不会触发full gc。这是为什么呢？这就涉及到重写了finalize()方法的类的回收了，下面详细说一下，或者也可以直接阅读上面推荐的文章。</p>
+<p>列一下finalize()方法相关的特性：</p>
+<ul>
+<li>当GC判断没有其他对该对象的引用时，会调用该方法，一般用于执行资源释放或其他清理工作</li>
+<li>finalize()方法抛出的异常会被忽略</li>
+<li>finalize()方法中可以使该对象重新关联到引用链上，也即是”复活”该对象，例如，让一个静态全局变量指向该对象，使其免于被回收</li>
+<li>finalize()方法最多执行一次</li>
+</ul>
+<h5 id="Finalizer-类"><a href="#Finalizer-类" class="headerlink" title="Finalizer 类"></a>Finalizer 类</h5><p>阅读上面推荐的文章就知道finalize()方法与Finalizer类脱不开关系。下面分析一下这个类的源码。</p>
+<p>Finalizer类有3个静态变量，2个成员变量，分别是：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ReferenceQueue&lt;Object&gt; queue</td>
+<td>全局静态变量，是一个引用队列，保存Finalizer对象</td>
+</tr>
+<tr>
+<td>Finalizer unfinalized</td>
+<td>全局静态变量，Finalizer对象以双向链表的形式保存，该变量指向当前链表的头部，每次新创建一个Finalizer对象会将其放在链表头部</td>
+</tr>
+<tr>
+<td>Object lock</td>
+<td>全局静态变量，用于在对双向链表操作时加锁</td>
+</tr>
+<tr>
+<td>next</td>
+<td>链表中当前对象的下一个</td>
+</tr>
+<tr>
+<td>prev</td>
+<td>链表中当前对象的前一个</td>
+</tr>
+</tbody></table>
+<p>注意到Finalizer类的源码中有一个register方法，注释是该方法由VM调用，推测是当重写了finalize()的对象初始化时会调用register方法（推荐文章中有对这部分的hotspot源码分析），该方法会将该对象作为构造器参数创建一个Finalizer对象，Finalizer继承了FinalReference&lt;Object&gt;，因此构造器会将finalizee（即实现了finalize()方法的对象）和全局的ReferenceQueue作为构造参数构造Reference&lt;Object&gt;。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="title function_">Finalizer</span><span class="params">(Object finalizee)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(finalizee, queue);</span><br><span class="line">    add();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Invoked by VM */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">register</span><span class="params">(Object finalizee)</span> &#123;</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Finalizer</span>(finalizee);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Finalizer类的runFinalizer方法就是最终用来调用对象的finalize()方法的。先判断是否已执行过finalize()方法，若没有，则从双向链表中移除自身，然后调用finalizee的finalize()方法，最后finalizee &#x3D; null;这一步注释说的是清理包含这个变量的栈帧，减少false retention概率，关于false retention后面单开文章说。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">runFinalizer</span><span class="params">(JavaLangAccess jla)</span> &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="built_in">this</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (hasBeenFinalized()) <span class="keyword">return</span>;</span><br><span class="line">            remove();<span class="comment">//不去掉的话，会导致对象仍然在引用链上，无法回收</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">finalizee</span> <span class="operator">=</span> <span class="built_in">this</span>.get();</span><br><span class="line">            <span class="keyword">if</span> (finalizee != <span class="literal">null</span> &amp;&amp; !(finalizee <span class="keyword">instanceof</span> java.lang.Enum)) &#123;</span><br><span class="line">                jla.invokeFinalize(finalizee);</span><br><span class="line"></span><br><span class="line">                <span class="comment">/* Clear stack slot containing this variable, to decrease</span></span><br><span class="line"><span class="comment">                   the chances of false retention with a conservative GC */</span></span><br><span class="line">                finalizee = <span class="literal">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable x) &#123; &#125;</span><br><span class="line">        <span class="built_in">super</span>.clear();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h6 id="FinalizerThread"><a href="#FinalizerThread" class="headerlink" title="FinalizerThread"></a>FinalizerThread</h6><p>Finalizer类通过静态初始化代码块启动一个FinalizerThread守护线程，该线程优先级较低。注意线程优先级较低这一点，正是这一点导致在上面的示例中来不及执行对象的finalize()方法，导致垃圾回收很慢，内存泄漏，触发full gc，甚至OOM。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    <span class="type">ThreadGroup</span> <span class="variable">tg</span> <span class="operator">=</span> Thread.currentThread().getThreadGroup();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">ThreadGroup</span> <span class="variable">tgn</span> <span class="operator">=</span> tg;</span><br><span class="line">         tgn != <span class="literal">null</span>;</span><br><span class="line">         tg = tgn, tgn = tg.getParent());</span><br><span class="line">    <span class="type">Thread</span> <span class="variable">finalizer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FinalizerThread</span>(tg);</span><br><span class="line">    finalizer.setPriority(Thread.MAX_PRIORITY - <span class="number">2</span>);</span><br><span class="line">    finalizer.setDaemon(<span class="literal">true</span>);</span><br><span class="line">    finalizer.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面看下FinalizerThread的逻辑：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">FinalizerThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="type">boolean</span> running;</span><br><span class="line">    FinalizerThread(ThreadGroup g) &#123;</span><br><span class="line">        <span class="built_in">super</span>(g, <span class="string">&quot;Finalizer&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (running)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Finalizer thread starts before System.initializeSystemClass</span></span><br><span class="line">        <span class="comment">// is called.  Wait until JavaLangAccess is available</span></span><br><span class="line">        <span class="keyword">while</span> (!VM.isBooted()) &#123;</span><br><span class="line">            <span class="comment">// delay until VM completes initialization</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                VM.awaitBooted();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException x) &#123;</span><br><span class="line">                <span class="comment">// ignore and continue</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">final</span> <span class="type">JavaLangAccess</span> <span class="variable">jla</span> <span class="operator">=</span> SharedSecrets.getJavaLangAccess();</span><br><span class="line">        running = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="type">Finalizer</span> <span class="variable">f</span> <span class="operator">=</span> (Finalizer)queue.remove();</span><br><span class="line">                f.runFinalizer(jla);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException x) &#123;</span><br><span class="line">                <span class="comment">// ignore and continue</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要关注最后的死循环部分，调用queue的remove()方法，取出队列中的Finalizer对象，执行其runFinalizer方法。</p>
+<p>到这里就剩下一个疑问点，Finalizer对象是什么时候加入queue队列的？这就要说到Reference&lt;T&gt;类了。</p>
+<h5 id="Reference-与-ReferenceHandler"><a href="#Reference-与-ReferenceHandler" class="headerlink" title="Reference 与 ReferenceHandler"></a>Reference 与 ReferenceHandler</h5><p>前面说到Finalizer继承了FinalReference&lt;Object&gt;，而FinalReference类继承了Reference。看一下这个类的静态初始化代码块，里面启动了一个ReferenceHandler守护线程，该线程优先级较高。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    <span class="type">ThreadGroup</span> <span class="variable">tg</span> <span class="operator">=</span> Thread.currentThread().getThreadGroup();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">ThreadGroup</span> <span class="variable">tgn</span> <span class="operator">=</span> tg;</span><br><span class="line">         tgn != <span class="literal">null</span>;</span><br><span class="line">         tg = tgn, tgn = tg.getParent());</span><br><span class="line">    <span class="type">Thread</span> <span class="variable">handler</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReferenceHandler</span>(tg, <span class="string">&quot;Reference Handler&quot;</span>);</span><br><span class="line">    <span class="comment">/* If there were a special system-only priority greater than</span></span><br><span class="line"><span class="comment">     * MAX_PRIORITY, it would be used here</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    handler.setPriority(Thread.MAX_PRIORITY);</span><br><span class="line">    handler.setDaemon(<span class="literal">true</span>);</span><br><span class="line">    handler.start();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// provide access in SharedSecrets</span></span><br><span class="line">    SharedSecrets.setJavaLangRefAccess(<span class="keyword">new</span> <span class="title class_">JavaLangRefAccess</span>() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">tryHandlePendingReference</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> tryHandlePending(<span class="literal">false</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ReferenceHandle线程死循环执行一个方法tryHandlePending，源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">tryHandlePending</span><span class="params">(<span class="type">boolean</span> waitForNotify)</span> &#123;</span><br><span class="line">        Reference&lt;Object&gt; r;</span><br><span class="line">        Cleaner c;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">                <span class="keyword">if</span> (pending != <span class="literal">null</span>) &#123;</span><br><span class="line">                    r = pending;</span><br><span class="line">                    <span class="comment">// &#x27;instanceof&#x27; might throw OutOfMemoryError sometimes</span></span><br><span class="line">                    <span class="comment">// so do this before un-linking &#x27;r&#x27; from the &#x27;pending&#x27; chain...</span></span><br><span class="line">                    c = r <span class="keyword">instanceof</span> Cleaner ? (Cleaner) r : <span class="literal">null</span>;</span><br><span class="line">                    <span class="comment">// unlink &#x27;r&#x27; from &#x27;pending&#x27; chain</span></span><br><span class="line">                    pending = r.discovered;</span><br><span class="line">                    r.discovered = <span class="literal">null</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// The waiting on the lock may cause an OutOfMemoryError</span></span><br><span class="line">                    <span class="comment">// because it may try to allocate exception objects.</span></span><br><span class="line">                    <span class="keyword">if</span> (waitForNotify) &#123;</span><br><span class="line">                        lock.wait();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// retry if waited</span></span><br><span class="line">                    <span class="keyword">return</span> waitForNotify;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (OutOfMemoryError x) &#123;</span><br><span class="line">            <span class="comment">// Give other threads CPU time so they hopefully drop some live references</span></span><br><span class="line">            <span class="comment">// and GC reclaims some space.</span></span><br><span class="line">            <span class="comment">// Also prevent CPU intensive spinning in case &#x27;r instanceof Cleaner&#x27; above</span></span><br><span class="line">            <span class="comment">// persistently throws OOME for some time...</span></span><br><span class="line">            Thread.<span class="keyword">yield</span>();</span><br><span class="line">            <span class="comment">// retry</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException x) &#123;</span><br><span class="line">            <span class="comment">// retry</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Fast path for cleaners</span></span><br><span class="line">        <span class="keyword">if</span> (c != <span class="literal">null</span>) &#123;</span><br><span class="line">            c.clean();</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ReferenceQueue&lt;? <span class="built_in">super</span> Object&gt; q = r.queue;</span><br><span class="line">        <span class="keyword">if</span> (q != ReferenceQueue.NULL) q.enqueue(r);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要逻辑就是将pending链表的头节点取出，并将其加入队列中（最后3行代码），其中pending链表是GC扫描出的pending状态的Reference对象链表，Finalizer实现了Reference，也会被扫描出来，至于具体逻辑就要查看jdk源码了，这个正好在参考文献 [^9] 也就是最开头推荐的文章中有提到。</p>
+<h5 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h5><p>回到最开始的例子，再分析一下。main函数死循环创建一个重写了finalize()方法的对象，JVM会为每一个对象创建一个Finalizer对象，ReferenceHandle线程负责将Finalizer对象加入ReferenceQueue，该线程优先级较高，而FinalizerThread线程负责消费ReferenceQueue，执行对象的finalize()方法，优先级较低。只有当对象的finalize()方法执行完，对象才能被回收。</p>
+<p>那么当FinalizerThread线程由于优先级低而抢不到CPU资源，或者finalize()方法执行较慢等原因来不及消费ReferenceQueue时，就会出现GC无法回收垃圾，从而导致full gc。</p>
+<p>finalize()方法最多执行一次的原理也在此说一下我个人的理解，不一定正确。上面说到，当对象创建时，如果该对象重写了finalize()方法，JVM会调用Finalizer对象的register方法，即该对象对应的Finalizer对象只会被创建一次，而一旦这个Finalizer对象被移出ReferenceQueue就不会再回到ReferenceQueue。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+              <a href="/tags/GC/" rel="tag"># GC</a>
+              <a href="/tags/CMS/" rel="tag"># CMS</a>
+              <a href="/tags/G1/" rel="tag"># G1</a>
+              <a href="/tags/ZGC/" rel="tag"># ZGC</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/jwt-authentication/" rel="prev" title="JWT 认证机制">
+                  <i class="fa fa-angle-left"></i> JWT 认证机制
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/jvm-tuning/" rel="next" title="JVM 调优实战">
+                  JVM 调优实战 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

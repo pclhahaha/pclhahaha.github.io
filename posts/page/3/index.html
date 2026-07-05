@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:type" content="website">
+<meta property="og:title" content="个人笔记">
+<meta property="og:url" content="http://pclhahaha.github.io/posts/page/3/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="pcl">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/posts/page/3/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"posts/page/3/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">个人笔记</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/feed-stream-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/feed-stream-design/" class="post-title-link" itemprop="url">Feed 流系统设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Feed 流（信息流）是社交和内容产品的核心——微博首页、朋友圈、抖音推荐，本质上都是在回答同一个问题：”用户打开 App 时，应该看到哪些内容，按什么顺序？”</p>
+<h2 id="一、业务场景"><a href="#一、业务场景" class="headerlink" title="一、业务场景"></a>一、业务场景</h2><p><strong>核心操作</strong>：</p>
+<ul>
+<li>用户 A 发布内容 → A 的所有粉丝的 Feed 中可见</li>
+<li>用户 B 打开 App → 看到关注的人最新发布的动态</li>
+</ul>
+<p><strong>核心矛盾</strong>：</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">写操作：一条内容需要<span class="string">&quot;分发&quot;</span>给 <span class="built_in">N</span> 个粉丝（推模式）</span><br><span class="line">读操作：打开 App 需要<span class="string">&quot;聚合&quot;</span> M 个关注者的内容（拉模式）</span><br><span class="line"><span class="built_in">N</span> 和 M 的数量级决定了两种模式的取舍</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、推模式（Fanout-on-Write-写扩散）"><a href="#二、推模式（Fanout-on-Write-写扩散）" class="headerlink" title="二、推模式（Fanout on Write &#x2F; 写扩散）"></a>二、推模式（Fanout on Write &#x2F; 写扩散）</h2><p><strong>原理</strong>：用户发内容时，直接把内容 ID 推送到所有粉丝的 Feed 收件箱中。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">用户 <span class="selector-tag">A</span> 发布动态</span><br><span class="line">    ↓</span><br><span class="line">查询 <span class="selector-tag">A</span> 的所有粉丝：<span class="selector-tag">B</span>, C, D, ...（<span class="number">100</span> 万粉丝）</span><br><span class="line">    ↓</span><br><span class="line">向每个粉丝的 Feed 收件箱中追加该动态 ID</span><br><span class="line">    ↓</span><br><span class="line">粉丝打开 App 时：直接从自己的收件箱按时间取最新内容</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong>：读路径极短，打开 App 即时展示（O(1)）<br><strong>缺点</strong>：写放大严重——大 V 发一条，要写 100 万次</p>
+<p><strong>存储选型</strong>：</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">粉丝收件箱 → Redis List / Sorted <span class="keyword">Set</span></span><br><span class="line">  - Key：feed:timeline:&#123;user_id&#125;</span><br><span class="line">  - Value：发布内容 ID 列表</span><br><span class="line">  - 每个用户最多保存 1000 条（超过的通过 ZREMRANGEBYRANK 自动裁剪）</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、拉模式（Fanout-on-Read-读扩散）"><a href="#三、拉模式（Fanout-on-Read-读扩散）" class="headerlink" title="三、拉模式（Fanout on Read &#x2F; 读扩散）"></a>三、拉模式（Fanout on Read &#x2F; 读扩散）</h2><p><strong>原理</strong>：用户发内容只存到自己发件箱，粉丝打开 App 时从所有关注者的发件箱聚合拉取。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">粉丝打开 App</span><br><span class="line">    ↓</span><br><span class="line">查询关注的用户列表：<span class="selector-attr">[A, B, C, ...]</span>（关注了 <span class="number">500</span> 人）</span><br><span class="line">    ↓</span><br><span class="line">从 <span class="selector-tag">A</span>、<span class="selector-tag">B</span>、C 的发件箱各拉取最新 N 条</span><br><span class="line">    ↓</span><br><span class="line">内存中合并、排序、去重、分页</span><br><span class="line">    ↓</span><br><span class="line">返回给客户端</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong>：写路径简单，无写扩散<br><strong>缺点</strong>：读路径重——关注 500 人就要做 500 次查询 + 内存归并排序</p>
+<p><strong>适用场景</strong>：用户关注数在 100~500 之间，粉丝数不可控</p>
+<h2 id="四、推拉结合（混合模式）"><a href="#四、推拉结合（混合模式）" class="headerlink" title="四、推拉结合（混合模式）"></a>四、推拉结合（混合模式）</h2><p>生产环境普遍采用的方案，核心思想：<strong>按粉丝数分级处理</strong>。</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">          用户发一条动态</span><br><span class="line">                 ↓</span><br><span class="line">        判断粉丝数 &gt; 阈值（如 <span class="number">1</span> 万）？</span><br><span class="line">        /                    <span class="string">\</span></span><br><span class="line">      是（大 V）             否（普通用户）</span><br><span class="line">      ↓                          ↓</span><br><span class="line"> 只写发件箱                    推送到粉丝收件箱</span><br><span class="line">（拉模式处理）                 （推模式处理）</span><br></pre></td></tr></table></figure>
+
+<p><strong>粉丝侧读取逻辑调整</strong>：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">打开 <span class="keyword">App</span></span><br><span class="line">    ↓</span><br><span class="line">从自己的收件箱取（普通用户推送的内容）</span><br><span class="line">    ↓</span><br><span class="line">从关注的大 V 发件箱拉取（大 V 的内容）</span><br><span class="line">    ↓</span><br><span class="line">合并 + 排序 + 返回</span><br></pre></td></tr></table></figure>
+
+<p><strong>阈值选择经验</strong>：</p>
+<ul>
+<li>阈值太低 → 退化为推模式，写放大问题</li>
+<li>阈值太高 → 退化为拉模式，读聚合开销大</li>
+<li>实践建议：1 万 ~ 10 万粉丝（根据系统压力动态调整）</li>
+</ul>
+<h2 id="五、存储与分页"><a href="#五、存储与分页" class="headerlink" title="五、存储与分页"></a>五、存储与分页</h2><h3 id="5-1-Redis-存储结构"><a href="#5-1-Redis-存储结构" class="headerlink" title="5.1 Redis 存储结构"></a>5.1 Redis 存储结构</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 收件箱：每个用户一个 Sorted Set</span></span><br><span class="line"><span class="symbol">Key:</span>   feed:inbox:<span class="punctuation">&#123;</span>user_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">Score:</span> 发布时间戳</span><br><span class="line"><span class="symbol">Value:</span> 动态 ID</span><br><span class="line"></span><br><span class="line"><span class="meta"># 发件箱：每个用户一个 Sorted Set</span></span><br><span class="line"><span class="symbol">Key:</span>   feed:outbox:<span class="punctuation">&#123;</span>user_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">Score:</span> 发布时间戳</span><br><span class="line"><span class="symbol">Value:</span> 动态 ID（只存大 V 的发件箱）</span><br><span class="line"></span><br><span class="line"><span class="meta"># 动态详情：</span></span><br><span class="line"><span class="symbol">Key:</span>   feed:detail:<span class="punctuation">&#123;</span>post_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">Value:</span> <span class="title class_">JSON</span> <span class="punctuation">&#123;</span> 内容, 图片URL, 发布时间, 作者信息... <span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">TTL:</span>   <span class="number">30</span> 天</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-冷热分离"><a href="#5-2-冷热分离" class="headerlink" title="5.2 冷热分离"></a>5.2 冷热分离</h3><table>
+<thead>
+<tr>
+<th>数据层级</th>
+<th>存储</th>
+<th>时间范围</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>热数据</td>
+<td>Redis Sorted Set</td>
+<td>最近 3 天</td>
+<td>TTL &#x3D; 7 天，自动过期</td>
+</tr>
+<tr>
+<td>温数据</td>
+<td>MySQL</td>
+<td>3 天 ~ 3 个月</td>
+<td>按时间分区，定时归档</td>
+</tr>
+<tr>
+<td>冷数据</td>
+<td>对象存储（COS&#x2F;OSS）</td>
+<td>3 个月以上</td>
+<td>压缩存储，按需加载</td>
+</tr>
+</tbody></table>
+<h3 id="5-3-分页与一致性"><a href="#5-3-分页与一致性" class="headerlink" title="5.3 分页与一致性"></a>5.3 分页与一致性</h3><ul>
+<li><strong>游标分页</strong>：使用时间戳作为游标，避免 offset 分页在数据变化时的重复&#x2F;丢失</li>
+<li><strong>MySQL 层面</strong>：<code>WHERE create_time &lt; last_cursor ORDER BY create_time DESC LIMIT 20</code></li>
+<li><strong>关注关系变化</strong>：如果在分页过程中关注&#x2F;取关某人，当前页不受影响，下一页反映最新关系</li>
+</ul>
+<h2 id="六、时间线一致性"><a href="#六、时间线一致性" class="headerlink" title="六、时间线一致性"></a>六、时间线一致性</h2><p><strong>问题</strong>：用户 B 先关注 A，A 发布动态，然后 B 取关 A。B 的 Feed 中是否应该看到这条动态？</p>
+<p>推模式下，动态已在 B 的收件箱中，取关后仍可见——这其实是合理的，因为发布时刻 B 确实是 A 的粉丝。</p>
+<p><strong>生产实践</strong>：读取时做一次关注关系校验，过滤掉已取关的用户内容。开销很小（关注关系可走本地缓存）。</p>
+<h2 id="七、生产注意事项"><a href="#七、生产注意事项" class="headerlink" title="七、生产注意事项"></a>七、生产注意事项</h2><p><strong>大 Key 问题</strong>：大 V 的动态详情可能很大（视频、长文），Redis 大 Key 影响稳定性。解决方案：Feed 收件箱只存 ID（几十字节），详情存独立 Key 或 MySQL。</p>
+<p><strong>热点问题</strong>：大 V 发内容后，短时间内被大量粉丝拉取。本地缓存（Caffeine）缓存热门内容详情 5 分钟，CDN 缓存图片&#x2F;视频等静态资源。</p>
+<p><strong>消息队列消峰</strong>：推模式下，大 V 发布触发百万级粉丝写入，通过消息队列分批消费。每批 1000 个粉丝，持续 10-30 秒完成全量扩散。</p>
+<h2 id="八、小结"><a href="#八、小结" class="headerlink" title="八、小结"></a>八、小结</h2><p>Feed 流系统的核心选择是推拉策略——没有银弹，只有权衡。推模式读快写慢，适合粉丝数可控的场景；拉模式写快读重，适合关注数可控的场景；混合模式在两者间找平衡，是大多数社交产品的最终选择。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/flash-sale-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/flash-sale-design/" class="post-title-link" itemprop="url">秒杀系统设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>秒杀是电商系统中最极端的场景——瞬时流量是平时的数千倍，库存扣减必须绝对正确（超卖是资损事故），用户体验还要好。设计秒杀系统的本质是：<strong>如何用最少资源，安全地让最想买的人抢到商品。</strong></p>
+<h2 id="一、业务特点与挑战"><a href="#一、业务特点与挑战" class="headerlink" title="一、业务特点与挑战"></a>一、业务特点与挑战</h2><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">        瞬时极高并发</span><br><span class="line">           /  <span class="string">\</span></span><br><span class="line">          /    <span class="string">\</span></span><br><span class="line">         /      <span class="string">\</span></span><br><span class="line">库存不超卖 ─────── 用户体验好（不卡、不白屏、不重复提交）</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心挑战</strong>：</p>
+<ul>
+<li>瞬时流量可能是平时的 100~1000 倍</li>
+<li>库存扣减必须在并发下绝对正确</li>
+<li>用户体感要流畅（页面快速响应）</li>
+</ul>
+<h2 id="二、容量估算"><a href="#二、容量估算" class="headerlink" title="二、容量估算"></a>二、容量估算</h2><p>假设：10 万库存的 iPhone，100 万人同时抢购。</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">峰值 QPS ≈ <span class="number">100</span> 万（实际集中在前 <span class="number">0</span>.<span class="number">5</span> 秒）</span><br><span class="line"></span><br><span class="line">数据库 TPS：单机 MySQL 约 <span class="number">3000~5000</span> TPS</span><br><span class="line">Redis 单机：<span class="number">10</span> 万 QPS（读），<span class="number">8</span> 万 QPS（写）</span><br><span class="line"></span><br><span class="line">结论：流量不能直接打到数据库，必须在前面拦截 <span class="number">99</span>% 以上。</span><br></pre></td></tr></table></figure>
+
+<p><strong>分层拦截漏斗</strong>：</p>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">100</span><span class="comment">% 请求（100 万 QPS）</span></span><br><span class="line">   │  前端：静态化 + 按钮置灰 + 防抖 ─→ 拦截 <span class="number">40</span><span class="comment">%</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">60</span> 万 QPS</span><br><span class="line">   │  CDN + 边缘限流 ─→ 拦截 <span class="number">30</span><span class="comment">%</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">30</span> 万 QPS</span><br><span class="line">   │  API 网关限流 + 用户维度排队 ─→ 拦截 <span class="number">80</span><span class="comment">%</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">6</span> 万 QPS</span><br><span class="line">   │  Redis 预减库存 ─→ 拦截 <span class="number">90</span><span class="comment">%（库存只有 10 万）</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">6</span>,<span class="number">000</span> QPS</span><br><span class="line">   │  MQ 异步排队写入 MySQL</span><br><span class="line">   ↓</span><br><span class="line">最终到达 DB：~<span class="number">3000</span> TPS（MySQL 可承受）</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、前端层优化"><a href="#三、前端层优化" class="headerlink" title="三、前端层优化"></a>三、前端层优化</h2><ul>
+<li><strong>静态化</strong>：秒杀页面做成纯静态 HTML，提前推送到 CDN。唯一动态的是”库存数量”和”按钮状态”，通过异步接口获取</li>
+<li><strong>按钮防抖</strong>：点击后置灰 3 秒，禁止重复提交</li>
+<li><strong>验证码滑块</strong>：抢购按钮点击时弹出，人机识别</li>
+<li><strong>页面版本控制</strong>：秒杀 URL 动态加签，每场活动不同 URL，防止提前暴露</li>
+</ul>
+<h2 id="四、网关层"><a href="#四、网关层" class="headerlink" title="四、网关层"></a>四、网关层</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx 单 IP 限流：每 IP 每秒最多 10 个请求</span></span><br><span class="line">limit_req_zone <span class="variable">$binary_remote_addr</span> <span class="attribute">zone</span>=seckill:10m <span class="attribute">rate</span>=10r/s;</span><br><span class="line"></span><br><span class="line"><span class="comment"># URI 级别限流：秒杀接口每秒最多 50000 请求</span></span><br><span class="line">limit_req_zone <span class="variable">$uri</span> <span class="attribute">zone</span>=seckill_uri:10m <span class="attribute">rate</span>=50000r/s;</span><br></pre></td></tr></table></figure>
+
+<p><strong>黑白名单</strong>：白名单（内部测试&#x2F;VIP 用户）走独立通道；黑名单（检测到异常行为的 IP&#x2F;设备）动态加入，实时拦截。</p>
+<p><strong>排队机制</strong>：用户进入页面后先获取”排队 Token”，服务端用 Redis 有序集合按时间戳排序，批次放行。拿到 Token 才能进入真正的抢购接口。</p>
+<h2 id="五、Redis-预减库存——核心逻辑"><a href="#五、Redis-预减库存——核心逻辑" class="headerlink" title="五、Redis 预减库存——核心逻辑"></a>五、Redis 预减库存——核心逻辑</h2><p>这是秒杀系统最重要的设计。库存不直接扣减 MySQL，而是先扣 Redis：</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 活动开始前：将库存总数 <span class="keyword">SET</span> 到 Redis</span><br><span class="line">   <span class="keyword">SET</span> <span class="comment">seckill:stock:12345 100000</span></span><br><span class="line"></span><br><span class="line">2. 用户抢购时：</span><br><span class="line">   stock <span class="comment">= DECR seckill:stock:12345</span></span><br><span class="line">   if <span class="comment">stock &lt; 0:</span></span><br><span class="line">       return <span class="comment">&quot;已售罄&quot;</span></span><br><span class="line">   if <span class="comment">stock &gt;= 0:</span></span><br><span class="line">       发送异步消息到 Kafka → 异步同步到 <span class="comment">MySQL</span></span><br><span class="line"></span><br><span class="line">3. 关键：stock <span class="comment">&lt; 0</span> 时回滚</span><br><span class="line">   INCR <span class="comment">seckill:stock:12345</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么用 DECR 而不是先 GET 再 SET？</strong> Redis 单线程模型下，DECR 是原子操作。先 GET 再 SET 在并发下会产生竞态条件。</p>
+<p><strong>防止重复抢购</strong>（Lua 脚本原子操作）：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 原子操作：判断用户是否抢过 + 扣库存</span></span><br><span class="line"><span class="keyword">local</span> uid = KEYS[<span class="number">1</span>]</span><br><span class="line"><span class="keyword">local</span> stock_key = KEYS[<span class="number">2</span>]</span><br><span class="line"><span class="keyword">local</span> bought_key = KEYS[<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 检查是否已抢过</span></span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">&quot;SISMEMBER&quot;</span>, bought_key, uid) == <span class="number">1</span> <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>  <span class="comment">-- 已抢过</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 扣库存</span></span><br><span class="line"><span class="keyword">local</span> stock = redis.call(<span class="string">&quot;DECR&quot;</span>, stock_key)</span><br><span class="line"><span class="keyword">if</span> stock &lt; <span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">    redis.call(<span class="string">&quot;INCR&quot;</span>, stock_key)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>  <span class="comment">-- 已售罄</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 记录已抢</span></span><br><span class="line">redis.call(<span class="string">&quot;SADD&quot;</span>, bought_key, uid)</span><br><span class="line"><span class="keyword">return</span> <span class="number">1</span>  <span class="comment">-- 抢购成功</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、异步同步到-MySQL"><a href="#六、异步同步到-MySQL" class="headerlink" title="六、异步同步到 MySQL"></a>六、异步同步到 MySQL</h2><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Redis 扣减成功 → 发送 Kafka 消息 → 消费者批量写入 MySQL</span><br><span class="line">                  &#123; user_id, item_id, order_id, <span class="built_in">timestamp</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>消息丢失怎么办？</strong> Kafka 持久化 + ACK 确认 + 定时对账任务（对比 Redis 库存 vs MySQL 订单数，自动补单或告警）。</p>
+<h2 id="七、熔断降级"><a href="#七、熔断降级" class="headerlink" title="七、熔断降级"></a>七、熔断降级</h2><p><strong>熔断</strong>：错误率 &gt; 50%（滑动窗口）→ 断路器打开 → 快速返回”系统繁忙” → 冷却 30s → 半开放少量探测 → 正常则恢复。</p>
+<p><strong>降级</strong>：关闭非核心功能（推荐列表、购物车、积分），返回兜底数据”抢购太火爆，请稍后重试”。</p>
+<p><strong>隔离</strong>：秒杀服务使用独立机器、独立 Redis、独立数据库。即使秒杀链路崩溃，不影响主站下单&#x2F;支付&#x2F;浏览。</p>
+<h2 id="八、架构演进路径"><a href="#八、架构演进路径" class="headerlink" title="八、架构演进路径"></a>八、架构演进路径</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">第一版（初创期）：单体应用 + MySQL</span><br><span class="line">  └── 问题：秒杀把主库打挂，影响全站</span><br><span class="line">       ↓</span><br><span class="line">第二版（成长期）：Redis 缓存预减库存</span><br><span class="line">  └── 问题：Redis 和 MySQL 数据不一致</span><br><span class="line">       ↓</span><br><span class="line">第三版（成熟期）：前端静态化 + 网关限流 + Redis + MQ + 独立部署</span><br><span class="line">  └── 问题：热点商品导致 Redis 单分片过热</span><br><span class="line">       ↓</span><br><span class="line">第四版（规模化）：Redis 多副本 + 本地缓存 Caffeine 兜底 + 服务物理隔离</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>秒杀系统设计的核心是一句话：<strong>在流量到达数据库之前，用多层漏斗拦截掉 99% 的请求</strong>。前端静态化 + 网关限流 + Redis 原子库存预扣 + MQ 异步消峰，这四层构成了标准方案。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/flink-stream-processing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/flink-stream-processing/" class="post-title-link" itemprop="url">Flink 实时计算</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Flink 是当前最主流的流处理引擎。相比 Spark Streaming 的微批处理（micro-batch），Flink 是真正的逐事件处理，延迟可以从秒级降到毫秒级。</p>
+<h2 id="一、Flink-vs-Spark-Streaming"><a href="#一、Flink-vs-Spark-Streaming" class="headerlink" title="一、Flink vs Spark Streaming"></a>一、Flink vs Spark Streaming</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Spark Streaming</th>
+<th>Flink</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>处理模型</td>
+<td>微批（micro-batch，通常1-10秒）</td>
+<td>逐事件（event-by-event）</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>秒级</td>
+<td>毫秒级</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>有限（依赖外部存储）</td>
+<td>内置 RocksDB 状态后端</td>
+</tr>
+<tr>
+<td>精确一次</td>
+<td>支持（但有限制）</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td>窗口</td>
+<td>基于批次时间</td>
+<td>事件时间 + Watermark</td>
+</tr>
+<tr>
+<td>SQL 支持</td>
+<td>Spark SQL</td>
+<td>Flink SQL（ANSI SQL 兼容）</td>
+</tr>
+</tbody></table>
+<h2 id="二、核心概念"><a href="#二、核心概念" class="headerlink" title="二、核心概念"></a>二、核心概念</h2><h3 id="Watermark——处理乱序数据"><a href="#Watermark——处理乱序数据" class="headerlink" title="Watermark——处理乱序数据"></a>Watermark——处理乱序数据</h3><p>现实世界中事件到达顺序可能是乱的。Watermark 是 Flink 判断事件时间窗口”已完成”的机制：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">事件时间: <span class="number">10</span>:<span class="number">00</span>  <span class="number">10</span>:<span class="number">01</span>  <span class="number">10</span>:<span class="number">03</span>  <span class="number">10</span>:<span class="number">02</span>(延迟到达)  <span class="number">10</span>:<span class="number">04</span>  <span class="number">10</span>:<span class="number">05</span></span><br><span class="line">                                              ↑</span><br><span class="line">                              Watermark = <span class="number">10</span>:<span class="number">04</span> → <span class="number">10:00-10:03</span> 的窗口可以关闭了</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> events (</span><br><span class="line">    event_time <span class="type">TIMESTAMP</span>(<span class="number">3</span>),</span><br><span class="line">    user_id STRING,</span><br><span class="line">    action STRING,</span><br><span class="line">    WATERMARK <span class="keyword">FOR</span> event_time <span class="keyword">AS</span> event_time <span class="operator">-</span> <span class="type">INTERVAL</span> <span class="string">&#x27;5&#x27;</span> <span class="keyword">SECOND</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="精确一次（Exactly-Once）"><a href="#精确一次（Exactly-Once）" class="headerlink" title="精确一次（Exactly-Once）"></a>精确一次（Exactly-Once）</h3><p>Flink 通过 Checkpoint 机制实现精确一次语义：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> Flink 定期触发 <span class="keyword">Checkpoint</span>（比如每 <span class="number">60</span> 秒）</span><br><span class="line"><span class="number">2.</span> 暂停数据处理 → 保存所有算子的当前状态（RocksDB <span class="keyword">Snapshot</span>）→ 保存 Kafka <span class="keyword">offset</span></span><br><span class="line"><span class="number">3.</span> 状态保存到持久化存储（S3/HDFS）</span><br><span class="line"><span class="number">4.</span> 故障恢复时：从最近的 <span class="keyword">Checkpoint</span> 恢复状态 + 从保存的 <span class="keyword">offset</span> 重放 Kafka</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Flink-SQL——流批一体"><a href="#三、Flink-SQL——流批一体" class="headerlink" title="三、Flink SQL——流批一体"></a>三、Flink SQL——流批一体</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 实时统计每 5 分钟的 PV</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    TUMBLE_START(event_time, <span class="type">INTERVAL</span> <span class="string">&#x27;5&#x27;</span> <span class="keyword">MINUTE</span>) <span class="keyword">AS</span> window_start,</span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> pv</span><br><span class="line"><span class="keyword">FROM</span> events</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> TUMBLE(event_time, <span class="type">INTERVAL</span> <span class="string">&#x27;5&#x27;</span> <span class="keyword">MINUTE</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- Top-N 热门商品（实时更新）</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> item_id, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> cnt,</span><br><span class="line">           <span class="built_in">ROW_NUMBER</span>() <span class="keyword">OVER</span> (<span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">DESC</span>) <span class="keyword">as</span> rn</span><br><span class="line">    <span class="keyword">FROM</span> orders</span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> item_id</span><br><span class="line">) <span class="keyword">WHERE</span> rn <span class="operator">&lt;=</span> <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、状态管理与-RocksDB"><a href="#四、状态管理与-RocksDB" class="headerlink" title="四、状态管理与 RocksDB"></a>四、状态管理与 RocksDB</h2><p>Flink 的算子状态默认存储在内存中。大规模状态（如用户会话、去重集合）使用 RocksDB 作为状态后端：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">state.backend:</span> <span class="string">rocksdb</span></span><br><span class="line"><span class="attr">state.backend.rocksdb.localdir:</span> <span class="string">/tmp/flink-state</span></span><br><span class="line"><span class="attr">state.checkpoints.dir:</span> <span class="string">s3://bucket/flink/checkpoints/</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>RocksDB 将状态持久化到本地 SSD，内存只做缓存</li>
+<li>Checkpoint 时 RocksDB 做增量快照到 S3——只上传变化的部分，节省网络和存储</li>
+<li>故障恢复时从 S3 拉取最近 Checkpoint 的 RocksDB 文件</li>
+</ul>
+<h2 id="五、部署模式"><a href="#五、部署模式" class="headerlink" title="五、部署模式"></a>五、部署模式</h2><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>适用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Session</strong></td>
+<td>开发测试</td>
+<td>共享集群资源，多个 Job 共享 JM&#x2F;TM</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td>生产推荐</td>
+<td>一个 Job 一个集群，资源隔离</td>
+</tr>
+</tbody></table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 提交 Flink Job</span></span><br><span class="line">flink run-application -t yarn-application \</span><br><span class="line">  -Djobmanager.memory.process.size=4096m \</span><br><span class="line">  -Dtaskmanager.memory.process.size=8192m \</span><br><span class="line">  -Dtaskmanager.numberOfTaskSlots=4 \</span><br><span class="line">  -c com.example.StreamJob \</span><br><span class="line">  s3://bucket/jars/stream-job.jar</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、小结"><a href="#六、小结" class="headerlink" title="六、小结"></a>六、小结</h2><p>Flink 的核心价值是”低延迟 + 精确一次 + 事件时间语义”。实时数仓、实时风控、实时推荐这些对延迟敏感的场景，Flink 是首选方案。如果你的延迟要求是”秒级”，Spark Streaming 可能够用；如果是”毫秒级”，必须 Flink。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/function-calling-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/function-calling-guide/" class="post-title-link" itemprop="url">Function Calling 与 Tool Use</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Function Calling 是 LLM 连接外部世界的桥梁——不是让 LLM 直接执行代码，而是让 LLM <strong>告诉系统</strong>应该调用哪个函数和什么参数，系统执行后再把结果返回给 LLM。</p>
+<h2 id="一、工作原理"><a href="#一、工作原理" class="headerlink" title="一、工作原理"></a>一、工作原理</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">用户: <span class="string">&quot;今天北京天气怎么样？&quot;</span></span><br><span class="line"></span><br><span class="line">LLM 判断: 需要调用 get_weather 函数</span><br><span class="line">    → 返回 function_call: &#123;name: <span class="string">&quot;get_weather&quot;</span>, arguments: &#123;city: <span class="string">&quot;北京&quot;</span>&#125;&#125;</span><br><span class="line"></span><br><span class="line">系统: 执行 <span class="built_in">get_weather</span>(city=<span class="string">&quot;北京&quot;</span>) → <span class="string">&quot;25°C，晴&quot;</span></span><br><span class="line"></span><br><span class="line">LLM 接收函数结果: <span class="string">&quot;今天北京天气晴朗，温度25°C&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="OpenAI-格式"><a href="#OpenAI-格式" class="headerlink" title="OpenAI 格式"></a>OpenAI 格式</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;model&quot;</span><span class="punctuation">:</span> <span class="string">&quot;gpt-4&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;messages&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;今天北京天气怎么样？&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tools&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;get_weather&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;获取指定城市的天气信息&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;object&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;city&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;城市名称&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;city&quot;</span><span class="punctuation">]</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>LLM 返回：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;role&quot;</span><span class="punctuation">:</span> <span class="string">&quot;assistant&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tool_calls&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;get_weather&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#123;\&quot;city\&quot;: \&quot;北京\&quot;&#125;&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、实现循环"><a href="#二、实现循环" class="headerlink" title="二、实现循环"></a>二、实现循环</h2><p>真正的 Agent 需要多次调用 Function Calling：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">run_agent</span>(<span class="params">user_query, tools, max_iterations=<span class="number">5</span></span>):</span><br><span class="line">    messages = [&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: user_query&#125;]</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(max_iterations):</span><br><span class="line">        response = llm.invoke(messages, tools=tools)</span><br><span class="line">        msg = response.choices[<span class="number">0</span>].message</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> msg.tool_calls:</span><br><span class="line">            <span class="comment"># LLM 要求调用工具</span></span><br><span class="line">            messages.append(msg)</span><br><span class="line">            <span class="keyword">for</span> tool_call <span class="keyword">in</span> msg.tool_calls:</span><br><span class="line">                result = execute_tool(tool_call)</span><br><span class="line">                messages.append(&#123;</span><br><span class="line">                    <span class="string">&quot;role&quot;</span>: <span class="string">&quot;tool&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;tool_call_id&quot;</span>: tool_call.<span class="built_in">id</span>,</span><br><span class="line">                    <span class="string">&quot;content&quot;</span>: result</span><br><span class="line">                &#125;)</span><br><span class="line">            <span class="comment"># 循环回去，LLM 看到工具结果后决定下一步</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># LLM 认为任务完成</span></span><br><span class="line">            <span class="keyword">return</span> msg.content</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、关键设计"><a href="#三、关键设计" class="headerlink" title="三、关键设计"></a>三、关键设计</h2><h3 id="Tool-Description-很重要"><a href="#Tool-Description-很重要" class="headerlink" title="Tool Description 很重要"></a>Tool Description 很重要</h3><p>LLM 根据 description 决定何时调用哪个工具——一个模糊的 description 会导致 LLM 不调用或调用错误。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ❌ 差：描述太模糊</span></span><br><span class="line">&#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;process&quot;</span>, <span class="string">&quot;description&quot;</span>: <span class="string">&quot;处理数据&quot;</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># ✅ 好：描述清晰具体</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;query_database&quot;</span>,</span><br><span class="line">    <span class="string">&quot;description&quot;</span>: <span class="string">&quot;执行 SQL 查询并返回结果。仅在用户明确要求查询数据库时使用。&quot;</span>,</span><br><span class="line">    <span class="string">&quot;parameters&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;sql&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>, <span class="string">&quot;description&quot;</span>: <span class="string">&quot;要执行的 SQL 语句&quot;</span>&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="强制调用"><a href="#强制调用" class="headerlink" title="强制调用"></a>强制调用</h3><p>有些场景需要强制调用工具，可以设置 <code>tool_choice</code>:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;tool_choice&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;get_weather&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="并行调用"><a href="#并行调用" class="headerlink" title="并行调用"></a>并行调用</h3><p>LLM 可以同时返回多个 tool_calls（并行执行无依赖的工具）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;tool_calls&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span><span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;get_weather&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#123;\&quot;city\&quot;:\&quot;北京\&quot;&#125;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span><span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;get_weather&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#123;\&quot;city\&quot;:\&quot;上海\&quot;&#125;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、与-LangGraph-的结合"><a href="#四、与-LangGraph-的结合" class="headerlink" title="四、与 LangGraph 的结合"></a>四、与 LangGraph 的结合</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langgraph.graph <span class="keyword">import</span> StateGraph, END</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">decide_next</span>(<span class="params">state</span>):</span><br><span class="line">    response = llm.invoke(state[<span class="string">&quot;messages&quot;</span>], tools=tools)</span><br><span class="line">    <span class="keyword">if</span> response.tool_calls:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;execute_tools&quot;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;end&quot;</span></span><br><span class="line"></span><br><span class="line">graph.add_node(<span class="string">&quot;llm&quot;</span>, call_llm)</span><br><span class="line">graph.add_node(<span class="string">&quot;tools&quot;</span>, execute_tools)</span><br><span class="line">graph.add_conditional_edges(<span class="string">&quot;llm&quot;</span>, decide_next, &#123;<span class="string">&quot;execute_tools&quot;</span>: <span class="string">&quot;tools&quot;</span>, <span class="string">&quot;end&quot;</span>: END&#125;)</span><br><span class="line">graph.add_edge(<span class="string">&quot;tools&quot;</span>, <span class="string">&quot;llm&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># LLM → 需要工具 → 执行 → 结果给 LLM → 需要更多工具？→ 循环 → 完成</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、小结"><a href="#五、小结" class="headerlink" title="五、小结"></a>五、小结</h2><p>Function Calling 的核心不是”LLM 调用函数”，而是”LLM 说出它想调用什么”。执行权始终在系统端——这意味着你可以加入权限控制、人工审批、调用审计等安全机制。这是 Agent 安全性的重要保障。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/google-spanner-case-study/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/google-spanner-case-study/" class="post-title-link" itemprop="url">Google Spanner 架构——万亿行数据五个9的高可用</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Google Spanner 是全球最知名的 NewSQL 数据库，管理着万亿行数据并提供 99.999%（五个9）的可用性。它是第一个在全球范围内提供外部一致性的分布式数据库——这意味着不论数据在世界的哪个角落被修改，所有用户看到的顺序都是一致的。</p>
+<h2 id="一、解决的问题"><a href="#一、解决的问题" class="headerlink" title="一、解决的问题"></a>一、解决的问题</h2><p>传统数据库在可扩展性和一致性之间需要做取舍：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>一致性</th>
+<th>可扩展性</th>
+<th>代表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单机 SQL</td>
+<td>强一致</td>
+<td>差</td>
+<td>PostgreSQL</td>
+</tr>
+<tr>
+<td>分库分表</td>
+<td>最终一致</td>
+<td>好</td>
+<td>MySQL 分片</td>
+</tr>
+<tr>
+<td>NoSQL</td>
+<td>最终一致</td>
+<td>极好</td>
+<td>Cassandra</td>
+</tr>
+<tr>
+<td><strong>NewSQL</strong></td>
+<td><strong>强一致</strong></td>
+<td><strong>极好</strong></td>
+<td><strong>Spanner</strong></td>
+</tr>
+</tbody></table>
+<p>Spanner 的目标：在一个全球分布的环境下，提供关系型数据库的 ACID 事务保证，同时具备 NoSQL 的水平扩展能力。</p>
+<h2 id="二、核心架构"><a href="#二、核心架构" class="headerlink" title="二、核心架构"></a>二、核心架构</h2><h3 id="2-1-部署拓扑"><a href="#2-1-部署拓扑" class="headerlink" title="2.1 部署拓扑"></a>2.1 部署拓扑</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-attr">[全球 Paxos 集群]</span></span><br><span class="line">┌─────────────────┐</span><br><span class="line">│   Spanner 集群   │</span><br><span class="line">│  (Zone <span class="selector-tag">A</span>)        │</span><br><span class="line">│  ┌───────────┐   │</span><br><span class="line">│  │ Paxos 副本 │   │</span><br><span class="line">│  │ 强一致读/写 │   │</span><br><span class="line">│  └───────────┘   │</span><br><span class="line">└─────────────────┘</span><br><span class="line">         │</span><br><span class="line">┌─────────────────┐</span><br><span class="line">│   Spanner 集群   │</span><br><span class="line">│  (Zone <span class="selector-tag">B</span>)        │</span><br><span class="line">│  ┌───────────┐   │</span><br><span class="line">│  │ Paxos 副本 │   │</span><br><span class="line">│  └───────────┘   │</span><br><span class="line">└─────────────────┘</span><br><span class="line">         │</span><br><span class="line">┌─────────────────┐</span><br><span class="line">│   Spanner 集群   │</span><br><span class="line">│  (Zone C)        │</span><br><span class="line">│  ┌───────────┐   │</span><br><span class="line">│  │ Paxos 副本 │   │</span><br><span class="line">│  └───────────┘   │</span><br><span class="line">└─────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>每个 Spanner 部署被称为一个 <strong>Universe</strong>，每个 Universe 包含多个 Zone。每个 Zone 内有一组 Paxos 副本提供读写服务。</p>
+<h3 id="2-2-数据分片"><a href="#2-2-数据分片" class="headerlink" title="2.2 数据分片"></a>2.2 数据分片</h3><p>数据被切分成 <strong>Split</strong>，每个 Split 包含一系列连续的主键范围：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Split A:  [<span class="keyword">user</span>:<span class="number">000000</span>, <span class="keyword">user</span>:<span class="number">500000</span>)</span><br><span class="line">Split B:  [<span class="keyword">user</span>:<span class="number">500000</span>, <span class="keyword">user</span>:<span class="number">999999</span>)</span><br><span class="line">Split C:  [<span class="keyword">user</span>:<span class="number">1000000</span>, <span class="keyword">user</span>:<span class="number">1499999</span>)</span><br></pre></td></tr></table></figure>
+
+<p>每个 Split 由一个 Paxos 组管理，Paxos 组的多个副本分布在不同 Zone，保证容灾能力。</p>
+<h3 id="2-3-读写路径"><a href="#2-3-读写路径" class="headerlink" title="2.3 读写路径"></a>2.3 读写路径</h3><p><strong>写操作</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 客户端 → 找到 Split 的 Paxos Leader</span><br><span class="line"><span class="bullet">2.</span> Leader → 通过 Paxos 协议写入日志</span><br><span class="line"><span class="bullet">3.</span> 多数派确认 → 写入成功 → 返回客户端</span><br><span class="line"><span class="bullet">4.</span> Leader 异步应用到存储引擎</span><br></pre></td></tr></table></figure>
+
+<p><strong>读操作</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 客户端 → 找到 Split 的 Paxos Leader 或 Follower</span><br><span class="line"><span class="bullet">2.</span> 如果读 Follower：检查本地时间戳是否 ≥ 读请求的时间戳</span><br><span class="line">   ├─ 是 → 直接返回（外部一致）</span><br><span class="line">   └─ 否 → 等待到足够的时间戳后返回</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、TrueTime——外部一致性的基石"><a href="#三、TrueTime——外部一致性的基石" class="headerlink" title="三、TrueTime——外部一致性的基石"></a>三、TrueTime——外部一致性的基石</h2><p>Spanner 最独特的设计是 <strong>TrueTime</strong>：一个全球精密的时钟同步系统。传统分布式系统不可能实现完全一致的时间同步，Spanner 使用 GPS 和原子钟为每个数据中心提供精确的时间参考。</p>
+<h3 id="3-1-时间不确性"><a href="#3-1-时间不确性" class="headerlink" title="3.1 时间不确性"></a>3.1 时间不确性</h3><p>即使有 GPS 和原子钟，时钟同步也存在不确定性。TrueTime 不报告一个准确的时间点，而是报告一个时间区间：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TT.now() → [earliest, latest]</span><br><span class="line"></span><br><span class="line">例如: [<span class="number">2026-07-05</span> <span class="number">10</span>:<span class="number">00:00.000</span>, <span class="number">2026-07-05</span> <span class="number">10</span>:<span class="number">00:00.007</span>]</span><br></pre></td></tr></table></figure>
+
+<p>这意味着真实时间有 99.9999% 的置信度落在 [earliest, latest] 区间内，区间宽度通常 &lt; 7 毫秒。</p>
+<h3 id="3-2-如何用不确定性保证确定性"><a href="#3-2-如何用不确定性保证确定性" class="headerlink" title="3.2 如何用不确定性保证确定性"></a>3.2 如何用不确定性保证确定性</h3><p>提交等待（Commit Wait）协议是 Spanner 保证外部一致性的关键：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">事务 T 的提交时间戳: s</span><br><span class="line">提交等待: 在提交后等待，直到 TT<span class="selector-class">.now</span>()<span class="selector-class">.earliest</span> &gt; s</span><br><span class="line"></span><br><span class="line">也就是说，等待一段时间确保<span class="string">&quot;任何比 s 大的时间戳都已经在真实世界中过去了&quot;</span>。</span><br></pre></td></tr></table></figure>
+
+<p>这样保证了：如果事务 A 的提交时间戳 &lt; 事务 B 的提交时间戳，那么 A 在所有节点上都发生在 B 之前。这提供了一种近似完美的外部一致性，概率满足。</p>
+<h2 id="四、Paxos-副本与数据复制"><a href="#四、Paxos-副本与数据复制" class="headerlink" title="四、Paxos 副本与数据复制"></a>四、Paxos 副本与数据复制</h2><p>Spanner 使用 Paxos 协议管理每个 Split 的数据复制。Paxos 组的成员分布在多个数据中心：</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Split A 的 Paxos 组 (3 副本)</span><span class="punctuation">:</span></span><br><span class="line">  <span class="attribute">Zone A</span><span class="punctuation">:</span> <span class="string">Leader (处理所有写 + 强一致读)</span></span><br><span class="line">  <span class="attribute">Zone B</span><span class="punctuation">:</span> <span class="string">Follower (只读，复制延迟 ~10ms)</span></span><br><span class="line">  <span class="attribute">Zone C</span><span class="punctuation">:</span> <span class="string">Follower (只读，复制延迟 ~50ms)</span></span><br></pre></td></tr></table></figure>
+
+<p>当 Leader 所在的 Zone 故障时，Paxos 协议保证剩余的副本能在秒级选出新 Leader，满足 5 个 9 的可用性要求。</p>
+<h2 id="五、Schema-设计"><a href="#五、Schema-设计" class="headerlink" title="五、Schema 设计"></a>五、Schema 设计</h2><p>Spanner 支持标准 SQL 并且扩展了分布式特有的功能：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> Users (</span><br><span class="line">  user_id   INT64 <span class="keyword">NOT NULL</span>,</span><br><span class="line">  name      STRING(<span class="number">100</span>),</span><br><span class="line">  email     STRING(<span class="number">100</span>),</span><br><span class="line">  created_at <span class="type">TIMESTAMP</span>,</span><br><span class="line">) <span class="keyword">PRIMARY KEY</span> (user_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 交错表：子表与父表共享主键前缀，数据物理上相邻</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> UserOrders (</span><br><span class="line">  user_id   INT64 <span class="keyword">NOT NULL</span>,</span><br><span class="line">  order_id  INT64 <span class="keyword">NOT NULL</span>,</span><br><span class="line">  amount    FLOAT64,</span><br><span class="line">) <span class="keyword">PRIMARY KEY</span> (user_id, order_id),</span><br><span class="line">  INTERLEAVE <span class="keyword">IN</span> PARENT Users;</span><br></pre></td></tr></table></figure>
+
+<p>**交错表（Interleaving）**是 Spanner 特有的设计：将父子表的数据物理上存储在一起，使得”根据用户查其所有订单”只需要一次磁盘扫描，而不需要分布式 JOIN。</p>
+<h2 id="六、性能优化"><a href="#六、性能优化" class="headerlink" title="六、性能优化"></a>六、性能优化</h2><table>
+<thead>
+<tr>
+<th>优化策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>交错表</strong></td>
+<td>消除分布式 JOIN</td>
+</tr>
+<tr>
+<td><strong>只读副本</strong></td>
+<td>Follower 可以处理只读事务，分散读压力</td>
+</tr>
+<tr>
+<td><strong>批量写入</strong></td>
+<td>聚合多个小写入为一次 Paxos 提交</td>
+</tr>
+<tr>
+<td><strong>客户端路由</strong></td>
+<td>客户端智能路由到最近的 Follower 读取</td>
+</tr>
+<tr>
+<td><strong>热点检测</strong></td>
+<td>自动检测并分裂热点 Split</td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>Google Spanner 解决了分布式数据库的”圣杯问题”：在保持 SQL 语义和 ACID 保证的前提下实现全球级扩展性。这得益于两项创新：TrueTime 使用物理时间（GPS&#x2F;原子钟）取代逻辑时钟，为分布式事务提供了确定性的时间参考；Paxos 副本 + 交错表则在高可用和高性能之间找到平衡。</p>
+<p>Spanner 的开源等价物包括 CockroachDB 和 TiDB——它们都受到 Spanner 论文的启发，但使用混合逻辑时钟（HLC）代替 GPS 时钟，在易部署性和一致性之间做出不同的取舍。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/hive-trino-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/hive-trino-guide/" class="post-title-link" itemprop="url">Hive 与 Presto/Trino 实战</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Hive 是大数据 SQL 查询引擎的鼻祖，但今天它的角色已经从”查询引擎”转变为”元数据管理 + ETL 管道”。Presto&#x2F;Trino 则凭借内存计算能力接替了交互式查询的角色。</p>
+<h2 id="一、Hive-的核心概念"><a href="#一、Hive-的核心概念" class="headerlink" title="一、Hive 的核心概念"></a>一、Hive 的核心概念</h2><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">用户 <span class="keyword">SQL</span> → Hive Metastore (MySQL) → 获取表 <span class="keyword">Schema</span>/分区信息</span><br><span class="line">                                       ↓</span><br><span class="line">                              Hive 执行引擎</span><br><span class="line">                              (MapReduce/Tez/Spark)</span><br><span class="line">                                       ↓</span><br><span class="line">                              HDFS / S3 上的数据文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="表类型"><a href="#表类型" class="headerlink" title="表类型"></a>表类型</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>数据位置</th>
+<th>删除表</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MANAGED TABLE</strong></td>
+<td>Hive 仓库目录</td>
+<td>数据也被删除</td>
+<td>临时表</td>
+</tr>
+<tr>
+<td><strong>EXTERNAL TABLE</strong></td>
+<td>外部路径（如 S3）</td>
+<td>只删元数据，数据保留</td>
+<td>数据湖标准做法</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- External table（数据湖推荐）</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> events (</span><br><span class="line">    event_id    <span class="type">BIGINT</span>,</span><br><span class="line">    user_id     <span class="type">BIGINT</span>,</span><br><span class="line">    event_type  STRING</span><br><span class="line">)</span><br><span class="line">PARTITIONED <span class="keyword">BY</span> (dt STRING)</span><br><span class="line">STORED <span class="keyword">AS</span> PARQUET</span><br><span class="line">LOCATION <span class="string">&#x27;s3://bucket/events/&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="分区管理"><a href="#分区管理" class="headerlink" title="分区管理"></a>分区管理</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 手动添加分区</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> events <span class="keyword">ADD</span> <span class="keyword">PARTITION</span> (dt<span class="operator">=</span><span class="string">&#x27;2026-07-01&#x27;</span>) </span><br><span class="line">LOCATION <span class="string">&#x27;s3://bucket/events/dt=2026-07-01/&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 自动恢复所有分区（元数据同步）</span></span><br><span class="line">MSCK REPAIR <span class="keyword">TABLE</span> events;</span><br></pre></td></tr></table></figure>
+
+<p>注意：<code>MSCK REPAIR</code> 在大量分区时会非常慢——它需要列出 S3 上的所有前缀。如果分区数超过几千个，应考虑直接使用 Iceberg 等表格式自管理分区的元数据，而非依赖 Hive Metastore 的分区机制。</p>
+<h2 id="二、Hive-on-S3-的坑"><a href="#二、Hive-on-S3-的坑" class="headerlink" title="二、Hive on S3 的坑"></a>二、Hive on S3 的坑</h2><h3 id="小文件导致慢查询"><a href="#小文件导致慢查询" class="headerlink" title="小文件导致慢查询"></a>小文件导致慢查询</h3><p>Hive 的 MapReduce 执行引擎默认为每个文件启动一个 Mapper。如果 S3 上有 10000 个小文件，就会启动 10000 个 Mapper——极度浪费且慢。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>ETL 输出时 <code>coalesce</code> 合并文件</li>
+<li>定期运行小文件合并任务</li>
+<li>使用 <code>hive.input.format=org.apache.hadoop.hive.ql.io.CombineHiveInputFormat</code>（自动在 Map 端合并小文件）</li>
+</ul>
+<h3 id="Hive-Metastore-膨胀"><a href="#Hive-Metastore-膨胀" class="headerlink" title="Hive Metastore 膨胀"></a>Hive Metastore 膨胀</h3><p>每个分区都在 MySQL Metastore 中占用一条记录。数百万分区 → Metastore 查询变慢。</p>
+<p><strong>解决方案</strong>：用 Iceberg&#x2F;Hudi 等表格式替代 Hive 原生分区管理。</p>
+<h2 id="三、Presto-Trino——交互式查询引擎"><a href="#三、Presto-Trino——交互式查询引擎" class="headerlink" title="三、Presto&#x2F;Trino——交互式查询引擎"></a>三、Presto&#x2F;Trino——交互式查询引擎</h2><p>Trino（前身 PrestoSQL）是一个分布式 SQL 查询引擎，与 Hive 的关键区别：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Hive</th>
+<th>Trino</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>执行模型</td>
+<td>MapReduce&#x2F;Tez（磁盘中间结果）</td>
+<td>纯内存管道（Pipeline）</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>分钟级</td>
+<td>秒级（交互式查询）</td>
+</tr>
+<tr>
+<td>容错</td>
+<td>支持重跑失败 Task</td>
+<td>查询失败需要重新提交</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>批处理 ETL</td>
+<td>BI 报表、Ad-hoc 查询</td>
+</tr>
+</tbody></table>
+<p>Trino 的核心理念是 <strong>“纯内存、无磁盘”的流水线执行</strong>——数据在内存中从一个算子流向另一个算子，中间结果不落盘。这带来了极快的响应速度，但代价是无法处理超大内存的数据集和单节点故障导致全查询重跑。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- Trino 查询（和 Hive SQL 几乎一样）</span></span><br><span class="line"><span class="keyword">SELECT</span> user_id, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> cnt</span><br><span class="line"><span class="keyword">FROM</span> hive.events</span><br><span class="line"><span class="keyword">WHERE</span> dt <span class="operator">&gt;=</span> <span class="string">&#x27;2026-07-01&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> user_id</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> cnt <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<p>Trino 可以连接多个数据源做联邦查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 关联 Hive 表（S3）和 PostgreSQL 表</span></span><br><span class="line"><span class="keyword">SELECT</span> h.user_id, p.user_name, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> cnt</span><br><span class="line"><span class="keyword">FROM</span> hive.events h</span><br><span class="line"><span class="keyword">JOIN</span> postgresql.public.users p <span class="keyword">ON</span> h.user_id <span class="operator">=</span> p.id</span><br><span class="line"><span class="keyword">WHERE</span> h.dt <span class="operator">=</span> <span class="string">&#x27;2026-07-05&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> h.user_id, p.user_name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、执行引擎演进"><a href="#四、执行引擎演进" class="headerlink" title="四、执行引擎演进"></a>四、执行引擎演进</h2><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Hive</span> <span class="literal">on</span> MapReduce（<span class="number">2012</span>）→ Hive <span class="literal">on</span> Tez（<span class="number">2015</span>）→ Hive <span class="literal">on</span> Spark（<span class="number">2016</span>）→ </span><br><span class="line"><span class="attribute">Presto</span>/Trino 交互式查询（<span class="number">2018</span>+）→ Spark SQL 批处理（当前主力）</span><br></pre></td></tr></table></figure>
+
+<p>当前最佳实践：</p>
+<ul>
+<li><strong>ETL 管道</strong>：Spark on EMR（性能 + 生态）</li>
+<li><strong>交互式查询</strong>：Trino（亚秒-秒级）</li>
+<li><strong>元数据管理</strong>：Hive Metastore &#x2F; AWS Glue Catalog</li>
+<li><strong>表格式</strong>：Iceberg（取代传统 Hive 分区）</li>
+</ul>
+<h2 id="五、小结"><a href="#五、小结" class="headerlink" title="五、小结"></a>五、小结</h2><p>Hive 的定位已经从全能选手转变为元数据入口，真正的计算能力由 Spark 和 Trino 承担。实践中常见的是”Hive Metastore 管理表定义 + Spark 做 ETL + Trino 做 BI 查询”的组合。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/iceberg-delta-hudi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/iceberg-delta-hudi/" class="post-title-link" itemprop="url">Iceberg / Delta Lake / Hudi 表格式对比</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>数据湖的原始形态是直接在 S3&#x2F;HDFS 上写 Parquet 文件——没有表语义、没有 ACID、没有时间旅行。Iceberg、Delta Lake、Hudi 这三大表格式在原始 Parquet 之上添加了一层元数据管理，让数据湖有了数仓的可靠性。</p>
+<h2 id="一、为什么需要表格式"><a href="#一、为什么需要表格式" class="headerlink" title="一、为什么需要表格式"></a>一、为什么需要表格式</h2><figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">无表格式的 S3 Parquet:</span><br><span class="line">  s3://bucket/events/dt=2026<span class="string">-07</span><span class="string">-01</span>/</span><br><span class="line">    part<span class="string">-0001</span>.parquet</span><br><span class="line">    part<span class="string">-0002</span>.parquet</span><br><span class="line">  s3://bucket/events/dt=2026<span class="string">-07</span><span class="string">-02</span>/</span><br><span class="line">    part<span class="string">-0003</span>.parquet</span><br><span class="line"></span><br><span class="line">问题：</span><br><span class="line">  - 没有 schema 管理：不知道表有哪些列、类型是什么</span><br><span class="line">  - 没有事务：写入过程中其他人读到不完整数据</span><br><span class="line">  - 没有时间旅行：无法回退</span><br><span class="line">  - 分区变更需重写数据</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">有表格式（如 Iceberg）:</span><br><span class="line">  s3:<span class="operator">//</span>bucket<span class="operator">/</span>events<span class="symbol">/</span></span><br><span class="line">    metadata<span class="symbol">/</span></span><br><span class="line">      v1.json → 当前版本的表结构<span class="operator">+</span>文件清单</span><br><span class="line">      snap-<span class="operator">*</span>.avro → 每次写入的快照</span><br><span class="line">    data<span class="symbol">/</span></span><br><span class="line">      <span class="attr">dt</span><span class="operator">=</span><span class="number">202</span>6-<span class="number">0</span>7-<span class="number">01</span><span class="operator">/</span>file-<span class="number">1</span>.parquet</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、三方案对比"><a href="#二、三方案对比" class="headerlink" title="二、三方案对比"></a>二、三方案对比</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Iceberg</th>
+<th>Delta Lake</th>
+<th>Hudi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>创始</strong></td>
+<td>Netflix</td>
+<td>Databricks</td>
+<td>Uber</td>
+</tr>
+<tr>
+<td><strong>ACID</strong></td>
+<td>✅ 乐观并发</td>
+<td>✅ 乐观并发</td>
+<td>✅ OCC&#x2F;MVCC</td>
+</tr>
+<tr>
+<td><strong>时间旅行</strong></td>
+<td>✅ Snapshot</td>
+<td>✅ Version</td>
+<td>✅ Commit Timeline</td>
+</tr>
+<tr>
+<td><strong>Schema 演化</strong></td>
+<td>✅ 完整</td>
+<td>✅ 完整</td>
+<td>✅ 完整</td>
+</tr>
+<tr>
+<td><strong>分区演化</strong></td>
+<td>✅ 元数据变更即可</td>
+<td>❌ 需重写数据</td>
+<td>❌ 需重写数据</td>
+</tr>
+<tr>
+<td><strong>生态</strong></td>
+<td>中立，Spark&#x2F;Flink&#x2F;Trino&#x2F;Presto</td>
+<td>Spark 为主，Trino 有限</td>
+<td>Spark&#x2F;Flink&#x2F;Hive</td>
+</tr>
+<tr>
+<td><strong>流式写入</strong></td>
+<td>有限</td>
+<td>有限</td>
+<td><strong>最佳</strong>（Upsert&#x2F;Delete原生支持）</td>
+</tr>
+<tr>
+<td><strong>文件格式</strong></td>
+<td>Parquet&#x2F;ORC&#x2F;Avro</td>
+<td>Parquet</td>
+<td>Parquet&#x2F;ORC</td>
+</tr>
+</tbody></table>
+<h2 id="三、Iceberg——最中立的方案"><a href="#三、Iceberg——最中立的方案" class="headerlink" title="三、Iceberg——最中立的方案"></a>三、Iceberg——最中立的方案</h2><p>Iceberg 由 Netflix 捐赠给 Apache，是三者中最具生态中立性的方案。它的关键优势：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 时间旅行</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> events <span class="keyword">FOR</span> SYSTEM_VERSION <span class="keyword">AS</span> <span class="keyword">OF</span> <span class="string">&#x27;2026-07-01 00:00:00&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- Schema 演化（安全添加列）</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> events <span class="keyword">ADD</span> <span class="keyword">COLUMN</span> new_field STRING;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 分区演化（不重写数据改分区策略）</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> events REPLACE <span class="keyword">PARTITION</span> FIELD (days(dt));</span><br></pre></td></tr></table></figure>
+
+<p><strong>分区演化</strong>是 Iceberg 的独特能力——可以改变分区策略而无需重写历史数据，新策略只对未来的写入生效，查询时 Iceberg 透明处理新旧分区。</p>
+<h2 id="四、Delta-Lake——Spark-首选"><a href="#四、Delta-Lake——Spark-首选" class="headerlink" title="四、Delta Lake——Spark 首选"></a>四、Delta Lake——Spark 首选</h2><p>Delta Lake 由 Databricks 主导，与 Spark 深度集成：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Delta Lake 写入</span></span><br><span class="line">df.write.<span class="built_in">format</span>(<span class="string">&quot;delta&quot;</span>).mode(<span class="string">&quot;overwrite&quot;</span>).save(<span class="string">&quot;s3://bucket/table/&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 时间旅行</span></span><br><span class="line">spark.read.<span class="built_in">format</span>(<span class="string">&quot;delta&quot;</span>).option(<span class="string">&quot;versionAsOf&quot;</span>, <span class="number">5</span>).load(<span class="string">&quot;s3://bucket/table/&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># MERGE (Upsert)</span></span><br><span class="line">delta_table.alias(<span class="string">&quot;t&quot;</span>).merge(</span><br><span class="line">    updates.alias(<span class="string">&quot;u&quot;</span>), <span class="string">&quot;t.id = u.id&quot;</span></span><br><span class="line">).whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Vacuum（清理旧版本文件）</span></span><br><span class="line">delta_table.vacuum(retentionHours=<span class="number">168</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Delta Lake 与 Databricks 的 Photon 引擎深度绑定，在 Databricks 环境下性能无可匹敌，但在开源 Spark 上的性能与 Iceberg 相当。VACUUM 操作需定期执行，否则版本文件会无限增长。</p>
+<h2 id="五、Hudi——流式场景首选"><a href="#五、Hudi——流式场景首选" class="headerlink" title="五、Hudi——流式场景首选"></a>五、Hudi——流式场景首选</h2><p>Hudi 由 Uber 开发，设计初衷是解决流式数据的 Upsert 问题：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Hudi 流式写入</span></span><br><span class="line">df.write.<span class="built_in">format</span>(<span class="string">&quot;hudi&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.table.name&quot;</span>, <span class="string">&quot;events&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.datasource.write.operation&quot;</span>, <span class="string">&quot;upsert&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.datasource.write.recordkey.field&quot;</span>, <span class="string">&quot;id&quot;</span>) \</span><br><span class="line">    .option(<span class="string">&quot;hoodie.datasource.write.precombine.field&quot;</span>, <span class="string">&quot;ts&quot;</span>) \</span><br><span class="line">    .mode(<span class="string">&quot;append&quot;</span>) \</span><br><span class="line">    .save(<span class="string">&quot;s3://bucket/events/&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Hudi 的两种表类型：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>读优化</th>
+<th>写优化</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>COW</strong> (Copy on Write)</td>
+<td>列存 Parquet</td>
+<td>全量重写</td>
+<td>读多写少</td>
+</tr>
+<tr>
+<td><strong>MOR</strong> (Merge on Read)</td>
+<td>Base Parquet + Delta Avro</td>
+<td>增量追加</td>
+<td>写多读少、实时更新</td>
+</tr>
+</tbody></table>
+<p>MOR 表在写入时只追加增量日志（Avro 格式），查询时合并 Base 和 Delta 的数据——牺牲少量读性能换取近实时的写入延迟。</p>
+<h2 id="六、选型建议"><a href="#六、选型建议" class="headerlink" title="六、选型建议"></a>六、选型建议</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>通用数据湖、多引擎环境</td>
+<td><strong>Iceberg</strong>（最中立）</td>
+</tr>
+<tr>
+<td>Databricks&#x2F;Spark 为主</td>
+<td><strong>Delta Lake</strong>（原生集成）</td>
+</tr>
+<tr>
+<td>流式 Upsert、CDC</td>
+<td><strong>Hudi</strong>（流式写入最强）</td>
+</tr>
+<tr>
+<td>AWS EMR + S3</td>
+<td><strong>Iceberg</strong> 或 <strong>Hudi</strong></td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>三种表格式的本质都是在 Parquet 之上加”表管理层”。Iceberg 赢在中立性和分区演化，Delta Lake 赢在 Spark 生态和 Databricks 支持，Hudi 赢在流式 Upsert。选型时最重要的不是功能对比表，而是你的计算引擎生态——选和已有基础设施集成最好的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/instant-messaging-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/instant-messaging-design/" class="post-title-link" itemprop="url">即时通讯系统设计 (WhatsApp/微信)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>即时通讯（IM）是现代互联网最核心的应用场景之一。WhatsApp 日处理 400 亿条消息，微信日活跃用户超 10 亿。设计一个支撑亿级用户的 IM 系统，考验的是对网络协议、消息可靠性、存储架构和分布式系统的综合理解。</p>
+<h2 id="一、核心需求分析"><a href="#一、核心需求分析" class="headerlink" title="一、核心需求分析"></a>一、核心需求分析</h2><h3 id="1-1-功能需求"><a href="#1-1-功能需求" class="headerlink" title="1.1 功能需求"></a>1.1 功能需求</h3><ul>
+<li><strong>一对一消息</strong>：用户 A 发消息给用户 B，B 实时收到</li>
+<li><strong>群聊消息</strong>：消息广播至群内所有在线成员</li>
+<li><strong>在线状态</strong>：展示用户在线&#x2F;离线&#x2F;最后在线时间</li>
+<li><strong>历史消息</strong>：新设备登录后可拉取历史消息</li>
+<li><strong>已读回执</strong>：消息已投递&#x2F;已读状态同步</li>
+</ul>
+<h3 id="1-2-非功能需求"><a href="#1-2-非功能需求" class="headerlink" title="1.2 非功能需求"></a>1.2 非功能需求</h3><ul>
+<li><strong>低延迟</strong>：消息端到端延迟 &lt; 100ms（体感实时）</li>
+<li><strong>高可靠</strong>：消息不丢、不重、不乱序</li>
+<li><strong>高并发</strong>：支持亿级同时在线用户</li>
+<li><strong>跨设备</strong>：手机、PC、Web 同时在线，消息同步</li>
+</ul>
+<h2 id="二、通信协议选择"><a href="#二、通信协议选择" class="headerlink" title="二、通信协议选择"></a>二、通信协议选择</h2><h3 id="2-1-为什么不用-HTTP-短轮询？"><a href="#2-1-为什么不用-HTTP-短轮询？" class="headerlink" title="2.1 为什么不用 HTTP 短轮询？"></a>2.1 为什么不用 HTTP 短轮询？</h3><p>传统的 HTTP 请求-响应模式不适合 IM：</p>
+<ul>
+<li>客户端必须不断发请求检查新消息，浪费带宽和电量</li>
+<li>延迟高：轮询间隔决定了消息送达的上限</li>
+<li>服务端无法主动推送</li>
+</ul>
+<h3 id="2-2-长连接方案对比"><a href="#2-2-长连接方案对比" class="headerlink" title="2.2 长连接方案对比"></a>2.2 长连接方案对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>协议</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>WebSocket</td>
+<td>TCP 全双工</td>
+<td>浏览器原生支持、双向通信、连接复用</td>
+<td>需要维护连接状态</td>
+</tr>
+<tr>
+<td>TCP 私有协议</td>
+<td>自定义</td>
+<td>性能最优、包体精简</td>
+<td>客户端实现成本高</td>
+</tr>
+<tr>
+<td>MQTT</td>
+<td>发布-订阅</td>
+<td>适合 IoT、QoS 分级</td>
+<td>不直接支持群聊语义</td>
+</tr>
+</tbody></table>
+<p><strong>推荐</strong>：移动端用 WebSocket + Protobuf 序列化，Web 端直接用 WebSocket。</p>
+<h3 id="2-3-WebSocket-连接管理"><a href="#2-3-WebSocket-连接管理" class="headerlink" title="2.3 WebSocket 连接管理"></a>2.3 WebSocket 连接管理</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">客户端                          服务端</span><br><span class="line">  │                               │</span><br><span class="line">  ├──── WebSocket 握手 ──────────→│</span><br><span class="line">  │     (HTTP Upgrade)            │</span><br><span class="line">  ├←──── <span class="number">101</span> Switching ──────────┤</span><br><span class="line">  │                               │</span><br><span class="line">  ├──── 心跳 PING ───────────────→│  每 <span class="number">30s</span></span><br><span class="line">  ├←──── PONG ───────────────────┤</span><br><span class="line">  │                               │</span><br><span class="line">  ├──── 发送消息 (protobuf) ─────→│</span><br><span class="line">  ├←──── ACK ────────────────────┤</span><br></pre></td></tr></table></figure>
+
+<p>关键设计决策：</p>
+<ul>
+<li><strong>心跳间隔</strong>：30 秒发送一次 PING，60 秒未收到 PONG 判定连接断开</li>
+<li><strong>断线重连</strong>：指数退避延迟（1s → 2s → 4s → 8s，最大 60s）</li>
+<li><strong>连接迁移</strong>：用户切换网络时，携带 last_event_id 在新连接上继续收取未 ACK 的消息</li>
+</ul>
+<h2 id="三、消息可靠投递"><a href="#三、消息可靠投递" class="headerlink" title="三、消息可靠投递"></a>三、消息可靠投递</h2><h3 id="3-1-消息生命周期"><a href="#3-1-消息生命周期" class="headerlink" title="3.1 消息生命周期"></a>3.1 消息生命周期</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">发送方 → 网关 → 消息队列 → 接收方</span><br><span class="line">  │       │        │          │</span><br><span class="line">存本地   鉴权    持久化    推送+ACK</span><br></pre></td></tr></table></figure>
+
+<p>每条消息的投递状态：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SENT → DELIVERED → READ</span><br><span class="line">(已发送)  (已送达)   (已读)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-离线消息处理"><a href="#3-2-离线消息处理" class="headerlink" title="3.2 离线消息处理"></a>3.2 离线消息处理</h3><p>当接收方离线时：</p>
+<ol>
+<li>消息存入接收方的离线消息队列（Redis List &#x2F; MySQL）</li>
+<li>接收方上线后，从 last_event_id 开始拉取</li>
+<li>拉取完成后，标记这些消息为 DELIVERED</li>
+</ol>
+<p>消息 ID 设计：使用 Snowflake 算法生成全局递增 ID（64 位，毫秒级时间戳 + 机器 ID + 序列号），保证同一会话内消息有序。</p>
+<h3 id="3-3-消息去重"><a href="#3-3-消息去重" class="headerlink" title="3.3 消息去重"></a>3.3 消息去重</h3><p>由于网络重试，同一条消息可能被投递多次。通过以下机制保证幂等：</p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>客户端生成 msg_id</strong></td>
+<td>发送方生成 UUID 作为消息唯一标识</td>
+</tr>
+<tr>
+<td><strong>服务端去重</strong></td>
+<td>收到消息后，Redis SETNX <code>msg:&#123;msg_id&#125;</code> 检查是否已处理</td>
+</tr>
+<tr>
+<td><strong>接收方去重</strong></td>
+<td>接收方本地维护已接收消息 ID 集合，丢弃重复消息</td>
+</tr>
+</tbody></table>
+<h2 id="四、群聊消息分发"><a href="#四、群聊消息分发" class="headerlink" title="四、群聊消息分发"></a>四、群聊消息分发</h2><h3 id="4-1-写扩散-vs-读扩散"><a href="#4-1-写扩散-vs-读扩散" class="headerlink" title="4.1 写扩散 vs 读扩散"></a>4.1 写扩散 vs 读扩散</h3><p>群聊的核心难题：一条消息要送达成千上万个群成员。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>做法</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>写扩散</strong></td>
+<td>发消息时为每个群成员写一条收件箱记录</td>
+<td>读简单、延迟低</td>
+<td>大群写入放大严重（万人群 &#x3D; 万次写入）</td>
+</tr>
+<tr>
+<td><strong>读扩散</strong></td>
+<td>消息只写一份到群的 timeline</td>
+<td>写简单、存储省</td>
+<td>每个成员上线都读群消息，读压力大</td>
+</tr>
+<tr>
+<td><strong>混合策略</strong></td>
+<td>小群写扩散 + 大群读扩散</td>
+<td>平衡性能</td>
+<td>实现复杂</td>
+</tr>
+</tbody></table>
+<p><strong>WhatsApp 的做法</strong>：小群（&lt; 100 人）写扩散，大群（≥ 100 人）读扩散。</p>
+<h3 id="4-2-实现细节"><a href="#4-2-实现细节" class="headerlink" title="4.2 实现细节"></a>4.2 实现细节</h3><p><strong>小群写扩散流程</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 用户发消息 → 查群成员列表</span><br><span class="line"><span class="bullet">2.</span> 对每个成员：插入一条消息到成员的收件箱队列</span><br><span class="line"><span class="bullet">3.</span> 对在线成员：直接推送消息</span><br><span class="line"><span class="bullet">4.</span> 对离线成员：消息留在收件箱中等待上线拉取</span><br></pre></td></tr></table></figure>
+
+<p><strong>大群读扩散流程</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 用户发消息 → 写入群的 timeline（MySQL 表）</span><br><span class="line"><span class="bullet">2.</span> 成员打开群聊 → 从 timeline 拉取最新消息</span><br><span class="line"><span class="bullet">3.</span> 在线成员实时收到通知（有新消息），但不推送消息内容</span><br><span class="line"><span class="bullet">4.</span> 客户端决定是否立即拉取还是等用户主动查看</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、存储架构"><a href="#五、存储架构" class="headerlink" title="五、存储架构"></a>五、存储架构</h2><h3 id="5-1-消息存储"><a href="#5-1-消息存储" class="headerlink" title="5.1 消息存储"></a>5.1 消息存储</h3><table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>存储方案</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>在线消息</td>
+<td>Redis Stream &#x2F; Kafka</td>
+<td>实时投递，TTL 短（24h）</td>
+</tr>
+<tr>
+<td>离线消息</td>
+<td>Redis List + MySQL</td>
+<td>离线消息先存 Redis，定期归档到 MySQL</td>
+</tr>
+<tr>
+<td>历史消息</td>
+<td>MySQL + 冷热分离</td>
+<td>近 7 天热数据，更早的数据归档到对象存储</td>
+</tr>
+<tr>
+<td>附件&#x2F;图片</td>
+<td>对象存储 (S3&#x2F;OSS) + CDN</td>
+<td>缩略图、原图分别存储</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-用户状态"><a href="#5-2-用户状态" class="headerlink" title="5.2 用户状态"></a>5.2 用户状态</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Redis Hash：</span><br><span class="line"><span class="symbol">  user:</span><span class="punctuation">&#123;</span>user_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">    status:</span> <span class="string">&quot;online&quot;</span> | <span class="string">&quot;offline&quot;</span></span><br><span class="line"><span class="symbol">    last_seen:</span> <span class="number">1625097600</span></span><br><span class="line"><span class="symbol">    device_tokens:</span> [<span class="string">&quot;token1&quot;</span>, <span class="string">&quot;token2&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>在线状态通过心跳维护。定期（每 30s）更新 <code>last_seen</code> 时间戳，超过 60 秒未更新标记为离线。</p>
+<h2 id="六、系统架构总览"><a href="#六、系统架构总览" class="headerlink" title="六、系统架构总览"></a>六、系统架构总览</h2><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">                   ┌──────────────┐</span><br><span class="line">                   │    CDN       │  (图片/文件)</span><br><span class="line">                   └──────┬───────┘</span><br><span class="line">                          │</span><br><span class="line">客户端 ←── WebSocket ──→ <span class="selector-attr">[接入层网关集群]</span></span><br><span class="line">                          │</span><br><span class="line">                   ┌──────┴───────┐</span><br><span class="line">                   │   消息队列    │  (Kafka/RocketMQ)</span><br><span class="line">                   └──────┬───────┘</span><br><span class="line">                          │</span><br><span class="line">            ┌─────────────┼─────────────┐</span><br><span class="line">            │             │             │</span><br><span class="line">       <span class="selector-attr">[消息处理]</span>    <span class="selector-attr">[状态服务]</span>     <span class="selector-attr">[存储服务]</span></span><br><span class="line">       (去重/路由)   (在线/离线)    (MySQL+Redis)</span><br><span class="line">            │             │             │</span><br><span class="line">            └─────────────┼─────────────┘</span><br><span class="line">                          │</span><br><span class="line">                   <span class="selector-attr">[推送服务]</span></span><br><span class="line">                   (WebSocket Push + APNs/FCM 离线推送)</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、扩展性考量"><a href="#七、扩展性考量" class="headerlink" title="七、扩展性考量"></a>七、扩展性考量</h2><ul>
+<li><strong>接入层无状态</strong>：WebSocket 网关只负责连接管理和协议转换，业务逻辑下沉到消息处理层</li>
+<li><strong>按用户 ID 分片</strong>：消息队列按 user_id 哈希分区，保证同一用户的消息有序处理</li>
+<li><strong>消息 ID 递增</strong>：Snowflake 生成全局递增 ID，客户端用 ID 判断消息顺序</li>
+<li><strong>多机房部署</strong>：用户就近接入，消息通过专线同步到异地机房</li>
+<li><strong>容量评估</strong>：假设 1 亿用户、人均日发送 50 条消息，日均 50 亿条消息，峰值 QPS ≈ 50亿 &#x2F; 86400 × 1.5（峰值系数） ≈ 8.7 万 QPS</li>
+</ul>
+<h3 id="7-2-WhatsApp-的架构哲学"><a href="#7-2-WhatsApp-的架构哲学" class="headerlink" title="7.2 WhatsApp 的架构哲学"></a>7.2 WhatsApp 的架构哲学</h3><p>WhatsApp 后端能支撑 400 亿日消息量，依靠几个核心设计决策：</p>
+<p><strong>每连接一个 Erlang 进程，无连接池</strong>。传统后端用连接池复用 TCP 连接，WhatsApp 反其道而行——每个用户连接映射为一个轻量级 Erlang 进程（约 300 字节），不池化、不多路复用。这在其他语言下是不可行的（Java 线程需 ~1MB 栈），但 BEAM 虚拟机的进程模型让”百万进程一台机器”成为现实。</p>
+<p><strong>全异步消息传递</strong>。所有内部通信都是异步的——进程发送消息后立即继续处理下一件事，不等待回复。这避免了传统同步调用中的线程阻塞问题。</p>
+<p><strong>单向复制</strong>。数据从主数据中心单向复制到备用数据中心。备用节点只读，不处理写入。当主数据中心宕机时，备用节点中的进程状态会自动重新创建（Erlang Supervisor 树的设计），而非依赖复杂的主备切换。</p>
+<p><strong>ETS 内存表 + 直写缓存</strong>。WhatsApp 后端的许多集群使用 ETS（Erlang Term Storage，内存共享表）作为内部数据存储。配合直写缓存模式，读操作走内存表，写操作同时更新内存表和持久化存储——用空间换时间，极致优化读取延迟。</p>
+<h2 id="八、小结"><a href="#八、小结" class="headerlink" title="八、小结"></a>八、小结</h2><p>即时通讯系统的核心挑战是<strong>消息可靠性</strong>（不丢不重不乱序）和<strong>实时性</strong>（毫秒级端到端延迟）。关键架构决策包括：WebSocket 长连接、消息 ID 去重、小群写扩散&#x2F;大群读扩散的分发策略、以及 Redis + MySQL 的分层存储。WhatsApp 通过 Erlang&#x2F;OTP 构建的分布式 Actor 模型天然适合这种场景，而微信则选择了 C++ 协同程序 + 同步 RPC 的技术路线——两种方案都在亿级规模上证明了各自的可行性。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/io-multiplexing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/io-multiplexing/" class="post-title-link" itemprop="url">IO 多路复用 — select/poll/epoll</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>IO 多路复用是高性能网络编程的基石。从 select 到 poll 再到 epoll，内核的发展史就是一部”如何用更少的资源管理更多连接”的优化史。</p>
+<h2 id="一、为什么需要多路复用"><a href="#一、为什么需要多路复用" class="headerlink" title="一、为什么需要多路复用"></a>一、为什么需要多路复用</h2><p>在传统的阻塞 IO 模型中，<code>accept()</code> 和 <code>read()</code> 都是阻塞的——一个连接的处理会阻塞整个线程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 传统阻塞模型：一个连接一个线程</span></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="type">int</span> client = accept(server_fd, ...);  <span class="comment">// 阻塞等待新连接</span></span><br><span class="line">    pthread_create(..., handle_client, client);  <span class="comment">// 为每个连接创建线程</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>问题：1000 个连接 &#x3D; 1000 个线程。每个线程占用 ~1MB 栈空间 + 上下文切换开销。多路复用让一个线程同时监视成百上千个连接。</p>
+<h2 id="二、select"><a href="#二、select" class="headerlink" title="二、select"></a>二、select</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">fd_set read_fds;</span><br><span class="line">FD_ZERO(&amp;read_fds);</span><br><span class="line">FD_SET(socket1, &amp;read_fds);  <span class="comment">// 将 socket1 加入监视集合</span></span><br><span class="line">FD_SET(socket2, &amp;read_fds);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 阻塞等待任意一个 socket 可读</span></span><br><span class="line"><span class="type">int</span> ready = select(max_fd + <span class="number">1</span>, &amp;read_fds, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= max_fd; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (FD_ISSET(i, &amp;read_fds)) &#123;</span><br><span class="line">        <span class="comment">// socket i 可读了</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最大连接数</td>
+<td>1024（FD_SETSIZE 限制，可重编译但效率下降）</td>
+</tr>
+<tr>
+<td>传入传出</td>
+<td>每次调用都要把整个 fd_set 从用户态复制到内核态</td>
+</tr>
+<tr>
+<td>查找就绪</td>
+<td>O(N) 遍历所有 fd 检查 <code>FD_ISSET</code></td>
+</tr>
+<tr>
+<td>触发模式</td>
+<td>仅水平触发（Level Triggered）</td>
+</tr>
+</tbody></table>
+<h2 id="三、poll"><a href="#三、poll" class="headerlink" title="三、poll"></a>三、poll</h2><p>poll 解决了 select 的 1024 限制，但本质还是轮询：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> <span class="title">fds</span>[10000];</span></span><br><span class="line">fds[<span class="number">0</span>].fd = socket1; fds[<span class="number">0</span>].events = POLLIN;</span><br><span class="line">fds[<span class="number">1</span>].fd = socket2; fds[<span class="number">1</span>].events = POLLIN;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> ready = poll(fds, nfds, timeout);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; nfds; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (fds[i].revents &amp; POLLIN) &#123;</span><br><span class="line">        <span class="comment">// fds[i].fd 可读了</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>相比 select 的改进</strong>：</p>
+<ul>
+<li>使用链表存储 fd，不再有 1024 限制</li>
+<li>事件和返回用不同字段（<code>events</code> 传入，<code>revents</code> 传出）</li>
+</ul>
+<p><strong>未解决的问题</strong>：仍然需要 O(N) 遍历所有 fd 来确定哪些就绪。</p>
+<h2 id="四、epoll"><a href="#四、epoll" class="headerlink" title="四、epoll"></a>四、epoll</h2><p>epoll 是 Linux 上的终极 IO 多路复用方案，通过”回调通知”彻底告别 O(N) 遍历。</p>
+<h3 id="4-1-核心-API"><a href="#4-1-核心-API" class="headerlink" title="4.1 核心 API"></a>4.1 核心 API</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> epfd = epoll_create(<span class="number">1</span>);  <span class="comment">// 创建 epoll 实例</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">ev</span>;</span></span><br><span class="line">ev.events = EPOLLIN;  <span class="comment">// 监视可读事件</span></span><br><span class="line">ev.data.fd = socket1;</span><br><span class="line">epoll_ctl(epfd, EPOLL_CTL_ADD, socket1, &amp;ev);  <span class="comment">// 注册</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 等待就绪事件</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">events</span>[<span class="title">MAX_EVENTS</span>];</span></span><br><span class="line"><span class="type">int</span> n = epoll_wait(epfd, events, MAX_EVENTS, timeout);</span><br><span class="line"></span><br><span class="line"><span class="comment">// events[0..n-1] 都是就绪的 fd，直接处理</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">    <span class="type">int</span> fd = events[i].data.fd;</span><br><span class="line">    <span class="comment">// 处理 fd</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心差异</strong>：<code>events[]</code> 返回的都是真正就绪的 fd，不需要遍历所有注册的 fd。</p>
+<h3 id="4-2-触发模式"><a href="#4-2-触发模式" class="headerlink" title="4.2 触发模式"></a>4.2 触发模式</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>行为</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LT（水平触发）</strong></td>
+<td>只要缓冲区有数据就不停通知</td>
+<td>简单可靠，潜在通知风暴</td>
+</tr>
+<tr>
+<td><strong>ET（边缘触发）</strong></td>
+<td>只在状态变化时通知一次</td>
+<td>高性能，但需要非阻塞 IO + 一次读完</td>
+</tr>
+</tbody></table>
+<p>Netty 默认使用 ET 模式以减少不必要的通知。</p>
+<h3 id="4-3-底层实现"><a href="#4-3-底层实现" class="headerlink" title="4.3 底层实现"></a>4.3 底层实现</h3><p>epoll 在内核中用<strong>红黑树</strong>存储所有注册的 fd，用<strong>就绪链表</strong>存储就绪的 fd：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">epoll_create → 创建 eventpoll 对象</span><br><span class="line">                ├─ 红黑树（rbr）：存储所有监视的 fd</span><br><span class="line">                ├─ 就绪链表（rdllist）：存储就绪的 fd</span><br><span class="line">                └─ 等待队列（wq）：阻塞在 epoll_wait 的进程</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">epoll_ctl</span><span class="params">(ADD)</span></span> → 将 fd 加入红黑树</span><br><span class="line">                  → 注册回调：当 fd 就绪时，将其加入就绪链表</span><br><span class="line"></span><br><span class="line">epoll_wait → 检查就绪链表</span><br><span class="line">             ├─ 有就绪 → 立即返回就绪事件列表</span><br><span class="line">             └─ 无就绪 → 进程睡眠，等待回调唤醒</span><br></pre></td></tr></table></figure>
+
+<p>当网卡收到数据 → 触发中断 → 内核协议栈处理 → 调用 epoll 注册的回调 → 将 fd 加入就绪链表 → 唤醒等待 epoll_wait 的进程。</p>
+<h2 id="五、对比总结"><a href="#五、对比总结" class="headerlink" title="五、对比总结"></a>五、对比总结</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>select</th>
+<th>poll</th>
+<th>epoll</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>性能（大量空闲连接）</td>
+<td>O(N) 线性下降</td>
+<td>O(N) 线性下降</td>
+<td>O(1)，仅活跃连接</td>
+</tr>
+<tr>
+<td>最大连接数</td>
+<td>1024</td>
+<td>无限制</td>
+<td>无限制（受系统内存限制）</td>
+</tr>
+<tr>
+<td>内核态&#x2F;用户态拷贝</td>
+<td>每次完整拷贝</td>
+<td>每次完整拷贝</td>
+<td>仅拷贝就绪事件</td>
+</tr>
+<tr>
+<td>触发模式</td>
+<td>仅 LT</td>
+<td>仅 LT</td>
+<td>LT + ET</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>连接数少</td>
+<td>连接数中</td>
+<td><strong>高并发首选</strong></td>
+</tr>
+</tbody></table>
+<h2 id="六、在-Netty-中的应用"><a href="#六、在-Netty-中的应用" class="headerlink" title="六、在 Netty 中的应用"></a>六、在 Netty 中的应用</h2><p>Netty 在 Linux 上自动选择 epoll，通过 <code>EpollEventLoop</code> 实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Netty 自动选择最优传输</span></span><br><span class="line"><span class="type">NioEventLoopGroup</span> <span class="variable">group</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NioEventLoopGroup</span>();</span><br><span class="line"><span class="comment">// 如果系统支持 epoll，实际创建 EpollEventLoop（更高效）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或显式指定</span></span><br><span class="line"><span class="type">EpollEventLoopGroup</span> <span class="variable">epollGroup</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">EpollEventLoopGroup</span>();</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>select&#x2F;poll 靠轮询找到就绪的 fd（O(N)），epoll 靠回调通知直接拿到就绪列表（O(1)）。这个 O(N) 到 O(1) 的跨越，让单台服务器可以承载数十万甚至百万级的长连接。Java NIO 的 Selector 在 Linux 上底层就是 epoll。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-collections/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/java-collections/" class="post-title-link" itemprop="url">Java 集合框架深度解析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="一、集合框架概览"><a href="#一、集合框架概览" class="headerlink" title="一、集合框架概览"></a>一、集合框架概览</h2><p>Java 集合框架从两个顶层接口出发：<code>Collection</code> 和 <code>Map</code>。</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">                  Iterable</span><br><span class="line">                     |</span><br><span class="line">                 Collection</span><br><span class="line">            /       |       <span class="string">\</span></span><br><span class="line">         List     Queue     <span class="built_in">Set</span></span><br><span class="line">         /          <span class="string">\</span>       /  <span class="string">\</span></span><br><span class="line">   ArrayList      Deque   HashSet TreeSet</span><br><span class="line">   LinkedList    /    <span class="string">\</span></span><br><span class="line">   Vector   ArrayDeque  LinkedList</span><br><span class="line">         /             <span class="string">\</span></span><br><span class="line">ArrayBlockingQueue  PriorityQueue</span><br><span class="line">LinkedBlockingQueue</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    <span class="built_in">Map</span></span><br><span class="line">               /     |      <span class="string">\</span></span><br><span class="line">          HashMap  TreeMap  Hashtable</span><br><span class="line">            |                  |</span><br><span class="line">     LinkedHashMap     ConcurrentHashMap</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-1-List-Set-Queue-Map-实现类一览"><a href="#1-1-List-Set-Queue-Map-实现类一览" class="headerlink" title="1.1 List &#x2F; Set &#x2F; Queue &#x2F; Map 实现类一览"></a>1.1 List &#x2F; Set &#x2F; Queue &#x2F; Map 实现类一览</h3><table>
+<thead>
+<tr>
+<th>实现类</th>
+<th>底层结构</th>
+<th>线程安全</th>
+<th>关键特性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ArrayList</code></td>
+<td>Object[]</td>
+<td>否</td>
+<td>随机 O(1), 扩容 1.5x</td>
+</tr>
+<tr>
+<td><code>LinkedList</code></td>
+<td>双向链表</td>
+<td>否</td>
+<td>头尾 O(1), 随机 O(n)</td>
+</tr>
+<tr>
+<td><code>Vector</code></td>
+<td>Object[]</td>
+<td>是 (synchronized)</td>
+<td>JDK 1.0 遗留</td>
+</tr>
+<tr>
+<td><code>CopyOnWriteArrayList</code></td>
+<td>Object[] + 写时复制</td>
+<td>是 (ReentrantLock)</td>
+<td>读无锁, 写 O(n)</td>
+</tr>
+<tr>
+<td><code>HashSet</code></td>
+<td>HashMap (PRESENT 占位)</td>
+<td>否</td>
+<td>O(1) 查删</td>
+</tr>
+<tr>
+<td><code>TreeSet</code></td>
+<td>TreeMap</td>
+<td>否</td>
+<td>红黑树有序</td>
+</tr>
+<tr>
+<td><code>LinkedHashSet</code></td>
+<td>LinkedHashMap</td>
+<td>否</td>
+<td>维护插入顺序</td>
+</tr>
+<tr>
+<td><code>ArrayDeque</code></td>
+<td>循环数组</td>
+<td>否</td>
+<td>栈&#x2F;双端队列首选</td>
+</tr>
+<tr>
+<td><code>PriorityQueue</code></td>
+<td>二叉堆 (Object[])</td>
+<td>否</td>
+<td>按优先级出队</td>
+</tr>
+<tr>
+<td><code>ArrayBlockingQueue</code></td>
+<td>Object[] + 单锁</td>
+<td>是</td>
+<td>有界阻塞</td>
+</tr>
+<tr>
+<td><code>LinkedBlockingQueue</code></td>
+<td>单向链表 + 双锁</td>
+<td>是</td>
+<td>可选边界, 默认无界</td>
+</tr>
+<tr>
+<td><code>HashMap</code></td>
+<td>数组+链表+红黑树(8+)</td>
+<td>否</td>
+<td>O(1) 平均</td>
+</tr>
+<tr>
+<td><code>TreeMap</code></td>
+<td>红黑树</td>
+<td>否</td>
+<td>key 有序</td>
+</tr>
+<tr>
+<td><code>Hashtable</code></td>
+<td>数组+链表</td>
+<td>是 (synchronized)</td>
+<td>JDK 1.0 遗留</td>
+</tr>
+<tr>
+<td><code>ConcurrentHashMap</code></td>
+<td>Node[]+CAS+synchronized(8)</td>
+<td>是</td>
+<td>桶级锁, 读无锁</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-线程安全集合速览"><a href="#1-2-线程安全集合速览" class="headerlink" title="1.2 线程安全集合速览"></a>1.2 线程安全集合速览</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 传统 — 全局锁</span></span><br><span class="line">Map&lt;K,V&gt; m1 = <span class="keyword">new</span> <span class="title class_">Hashtable</span>&lt;&gt;();</span><br><span class="line">Map&lt;K,V&gt; m2 = Collections.synchronizedMap(<span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;());</span><br><span class="line">List&lt;E&gt;  l2 = Collections.synchronizedList(<span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;());</span><br><span class="line"></span><br><span class="line"><span class="comment">// JUC — 高并发方案</span></span><br><span class="line">Map&lt;K,V&gt;   m3 = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;();          <span class="comment">// CAS + synchronized(桶)</span></span><br><span class="line">List&lt;E&gt;    l3 = <span class="keyword">new</span> <span class="title class_">CopyOnWriteArrayList</span>&lt;&gt;();        <span class="comment">// 写时复制, 读无锁</span></span><br><span class="line">Queue&lt;E&gt;   q1 = <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">100</span>);       <span class="comment">// 单锁 + Condition</span></span><br><span class="line">Queue&lt;E&gt;   q2 = <span class="keyword">new</span> <span class="title class_">LinkedBlockingQueue</span>&lt;&gt;();         <span class="comment">// 双锁 takeLock/putLock</span></span><br><span class="line">Queue&lt;E&gt;   q3 = <span class="keyword">new</span> <span class="title class_">ConcurrentLinkedQueue</span>&lt;&gt;();       <span class="comment">// 无锁 CAS</span></span><br><span class="line">Set&lt;E&gt;    set = ConcurrentHashMap.newKeySet();</span><br></pre></td></tr></table></figure>
+
+<hr>
+<hr>
+<hr>
+<h2 id="四、ArrayList-vs-LinkedList"><a href="#四、ArrayList-vs-LinkedList" class="headerlink" title="四、ArrayList vs LinkedList"></a>四、ArrayList vs LinkedList</h2><h3 id="4-1-ArrayList-扩容"><a href="#4-1-ArrayList-扩容" class="headerlink" title="4.1 ArrayList 扩容"></a>4.1 ArrayList 扩容</h3><p>底层 <code>Object[] elementData</code>, 默认容量 10, 扩容 1.5 倍:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">grow</span><span class="params">(<span class="type">int</span> minCapacity)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCapacity</span> <span class="operator">=</span> elementData.length;</span><br><span class="line">    <span class="type">int</span> <span class="variable">newCapacity</span> <span class="operator">=</span> oldCapacity + (oldCapacity &gt;&gt; <span class="number">1</span>);  <span class="comment">// 1.5 倍</span></span><br><span class="line">    <span class="keyword">if</span> (newCapacity - minCapacity &lt; <span class="number">0</span>)</span><br><span class="line">        newCapacity = minCapacity;</span><br><span class="line">    elementData = Arrays.copyOf(elementData, newCapacity); <span class="comment">// System.arraycopy(native)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>modCount</code> 用于 fail-fast: 迭代期间检测到 <code>modCount</code> 变化立即抛 <code>ConcurrentModificationException</code>。</p>
+<h3 id="4-2-LinkedList-结构"><a href="#4-2-LinkedList-结构" class="headerlink" title="4.2 LinkedList 结构"></a>4.2 LinkedList 结构</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Node</span>&lt;E&gt; &#123; E item; Node&lt;E&gt; next; Node&lt;E&gt; prev; &#125;</span><br><span class="line"><span class="keyword">transient</span> Node&lt;E&gt; first;</span><br><span class="line"><span class="keyword">transient</span> Node&lt;E&gt; last;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">first                                              last</span><br><span class="line">  ↓                                                  ↓</span><br><span class="line">  [null|<span class="string">A</span>|<span class="string">→]  ⇄  [←</span>|<span class="string">B</span>|<span class="string">→]  ⇄  [←</span>|<span class="string">C</span>|<span class="string">→]  ⇄  [←</span>|<span class="string">D</span>|<span class="string">null]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-性能对比"><a href="#4-3-性能对比" class="headerlink" title="4.3 性能对比"></a>4.3 性能对比</h3><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>ArrayList</th>
+<th>LinkedList</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>get(i)</code></td>
+<td><strong>O(1)</strong></td>
+<td>O(n)</td>
+<td>数组寻址 vs 指针遍历</td>
+</tr>
+<tr>
+<td><code>add(E)</code></td>
+<td>均摊 O(1)</td>
+<td><strong>O(1)</strong></td>
+<td>扩容均摊 vs 直接尾插</td>
+</tr>
+<tr>
+<td><code>add(0,E)</code></td>
+<td>O(n)</td>
+<td><strong>O(1)</strong></td>
+<td>后移元素 vs 改头指针</td>
+</tr>
+<tr>
+<td><code>add(i,E)</code></td>
+<td>O(n)</td>
+<td><strong>O(n)</strong></td>
+<td>元素移位 vs 遍历定位+改指针</td>
+</tr>
+<tr>
+<td><code>remove(i)</code></td>
+<td>O(n)</td>
+<td><strong>O(n)</strong></td>
+<td>元素移位 vs 遍历定位+改指针</td>
+</tr>
+<tr>
+<td>遍历</td>
+<td><strong>O(n) 缓存友好</strong></td>
+<td>O(n) 缓存差</td>
+<td>连续内存 vs 随机指针</td>
+</tr>
+<tr>
+<td>内存 (100万元素)</td>
+<td>~4 MB</td>
+<td>~40 MB</td>
+<td>纯数据 vs 每个 3 个引用 + 对象头</td>
+</tr>
+</tbody></table>
+<p><strong>LinkedList 随机插入也 O(n)</strong> — 虽然 <code>add(index,E)</code> 定位后改指针是 O(1), 但 <code>node(index)</code> 遍历到目标位置已是 O(n), 定位开销主导。因此频繁中间插入&#x2F;删除<strong>两者都不适合</strong>，应重新考虑数据结构。</p>
+<h3 id="4-4-选型指南"><a href="#4-4-选型指南" class="headerlink" title="4.4 选型指南"></a>4.4 选型指南</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>频繁随机读取</td>
+<td><code>ArrayList</code></td>
+</tr>
+<tr>
+<td>频繁尾插入</td>
+<td><code>ArrayList</code> (均摊 O(1), 内存省)</td>
+</tr>
+<tr>
+<td>频繁头插入&#x2F;删除</td>
+<td><code>LinkedList</code> 或 <code>ArrayDeque</code></td>
+</tr>
+<tr>
+<td>栈</td>
+<td><code>ArrayDeque</code> (比 LinkedList 快, 比 Stack 好)</td>
+</tr>
+<tr>
+<td>队列</td>
+<td><code>ArrayDeque</code> (循环数组)</td>
+</tr>
+<tr>
+<td>大量删除</td>
+<td><code>ArrayList</code> — 从后往前删, 避免重复移位</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、其他集合"><a href="#五、其他集合" class="headerlink" title="五、其他集合"></a>五、其他集合</h2><p>当 <code>accessOrder=true</code> 时, <code>afterNodeAccess(e)</code> 将访问节点移到链表末尾 —— 最久未访问的自然停留在 head。</p>
+<h3 id="5-2-TreeMap-TreeSet"><a href="#5-2-TreeMap-TreeSet" class="headerlink" title="5.2 TreeMap &#x2F; TreeSet"></a>5.2 TreeMap &#x2F; TreeSet</h3><p><code>TreeMap</code> 底层红黑树:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">Entry</span>&lt;K,V&gt; <span class="keyword">implements</span> <span class="title class_">Map</span>.Entry&lt;K,V&gt; &#123;</span><br><span class="line">    K key; V value; Entry&lt;K,V&gt; left, right, parent; <span class="type">boolean</span> <span class="variable">color</span> <span class="operator">=</span> BLACK;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Comparator&lt;? <span class="built_in">super</span> K&gt; comparator;  <span class="comment">// 外部比较器</span></span><br></pre></td></tr></table></figure>
+
+<p>排序规则: <code>Comparator</code> (构造参数) &gt; <code>Comparable</code> (key 自身实现) &gt; 否则抛 <code>ClassCastException</code>。</p>
+<p><code>TreeSet</code> 内就是一个 <code>NavigableMap</code> (即 TreeMap), 所有操作委托给 Map, 用 <code>PRESENT = new Object()</code> 占位 value。</p>
+<h3 id="5-3-HashSet"><a href="#5-3-HashSet" class="headerlink" title="5.3 HashSet"></a>5.3 HashSet</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HashSet</span>&lt;E&gt; <span class="keyword">extends</span> <span class="title class_">AbstractSet</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> HashMap&lt;E,Object&gt; map;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Object</span> <span class="variable">PRESENT</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Object</span>();</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">add</span><span class="params">(E e)</span>   &#123; <span class="keyword">return</span> map.put(e, PRESENT)==<span class="literal">null</span>; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">remove</span><span class="params">(Object o)</span> &#123; <span class="keyword">return</span> map.remove(o)==PRESENT; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(Object o)</span> &#123; <span class="keyword">return</span> map.containsKey(o); &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">size</span><span class="params">()</span>              &#123; <span class="keyword">return</span> map.size(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>全部委托给 HashMap, value 统一用 <code>PRESENT</code> 占位。<code>LinkedHashSet</code> 同理, 内部是 LinkedHashMap。</p>
+<h3 id="5-4-CopyOnWriteArrayList"><a href="#5-4-CopyOnWriteArrayList" class="headerlink" title="5.4 CopyOnWriteArrayList"></a>5.4 CopyOnWriteArrayList</h3><p>写时复制: 写操作不修改原数组, 而是 <code>Arrays.copyOf</code> 复制新数组后再替换引用:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">add</span><span class="params">(E e)</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="type">ReentrantLock</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="built_in">this</span>.lock;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Object[] elements = getArray();</span><br><span class="line">        Object[] newElements = Arrays.copyOf(elements, len + <span class="number">1</span>);</span><br><span class="line">        newElements[len] = e;</span><br><span class="line">        setArray(newElements);  <span class="comment">// volatile 写, 对所有读线程立即可见</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123; lock.unlock(); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> E <span class="title function_">get</span><span class="params">(<span class="type">int</span> index)</span> &#123; <span class="keyword">return</span> get(getArray(), index); &#125; <span class="comment">// 完全无锁</span></span><br></pre></td></tr></table></figure>
+
+<p><code>COWIterator</code> 持有创建时的数组快照, 遍历期间不感知后续修改, 不抛 <code>ConcurrentModificationException</code>。</p>
+<p><strong>适用</strong>: 读多写少 (配置、白名单、监听器列表)。写操作 O(n) 需复制全数组, 数据量大时不适合。</p>
+<h3 id="5-5-ArrayBlockingQueue-vs-LinkedBlockingQueue"><a href="#5-5-ArrayBlockingQueue-vs-LinkedBlockingQueue" class="headerlink" title="5.5 ArrayBlockingQueue vs LinkedBlockingQueue"></a>5.5 ArrayBlockingQueue vs LinkedBlockingQueue</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>ArrayBlockingQueue</th>
+<th>LinkedBlockingQueue</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>底层</td>
+<td>循环数组 (定长)</td>
+<td>单向链表 (可选上限)</td>
+</tr>
+<tr>
+<td>锁</td>
+<td><strong>单锁</strong> (put+take 共用)</td>
+<td><strong>双锁</strong> (putLock + takeLock)</td>
+</tr>
+<tr>
+<td>并发度</td>
+<td>put 和 take 互斥</td>
+<td><strong>put 和 take 可并发</strong></td>
+</tr>
+<tr>
+<td>内存</td>
+<td>预分配数组</td>
+<td>每个元素新建 Node</td>
+</tr>
+<tr>
+<td>吞吐</td>
+<td>较低</td>
+<td>较高 (生产消费不互斥)</td>
+</tr>
+<tr>
+<td>默认容量</td>
+<td>必须指定</td>
+<td><code>Integer.MAX_VALUE</code></td>
+</tr>
+</tbody></table>
+<p>双锁原理: 入队操作尾部, 出队操作头部, 无数据结构冲突, 两把锁让生产者和消费者并行。</p>
+<hr>
+<h2 id="六、线程安全方案总结"><a href="#六、线程安全方案总结" class="headerlink" title="六、线程安全方案总结"></a>六、线程安全方案总结</h2><h3 id="6-1-各集合安全方案对比"><a href="#6-1-各集合安全方案对比" class="headerlink" title="6.1 各集合安全方案对比"></a>6.1 各集合安全方案对比</h3><table>
+<thead>
+<tr>
+<th>集合</th>
+<th>安全方案</th>
+<th>粒度</th>
+<th>特殊限制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hashtable</td>
+<td>全方法 synchronized</td>
+<td>全局</td>
+<td>不使用 (已过时)</td>
+</tr>
+<tr>
+<td>synchronizedMap&#x2F;List</td>
+<td>mutex 包装器 synchronized</td>
+<td>全局</td>
+<td>迭代需手动加锁</td>
+</tr>
+<tr>
+<td>Vector</td>
+<td>全方法 synchronized</td>
+<td>全局</td>
+<td>不使用</td>
+</tr>
+<tr>
+<td>ConcurrentHashMap (7)</td>
+<td>Segment[] + ReentrantLock</td>
+<td>Segment 级 (16)</td>
+<td>Segment 数固定</td>
+</tr>
+<tr>
+<td>ConcurrentHashMap (8)</td>
+<td>CAS + synchronized(桶头)</td>
+<td><strong>桶级</strong></td>
+<td>key&#x2F;value 不能为 null</td>
+</tr>
+<tr>
+<td>CopyOnWriteArrayList</td>
+<td>volatile 数组 + ReentrantLock</td>
+<td>写锁, 读无锁</td>
+<td>写 O(n)</td>
+</tr>
+<tr>
+<td>CopyOnWriteArraySet</td>
+<td>委托 CopyOnWriteArrayList</td>
+<td>同上</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>ArrayBlockingQueue</td>
+<td>ReentrantLock(单锁) + Condition</td>
+<td>单锁</td>
+<td>定长</td>
+</tr>
+<tr>
+<td>LinkedBlockingQueue</td>
+<td>ReentrantLock(双锁) + Condition</td>
+<td>双锁</td>
+<td>默认无界 (OOM 风险)</td>
+</tr>
+<tr>
+<td>ConcurrentLinkedQueue</td>
+<td>CAS 无锁 (Michael-Scott)</td>
+<td>无锁</td>
+<td>—</td>
+</tr>
+</tbody></table>
+<h3 id="6-2-常见误区"><a href="#6-2-常见误区" class="headerlink" title="6.2 常见误区"></a>6.2 常见误区</h3><ol>
+<li><p><strong><code>synchronizedMap</code> 迭代不是线程安全的</strong> — 必须手动同步:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Map</span> <span class="variable">m</span> <span class="operator">=</span> Collections.synchronizedMap(<span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;());</span><br><span class="line"><span class="keyword">synchronized</span> (m) &#123; <span class="keyword">for</span> (Object o : m.keySet()) &#123; &#125; &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>ConcurrentHashMap</code> 复合操作</strong> — <code>get</code>+<code>put</code> 非原子:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 可能覆盖其他线程刚 put 的值</span></span><br><span class="line"><span class="keyword">if</span> (map.get(key) == <span class="literal">null</span>) map.put(key, val);</span><br><span class="line"><span class="comment">// ✅ 正确做法</span></span><br><span class="line">map.computeIfAbsent(key, k -&gt; computeValue());</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>size()</code> 不精确</strong> — <code>ConcurrentHashMap.size()</code> 和 <code>mappingCount()</code> 都返回近似快照。</p>
+</li>
+<li><p><strong><code>CopyOnWriteArrayList</code> 写密集型场景</strong> — 百万级数据每次 add 复制整个数组, 延迟毫秒级。</p>
+</li>
+<li><p><strong><code>HashMap</code> 并发 <code>put</code>+<code>get</code></strong> — JDK 8 虽解决死循环, 但 resize 期间元素正在迁移, get 仍可能返回不一致结果。</p>
+</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>参考文献</strong>:<br>[^1]: Doug Lea, <em>Concurrent Programming in Java</em> (JSR-166 理论基础)<br>[^2]: JDK HashMap 源码注释 (泊松分布概率表)<br>[^3]: Brian Goetz, <em>Java Concurrency in Practice</em>, 第 5 章<br>[^4]: OpenJDK <code>java/util/HashMap.java</code> &#x2F; <code>java/util/concurrent/ConcurrentHashMap.java</code><br>[^5]: CLRS <em>Introduction to Algorithms</em>, 第 13 章 (红黑树)</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/posts/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/posts/">1</a><a class="page-number" href="/posts/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/posts/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/16/">16</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/posts/page/4/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一、设计模式概述1.1 什么是设计模式设计模式是前人总结的、针对特定问题的可复用解决方案——一套命名良好的编程惯例，目的是降低耦合、提高可维护性。 但设计模式不是银弹。模式的价值在于提供通用词汇表，让工程师用”单例””策略””责任链”快速对齐思路，而不是让每行代码都套用一种模式。 1.2 六大设计原则在谈具体模式之前，必须先理解背后的原则。模式是手段，原则才是目的。 SOLID 五原则    原则">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式 -- 后端实践">
+<meta property="og:url" content="http://pclhahaha.github.io/design-patterns/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="一、设计模式概述1.1 什么是设计模式设计模式是前人总结的、针对特定问题的可复用解决方案——一套命名良好的编程惯例，目的是降低耦合、提高可维护性。 但设计模式不是银弹。模式的价值在于提供通用词汇表，让工程师用”单例””策略””责任链”快速对齐思路，而不是让每行代码都套用一种模式。 1.2 六大设计原则在谈具体模式之前，必须先理解背后的原则。模式是手段，原则才是目的。 SOLID 五原则    原则">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="架构">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/design-patterns/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/design-patterns/","path":"design-patterns/","title":"设计模式 -- 后端实践"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>设计模式 -- 后端实践 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">一、设计模式概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AF%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 什么是设计模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%85%AD%E5%A4%A7%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 六大设计原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%89%E5%A4%A7%E5%88%86%E7%B1%BB"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 设计模式三大分类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%88%9B%E5%BB%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">二、创建型模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95-%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82"><span class="nav-number">2.1.</span> <span class="nav-text">2.2 工厂方法 &amp; 抽象工厂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">2.3 建造者模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.3.</span> <span class="nav-text">2.4 原型模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%BB%93%E6%9E%84%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">三、结构型模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">3.2 适配器模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.2.</span> <span class="nav-text">3.3 装饰器模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E9%97%A8%E9%9D%A2%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.3.</span> <span class="nav-text">3.4 门面模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%A1%8C%E4%B8%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">四、行为型模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%9C%A8%E6%A1%86%E6%9E%B6%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-number">5.</span> <span class="nav-text">五、设计模式在框架中的应用速查表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%AE%9E%E9%99%85%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E5%8F%96%E8%88%8D"><span class="nav-number">6.</span> <span class="nav-text">六、实际项目中的取舍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%B8%8D%E8%AF%A5%E7%94%A8%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 什么时候不该用设计模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-KISS-vs-DRY-%E7%9A%84%E5%B9%B3%E8%A1%A1"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 KISS vs DRY 的平衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-%E6%A8%A1%E5%BC%8F%E9%80%89%E6%8B%A9%E7%9A%84%E5%86%B3%E7%AD%96%E6%A0%91"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 模式选择的决策树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">6.4.</span> <span class="nav-text">6.4 学习建议</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/design-patterns/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="设计模式 -- 后端实践 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式 -- 后端实践
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">CS基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="一、设计模式概述"><a href="#一、设计模式概述" class="headerlink" title="一、设计模式概述"></a>一、设计模式概述</h2><h3 id="1-1-什么是设计模式"><a href="#1-1-什么是设计模式" class="headerlink" title="1.1 什么是设计模式"></a>1.1 什么是设计模式</h3><p>设计模式是前人总结的、针对特定问题的可复用解决方案——一套命名良好的编程惯例，目的是降低耦合、提高可维护性。</p>
+<p>但<strong>设计模式不是银弹</strong>。模式的价值在于提供通用词汇表，让工程师用”单例””策略””责任链”快速对齐思路，而不是让每行代码都套用一种模式。</p>
+<h3 id="1-2-六大设计原则"><a href="#1-2-六大设计原则" class="headerlink" title="1.2 六大设计原则"></a>1.2 六大设计原则</h3><p>在谈具体模式之前，必须先理解背后的原则。模式是手段，原则才是目的。</p>
+<p><strong>SOLID 五原则</strong></p>
+<table>
+<thead>
+<tr>
+<th>原则</th>
+<th>英文</th>
+<th>核心含义</th>
+<th>一句话记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单一职责</td>
+<td>SRP</td>
+<td>一个类只做一件事</td>
+<td>不要让别人修改你的类时顺带改你的功能</td>
+</tr>
+<tr>
+<td>开闭原则</td>
+<td>OCP</td>
+<td>对扩展开放，对修改关闭</td>
+<td>加新功能靠新增代码，不靠改旧代码</td>
+</tr>
+<tr>
+<td>里氏替换</td>
+<td>LSP</td>
+<td>子类可以替换父类且行为不变</td>
+<td>方形的矩形可以当矩形用吗？不行</td>
+</tr>
+<tr>
+<td>接口隔离</td>
+<td>ISP</td>
+<td>接口应该小而专</td>
+<td>别让实现类被迫实现它不需要的方法</td>
+</tr>
+<tr>
+<td>依赖倒置</td>
+<td>DIP</td>
+<td>依赖抽象而非具体实现</td>
+<td>高层模块不应依赖低层模块，两者都依赖接口</td>
+</tr>
+</tbody></table>
+<p><strong>迪米特法则（Law of Demeter &#x2F; 最少知识原则）</strong></p>
+<p>也叫”不要和陌生人说话”。一个对象应该对其他对象有尽可能少的了解——只与直接的朋友通信。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 违反迪米特法则：链式穿透多个对象</span></span><br><span class="line"><span class="type">String</span> <span class="variable">zip</span> <span class="operator">=</span> order.getCustomer().getAddress().getZip();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 遵循迪米特法则：通过中间对象暴露所需数据</span></span><br><span class="line"><span class="type">String</span> <span class="variable">zip</span> <span class="operator">=</span> order.getCustomerZip();</span><br></pre></td></tr></table></figure>
+
+<p>迪米特法则的核心价值在于降低耦合——调用者不需要知道被调用者的内部结构。但也别走向极端，为每个字段都包一层 getter 会导致类膨胀。</p>
+<p>六大原则不是孤立的教条，而是相互补充的实践指南。实际编码中，优先遵守 SRP 和 DIP，其他原则往往会在过程中自然满足。</p>
+<h3 id="1-3-设计模式三大分类"><a href="#1-3-设计模式三大分类" class="headerlink" title="1.3 设计模式三大分类"></a>1.3 设计模式三大分类</h3><p>GoF 将 23 种设计模式划分为三类：</p>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>关注点</th>
+<th>核心思路</th>
+<th>典型代表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建型</td>
+<td>对象怎么创建</td>
+<td>将对象的创建与使用分离</td>
+<td>单例、工厂、建造者、原型</td>
+</tr>
+<tr>
+<td>结构型</td>
+<td>类&#x2F;对象怎么组合</td>
+<td>通过继承&#x2F;组合构建更大结构</td>
+<td>代理、适配器、装饰器、门面</td>
+</tr>
+<tr>
+<td>行为型</td>
+<td>类&#x2F;对象怎么协作</td>
+<td>关注对象之间的责任分配和通信</td>
+<td>观察者、策略、模板方法、责任链、状态</td>
+</tr>
+</tbody></table>
+<p>以下各章节<strong>只聚焦后端开发中最常用的模式</strong>，略过那些”考试常见但生产鲜见”的模式。</p>
+<hr>
+<h2 id="二、创建型模式"><a href="#二、创建型模式" class="headerlink" title="二、创建型模式"></a>二、创建型模式</h2><p>创建型模式的核心问题：<strong>如何在不指定具体类的情况下创建对象</strong>。Spring 的 Bean 容器本质上就是一个巨大的工厂 + 单例注册表。</p>
+<hr>
+<h3 id="2-2-工厂方法-抽象工厂"><a href="#2-2-工厂方法-抽象工厂" class="headerlink" title="2.2 工厂方法 &amp; 抽象工厂"></a>2.2 工厂方法 &amp; 抽象工厂</h3><p><strong>意图</strong>：定义一个创建对象的接口，让子类决定实例化哪个类。工厂方法使类的实例化延迟到子类。</p>
+<p>直接 <code>new</code> 的问题：调用方需要知道具体类名，而具体类可能会变。工厂将这些变化封装起来。</p>
+<p><strong>工厂方法 vs 抽象工厂</strong></p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>工厂方法</th>
+<th>抽象工厂</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产品数量</td>
+<td>单一产品</td>
+<td>产品族（一组相关产品）</td>
+</tr>
+<tr>
+<td>实现方式</td>
+<td>继承，子类覆盖工厂方法</td>
+<td>组合，注入不同的工厂实例</td>
+</tr>
+<tr>
+<td>扩展点</td>
+<td>新增具体产品 &#x3D; 加一个工厂子类</td>
+<td>新增产品族 &#x3D; 加一个工厂实现</td>
+</tr>
+<tr>
+<td>典型场景</td>
+<td>一个方法返回一个对象</td>
+<td>一组相关对象需要配套使用</td>
+</tr>
+</tbody></table>
+<p><strong>Spring BeanFactory —— 工厂方法的集大成者</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">BeanFactory</span> &#123;</span><br><span class="line">    Object <span class="title function_">getBean</span><span class="params">(String name)</span> <span class="keyword">throws</span> BeansException;</span><br><span class="line">    &lt;T&gt; T <span class="title function_">getBean</span><span class="params">(Class&lt;T&gt; requiredType)</span> <span class="keyword">throws</span> BeansException;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>getBean()</code> 是工厂方法，具体的创建逻辑分散在各实现类中（<code>DefaultListableBeanFactory</code> 负责注册和获取，<code>AbstractAutowireCapableBeanFactory</code> 负责实例化和依赖注入）。<code>ApplicationContext</code> 继承 <code>BeanFactory</code>，形成经典的”工厂方法层次结构”。</p>
+<p><strong>MyBatis SqlSessionFactory</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">SqlSessionFactory</span> <span class="variable">factory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SqlSessionFactoryBuilder</span>()</span><br><span class="line">    .build(Resources.getResourceAsStream(<span class="string">&quot;mybatis-config.xml&quot;</span>));</span><br><span class="line"><span class="comment">// SqlSessionFactory 用工厂方法创建 SqlSession</span></span><br><span class="line"><span class="comment">// SqlSessionFactoryBuilder 用建造者模式从 XML 构建出 SqlSessionFactory</span></span><br></pre></td></tr></table></figure>
+
+<p>MyBatis 展示了<strong>工厂方法 + 建造者的组合使用</strong>。</p>
+<p><strong>JDK 中的工厂方法</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Calendar</span> <span class="variable">cal</span> <span class="operator">=</span> Calendar.getInstance();          <span class="comment">// 工厂方法</span></span><br><span class="line"><span class="type">ExecutorService</span> <span class="variable">pool</span> <span class="operator">=</span> Executors.newFixedThreadPool(<span class="number">10</span>);  <span class="comment">// 静态工厂方法</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-3-建造者模式"><a href="#2-3-建造者模式" class="headerlink" title="2.3 建造者模式"></a>2.3 建造者模式</h3><p><strong>意图</strong>：将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示。</p>
+<p><strong>何时使用</strong>：</p>
+<ul>
+<li>构造函数参数超过 4 个</li>
+<li>参数有可选值，且多种组合</li>
+<li>需要构建不可变对象</li>
+</ul>
+<p><strong>Lombok @Builder</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Builder</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderRequest</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String orderId;</span><br><span class="line">    <span class="keyword">private</span> Long userId;</span><br><span class="line">    <span class="keyword">private</span> BigDecimal amount;</span><br><span class="line">    <span class="keyword">private</span> String payChannel;    <span class="comment">// 可选</span></span><br><span class="line">    <span class="keyword">private</span> String couponCode;     <span class="comment">// 可选</span></span><br><span class="line">    <span class="keyword">private</span> String remark;         <span class="comment">// 可选</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="type">OrderRequest</span> <span class="variable">request</span> <span class="operator">=</span> OrderRequest.builder()</span><br><span class="line">    .orderId(<span class="string">&quot;ORD-001&quot;</span>)</span><br><span class="line">    .userId(<span class="number">1001L</span>)</span><br><span class="line">    .amount(<span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;99.00&quot;</span>))</span><br><span class="line">    .payChannel(<span class="string">&quot;WECHAT&quot;</span>)</span><br><span class="line">    .remark(<span class="string">&quot;加急配送&quot;</span>)</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
+
+<p>Lombok 编译期生成静态内部类 <code>OrderRequestBuilder</code>，每个字段对应一个 setter 方法返回 <code>this</code> 实现链式调用，<code>build()</code> 方法调用全参构造器创建目标对象。</p>
+<p><strong>OkHttp Request.Builder</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Request</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Request</span>.Builder()</span><br><span class="line">    .url(<span class="string">&quot;https://api.example.com/data&quot;</span>)</span><br><span class="line">    .header(<span class="string">&quot;Authorization&quot;</span>, <span class="string">&quot;Bearer token&quot;</span>)</span><br><span class="line">    .post(RequestBody.create(json, MediaType.parse(<span class="string">&quot;application/json&quot;</span>)))</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
+
+<p>OkHttp 的 <code>Request</code> 是不可变对象，大量可选配置（头、超时、缓存策略）通过 Builder 构建，避免参数爆炸。</p>
+<p><strong>建造者模式 vs 工厂模式</strong></p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>建造者</th>
+<th>工厂</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>关注点</td>
+<td>如何一步步组装复杂对象</td>
+<td>直接创建对象，不关心步骤</td>
+</tr>
+<tr>
+<td>参数数量</td>
+<td>很多，且可选</td>
+<td>少，通常是必须的</td>
+</tr>
+<tr>
+<td>构建过程</td>
+<td>分步骤，可以灵活组合</td>
+<td>一次性完成</td>
+</tr>
+<tr>
+<td>返回时机</td>
+<td>调用 build() 时才创建</td>
+<td>调用工厂方法即返回</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="2-4-原型模式"><a href="#2-4-原型模式" class="headerlink" title="2.4 原型模式"></a>2.4 原型模式</h3><p><strong>意图</strong>：通过复制已有对象来创建新对象，而不是通过 new。</p>
+<p><strong>Java 中的核心接口</strong>：<code>Cloneable</code> + <code>Object.clone()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ReportTemplate</span> <span class="keyword">implements</span> <span class="title class_">Cloneable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String header;</span><br><span class="line">    <span class="keyword">private</span> String footer;</span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; columns;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ReportTemplate <span class="title function_">clone</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">ReportTemplate</span> <span class="variable">cloned</span> <span class="operator">=</span> (ReportTemplate) <span class="built_in">super</span>.clone();</span><br><span class="line">            <span class="comment">// 深拷贝：集合字段需要单独处理</span></span><br><span class="line">            cloned.columns = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(<span class="built_in">this</span>.columns);</span><br><span class="line">            <span class="keyword">return</span> cloned;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (CloneNotSupportedException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AssertionError</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意 <code>super.clone()</code> 是<strong>浅拷贝</strong>——引用类型字段只复制引用。如果对象包含集合或其他可变对象，需要手动实现深拷贝。</p>
+<p><strong>Spring @Scope(“prototype”)</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope(&quot;prototype&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ShoppingCart</span> &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 每次 getBean 都返回一个新实例</span></span><br><span class="line"><span class="type">ShoppingCart</span> <span class="variable">cart1</span> <span class="operator">=</span> context.getBean(ShoppingCart.class);</span><br><span class="line"><span class="type">ShoppingCart</span> <span class="variable">cart2</span> <span class="operator">=</span> context.getBean(ShoppingCart.class);</span><br><span class="line"><span class="comment">// cart1 != cart2</span></span><br></pre></td></tr></table></figure>
+
+<p>Spring 的 <code>prototype</code> scope 并非严格意义上的 clone，而是每次重新创建。但从效果上看，它实现了”通过已有定义来获取新对象”的语义。</p>
+<blockquote>
+<p><code>Cloneable</code> 被普遍认为是失败的设计（clone 方法靠约定而非接口定义）。实际项目推荐 JSON 序列化&#x2F;反序列化或 MapStruct 做深拷贝。</p>
+</blockquote>
+<hr>
+<h2 id="三、结构型模式"><a href="#三、结构型模式" class="headerlink" title="三、结构型模式"></a>三、结构型模式</h2><p>结构型模式关注如何将类或对象组合成更大的结构。它们的核心价值在于<strong>解耦接口与实现</strong>，让系统更容易扩展。</p>
+<hr>
+<h3 id="3-2-适配器模式"><a href="#3-2-适配器模式" class="headerlink" title="3.2 适配器模式"></a>3.2 适配器模式</h3><p><strong>意图</strong>：将一个接口转换成客户期望的另一个接口，使原本不兼容的接口能一起工作。</p>
+<p><strong>UML 简述</strong>：适配器持有被适配对象，实现目标接口，将客户调用转换为对 Adaptee 的调用。</p>
+<p><strong>SpringMVC HandlerAdapter</strong></p>
+<p>这是适配器模式在后端框架中最经典的应用。SpringMVC 中有多种 Handler 类型（<code>@Controller</code>、<code>HttpRequestHandler</code>、<code>Servlet</code>），每种都有自己的执行方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">HandlerAdapter</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">supports</span><span class="params">(Object handler)</span>;               <span class="comment">// 是否支持该 handler</span></span><br><span class="line">    ModelAndView <span class="title function_">handle</span><span class="params">(HttpServletRequest req,     // 执行 handler</span></span><br><span class="line"><span class="params">                        HttpServletResponse resp,</span></span><br><span class="line"><span class="params">                        Object handler)</span> <span class="keyword">throws</span> Exception;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现类示例</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestMappingHandlerAdapter</span> <span class="keyword">implements</span> <span class="title class_">HandlerAdapter</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">supports</span><span class="params">(Object handler)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> handler <span class="keyword">instanceof</span> HandlerMethod;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ... 处理 @RequestMapping 注解的方法</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HttpRequestHandlerAdapter</span> <span class="keyword">implements</span> <span class="title class_">HandlerAdapter</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">supports</span><span class="params">(Object handler)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> handler <span class="keyword">instanceof</span> HttpRequestHandler;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ... 处理 HttpRequestHandler 类型</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>DispatcherServlet.doDispatch()</code> 中的核心逻辑：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简化后的源码逻辑</span></span><br><span class="line"><span class="type">HandlerAdapter</span> <span class="variable">ha</span> <span class="operator">=</span> getHandlerAdapter(mappedHandler.getHandler());</span><br><span class="line"><span class="comment">// 遍历所有 HandlerAdapter，调用 supports() 找到匹配的适配器</span></span><br><span class="line">mv = ha.handle(processedRequest, response, mappedHandler.getHandler());</span><br></pre></td></tr></table></figure>
+
+<p><strong>SLF4J —— 日志门面的适配器层</strong></p>
+<p>SLF4J 的绑定层（如 <code>slf4j-log4j12</code>）是纯适配器：应用 -&gt; SLF4J API(门面) -&gt; slf4j-logback(适配器) &#x2F; slf4j-log4j12(适配器) -&gt; Logback &#x2F; Log4j 1.x。每个绑定包内部将 SLF4J 的 <code>Logger.info()</code> 转换为具体日志框架的 <code>logger.log()</code>。</p>
+<hr>
+<h3 id="3-3-装饰器模式"><a href="#3-3-装饰器模式" class="headerlink" title="3.3 装饰器模式"></a>3.3 装饰器模式</h3><p><strong>意图</strong>：动态地给对象添加额外的职责，提供比继承更灵活的扩展方式。</p>
+<p><strong>与代理模式的区别</strong>：这是另一个面试高频题。装饰器和代理的类结构几乎一样，但<strong>意图完全不同</strong>：</p>
+<ul>
+<li>代理：控制访问（鉴权、延迟加载、远程调用）——代理决定”是否调用”</li>
+<li>装饰器：增强功能（加日志、加密、压缩）——装饰器必然调用目标，并在前后加功能</li>
+</ul>
+<p><strong>Java IO —— 装饰器模式的集大成者</strong></p>
+<p>Java IO 流的类层次是装饰器模式的经典范例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心组件</span></span><br><span class="line"><span class="type">InputStream</span> <span class="variable">fileInput</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;data.txt&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 一层层装饰</span></span><br><span class="line"><span class="type">InputStream</span> <span class="variable">buffered</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedInputStream</span>(fileInput);    <span class="comment">// 增加缓冲</span></span><br><span class="line"><span class="type">InputStream</span> <span class="variable">dataInput</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DataInputStream</span>(buffered);        <span class="comment">// 增加基本类型读取</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 一行等价写法</span></span><br><span class="line"><span class="type">DataInputStream</span> <span class="variable">dis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DataInputStream</span>(</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">BufferedInputStream</span>(</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;data.txt&quot;</span>)</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>每个 <code>FilterInputStream</code> 的子类都是一个装饰器，持有另一个 <code>InputStream</code> 的引用，在调用被装饰流的方法前后添加行为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BufferedInputStream</span> <span class="keyword">extends</span> <span class="title class_">FilterInputStream</span> &#123;</span><br><span class="line">    <span class="comment">// 持有 InputStream in (继承自 FilterInputStream)</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">read</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">if</span> (缓冲区为空) &#123;</span><br><span class="line">            fill();  <span class="comment">// 批量预读 → 减少系统调用</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> 缓冲区中读取一个字节;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Java Collections 中的装饰器</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将线程不安全的集合装饰成线程安全的</span></span><br><span class="line">List&lt;String&gt; syncList = Collections.synchronizedList(<span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将可变集合装饰成不可变的</span></span><br><span class="line">List&lt;String&gt; unmodifiable = Collections.unmodifiableList(list);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现原理——内部是一个包装类</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SynchronizedList</span>&lt;E&gt; <span class="keyword">implements</span> <span class="title class_">List</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="keyword">final</span> List&lt;E&gt; list;  <span class="comment">// 被装饰的对象</span></span><br><span class="line">    <span class="keyword">final</span> Object mutex;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">add</span><span class="params">(E e)</span> &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (mutex) &#123;</span><br><span class="line">            <span class="keyword">return</span> list.add(e);  <span class="comment">// 在原有方法外包裹同步</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>装饰器 vs 代理 vs 适配器</strong></p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>增强行为？</th>
+<th>改变接口？</th>
+<th>核心目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>装饰器</td>
+<td>是</td>
+<td>否（接口相同）</td>
+<td>动态添加功能</td>
+</tr>
+<tr>
+<td>代理</td>
+<td>可有可无</td>
+<td>否（接口相同）</td>
+<td>控制访问</td>
+</tr>
+<tr>
+<td>适配器</td>
+<td>否</td>
+<td>是（接口不同）</td>
+<td>接口转换</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="3-4-门面模式"><a href="#3-4-门面模式" class="headerlink" title="3.4 门面模式"></a>3.4 门面模式</h3><p><strong>意图</strong>：为子系统中的一组接口提供一个统一的高层接口，使子系统更容易使用。</p>
+<p>门面模式可能是最被低估的设计模式之一。它不涉及复杂的类结构，但价值巨大——<strong>减少调用方需要知道的类的数量</strong>，降低使用门槛。</p>
+<p><strong>SLF4J 日志门面</strong></p>
+<p>SLF4J 的门面层：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 应用程序只需要面对 SLF4J 这一个&quot;门面&quot;</span></span><br><span class="line"><span class="type">Logger</span> <span class="variable">logger</span> <span class="operator">=</span> LoggerFactory.getLogger(MyClass.class);</span><br><span class="line">logger.info(<span class="string">&quot;用户登录成功, userId=&#123;&#125;&quot;</span>, userId);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 底层的 Logback/Log4j2 对调用方完全透明</span></span><br><span class="line"><span class="comment">// 切换日志框架只需要更换依赖，代码零改动</span></span><br></pre></td></tr></table></figure>
+
+<p>这就是门面模式的价值——应用代码只依赖 SLF4J API，不直接依赖任何具体日志实现。</p>
+<p><strong>门面在现代架构中的演变：网关</strong></p>
+<p>微服务架构中，API 网关将多个服务的接口聚合成统一入口，对客户端屏蔽后端复杂性——与门面”为子系统提供统一接口”的意图完全一致。</p>
+<p><strong>门面 vs 适配器 vs 代理 速记</strong></p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">门面（Facade）  → 简化接口（把复杂的变简单）</span><br><span class="line">适配器（Adapter） → 转换接口（把不兼容的变兼容）</span><br><span class="line">代理（<span class="built_in">Proxy</span>）    → 控制接口（在访问前后加上控制逻辑）</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、行为型模式"><a href="#四、行为型模式" class="headerlink" title="四、行为型模式"></a>四、行为型模式</h2><p>行为型模式关注算法和对象间的职责分配。它们是日常业务代码中最常被使用的模式类别。</p>
+<hr>
+<hr>
+<hr>
+<hr>
+<hr>
+<h2 id="五、设计模式在框架中的应用速查表"><a href="#五、设计模式在框架中的应用速查表" class="headerlink" title="五、设计模式在框架中的应用速查表"></a>五、设计模式在框架中的应用速查表</h2><p>以下表格覆盖了本文讨论的所有模式在后端主流框架&#x2F;库中的具体落点：</p>
+<table>
+<thead>
+<tr>
+<th>设计模式</th>
+<th>JDK</th>
+<th>Spring</th>
+<th>其他框架</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单例</td>
+<td><code>Runtime</code>, <code>Desktop</code></td>
+<td>Bean 默认 Scope</td>
+<td>Logback <code>LoggerFactory</code></td>
+</tr>
+<tr>
+<td>工厂方法</td>
+<td><code>Calendar.getInstance()</code></td>
+<td><code>BeanFactory.getBean()</code></td>
+<td>MyBatis <code>SqlSessionFactory</code></td>
+</tr>
+<tr>
+<td>抽象工厂</td>
+<td><code>DocumentBuilderFactory</code></td>
+<td><code>AopProxyFactory</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td>建造者</td>
+<td><code>StringBuilder</code>, <code>Stream.Builder</code></td>
+<td><code>RestTemplateBuilder</code></td>
+<td>Lombok <code>@Builder</code>, OkHttp <code>Request.Builder</code></td>
+</tr>
+<tr>
+<td>原型</td>
+<td><code>Cloneable</code></td>
+<td><code>@Scope(&quot;prototype&quot;)</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td>代理</td>
+<td><code>Proxy.newProxyInstance()</code></td>
+<td>Spring AOP (JDK&#x2F;CGLIB)</td>
+<td>Feign 声明式调用</td>
+</tr>
+<tr>
+<td>适配器</td>
+<td><code>InputStreamReader</code></td>
+<td><code>HandlerAdapter</code></td>
+<td>SLF4J 绑定层</td>
+</tr>
+<tr>
+<td>装饰器</td>
+<td><code>BufferedInputStream</code>, <code>CheckedInputStream</code></td>
+<td><code>TransactionAwareCacheDecorator</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td>门面</td>
+<td>-</td>
+<td><code>JdbcTemplate</code>(部分)</td>
+<td>SLF4J API</td>
+</tr>
+<tr>
+<td>观察者</td>
+<td><code>Observer/Observable</code>(已弃用)</td>
+<td><code>@EventListener</code> &#x2F; <code>ApplicationEvent</code></td>
+<td>MQ 发布订阅</td>
+</tr>
+<tr>
+<td>策略</td>
+<td><code>Comparator</code></td>
+<td><code>ResourceLoader</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td>模板方法</td>
+<td><code>InputStream.read(byte[])</code></td>
+<td><code>AbstractApplicationContext.refresh()</code></td>
+<td><code>JdbcTemplate</code></td>
+</tr>
+<tr>
+<td>责任链</td>
+<td>-</td>
+<td><code>HandlerInterceptor</code></td>
+<td>Servlet <code>Filter</code>, Netty <code>ChannelPipeline</code></td>
+</tr>
+<tr>
+<td>状态</td>
+<td>-</td>
+<td>Spring State Machine</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、实际项目中的取舍"><a href="#六、实际项目中的取舍" class="headerlink" title="六、实际项目中的取舍"></a>六、实际项目中的取舍</h2><h3 id="6-1-什么时候不该用设计模式"><a href="#6-1-什么时候不该用设计模式" class="headerlink" title="6.1 什么时候不该用设计模式"></a>6.1 什么时候不该用设计模式</h3><p>学会了模式之后最容易犯的错误就是<strong>到处套模式</strong>。以下场景慎重：</p>
+<p><strong>1) 过度设计</strong></p>
+<p>一个只有 3 个 if 分支的业务逻辑，不需要拆成 5 个类+3 个接口。随着系统演进加分支再来重构。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 过度设计——为了一个简单的转换，写了 4 个类</span></span><br><span class="line"><span class="comment">// String → Integer 只需要 Integer.parseInt() 就能搞定</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2) 性能敏感路径</strong></p>
+<p>模式带来的间接调用、对象创建和抽象层次，在热点路径上是实打实的开销：</p>
+<ul>
+<li>代理模式的反射调用有性能损耗</li>
+<li>装饰器模式的层层包装增加对象创建开销</li>
+<li>观察者模式的同步通知可能阻塞关键路径</li>
+</ul>
+<p><strong>3) 团队水平参差</strong></p>
+<p>如果一个模式的抽象让团队一半以上的人看不懂，那就别用。代码首先是给人读的，其次才是给机器执行的。</p>
+<h3 id="6-2-KISS-vs-DRY-的平衡"><a href="#6-2-KISS-vs-DRY-的平衡" class="headerlink" title="6.2 KISS vs DRY 的平衡"></a>6.2 KISS vs DRY 的平衡</h3><table>
+<thead>
+<tr>
+<th>原则</th>
+<th>含义</th>
+<th>极端问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>KISS</td>
+<td>Keep It Simple, Stupid</td>
+<td>代码重复、不够抽象</td>
+</tr>
+<tr>
+<td>DRY</td>
+<td>Don’t Repeat Yourself</td>
+<td>过度抽象、耦合爆炸</td>
+</tr>
+</tbody></table>
+<p>两者的平衡点在于 <strong>Rule of Three</strong>：</p>
+<blockquote>
+<p>第一次：直接写代码<br>第二次：容忍重复，但开始留意规律<br>第三次：抽象重构，引入合适的模式</p>
+</blockquote>
+<p>不等第三次就抽象的代价往往是”为了消除 5 行重复代码，引入了 100 行框架代码”。</p>
+<h3 id="6-3-模式选择的决策树"><a href="#6-3-模式选择的决策树" class="headerlink" title="6.3 模式选择的决策树"></a>6.3 模式选择的决策树</h3><p>遇到设计问题时，按以下顺序思考：</p>
+<ol>
+<li><strong>先问是否真的需要模式</strong>——能不能用更简单的方式解决？</li>
+<li><strong>确定问题类型</strong>——是对象创建、结构组装，还是行为协作？</li>
+<li><strong>寻找框架已经提供的机制</strong>——Spring 可能已经用某种模式解决了你的问题</li>
+<li><strong>参考速查表中的实践</strong>——看看类似场景下优秀的框架是怎么做的</li>
+<li><strong>保持简单</strong>——能用组合就不用继承，能用一个类就不用三个</li>
+</ol>
+<h3 id="6-4-学习建议"><a href="#6-4-学习建议" class="headerlink" title="6.4 学习建议"></a>6.4 学习建议</h3><p>对于后端工程师而言，学习设计模式的最佳路径是：</p>
+<ol>
+<li><strong>不要抱着 GoF 书死磕</strong>——先看框架源码，再回头对照模式定义</li>
+<li><strong>从 Spring 源码入手</strong>——阅读 <code>AbstractApplicationContext.refresh()</code> 理解模板方法，阅读 <code>DispatcherServlet.doDispatch()</code> 理解适配器，阅读 AOP 代理创建理解代理模式</li>
+<li><strong>在 Code Review 中实践</strong>——看到 5 层 if-else 时思考是否该用策略模式，看到重复的 try-catch 时思考是否该用模板方法</li>
+<li><strong>记住模式是词汇表，不是教条</strong>——代码中”用了什么模式”不重要，代码是否易于理解和维护才重要</li>
+</ol>
+<p>最后，用一句话总结设计模式的本质：</p>
+<blockquote>
+<p><strong>设计模式不是为了让你多写代码，而是为了让你在正确的时机写出正确的抽象。</strong> 如果在某个场景下一个简单的 if-else 就能清晰表达业务逻辑，那它就是一种好的设计——模式只是手段，清晰的代码才是目的。</p>
+</blockquote>
+<hr>
+<p><em>本文覆盖了后端开发中最高频的设计模式，每个模式都附带了框架源码级的实践案例。建议收藏作为速查参考，在 Code Review 或设计评审时对照翻阅。</em></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/dev-practices/" rel="prev" title="后端开发实践: 从代码规范到 CI&#x2F;CD">
+                  <i class="fa fa-angle-left"></i> 后端开发实践: 从代码规范到 CI/CD
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/ddd/" rel="next" title="领域驱动设计 (DDD)">
+                  领域驱动设计 (DDD) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

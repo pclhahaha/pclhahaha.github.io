@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="在分布式系统中，限流是保护服务不被突发流量击垮的关键手段。核心目标是：在保证系统承载能力的前提下，尽可能多地处理请求。 1.1 计数器（固定窗口）最简单的方式：在固定的时间窗口内计数，超过阈值则拒绝。 123窗口: [12:00:00 - 12:00:01)计数器: 0 → 1 → 2 → ... → 100 → 拒绝12:00:01: 计数器重置为 0  临界问题：在窗口边界处（如 12:00:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="限流算法对比">
+<meta property="og:url" content="http://pclhahaha.github.io/rate-limiting-algorithms/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="在分布式系统中，限流是保护服务不被突发流量击垮的关键手段。核心目标是：在保证系统承载能力的前提下，尽可能多地处理请求。 1.1 计数器（固定窗口）最简单的方式：在固定的时间窗口内计数，超过阈值则拒绝。 123窗口: [12:00:00 - 12:00:01)计数器: 0 → 1 → 2 → ... → 100 → 拒绝12:00:01: 计数器重置为 0  临界问题：在窗口边界处（如 12:00:">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="限流">
+<meta property="article:tag" content="Sentinel">
+<meta property="article:tag" content="Guava RateLimiter">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/rate-limiting-algorithms/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/rate-limiting-algorithms/","path":"rate-limiting-algorithms/","title":"限流算法对比"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>限流算法对比 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E8%AE%A1%E6%95%B0%E5%99%A8%EF%BC%88%E5%9B%BA%E5%AE%9A%E7%AA%97%E5%8F%A3%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">1.1 计数器（固定窗口）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">2.</span> <span class="nav-text">1.2 滑动窗口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E6%BC%8F%E6%A1%B6%EF%BC%88Leaky-Bucket%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">1.3 漏桶（Leaky Bucket）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E4%BB%A4%E7%89%8C%E6%A1%B6%EF%BC%88Token-Bucket%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">1.4 令牌桶（Token Bucket）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SmoothBursty-vs-SmoothWarmingUp"><span class="nav-number">4.1.</span> <span class="nav-text">SmoothBursty vs SmoothWarmingUp</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Sentinel"><span class="nav-number">5.</span> <span class="nav-text">1.5 Sentinel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-number">6.</span> <span class="nav-text">1.6 限流算法对比</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/rate-limiting-algorithms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="限流算法对比 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          限流算法对比
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在分布式系统中，限流是保护服务不被突发流量击垮的关键手段。核心目标是：在保证系统承载能力的前提下，尽可能多地处理请求。</p>
+<h3 id="1-1-计数器（固定窗口）"><a href="#1-1-计数器（固定窗口）" class="headerlink" title="1.1 计数器（固定窗口）"></a>1.1 计数器（固定窗口）</h3><p>最简单的方式：在固定的时间窗口内计数，超过阈值则拒绝。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">窗口: [12:00:00 - 12:00:01)</span><br><span class="line">计数器:<span class="number"> 0 </span>→<span class="number"> 1 </span>→<span class="number"> 2 </span>→ ... →<span class="number"> 100 </span>→ 拒绝</span><br><span class="line">12:00:01: 计数器重置为 0</span><br></pre></td></tr></table></figure>
+
+<p><strong>临界问题</strong>：在窗口边界处（如 12:00:00.900 - 12:00:01.100），两个窗口各允许 100 次，实际通过了 200 次——是期望值的两倍。</p>
+<h3 id="1-2-滑动窗口"><a href="#1-2-滑动窗口" class="headerlink" title="1.2 滑动窗口"></a>1.2 滑动窗口</h3><p>固定窗口的改进版，将大窗口切分为多个小格子：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">将 <span class="number">1</span> 秒窗口切分为 <span class="number">10</span> 个格子（每个 <span class="number">100m</span>s）</span><br><span class="line">当前时间: <span class="number">12</span>:<span class="number">00:01.350</span></span><br><span class="line">计算范围: [<span class="number">12</span>:<span class="number">00:00.350</span>, <span class="number">12</span>:<span class="number">00:01.350</span>] 内命中 <span class="number">10</span> 个格子中的计数</span><br></pre></td></tr></table></figure>
+
+<p>滑动窗口更平滑，基本消除了固定窗口的临界突变问题，是生产环境的常用方案。</p>
+<h3 id="1-3-漏桶（Leaky-Bucket）"><a href="#1-3-漏桶（Leaky-Bucket）" class="headerlink" title="1.3 漏桶（Leaky Bucket）"></a>1.3 漏桶（Leaky Bucket）</h3><p>漏桶算法的核心：</p>
+<ul>
+<li>请求以任意速率到达，先放入<strong>固定容量的桶</strong>（队列）</li>
+<li>桶以<strong>恒定速率</strong>漏出（处理）请求</li>
+<li>桶满后，新请求被丢弃</li>
+</ul>
+<p><strong>特点</strong>：强制输出速率恒定，能有效应对突发流量（突发请求由桶容量缓存），但峰值处理能力被严格限制。适合需要平滑输出的场景（如消息队列生产速率控制）。</p>
+<h3 id="1-4-令牌桶（Token-Bucket）"><a href="#1-4-令牌桶（Token-Bucket）" class="headerlink" title="1.4 令牌桶（Token Bucket）"></a>1.4 令牌桶（Token Bucket）</h3><p>令牌桶是漏桶的”逆操作”，也是 Guava RateLimiter 和 Sentinel 限流的基础：</p>
+<ul>
+<li>系统以<strong>固定速率</strong>向桶中放入令牌</li>
+<li>桶有最大容量（<code>maxTokens</code>），满后丢弃多余令牌</li>
+<li>请求到达时从桶中取令牌，取到则通过，否则拒绝或等待</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Guava RateLimiter 令牌桶实现</span></span><br><span class="line"><span class="type">RateLimiter</span> <span class="variable">limiter</span> <span class="operator">=</span> RateLimiter.create(<span class="number">10.0</span>);  <span class="comment">// 每秒 10 个许可</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handleRequest</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (limiter.tryAcquire(<span class="number">100</span>, TimeUnit.MILLISECONDS)) &#123;</span><br><span class="line">        <span class="comment">// 处理请求</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 限流</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RateLimitException</span>(<span class="string">&quot;too many requests&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 预热模式：启动时低速率，逐步增加到稳定速率</span></span><br><span class="line"><span class="type">RateLimiter</span> <span class="variable">warmupLimiter</span> <span class="operator">=</span> RateLimiter.create(<span class="number">10.0</span>, <span class="number">5</span>, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure>
+
+<h4 id="SmoothBursty-vs-SmoothWarmingUp"><a href="#SmoothBursty-vs-SmoothWarmingUp" class="headerlink" title="SmoothBursty vs SmoothWarmingUp"></a>SmoothBursty vs SmoothWarmingUp</h4><p>Guava RateLimiter 提供两种令牌获取模式：</p>
+<ul>
+<li><strong>SmoothBursty</strong>：默认模式，允许突发流量——桶中的令牌可以一次性取完，然后进入等待</li>
+<li><strong>SmoothWarmingUp</strong>：预热模式——系统刚启动时令牌生成速率较低，逐步增加到稳定值，适合需要预热的系统（如缓存冷启动）</li>
+</ul>
+<h3 id="1-5-Sentinel"><a href="#1-5-Sentinel" class="headerlink" title="1.5 Sentinel"></a>1.5 Sentinel</h3><p>Sentinel 是阿里巴巴开源的流量治理组件，以”流量为切入点”提供：</p>
+<ul>
+<li><strong>限流</strong>：支持 QPS&#x2F;并发线程数&#x2F;关联资源限流，基于滑动窗口统计</li>
+<li><strong>熔断</strong>：基于响应时间&#x2F;异常比例&#x2F;异常数熔断</li>
+<li><strong>热点参数限流</strong>：对”热点”参数值（如爆款商品 ID）进行更细粒度的限流</li>
+<li><strong>系统自适应限流</strong>：根据系统 Load、CPU 使用率、平均 RT 等自动调整阈值</li>
+</ul>
+<p>Sentinel 的限流算法基于改进的滑动窗口（LeapArray），使用环形数组存储各时间窗口的统计数据，滑动时只更新头尾两个窗口，时间复杂度 O(1)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Sentinel 限流规则配置</span></span><br><span class="line"><span class="type">FlowRule</span> <span class="variable">rule</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FlowRule</span>();</span><br><span class="line">rule.setResource(<span class="string">&quot;orderService&quot;</span>);</span><br><span class="line">rule.setGrade(RuleConstant.FLOW_GRADE_QPS);</span><br><span class="line">rule.setCount(<span class="number">100</span>);  <span class="comment">// QPS 上限 100</span></span><br><span class="line">FlowRuleManager.loadRules(Collections.singletonList(rule));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="type">Entry</span> <span class="variable">entry</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    entry = SphU.entry(<span class="string">&quot;orderService&quot;</span>);</span><br><span class="line">    <span class="comment">// 业务逻辑</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (BlockException e) &#123;</span><br><span class="line">    <span class="comment">// 被限流或熔断</span></span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (entry != <span class="literal">null</span>) entry.exit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-6-限流算法对比"><a href="#1-6-限流算法对比" class="headerlink" title="1.6 限流算法对比"></a>1.6 限流算法对比</h3><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>平滑度</th>
+<th>突发容忍</th>
+<th>实现复杂度</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>固定窗口</td>
+<td>低</td>
+<td>否</td>
+<td>极低</td>
+<td>简单场景</td>
+</tr>
+<tr>
+<td>滑动窗口</td>
+<td>中</td>
+<td>否</td>
+<td>低</td>
+<td>通用限流</td>
+</tr>
+<tr>
+<td>漏桶</td>
+<td>高</td>
+<td>是（由桶容量）</td>
+<td>低</td>
+<td>流量整型、消息队列</td>
+</tr>
+<tr>
+<td>令牌桶</td>
+<td>中高</td>
+<td>是</td>
+<td>中</td>
+<td>突发流量场景、网关</td>
+</tr>
+<tr>
+<td>Sentinel</td>
+<td>高</td>
+<td>可配置</td>
+<td>中</td>
+<td>生产级流量治理</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>数据完整性检测</strong>：通过 checksum 检测数据损坏并自动从正常副本恢复；通过 chunk version number 检测并回收过期的陈旧副本</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/%E9%99%90%E6%B5%81/" rel="tag"># 限流</a>
+              <a href="/tags/Sentinel/" rel="tag"># Sentinel</a>
+              <a href="/tags/Guava-RateLimiter/" rel="tag"># Guava RateLimiter</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/reactive-programming/" rel="prev" title="响应式编程 — RxJava &#x2F; Reactor">
+                  <i class="fa fa-angle-left"></i> 响应式编程 — RxJava / Reactor
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/raft-algorithm/" rel="next" title="Raft 共识算法详解">
+                  Raft 共识算法详解 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

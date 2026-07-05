@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一、核心需求   需求 说明    大规模抓取 每天抓取数十亿网页   礼貌性抓取 遵守 robots.txt，不压垮目标站点   去重 同一个 URL 只抓一次   优先级调度 重要页面优先抓取   容错 爬虫节点宕机不影响整体进度   二、系统架构12345678910111213141516┌──────────────────────────────────────────┐│">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式爬虫系统设计">
+<meta property="og:url" content="http://pclhahaha.github.io/web-crawler-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="一、核心需求   需求 说明    大规模抓取 每天抓取数十亿网页   礼貌性抓取 遵守 robots.txt，不压垮目标站点   去重 同一个 URL 只抓一次   优先级调度 重要页面优先抓取   容错 爬虫节点宕机不影响整体进度   二、系统架构12345678910111213141516┌──────────────────────────────────────────┐│">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="Bloom Filter">
+<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="URL去重">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/web-crawler-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/web-crawler-design/","path":"web-crawler-design/","title":"分布式爬虫系统设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式爬虫系统设计 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A0%B8%E5%BF%83%E9%9C%80%E6%B1%82"><span class="nav-number">1.</span> <span class="nav-text">一、核心需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">二、系统架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81URL-Frontier"><span class="nav-number">3.</span> <span class="nav-text">三、URL Frontier</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E8%AE%BE%E8%AE%A1%E8%A6%81%E7%82%B9"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 设计要点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%88%86%E5%B8%83%E5%BC%8F%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 分布式实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%88%AC%E8%99%AB%E8%8A%82%E7%82%B9%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text">四、爬虫节点设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E6%8A%93%E5%8F%96%E6%B5%81%E7%A8%8B"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 抓取流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-HTML-%E8%A7%A3%E6%9E%90"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 HTML 解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-robots-txt-%E5%A4%84%E7%90%86"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 robots.txt 处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%8E%BB%E9%87%8D%E7%AD%96%E7%95%A5"><span class="nav-number">5.</span> <span class="nav-text">五、去重策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8E%BB%E9%87%8D%E5%A6%82%E6%AD%A4%E9%87%8D%E8%A6%81"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 为什么去重如此重要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E6%96%B9%E6%A1%88"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 布隆过滤器方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-URL-%E8%A7%84%E8%8C%83%E5%8C%96"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 URL 规范化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%86%85%E5%AE%B9%E6%8F%90%E5%8F%96%E4%B8%8E%E5%AD%98%E5%82%A8"><span class="nav-number">6.</span> <span class="nav-text">六、内容提取与存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E5%86%85%E5%AE%B9%E5%8E%BB%E9%87%8D"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 内容去重</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E5%AD%98%E5%82%A8"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 存储</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%88%AC%E8%99%AB%E9%99%B7%E9%98%B1%E4%B8%8E%E5%8F%8D%E7%88%AC%E5%AF%B9%E6%8A%97"><span class="nav-number">7.</span> <span class="nav-text">七、爬虫陷阱与反爬对抗</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E5%B8%B8%E8%A7%81%E9%99%B7%E9%98%B1"><span class="nav-number">7.1.</span> <span class="nav-text">7.1 常见陷阱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E5%8F%8D%E7%88%AC%E5%AF%B9%E6%8A%97"><span class="nav-number">7.2.</span> <span class="nav-text">7.2 反爬对抗</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AE%B9%E9%87%8F%E4%BC%B0%E7%AE%97"><span class="nav-number">8.</span> <span class="nav-text">八、容量估算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">九、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/web-crawler-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式爬虫系统设计 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式爬虫系统设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="一、核心需求"><a href="#一、核心需求" class="headerlink" title="一、核心需求"></a>一、核心需求</h2><table>
+<thead>
+<tr>
+<th>需求</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>大规模抓取</strong></td>
+<td>每天抓取数十亿网页</td>
+</tr>
+<tr>
+<td><strong>礼貌性抓取</strong></td>
+<td>遵守 robots.txt，不压垮目标站点</td>
+</tr>
+<tr>
+<td><strong>去重</strong></td>
+<td>同一个 URL 只抓一次</td>
+</tr>
+<tr>
+<td><strong>优先级调度</strong></td>
+<td>重要页面优先抓取</td>
+</tr>
+<tr>
+<td><strong>容错</strong></td>
+<td>爬虫节点宕机不影响整体进度</td>
+</tr>
+</tbody></table>
+<h2 id="二、系统架构"><a href="#二、系统架构" class="headerlink" title="二、系统架构"></a>二、系统架构</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────────────────────────────────┐</span><br><span class="line">│              URL Frontier                 │</span><br><span class="line">│  (优先级队列 + 布隆过滤器去重)             │</span><br><span class="line">└──────────────────┬───────────────────────┘</span><br><span class="line">                   │</span><br><span class="line">    ┌──────────────┼──────────────┐</span><br><span class="line">    │              │              │</span><br><span class="line"><span class="selector-attr">[爬虫节点1]</span>   <span class="selector-attr">[爬虫节点2]</span>   <span class="selector-attr">[爬虫节点N]</span></span><br><span class="line">    │              │              │</span><br><span class="line">    ├─ DNS解析     │              │</span><br><span class="line">    ├─ HTTP下载    │              │</span><br><span class="line">    ├─ Robots检查  │              │</span><br><span class="line">    ├─ <span class="selector-tag">HTML</span>解析    │              │</span><br><span class="line">    └─ 链接提取 → URL Frontier</span><br><span class="line">         │</span><br><span class="line">    <span class="selector-attr">[文档存储]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、URL-Frontier"><a href="#三、URL-Frontier" class="headerlink" title="三、URL Frontier"></a>三、URL Frontier</h2><h3 id="3-1-设计要点"><a href="#3-1-设计要点" class="headerlink" title="3.1 设计要点"></a>3.1 设计要点</h3><p>URL Frontier 是分布式爬虫的大脑，负责管理待爬取 URL 的调度和分发。核心功能：</p>
+<p><strong>去重</strong>：</p>
+<p>使用布隆过滤器检测 URL 是否已爬取。百亿级 URL，0.01% 误判率 → 约 24GB 内存。为了支持长期运行，定期（如每周）从持久化存储重建布隆过滤器。</p>
+<p><strong>礼貌性控制</strong>：</p>
+<p>同一域名的两次请求间隔 ≥ politeness_delay（通常 1-10 秒）。策略是按域名分配后端队列，爬虫节点从各域名队列中轮流取 URL：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">域名队列：</span><br><span class="line">  example<span class="selector-class">.com</span>  → <span class="selector-attr">[url1, url2, url3, ...]</span></span><br><span class="line">  wikipedia<span class="selector-class">.org</span> → <span class="selector-attr">[url4, url5, ...]</span></span><br><span class="line">  github<span class="selector-class">.com</span>    → <span class="selector-attr">[url6, ...]</span></span><br><span class="line"></span><br><span class="line">爬虫从 example<span class="selector-class">.com</span> 抓取一个 URL 后，必须等待 politeness_delay 才能再取该域名的 URL。</span><br><span class="line">这期间可以从其他域名队列取 URL，保持爬虫持续工作。</span><br></pre></td></tr></table></figure>
+
+<p><strong>优先级</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>URL 特征</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>高</td>
+<td>首页、热门页面、频繁更新的页面</td>
+<td>新闻首页</td>
+</tr>
+<tr>
+<td>中</td>
+<td>文章页、产品页</td>
+<td>博客文章、商品详情</td>
+</tr>
+<tr>
+<td>低</td>
+<td>用户评论页、历史归档</td>
+<td>2010 年的归档新闻</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-分布式实现"><a href="#3-2-分布式实现" class="headerlink" title="3.2 分布式实现"></a>3.2 分布式实现</h3><p>按域名分片避免多个爬虫同时爬同一域名：</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">URL</span> <span class="variable">Frontier</span> 分片策略：</span><br><span class="line">  <span class="variable">shard</span> <span class="operator">=</span> <span class="variable">hash</span><span class="punctuation">(</span><span class="variable">domain</span><span class="punctuation">)</span> <span class="operator">%</span> <span class="built_in">N</span></span><br><span class="line"></span><br><span class="line">这样就保证了同一域名的所有 <span class="built_in">URL</span> 都由同一组爬虫处理，</span><br><span class="line">无需额外的跨节点协调。</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、爬虫节点设计"><a href="#四、爬虫节点设计" class="headerlink" title="四、爬虫节点设计"></a>四、爬虫节点设计</h2><h3 id="4-1-抓取流程"><a href="#4-1-抓取流程" class="headerlink" title="4.1 抓取流程"></a>4.1 抓取流程</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 从 URL Frontier 获取一个 URL</span><br><span class="line"><span class="bullet">2.</span> DNS 解析 → IP 地址</span><br><span class="line"><span class="bullet">3.</span> 检查 robots.txt（可缓存，TTL 1 小时）</span><br><span class="line"><span class="bullet">4.</span> HTTP GET 请求（带 User-Agent、Referer 等头部）</span><br><span class="line"><span class="bullet">5.</span> 检查 HTTP 状态码</span><br><span class="line">   ├─ 200 → 提取链接，存储文档</span><br><span class="line">   ├─ 301/302 → 记录重定向，新 URL 加入队列（不计数原 URL）</span><br><span class="line">   ├─ 429 → 退避重试（指数延迟）</span><br><span class="line">   └─ 4xx/5xx → 记录错误，放弃或有限重试</span><br><span class="line"><span class="bullet">6.</span> 解析 HTML，提取所有 <span class="language-xml"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>&gt;</span></span> 链接</span><br><span class="line"><span class="bullet">7.</span> 新链接过滤后加入 URL Frontier</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-HTML-解析"><a href="#4-2-HTML-解析" class="headerlink" title="4.2 HTML 解析"></a>4.2 HTML 解析</h3><p>HTML 解析的目的是：</p>
+<ul>
+<li><strong>提取链接</strong>：所有 <code>&lt;a href=&quot;...&quot;&gt;</code> 标签，处理相对路径</li>
+<li><strong>提取内容</strong>：标题、正文、发布时间（用于搜索引擎索引）</li>
+<li><strong>规范化 URL</strong>：移除 fragment、排序 query 参数、去重协议（http vs https）</li>
+</ul>
+<h3 id="4-3-robots-txt-处理"><a href="#4-3-robots-txt-处理" class="headerlink" title="4.3 robots.txt 处理"></a>4.3 robots.txt 处理</h3><p>每个域名在首次抓取时需要下载并解析 robots.txt：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="params">User-agent:</span> <span class="operator">*</span></span><br><span class="line"><span class="params">Disallow:</span> <span class="operator">/</span>private<span class="symbol">/</span></span><br><span class="line"><span class="params">Disallow:</span> <span class="operator">/</span>admin<span class="symbol">/</span></span><br><span class="line"><span class="params">Crawl-delay:</span> <span class="number">5</span></span><br><span class="line"><span class="params">Allow:</span> <span class="operator">/</span>public<span class="operator">/</span></span><br></pre></td></tr></table></figure>
+
+<p>将此解析为规则集并缓存。每个爬虫节点在抓取 URL 前先检查是否被允许，减少对目标站点的压力。</p>
+<h2 id="五、去重策略"><a href="#五、去重策略" class="headerlink" title="五、去重策略"></a>五、去重策略</h2><h3 id="5-1-为什么去重如此重要"><a href="#5-1-为什么去重如此重要" class="headerlink" title="5.1 为什么去重如此重要"></a>5.1 为什么去重如此重要</h3><p>互联网上的页面存在大量重复链接：同一个页面被多个页面引用、URL 参数变化导致表面不同的 URL、HTTP&#x2F;HTTPS 双版本等。不去重会导致：</p>
+<ul>
+<li>浪费带宽重复抓取同一内容</li>
+<li>目标站点压力剧增</li>
+<li>存储大量重复数据</li>
+</ul>
+<h3 id="5-2-布隆过滤器方案"><a href="#5-2-布隆过滤器方案" class="headerlink" title="5.2 布隆过滤器方案"></a>5.2 布隆过滤器方案</h3><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">布隆过滤器配置：</span><br><span class="line">  n <span class="operator">=</span> <span class="number">100</span> 亿（预期 URL 数）</span><br><span class="line">  p <span class="operator">=</span> <span class="number">0.001</span>（误判率 <span class="number">0.1</span>%）</span><br><span class="line">  m <span class="operator">=</span> -<span class="number">100</span>亿 × ln(<span class="number">0.001</span>) / (ln2)² ≈ <span class="number">1440</span> 亿 bit ≈ <span class="number">168</span> GB</span><br><span class="line">  k <span class="operator">=</span> m/n × ln2 ≈ <span class="number">10</span></span><br><span class="line"></span><br><span class="line">这需要 <span class="number">168</span> GB 内存，过大。可以通过以下方式优化：</span><br></pre></td></tr></table></figure>
+
+<p><strong>优化方案</strong>：按域名分片的布隆过滤器</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">每个域名的布隆过滤器只需要覆盖该域名下的 URL 数量：</span><br><span class="line">  example.com 有<span class="number"> 1000 </span>万页面 →<span class="number"> 14 </span>MB 布隆过滤器</span><br><span class="line">  wikipedia.org 有<span class="number"> 600 </span>万页面 →<span class="number"> 9 </span>MB 布隆过滤器</span><br><span class="line"></span><br><span class="line">每个爬虫节点按域名加载对应的布隆过滤器，整体内存分散到所有节点。</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-URL-规范化"><a href="#5-3-URL-规范化" class="headerlink" title="5.3 URL 规范化"></a>5.3 URL 规范化</h3><p>在进入布隆过滤器之前，需要对 URL 做规范化（Canonicalization）：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">原始 URL: http:<span class="regexp">//</span>www.example.com:<span class="number">80</span>/path?b=<span class="number">2</span>&amp;a=<span class="number">1</span><span class="comment">#section</span></span><br><span class="line">规范化:   http:<span class="regexp">//</span>example.com/path?a=<span class="number">1</span>&amp;b=<span class="number">2</span></span><br><span class="line"></span><br><span class="line">处理规则：</span><br><span class="line">  - 协议转小写</span><br><span class="line">  - Host 转小写，去掉默认端口</span><br><span class="line">  - 路径标准化（<span class="regexp">/./</span> → <span class="regexp">/， /</span>a<span class="regexp">/../</span>b<span class="regexp">/ → /</span>b/）</span><br><span class="line">  - Query 参数按字母序排序</span><br><span class="line">  - 去掉 fragment (<span class="comment">#xxx)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、内容提取与存储"><a href="#六、内容提取与存储" class="headerlink" title="六、内容提取与存储"></a>六、内容提取与存储</h2><h3 id="6-1-内容去重"><a href="#6-1-内容去重" class="headerlink" title="6.1 内容去重"></a>6.1 内容去重</h3><p>即使 URL 不同，页面内容也可能完全相同（镜像站、CDN 等）。除了 URL 去重，还需要内容去重。使用 <strong>SimHash</strong> 或 <strong>MD5</strong> 签名来实现：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">对于每个抓取的页面：</span><br><span class="line"><span class="bullet">  1.</span> 提取正文文本</span><br><span class="line"><span class="bullet">  2.</span> 计算 MD5 哈希</span><br><span class="line"><span class="bullet">  3.</span> 如果哈希已存在 → 此页面是重复内容，跳过</span><br><span class="line"><span class="bullet">  4.</span> 如果哈希不存在 → 存储并记录</span><br></pre></td></tr></table></figure>
+
+<p>SimHash 的额外优势：两个页面即使内容不完全一致，如果 SimHash 的汉明距离很小（&lt; 3），说明它们高度相似，可能是镜像站或转载，可以选择只保留一个版本。</p>
+<h3 id="6-2-存储"><a href="#6-2-存储" class="headerlink" title="6.2 存储"></a>6.2 存储</h3><table>
+<thead>
+<tr>
+<th>数据</th>
+<th>存储</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始 HTML</td>
+<td>对象存储 (S3&#x2F;HDFS)</td>
+<td>压缩后存储</td>
+</tr>
+<tr>
+<td>结构化数据</td>
+<td>宽表 (HBase&#x2F;Cassandra)</td>
+<td>URL、标题、时间、关键词</td>
+</tr>
+<tr>
+<td>链接图</td>
+<td>图数据库或 K-V 存储</td>
+<td>URL → {引用该 URL 的页面列表}</td>
+</tr>
+<tr>
+<td>爬虫状态</td>
+<td>Redis</td>
+<td>当前进度、速率、错误率</td>
+</tr>
+</tbody></table>
+<h2 id="七、爬虫陷阱与反爬对抗"><a href="#七、爬虫陷阱与反爬对抗" class="headerlink" title="七、爬虫陷阱与反爬对抗"></a>七、爬虫陷阱与反爬对抗</h2><h3 id="7-1-常见陷阱"><a href="#7-1-常见陷阱" class="headerlink" title="7.1 常见陷阱"></a>7.1 常见陷阱</h3><table>
+<thead>
+<tr>
+<th>陷阱类型</th>
+<th>表现</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>无穷日历页</strong></td>
+<td>某个博客按日期归档，日期链接无穷无尽</td>
+<td>限制路径深度、限制同域名下的链接数量</td>
+</tr>
+<tr>
+<td><strong>Session ID 陷阱</strong></td>
+<td>每次访问生成新的 session ID 参数导致 URL 无限增多</td>
+<td>URL 规范化时去掉 session 参数</td>
+</tr>
+<tr>
+<td><strong>动态页面</strong></td>
+<td>页面内容根据参数不断变化（搜索页、过滤页）</td>
+<td>识别低价值页面类型，降低优先级或直接跳过</td>
+</tr>
+<tr>
+<td><strong>重定向循环</strong></td>
+<td>A → B → C → A</td>
+<td>限制重定向次数（≤ 5 次），记录重定向链</td>
+</tr>
+</tbody></table>
+<h3 id="7-2-反爬对抗"><a href="#7-2-反爬对抗" class="headerlink" title="7.2 反爬对抗"></a>7.2 反爬对抗</h3><p>现代网站大量使用反爬技术，企业级爬虫需要相应策略：</p>
+<ul>
+<li><strong>IP 代理池</strong>：维护数千个代理 IP，每个域名分配不同的出口 IP</li>
+<li><strong>User-Agent 轮换</strong>：模拟不同浏览器和设备的 User-Agent</li>
+<li><strong>渲染引擎</strong>：对于 SPA (React&#x2F;Vue) 页面，使用 Headless Chrome 渲染后再提取内容</li>
+<li><strong>行为模拟</strong>：鼠标移动、滚动等，降低被检测为爬虫的概率</li>
+</ul>
+<h2 id="八、容量估算"><a href="#八、容量估算" class="headerlink" title="八、容量估算"></a>八、容量估算</h2><p>假设目标：每天抓取 10 亿网页</p>
+<ul>
+<li>平均页面大小 100KB → 每天下载 10亿 × 100KB &#x3D; 100TB</li>
+<li>平均抓取速度 50 页&#x2F;秒&#x2F;节点 → 需要 10亿 &#x2F; (50 × 86400) ≈ 230 个爬虫节点</li>
+<li>考虑网络延迟和处理开销，实际需要 300-500 个节点</li>
+</ul>
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>分布式爬虫的核心挑战是<strong>规模</strong>和<strong>礼貌性</strong>的统一。URL Frontier 的优先级调度和域名分片策略保证了公平高效的抓取，布隆过滤器提供了 O(1) 的去重能力，URL 规范化和 SimHash 去重则进一步减少了存储浪费。Google、CommonCrawl 等大型搜索引擎都在此架构基础上做了各自的优化——比如 Google 使用自研的 Caffeine 索引系统处理实时更新，CommonCrawl 每两个月抓取一次全量快照作为公开数据集。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/Bloom-Filter/" rel="tag"># Bloom Filter</a>
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"># 爬虫</a>
+              <a href="/tags/URL%E5%8E%BB%E9%87%8D/" rel="tag"># URL去重</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/whatsapp-architecture-case-study/" rel="prev" title="WhatsApp 日处理400亿消息的架构">
+                  <i class="fa fa-angle-left"></i> WhatsApp 日处理400亿消息的架构
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/virtualization/" rel="next" title="虚拟化与容器化: 从 Hypervisor 到 K8s">
+                  虚拟化与容器化: 从 Hypervisor 到 K8s <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

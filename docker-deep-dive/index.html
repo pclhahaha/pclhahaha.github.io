@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 容器 vs 虚拟机容器化是指将应用及其所有依赖打包在一起，使其能够运行在任何平台上。容器间共享操作系统内核，而虚拟化则是多个操作系统共享硬件，因此容器是比虚拟化更高一个层次的虚拟化。 架构对比（文字描述）： 12虚拟机:   硬件 → Host OS → Hypervisor → [Guest OS → Bins&#x2F;Libs → App] × N容器:     硬件 → Host OS →">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 深度解析">
+<meta property="og:url" content="http://pclhahaha.github.io/docker-deep-dive/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 容器 vs 虚拟机容器化是指将应用及其所有依赖打包在一起，使其能够运行在任何平台上。容器间共享操作系统内核，而虚拟化则是多个操作系统共享硬件，因此容器是比虚拟化更高一个层次的虚拟化。 架构对比（文字描述）： 12虚拟机:   硬件 → Host OS → Hypervisor → [Guest OS → Bins&#x2F;Libs → App] × N容器:     硬件 → Host OS →">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="容器">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="镜像">
+<meta property="article:tag" content="Dockerfile">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/docker-deep-dive/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/docker-deep-dive/","path":"docker-deep-dive/","title":"Docker 深度解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Docker 深度解析 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%AE%B9%E5%99%A8-vs-%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">1.1 容器 vs 虚拟机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Docker-%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">1.2 Docker 架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E9%95%9C%E5%83%8F-Image"><span class="nav-number">3.</span> <span class="nav-text">1.3 镜像 (Image)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#UnionFS-%E4%B8%8E%E5%88%86%E5%B1%82%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.1.</span> <span class="nav-text">UnionFS 与分层文件系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Copy-on-Write-COW-%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6"><span class="nav-number">3.2.</span> <span class="nav-text">Copy-on-Write (COW) 写时复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Overlay2-%E5%AD%98%E5%82%A8%E9%A9%B1%E5%8A%A8"><span class="nav-number">3.3.</span> <span class="nav-text">Overlay2 存储驱动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E9%98%B6%E6%AE%B5%E6%9E%84%E5%BB%BA-Multi-Stage-Build"><span class="nav-number">3.4.</span> <span class="nav-text">多阶段构建 (Multi-Stage Build)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E5%AE%B9%E5%99%A8%E9%9A%94%E7%A6%BB%E6%9C%BA%E5%88%B6"><span class="nav-number">4.</span> <span class="nav-text">1.4 容器隔离机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux-Namespace-%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E9%9A%94%E7%A6%BB"><span class="nav-number">4.1.</span> <span class="nav-text">Linux Namespace (命名空间隔离)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cgroup-%E6%8E%A7%E5%88%B6%E7%BB%84%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6"><span class="nav-number">4.2.</span> <span class="nav-text">Cgroup (控制组资源限制)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6"><span class="nav-number">4.3.</span> <span class="nav-text">其他安全机制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">1.5 网络模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E5%AD%98%E5%82%A8"><span class="nav-number">6.</span> <span class="nav-text">1.6 存储</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/docker-deep-dive/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Docker 深度解析 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker 深度解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AE%B9%E5%99%A8%E5%8C%96/" itemprop="url" rel="index"><span itemprop="name">容器化</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-容器-vs-虚拟机"><a href="#1-1-容器-vs-虚拟机" class="headerlink" title="1.1 容器 vs 虚拟机"></a>1.1 容器 vs 虚拟机</h3><p>容器化是指将应用及其所有依赖打包在一起，使其能够运行在任何平台上。容器间共享操作系统内核，而虚拟化则是多个操作系统共享硬件，因此容器是比虚拟化更高一个层次的虚拟化。</p>
+<p><strong>架构对比（文字描述）：</strong></p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">虚拟机<span class="symbol">:</span>   硬件 → Host OS → Hypervisor → [Guest OS → Bins/Libs → App] × <span class="built_in">N</span></span><br><span class="line">容器<span class="symbol">:</span>     硬件 → Host OS → Docker Engine → [Bins/Libs → App] × <span class="built_in">N</span></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>虚拟机 (VM)</th>
+<th>容器 (Container)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>隔离层级</td>
+<td>OS 级别，每个 VM 有独立内核</td>
+<td>进程级别，共享 Host 内核</td>
+</tr>
+<tr>
+<td>启动速度</td>
+<td>分钟级</td>
+<td>秒级 &#x2F; 毫秒级</td>
+</tr>
+<tr>
+<td>镜像大小</td>
+<td>GB 级 (含完整 OS)</td>
+<td>MB 级</td>
+</tr>
+<tr>
+<td>资源开销</td>
+<td>高 (Guest OS + Hypervisor 开销)</td>
+<td>低 (直接复用 Host 内核)</td>
+</tr>
+<tr>
+<td>安全隔离</td>
+<td>强 (独立内核，硬件级隔离)</td>
+<td>弱 (共享内核，namespace 隔离)</td>
+</tr>
+<tr>
+<td>部署密度</td>
+<td>一台物理机几十个 VM</td>
+<td>一台物理机数百个容器</td>
+</tr>
+</tbody></table>
+<p>容器带来的好处：可移植性、敏捷、启动快、错误隔离、资源利用率高、便于编排管理。</p>
+<h3 id="1-2-Docker-架构"><a href="#1-2-Docker-架构" class="headerlink" title="1.2 Docker 架构"></a>1.2 Docker 架构</h3><p>Docker 采用经典的 C&#x2F;S 架构：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Docker CLI (docker) ──<span class="attribute">REST</span> API──→ dockerd (Daemon) ──gRPC──→ containerd ──shim──→ runc → 容器进程</span><br><span class="line">                                        │                       (OCI Runtime)</span><br><span class="line">                                    <span class="built_in">containerd</span>(内置)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Docker Client</strong> (<code>docker</code>)：用户交互入口，通过 Unix Socket (<code>/var/run/docker.sock</code>) 发送命令到 Daemon</li>
+<li><strong>Docker Daemon</strong> (<code>dockerd</code>)：核心守护进程，负责接收请求、管理镜像&#x2F;容器&#x2F;网络&#x2F;存储</li>
+<li><strong>containerd</strong>：管理容器生命周期的核心运行时，从 dockerd 中独立出来，通过 gRPC 通信</li>
+<li><strong>containerd-shim</strong>：作为容器进程的父进程，解决 “runc 退出但容器不退出” 的问题，同时收集退出状态</li>
+<li><strong>runc</strong>：OCI Runtime 参考实现，基于 Linux namespace + cgroup 创建容器进程，创建完成后即退出</li>
+</ul>
+<h3 id="1-3-镜像-Image"><a href="#1-3-镜像-Image" class="headerlink" title="1.3 镜像 (Image)"></a>1.3 镜像 (Image)</h3><h4 id="UnionFS-与分层文件系统"><a href="#UnionFS-与分层文件系统" class="headerlink" title="UnionFS 与分层文件系统"></a>UnionFS 与分层文件系统</h4><p>Docker 镜像采用 <strong>Union File System (联合文件系统)</strong> 实现分层存储。每一层都是只读的，只有最顶层的容器层是可写的：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────────────┐</span><br><span class="line">│   容器层 (Thin R/W)   │ ← 容器运行时创建，仅修改写入此层</span><br><span class="line">├──────────────────────┤</span><br><span class="line">│   镜像层 3 (只读)     │ ← COPY app.jar /app/</span><br><span class="line">├──────────────────────┤</span><br><span class="line">│   镜像层 2 (只读)     │ ← <span class="built_in">RUN</span> apt-<span class="built_in">get</span> install openjdk-17</span><br><span class="line">├──────────────────────┤</span><br><span class="line">│   镜像层 1 (只读)     │ ← <span class="keyword">FROM</span> ubuntu:22.04</span><br><span class="line">└──────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h4 id="Copy-on-Write-COW-写时复制"><a href="#Copy-on-Write-COW-写时复制" class="headerlink" title="Copy-on-Write (COW) 写时复制"></a>Copy-on-Write (COW) 写时复制</h4><p>容器需要修改文件时：从镜像只读层查找文件 → 复制到容器可写层 → 在可写层修改。此后的读操作从可写层返回（上层文件会<strong>掩盖</strong>下层同名文件）。删除操作通过 <strong>whiteout 文件</strong>实现：在容器层创建 <code>.wh.&lt;filename&gt;</code> 隐藏文件，UnionFS 遇到它时会将该文件标记为已删除。</p>
+<h4 id="Overlay2-存储驱动"><a href="#Overlay2-存储驱动" class="headerlink" title="Overlay2 存储驱动"></a>Overlay2 存储驱动</h4><p>Overlay2 是 Docker 默认存储驱动（替代了早期的 AUFS&#x2F;DeviceMapper），通过合并多个目录层实现：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">lowerdir=<span class="regexp">/var/</span>lib<span class="regexp">/docker/</span>overlay2<span class="regexp">/l/</span>&lt;layer-id-<span class="number">1</span>&gt;:&lt;layer-id-<span class="number">2</span>&gt;:...  ← 所有只读层</span><br><span class="line">upperdir=<span class="regexp">/var/</span>lib<span class="regexp">/docker/</span>overlay2<span class="regexp">/&lt;container-id&gt;/</span>diff              ← 容器可写层</span><br><span class="line">workdir=<span class="regexp">/var/</span>lib<span class="regexp">/docker/</span>overlay2<span class="regexp">/&lt;container-id&gt;/</span>work               ← 内部工作目录</span><br><span class="line">merged =<span class="regexp">/var/</span>lib<span class="regexp">/docker/</span>overlay2<span class="regexp">/&lt;container-id&gt;/m</span>erged             ← 联合挂载点（容器看到的根文件系统）</span><br></pre></td></tr></table></figure>
+
+<h4 id="多阶段构建-Multi-Stage-Build"><a href="#多阶段构建-Multi-Stage-Build" class="headerlink" title="多阶段构建 (Multi-Stage Build)"></a>多阶段构建 (Multi-Stage Build)</h4><p>解决 “构建时依赖臃肿” 的问题，将编译环境和运行环境分离：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> maven:<span class="number">3.9</span> AS builder</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> pom.xml . &amp;&amp; COPY src/ src/</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> mvn package -DskipTests</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> openjdk:<span class="number">17</span>-slim</span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder /app/target/app.jar /app/app.jar</span></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [<span class="string">&quot;java&quot;</span>, <span class="string">&quot;-jar&quot;</span>, <span class="string">&quot;/app/app.jar&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p>最终镜像只包含运行阶段的内容，不含 Maven、源码等编译依赖，体积大幅缩小。</p>
+<h3 id="1-4-容器隔离机制"><a href="#1-4-容器隔离机制" class="headerlink" title="1.4 容器隔离机制"></a>1.4 容器隔离机制</h3><h4 id="Linux-Namespace-命名空间隔离"><a href="#Linux-Namespace-命名空间隔离" class="headerlink" title="Linux Namespace (命名空间隔离)"></a>Linux Namespace (命名空间隔离)</h4><p>Namespace 是容器隔离的核心，每种 namespace 隔离一类系统资源：</p>
+<table>
+<thead>
+<tr>
+<th>Namespace</th>
+<th>隔离内容</th>
+<th>系统调用常量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PID</td>
+<td>进程 PID 编号，容器内 PID&#x3D;1 是容器内首个进程</td>
+<td>CLONE_NEWPID</td>
+</tr>
+<tr>
+<td>NET</td>
+<td>网络设备、IP 地址、路由表、防火墙规则</td>
+<td>CLONE_NEWNET</td>
+</tr>
+<tr>
+<td>MNT</td>
+<td>文件系统挂载点，容器拥有独立的 &#x2F; 根目录</td>
+<td>CLONE_NEWNS</td>
+</tr>
+<tr>
+<td>UTS</td>
+<td>主机名 (hostname) 和 NIS 域名</td>
+<td>CLONE_NEWUTS</td>
+</tr>
+<tr>
+<td>IPC</td>
+<td>System V IPC 和 POSIX 消息队列</td>
+<td>CLONE_NEWIPC</td>
+</tr>
+<tr>
+<td>USER</td>
+<td>用户和组 ID，容器内 uid&#x3D;0 可映射到宿主机 uid&#x3D;1000</td>
+<td>CLONE_NEWUSER</td>
+</tr>
+<tr>
+<td>Cgroup</td>
+<td>cgroup 根目录视图，限制容器可见的 cgroup 层级</td>
+<td>CLONE_NEWCGROUP</td>
+</tr>
+</tbody></table>
+<h4 id="Cgroup-控制组资源限制"><a href="#Cgroup-控制组资源限制" class="headerlink" title="Cgroup (控制组资源限制)"></a>Cgroup (控制组资源限制)</h4><p>cgroup v2 是当前推荐版本，Docker 为每个容器创建一个子 cgroup：</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/sys/fs/cgroup/docker/&lt;<span class="keyword">container</span>-id&gt;/</span><br><span class="line">├── cpu.<span class="keyword">max</span>       ← CPU 配额 (<span class="string">&quot;200000 100000&quot;</span> = <span class="number">2</span>核)</span><br><span class="line">├── <span class="keyword">memory</span>.<span class="keyword">max</span>    ← 内存上限 (<span class="string">&quot;536870912&quot;</span> = <span class="number">512</span>MB)</span><br><span class="line">├── <span class="keyword">memory</span>.high   ← 内存软限制</span><br><span class="line">├── io.<span class="keyword">max</span>        ← 磁盘 IO 限制</span><br><span class="line">├── pids.<span class="keyword">max</span>      ← 进程数上限</span><br><span class="line">└── cgroup.procs  ← 属于该 cgroup 的进程 PID 列表</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>子系统</th>
+<th>Docker 参数</th>
+<th>控制内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>cpu</td>
+<td><code>--cpus=2</code>, <code>--cpu-shares</code></td>
+<td>CPU 配额与权重</td>
+</tr>
+<tr>
+<td>memory</td>
+<td><code>--memory=512m</code>, <code>--memory-swap</code></td>
+<td>内存硬&#x2F;软限制</td>
+</tr>
+<tr>
+<td>io</td>
+<td><code>--blkio-weight</code>, <code>--device-read-bps</code></td>
+<td>磁盘 IO 限制</td>
+</tr>
+<tr>
+<td>pids</td>
+<td><code>--pids-limit=100</code></td>
+<td>最大进程数</td>
+</tr>
+</tbody></table>
+<h4 id="其他安全机制"><a href="#其他安全机制" class="headerlink" title="其他安全机制"></a>其他安全机制</h4><ul>
+<li><strong>Capabilities</strong>：将 root 权限拆分为细粒度能力（如 <code>NET_BIND_SERVICE</code>），容器默认仅保留安全子集，推荐 <code>--cap-drop=ALL --cap-add=NET_BIND_SERVICE</code> 最小权限运行</li>
+<li><strong>Seccomp</strong>：限制容器进程可调用的系统调用，默认 profile 禁用了约 44 个危险系统调用</li>
+<li><strong>AppArmor &#x2F; SELinux</strong>：基于路径或标签的强制访问控制，限制容器对文件系统的访问</li>
+</ul>
+<h3 id="1-5-网络模式"><a href="#1-5-网络模式" class="headerlink" title="1.5 网络模式"></a>1.5 网络模式</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>参数</th>
+<th>行为</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bridge</td>
+<td><code>--network bridge</code> (默认)</td>
+<td>容器连接 docker0 网桥，通过 NAT 访问外部</td>
+<td>单机容器通信</td>
+</tr>
+<tr>
+<td>host</td>
+<td><code>--network host</code></td>
+<td>直接使用宿主机网络栈，无隔离</td>
+<td>高性能网络</td>
+</tr>
+<tr>
+<td>container</td>
+<td><code>--network container:NAME</code></td>
+<td>共享指定容器的网络 namespace（含 localhost）</td>
+<td>Sidecar 模式</td>
+</tr>
+<tr>
+<td>none</td>
+<td><code>--network none</code></td>
+<td>无网络，仅 lo 回环接口</td>
+<td>安全敏感场景</td>
+</tr>
+<tr>
+<td>overlay</td>
+<td>(Swarm 模式)</td>
+<td>跨主机通信，VXLAN 隧道封装</td>
+<td>多主机容器网络</td>
+</tr>
+</tbody></table>
+<p><strong>bridge 模式 iptables 规则原理：</strong></p>
+<ul>
+<li>外网访问容器 (DNAT)：<code>PREROUTING → DOCKER chain → DNAT &lt;宿主机IP:8080&gt; → &lt;容器IP:80&gt;</code></li>
+<li>容器访问外网 (SNAT&#x2F;MASQUERADE)：<code>容器 → docker0 → POSTROUTING → 源IP改为宿主机IP → eth0 → 外网</code></li>
+</ul>
+<h3 id="1-6-存储"><a href="#1-6-存储" class="headerlink" title="1.6 存储"></a>1.6 存储</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>生命周期</th>
+<th>存放位置</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Volume</td>
+<td>独立于容器</td>
+<td><code>/var/lib/docker/volumes/&lt;name&gt;/</code></td>
+<td>Docker 管理，推荐方式</td>
+</tr>
+<tr>
+<td>Bind Mount</td>
+<td>独立于容器</td>
+<td>宿主机任意路径</td>
+<td>直接挂载宿主机目录，权限管理复杂</td>
+</tr>
+<tr>
+<td>tmpfs</td>
+<td>随容器</td>
+<td>内存中</td>
+<td>临时存储，不写磁盘</td>
+</tr>
+</tbody></table>
+<pre><code class="language-yaml">
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AE%B9%E5%99%A8/" rel="tag"># 容器</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/%E9%95%9C%E5%83%8F/" rel="tag"># 镜像</a>
+              <a href="/tags/Dockerfile/" rel="tag"># Dockerfile</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/fst-finite-state-transducer/" rel="prev" title="FST 有限状态转换器">
+                  <i class="fa fa-angle-left"></i> FST 有限状态转换器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/dns-system/" rel="next" title="DNS 域名系统">
+                  DNS 域名系统 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

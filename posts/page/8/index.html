@@ -1,0 +1,2298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:type" content="website">
+<meta property="og:title" content="个人笔记">
+<meta property="og:url" content="http://pclhahaha.github.io/posts/page/8/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="pcl">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/posts/page/8/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"posts/page/8/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">个人笔记</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/video-streaming-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/video-streaming-design/" class="post-title-link" itemprop="url">视频流系统设计 (YouTube/Netflix)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Netflix 占全球互联网下行流量的 15%，YouTube 每分钟上传 500 小时视频。视频流系统的挑战在于：海量存储、实时转码、全球低延迟分发、以及千人千面的推荐。</p>
+<h2 id="一、核心需求"><a href="#一、核心需求" class="headerlink" title="一、核心需求"></a>一、核心需求</h2><table>
+<thead>
+<tr>
+<th>需求</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>上传视频</td>
+<td>支持各种格式、码率、分辨率</td>
+</tr>
+<tr>
+<td>转码处理</td>
+<td>将原始视频转为多个分辨率+码率版本</td>
+</tr>
+<tr>
+<td>自适应流</td>
+<td>根据用户网络状况动态切换清晰度</td>
+</tr>
+<tr>
+<td>全球分发</td>
+<td>CDN 边缘节点缓存，就近服务</td>
+</tr>
+<tr>
+<td>搜索推荐</td>
+<td>基于用户行为的个性化推荐</td>
+</tr>
+</tbody></table>
+<h2 id="二、视频上传与存储"><a href="#二、视频上传与存储" class="headerlink" title="二、视频上传与存储"></a>二、视频上传与存储</h2><h3 id="2-1-上传流程"><a href="#2-1-上传流程" class="headerlink" title="2.1 上传流程"></a>2.1 上传流程</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">客户端 → 分片上传 → 对象存储(S3)</span><br><span class="line">                      │</span><br><span class="line">                  <span class="selector-attr">[消息队列]</span></span><br><span class="line">                      │</span><br><span class="line">              ┌───────┴───────┐</span><br><span class="line">              │   转码服务     │</span><br><span class="line">              │  (异步处理)    │</span><br><span class="line">              └───────┬───────┘</span><br><span class="line">                      │</span><br><span class="line">              多分辨率版本 → 对象存储</span><br><span class="line">                      │</span><br><span class="line">                    CDN 预热</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-分片上传"><a href="#2-2-分片上传" class="headerlink" title="2.2 分片上传"></a>2.2 分片上传</h3><p>大视频（&gt;100MB）必须分片上传：</p>
+<ul>
+<li>将视频切分为 5-10MB 的 chunk</li>
+<li>支持断点续传：上传中断后可从中断位置继续</li>
+<li>合并：上传完成后，服务端合并所有分片（或直接保存分片元数据）</li>
+</ul>
+<h3 id="2-3-存储架构"><a href="#2-3-存储架构" class="headerlink" title="2.3 存储架构"></a>2.3 存储架构</h3><p>Netflix 将视频存储到 Amazon S3，但实际播放是从 Open Connect CDN 直接分发。存储和分发解耦：</p>
+<ul>
+<li><strong>原视频存储</strong>：S3&#x2F;OSS 对象存储，原始的高码率视频</li>
+<li><strong>转码版本</strong>：同样存储在对象存储，生成 1080p&#x2F;720p&#x2F;480p&#x2F;360p&#x2F;240p 多版本</li>
+<li><strong>元数据存储</strong>：MySQL&#x2F;PostgreSQL 存储视频标题、描述、标签、时长</li>
+</ul>
+<h2 id="三、视频转码"><a href="#三、视频转码" class="headerlink" title="三、视频转码"></a>三、视频转码</h2><h3 id="3-1-为什么需要转码"><a href="#3-1-为什么需要转码" class="headerlink" title="3.1 为什么需要转码"></a>3.1 为什么需要转码</h3><p>原始视频通常是单一高分格式（如 4K 60fps H.264），但用户设备差异巨大：</p>
+<ul>
+<li>iPhone 13 支持 HEVC 硬解</li>
+<li>Android 低端机可能只支持 H.264 Baseline</li>
+<li>浏览器 Web 端用 VP9 或 AV1</li>
+<li>弱网用户需要 360p 低码率版本</li>
+</ul>
+<h3 id="3-2-转码流水线"><a href="#3-2-转码流水线" class="headerlink" title="3.2 转码流水线"></a>3.2 转码流水线</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">原始视频 → 分析(场景检测) → 切片(按场景切段) → 并行转码 → 合并 → 输出多版本</span><br><span class="line">                │</span><br><span class="line">           <span class="selector-attr">[机器学习]</span></span><br><span class="line">           (内容分类/敏感内容检测/字幕生成)</span><br></pre></td></tr></table></figure>
+
+<p>关键优化：</p>
+<ul>
+<li><strong>DAG 调度</strong>：每个转码任务抽象的 DAG 节点，利用工作流引擎（如 Netflix Maestro）编排</li>
+<li><strong>自适应码率 (ABR)</strong>：HLS&#x2F;DASH 协议将视频切为 2-4 秒的小片段，每片段有多个码率版本。播放器根据当前缓冲和带宽动态切换。</li>
+<li><strong>GPU 加速</strong>：使用 NVIDIA GPU + NVENC 硬件编码，比 CPU 编码快 10x</li>
+</ul>
+<h2 id="四、内容分发网络-CDN"><a href="#四、内容分发网络-CDN" class="headerlink" title="四、内容分发网络 (CDN)"></a>四、内容分发网络 (CDN)</h2><h3 id="4-1-Netflix-Open-Connect"><a href="#4-1-Netflix-Open-Connect" class="headerlink" title="4.1 Netflix Open Connect"></a>4.1 Netflix Open Connect</h3><p>Netflix 不依赖第三方 CDN，而是构建了自己的 CDN 网络 Open Connect：</p>
+<ol>
+<li>将视频内容<strong>预推送到全球 1000+ 个 ISP 机房</strong></li>
+<li>用户点播时，请求首先路由到最近的 Open Connect 节点</li>
+<li>节点有缓存则直接返回，没有则回源拉取</li>
+</ol>
+<p><strong>关键指标</strong>：Netflix 的直播流可以在 60 秒内推送到 1 亿台设备。</p>
+<h3 id="4-2-CDN-缓存策略"><a href="#4-2-CDN-缓存策略" class="headerlink" title="4.2 CDN 缓存策略"></a>4.2 CDN 缓存策略</h3><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>热门内容</strong></td>
+<td>预热到所有边缘节点（如热门剧集全集）</td>
+</tr>
+<tr>
+<td><strong>长尾内容</strong></td>
+<td>仅存储在中心节点，按需回源</td>
+</tr>
+<tr>
+<td><strong>分层缓存</strong></td>
+<td>L1（边缘）→ L2（区域）→ L3（中心&#x2F;源站）</td>
+</tr>
+<tr>
+<td><strong>TTL 设置</strong></td>
+<td>不同内容设置不同 TTL，热门内容缓存更久</td>
+</tr>
+</tbody></table>
+<h2 id="五、直播-vs-点播"><a href="#五、直播-vs-点播" class="headerlink" title="五、直播 vs 点播"></a>五、直播 vs 点播</h2><h3 id="5-1-架构差异"><a href="#5-1-架构差异" class="headerlink" title="5.1 架构差异"></a>5.1 架构差异</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>点播 (VOD)</th>
+<th>直播 (Live)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>延迟要求</td>
+<td>秒级可接受</td>
+<td>毫秒-秒级（体育赛事）</td>
+</tr>
+<tr>
+<td>内容处理</td>
+<td>可提前转码</td>
+<td>实时转码</td>
+</tr>
+<tr>
+<td>分发方式</td>
+<td>CDN 缓存</td>
+<td>边缘节点实时转发</td>
+</tr>
+<tr>
+<td>协议</td>
+<td>HLS (10-30s 延迟)</td>
+<td>WebRTC&#x2F;RTMP (500ms-2s)</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-直播架构"><a href="#5-2-直播架构" class="headerlink" title="5.2 直播架构"></a>5.2 直播架构</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主播端 → RTMP 推流 → 直播服务器 → 实时转码(ABR) → </span><br><span class="line">    ├→ HLS 切片生成 → CDN 分发 → 普通观众 (<span class="number">10s</span> 延迟)</span><br><span class="line">    └→ WebRTC 低延迟通道 → 交互式观众 (<span class="number">500ms</span> 延迟)</span><br></pre></td></tr></table></figure>
+
+<p>Netflix 在 2024 年首次支持全球直播（如体育赛事、脱口秀），技术要点：</p>
+<ul>
+<li>使用 Fastly CDN 边缘计算处理实时转码</li>
+<li>HLS 低延迟模式（LL-HLS）将延迟降到 2-3 秒</li>
+<li>全球同步：通过 NTP 时间同步保证不同地区观众看到同一时刻内容</li>
+</ul>
+<h2 id="六、播放器自适应码率"><a href="#六、播放器自适应码率" class="headerlink" title="六、播放器自适应码率"></a>六、播放器自适应码率</h2><h3 id="6-1-ABR-算法"><a href="#6-1-ABR-算法" class="headerlink" title="6.1 ABR 算法"></a>6.1 ABR 算法</h3><p>播放器持续监测：</p>
+<ul>
+<li><strong>缓冲区长度</strong>：当前缓冲了多少秒数据</li>
+<li><strong>下载速度</strong>：每个片段下载耗费的时间</li>
+</ul>
+<p>决策逻辑：</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">buffer</span> &lt; <span class="number">5</span>s:</span><br><span class="line">    切换到最低码率（防止卡顿）</span><br><span class="line">elif <span class="built_in">buffer</span> &gt; <span class="number">15</span>s:</span><br><span class="line">    切换到更高码率（提高清晰度）</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    保持当前码率</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-预加载策略"><a href="#6-2-预加载策略" class="headerlink" title="6.2 预加载策略"></a>6.2 预加载策略</h3><ul>
+<li>Netflix 在浏览页面时后台预加载预告片</li>
+<li>YouTube 预加载推荐列表前 3 个视频的首个片段</li>
+<li>利用用户行为预测下一个可能播放的视频</li>
+</ul>
+<h2 id="七、数据架构与搜索"><a href="#七、数据架构与搜索" class="headerlink" title="七、数据架构与搜索"></a>七、数据架构与搜索</h2><h3 id="7-1-视频元数据"><a href="#7-1-视频元数据" class="headerlink" title="7.1 视频元数据"></a>7.1 视频元数据</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="params">video_id:</span> 主键</span><br><span class="line"><span class="params">title:</span> 标题</span><br><span class="line"><span class="params">description:</span> 描述</span><br><span class="line"><span class="params">tags:</span> [数组]</span><br><span class="line"><span class="params">duration_seconds:</span> 时长</span><br><span class="line"><span class="params">uploader_id:</span> 上传者</span><br><span class="line"><span class="params">urls:</span> &#123;<span class="number">1080</span><span class="params">p:</span> <span class="string">&quot;...&quot;</span>, <span class="number">720</span><span class="params">p:</span> <span class="string">&quot;...&quot;</span>, <span class="number">480</span><span class="params">p:</span> <span class="string">&quot;...&quot;</span>&#125;</span><br><span class="line"><span class="params">view_count:</span> 播放量 (定期更新)</span><br><span class="line"><span class="params">created_at:</span> 上传时间</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-2-搜索引擎"><a href="#7-2-搜索引擎" class="headerlink" title="7.2 搜索引擎"></a>7.2 搜索引擎</h3><p>YouTube 的搜索基于 Elasticsearch：</p>
+<ul>
+<li>倒排索引覆盖标题、描述、字幕</li>
+<li>排序公式综合播放量、点赞、评论、上传时间</li>
+<li>个性化排序通过机器学习模型（用户历史、兴趣特征 + 视频特征）计算相关性分数</li>
+</ul>
+<h2 id="八、容量估算"><a href="#八、容量估算" class="headerlink" title="八、容量估算"></a>八、容量估算</h2><p>假设 10 亿视频，平均大小 500MB，总存储 &#x3D; 10亿 × 500MB &#x3D; 500PB（不含多码率版本和副本）</p>
+<ul>
+<li>每日上传 100 万视频，100万 × 500MB &#x3D; 500TB&#x2F;天</li>
+<li>如果 10% 是热门内容需要 CDN 缓存：50TB × 3副本 &#x3D; 150TB CDN 存储</li>
+</ul>
+<p>YouTube 使用 Google 自研的 Colossus 文件系统 + Spanner 数据库，Netflix 使用 AWS S3 + Cassandra。</p>
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>视频流系统的核心挑战是<strong>规模</strong>——从存储、转码、分发到播放的完整链路都必须在亿级用户和海量内容上保持稳定。关键技术：分片上传 + 异步转码流水线 + 自适应码率 (ABR) + 全球 CDN 分层缓存。Netflix 和 YouTube 分别代表了”自建 CDN”和”云原生”两种路线，都验证了各自在超大规模下的可行性。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/virtualization/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/virtualization/" class="post-title-link" itemprop="url">虚拟化与容器化: 从 Hypervisor 到 K8s</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD/" itemprop="url" rel="index"><span itemprop="name">基础设施</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <hr>
+<blockquote>
+<p>📖 本文前六节（Docker 基础、容器 vs 虚拟机、镜像分层、网络模式、存储卷、多阶段构建）已独立为 <a href="/docker-deep-dive/">Docker 深度解析</a>，建议先阅读。以下从 Dockerfile 实践开始。</p>
+</blockquote>
+<h3 id="1-7-Dockerfile-最佳实践"><a href="#1-7-Dockerfile-最佳实践" class="headerlink" title="1.7 Dockerfile 最佳实践"></a>1.7 Dockerfile 最佳实践</h3><ol>
+<li><strong>选择官方最小基础镜像</strong>：优先 <code>alpine</code> 或 <code>distroless</code>，避免臃肿的 <code>ubuntu:latest</code></li>
+<li><strong>固定镜像版本</strong>：<code>FROM node:20.11-alpine</code> 而非 <code>FROM node:latest</code>，确保构建可重复</li>
+<li><strong>合并 RUN 指令减少层数</strong>：多个命令用 <code>&amp;&amp;</code> 连接，最后 <code>rm -rf /var/lib/apt/lists/*</code> 清理缓存</li>
+<li><strong>先 COPY 依赖文件再 COPY 源码</strong>：利用层缓存，依赖不变时跳过重新安装</li>
+<li><strong>使用 .dockerignore</strong>：排除 <code>node_modules</code>、<code>.git</code>、<code>*.log</code> 等，减小构建上下文</li>
+<li><strong>多阶段构建</strong>：编译和运行分离，最终镜像只含运行时必需文件</li>
+<li><strong>使用非 root 用户</strong>：<code>USER 1000</code>，遵循最小权限原则</li>
+<li><strong>设置 WORKDIR</strong>：使用绝对路径 <code>WORKDIR /app</code>，避免 <code>RUN cd /app &amp;&amp; ...</code></li>
+<li><strong>优先 COPY 而非 ADD</strong>：<code>ADD</code> 有自动解压 tar 的功能，容易引入意外行为</li>
+<li><strong>合理排序分层</strong>：不易变动的指令放前面（系统依赖安装），频繁变动的放后面（<code>COPY . .</code>）</li>
+<li><strong>使用 HEALTHCHECK</strong>：<code>HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD curl -f http://localhost:8080/health || exit 1</code></li>
+<li><strong>使用 exec 形式的 CMD&#x2F;ENTRYPOINT</strong>：<code>CMD [&quot;java&quot;, &quot;-jar&quot;, &quot;app.jar&quot;]</code> 而非 shell 形式 <code>CMD java -jar app.jar</code>，确保信号转发正确</li>
+</ol>
+<h3 id="1-8-Docker-Compose"><a href="#1-8-Docker-Compose" class="headerlink" title="1.8 Docker Compose"></a>1.8 Docker Compose</h3><p>Docker Compose 用于定义和运行多容器应用，通过单个 YAML 文件声明服务、网络、存储：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.9&quot;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">build:</span> <span class="string">.</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">myapp:latest</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DB_HOST=db</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="attr">db:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span>    <span class="comment"># 等待 db 健康检查通过后启动</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line">    <span class="attr">deploy:</span></span><br><span class="line">      <span class="attr">resources:</span></span><br><span class="line">        <span class="attr">limits:</span> &#123; <span class="attr">cpus:</span> <span class="string">&quot;2&quot;</span>, <span class="attr">memory:</span> <span class="string">512M</span> &#125;</span><br><span class="line">        <span class="attr">reservations:</span> &#123; <span class="attr">cpus:</span> <span class="string">&quot;0.5&quot;</span>, <span class="attr">memory:</span> <span class="string">256M</span> &#125;</span><br><span class="line"></span><br><span class="line">  <span class="attr">db:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">postgres:16-alpine</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">POSTGRES_USER:</span> <span class="string">myuser</span></span><br><span class="line">      <span class="attr">POSTGRES_PASSWORD_FILE:</span> <span class="string">/run/secrets/db_password</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">pgdata:/var/lib/postgresql/data</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD-SHELL&quot;</span>, <span class="string">&quot;pg_isready -U myuser&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">5</span></span><br><span class="line">    <span class="attr">secrets:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">db_password</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line">  <span class="attr">pgdata:</span></span><br><span class="line"><span class="attr">secrets:</span></span><br><span class="line">  <span class="attr">db_password:</span></span><br><span class="line">    <span class="attr">file:</span> <span class="string">./secrets/db_password.txt</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、容器编排——Kubernetes-深度解析"><a href="#二、容器编排——Kubernetes-深度解析" class="headerlink" title="二、容器编排——Kubernetes 深度解析"></a>二、容器编排——Kubernetes 深度解析</h2><h3 id="2-1-架构全景"><a href="#2-1-架构全景" class="headerlink" title="2.1 架构全景"></a>2.1 架构全景</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────── Control Plane ───────────────────┐</span><br><span class="line">│  ┌───────────┐   ┌────────┐   ┌────────────┐        │</span><br><span class="line">│  │API Server │←→ │  etcd  │   │ Controller │        │</span><br><span class="line">│  │(REST API) │   │(Raft KV)│   │  Manager   │        │</span><br><span class="line">│  └─────┬─────┘   └────────┘   │(调谐循环)   │        │</span><br><span class="line">│        │                      └────────────┘        │</span><br><span class="line">│  ┌─────┴─────┐                                      │</span><br><span class="line">│  │ Scheduler │ 为 Pod 选择最优 <span class="keyword">Node</span>                  <span class="title">│</span></span><br><span class="line"><span class="title">│  └───────────┘                                      │</span></span><br><span class="line"><span class="title">└──────────────────────┬──────────────────────────────┘</span></span><br><span class="line"><span class="title">                       │ HTTPS</span> (<span class="number">6443</span>)</span><br><span class="line">  ┌────────────────────┼────────────────────┐</span><br><span class="line">  │  Worker <span class="keyword">Node</span> <span class="title">1</span>     │                    │  Worker <span class="keyword">Node</span> <span class="title">2</span></span><br><span class="line">  │  ┌───────┐ ┌──────┐│                    │  ┌───────┐ ┌──────┐</span><br><span class="line">  │  │kubelet│ │kube- ││                    │  │kubelet│ │kube- │</span><br><span class="line">  │  │CRI→runc│ │proxy ││                    │  └───────┘ │proxy │</span><br><span class="line">  │  └───────┘ └──────┘│                    │  ┌────────────────┐</span><br><span class="line">  │  ┌────────────────┐│                    │  │ Pod: [pause]   │</span><br><span class="line">  │  │ Pod: [pause]   ││                    │  │ + [app]+[sidecar]│</span><br><span class="line">  │  │ + [app container]│                   │  └────────────────┘</span><br><span class="line">  │  └────────────────┘│</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>位置</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>kube-apiserver</strong></td>
+<td>Master</td>
+<td>集群统一入口 (REST API)，认证&#x2F;授权&#x2F;准入控制，所有组件通过它交互</td>
+</tr>
+<tr>
+<td><strong>etcd</strong></td>
+<td>Master</td>
+<td>分布式 KV 存储 (Raft 共识)，保存集群所有状态数据</td>
+</tr>
+<tr>
+<td><strong>kube-scheduler</strong></td>
+<td>Master</td>
+<td>监听未绑定 Node 的 Pod，根据调度策略选择最优节点</td>
+</tr>
+<tr>
+<td><strong>controller-manager</strong></td>
+<td>Master</td>
+<td>运行各类 Controller（Deployment&#x2F;ReplicaSet&#x2F;Node 等），通过调谐循环将当前状态驱动到期望状态</td>
+</tr>
+<tr>
+<td><strong>kubelet</strong></td>
+<td>Node</td>
+<td>节点代理，接收 PodSpec，通过 CRI 调用容器运行时管理容器</td>
+</tr>
+<tr>
+<td><strong>kube-proxy</strong></td>
+<td>Node</td>
+<td>维护节点上的 iptables&#x2F;IPVS 规则，实现 Service 到 Pod 的流量转发</td>
+</tr>
+</tbody></table>
+<h3 id="2-2-Pod"><a href="#2-2-Pod" class="headerlink" title="2.2 Pod"></a>2.2 Pod</h3><p>Pod 是 K8s 最小调度单元，包含一个或多个共享 namespace 的容器。</p>
+<p><strong>Pause 容器</strong>：每个 Pod 启动时首先创建 pause 容器（~700KB 的 sandbox 容器），作用：</p>
+<ol>
+<li>创建并持有 Pod 的 NET &#x2F; IPC namespace</li>
+<li>后续业务容器加入 pause 容器的 namespace，实现网络和 IPC 共享</li>
+<li>极为精简，几乎不会崩溃，保证 Pod 网络 namespace 不丢失</li>
+</ol>
+<p>Pod 内容器通过 localhost 互相访问，共享同一 IP 和端口空间。PID namespace 可选共享，MNT namespace 各自独立。</p>
+<p><strong>探针 (Probes)：</strong></p>
+<table>
+<thead>
+<tr>
+<th>探针</th>
+<th>作用</th>
+<th>失败后果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>livenessProbe</strong></td>
+<td>检查容器是否<strong>存活</strong>（死锁&#x2F;卡死）</td>
+<td>杀死容器，按 restartPolicy 重启</td>
+</tr>
+<tr>
+<td><strong>readinessProbe</strong></td>
+<td>检查容器是否<strong>就绪</strong>接受流量</td>
+<td>从 Service Endpoints 中移除</td>
+</tr>
+<tr>
+<td><strong>startupProbe</strong></td>
+<td>检查容器是否<strong>启动完成</strong>（慢启动）</td>
+<td>杀死容器，按 restartPolicy 重启</td>
+</tr>
+</tbody></table>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">app</span></span><br><span class="line">      <span class="attr">startupProbe:</span>                          <span class="comment"># 慢启动保护</span></span><br><span class="line">        <span class="attr">httpGet:</span> &#123; <span class="attr">path:</span> <span class="string">/healthz</span>, <span class="attr">port:</span> <span class="number">8080</span> &#125;</span><br><span class="line">        <span class="attr">failureThreshold:</span> <span class="number">30</span>                 <span class="comment"># 最多等 30×10s = 300s</span></span><br><span class="line">        <span class="attr">periodSeconds:</span> <span class="number">10</span></span><br><span class="line">      <span class="attr">livenessProbe:</span>                         <span class="comment"># 存活检查</span></span><br><span class="line">        <span class="attr">httpGet:</span> &#123; <span class="attr">path:</span> <span class="string">/healthz</span>, <span class="attr">port:</span> <span class="number">8080</span> &#125;</span><br><span class="line">        <span class="attr">periodSeconds:</span> <span class="number">15</span></span><br><span class="line">        <span class="attr">failureThreshold:</span> <span class="number">3</span></span><br><span class="line">      <span class="attr">readinessProbe:</span>                        <span class="comment"># 就绪检查</span></span><br><span class="line">        <span class="attr">httpGet:</span> &#123; <span class="attr">path:</span> <span class="string">/ready</span>, <span class="attr">port:</span> <span class="number">8080</span> &#125;</span><br><span class="line">        <span class="attr">periodSeconds:</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<p>探针执行方式：<strong>exec</strong>（容器内执行命令）、<strong>httpGet</strong>、<strong>tcpSocket</strong> 三种。</p>
+<h3 id="2-3-Controller"><a href="#2-3-Controller" class="headerlink" title="2.3 Controller"></a>2.3 Controller</h3><p>Controller 是 K8s 核心设计哲学：<strong>声明式 API + 调谐循环 (Reconcile Loop)</strong>。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">调谐循环伪代码:</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    currentState = <span class="built_in">getCurrentState</span>()</span><br><span class="line">    desiredState = <span class="built_in">getDesiredState</span>()</span><br><span class="line">    <span class="keyword">if</span> currentState != desiredState &#123;</span><br><span class="line">        <span class="built_in">executeActions</span>(<span class="built_in">computeDiff</span>(currentState, desiredState))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>Controller</th>
+<th>用途</th>
+<th>核心机制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Deployment</strong></td>
+<td>无状态应用，滚动更新&#x2F;回滚</td>
+<td>管理 ReplicaSet，RS 管理 Pod</td>
+</tr>
+<tr>
+<td><strong>ReplicaSet</strong></td>
+<td>保证指定数量的 Pod 副本运行</td>
+<td>通过 label selector 匹配 Pod</td>
+</tr>
+<tr>
+<td><strong>StatefulSet</strong></td>
+<td>有状态应用，稳定标识&#x2F;有序部署&#x2F;持久存储</td>
+<td>Pod 固定名称 (app-0, app-1…)，PVC 模板</td>
+</tr>
+<tr>
+<td><strong>DaemonSet</strong></td>
+<td>每个节点运行一个 Pod 副本</td>
+<td>日志收集 (Fluentd)、监控 (Node Exporter)</td>
+</tr>
+<tr>
+<td><strong>Job</strong></td>
+<td>一次性任务</td>
+<td>completions 成功次数，parallelism 并行度</td>
+</tr>
+<tr>
+<td><strong>CronJob</strong></td>
+<td>定时任务，cron 表达式</td>
+<td>在指定时间创建 Job</td>
+</tr>
+</tbody></table>
+<h4 id="Deployment-滚动更新原理"><a href="#Deployment-滚动更新原理" class="headerlink" title="Deployment 滚动更新原理"></a>Deployment 滚动更新原理</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">3</span></span><br><span class="line">  <span class="attr">strategy:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">RollingUpdate</span></span><br><span class="line">    <span class="attr">rollingUpdate:</span></span><br><span class="line">      <span class="attr">maxSurge:</span> <span class="number">1</span>          <span class="comment"># 更新时最多多创建 1 个 Pod</span></span><br><span class="line">      <span class="attr">maxUnavailable:</span> <span class="number">0</span>    <span class="comment"># 更新时不可用 Pod 最多 0 个</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>更新过程 (replicas&#x3D;3, maxSurge&#x3D;1, maxUnavailable&#x3D;0)：</strong></p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Step 1: [v1][v1][v1]         → 创建 1 个 v2 → [v1][v1][v1][v2]</span><br><span class="line">Step 2: [v1][v1][v1][v2]     → v2 就绪，删 1 个 v1 → [v1][v1][v2]</span><br><span class="line">Step 3: [v1][v1][v2]         → 创建 1 个 v2 → [v1][v1][v2][v2]</span><br><span class="line">Step 4: 删 1 个 v1 → [v1][v2][v2] → 创建 v2 → 删 v1 → [v2][v2][v2]  完成！</span><br></pre></td></tr></table></figure>
+
+<p>Deployment 通过逐步伸缩新旧 ReplicaSet 实现滚动更新，旧 RS 保留以便回滚 (<code>kubectl rollout undo</code>)。</p>
+<h4 id="StatefulSet-特性"><a href="#StatefulSet-特性" class="headerlink" title="StatefulSet 特性"></a>StatefulSet 特性</h4><ul>
+<li><strong>稳定网络标识</strong>：<code>&lt;statefulset&gt;-&lt;序号&gt;.&lt;headless-svc&gt;.&lt;ns&gt;.svc.cluster.local</code></li>
+<li><strong>稳定存储</strong>：每个 Pod 绑定独立 PVC（通过 <code>volumeClaimTemplates</code>），Pod 重建后仍挂载相同存储</li>
+<li><strong>有序部署与逆序删除</strong>：<code>podManagementPolicy: OrderedReady</code> → 0→1→2 启动，2→1→0 删除</li>
+</ul>
+<h3 id="2-4-Service"><a href="#2-4-Service" class="headerlink" title="2.4 Service"></a>2.4 Service</h3><p>Service 为 Pod 提供稳定入口，解决 Pod IP 不固定的问题。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>行为</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ClusterIP</strong></td>
+<td>默认类型，集群内部 VIP，仅集群内可访问</td>
+<td>内部服务间调用</td>
+</tr>
+<tr>
+<td><strong>NodePort</strong></td>
+<td>在每个 Node 上开放固定端口 (30000-32767)</td>
+<td>开发测试 &#x2F; 简单外部访问</td>
+</tr>
+<tr>
+<td><strong>LoadBalancer</strong></td>
+<td>通过云厂商 LB 暴露公网或内网地址</td>
+<td>生产环境外部入口</td>
+</tr>
+<tr>
+<td><strong>ExternalName</strong></td>
+<td>返回 CNAME，将 Service 映射到外部 DNS 名称</td>
+<td>代理集群外部服务</td>
+</tr>
+<tr>
+<td><strong>Headless</strong></td>
+<td><code>clusterIP: None</code>，DNS 直接返回 Pod IP</td>
+<td>StatefulSet 对等发现</td>
+</tr>
+</tbody></table>
+<h4 id="kube-proxy-模式对比"><a href="#kube-proxy-模式对比" class="headerlink" title="kube-proxy 模式对比"></a>kube-proxy 模式对比</h4><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>原理</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>iptables</td>
+<td>随机负载均衡，规则数随 Service&#x2F;Pod 增长</td>
+<td>简单，中小规模集群</td>
+</tr>
+<tr>
+<td>IPVS</td>
+<td>内核 L4 负载均衡器，支持 rr&#x2F;lc&#x2F;dh&#x2F;sh</td>
+<td>性能优，大规模集群 (&gt;1000 Service)</td>
+</tr>
+</tbody></table>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span> &#123; <span class="attr">app:</span> <span class="string">myapp</span> &#125;</span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">80</span>          <span class="comment"># Service 端口</span></span><br><span class="line">      <span class="attr">targetPort:</span> <span class="number">8080</span>  <span class="comment"># Pod 端口</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line">  <span class="attr">sessionAffinity:</span> <span class="string">ClientIP</span>   <span class="comment"># 同一客户端 IP 路由到同一 Pod</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-5-Ingress-Gateway-API"><a href="#2-5-Ingress-Gateway-API" class="headerlink" title="2.5 Ingress &#x2F; Gateway API"></a>2.5 Ingress &#x2F; Gateway API</h3><p><strong>Ingress</strong> 负责将集群外部的 HTTP(S) 流量路由到集群内部的 Service：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Ingress</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">nginx.ingress.kubernetes.io/rewrite-target:</span> <span class="string">/</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">ingressClassName:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">tls:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">hosts:</span> [<span class="string">example.com</span>]</span><br><span class="line">      <span class="attr">secretName:</span> <span class="string">tls-secret</span></span><br><span class="line">  <span class="attr">rules:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">example.com</span></span><br><span class="line">      <span class="attr">http:</span></span><br><span class="line">        <span class="attr">paths:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/api</span></span><br><span class="line">            <span class="attr">pathType:</span> <span class="string">Prefix</span></span><br><span class="line">            <span class="attr">backend:</span></span><br><span class="line">              <span class="attr">service:</span> &#123; <span class="attr">name:</span> <span class="string">api-service</span>, <span class="attr">port:</span> &#123; <span class="attr">number:</span> <span class="number">8080</span> &#125; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>Ingress 的局限性推动了 <strong>Gateway API</strong> 的出现，它将角色拆分为 GatewayClass（基础设施层）、Gateway（网关实例）和 HTTPRoute（路由规则），支持灰度发布（权重路由）、请求匹配、跨 namespace 路由等高级功能。</p>
+<h3 id="2-6-存储"><a href="#2-6-存储" class="headerlink" title="2.6 存储"></a>2.6 存储</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PV (PersistentVolume) ←──绑定──→ PVC (PersistentVolumeClaim)</span><br><span class="line">  集群存储资源                     用户请求 (大小/访问模式)</span><br><span class="line">       ↑                                    </span><br><span class="line">StorageClass (动态供应) → provisioner + 参数 (AWS EBS / NFS / Ceph RBD)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>访问模式</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RWO (ReadWriteOnce)</td>
+<td>单节点读写挂载</td>
+</tr>
+<tr>
+<td>ROX (ReadOnlyMany)</td>
+<td>多节点只读挂载</td>
+</tr>
+<tr>
+<td>RWX (ReadWriteMany)</td>
+<td>多节点读写挂载 (需 NFS&#x2F;CephFS)</td>
+</tr>
+</tbody></table>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">storage.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">StorageClass</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">fast-ssd</span></span><br><span class="line"><span class="attr">provisioner:</span> <span class="string">kubernetes.io/aws-ebs</span></span><br><span class="line"><span class="attr">parameters:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">gp3</span></span><br><span class="line">  <span class="attr">iops:</span> <span class="string">&quot;3000&quot;</span></span><br><span class="line"><span class="attr">reclaimPolicy:</span> <span class="string">Delete</span></span><br><span class="line"><span class="attr">volumeBindingMode:</span> <span class="string">WaitForFirstConsumer</span>   <span class="comment"># 延迟绑定，避免跨区问题</span></span><br><span class="line"><span class="attr">allowVolumeExpansion:</span> <span class="literal">true</span>                <span class="comment"># 允许在线扩容</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>CSI (Container Storage Interface)</strong> 是 K8s 与存储系统的标准接口，包含三个 gRPC 服务：</p>
+<ul>
+<li><strong>Identity Service</strong>：返回插件信息和能力</li>
+<li><strong>Controller Service</strong>：创建&#x2F;删除&#x2F;快照&#x2F;扩容卷（由外部 provisioner 调用）</li>
+<li><strong>Node Service</strong>：挂载&#x2F;卸载卷到 Pod（由 kubelet 调用）</li>
+</ul>
+<h3 id="2-7-配置管理"><a href="#2-7-配置管理" class="headerlink" title="2.7 配置管理"></a>2.7 配置管理</h3><h4 id="ConfigMap"><a href="#ConfigMap" class="headerlink" title="ConfigMap"></a>ConfigMap</h4><p>存储非敏感配置，支持环境变量注入和文件挂载：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">app-config</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">application.yml:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    server:</span></span><br><span class="line"><span class="string">      port: 8080</span></span><br><span class="line"><span class="string">    database:</span></span><br><span class="line"><span class="string">      pool-size: 20</span></span><br><span class="line"><span class="string"></span><span class="meta">---</span></span><br><span class="line"><span class="comment"># 环境变量注入</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">app</span></span><br><span class="line">      <span class="attr">envFrom:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">configMapRef:</span> &#123; <span class="attr">name:</span> <span class="string">app-config</span> &#125;</span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># 文件挂载 (支持热更新，约60s生效)</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">app</span></span><br><span class="line">      <span class="attr">volumeMounts:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">config-vol</span></span><br><span class="line">          <span class="attr">mountPath:</span> <span class="string">/etc/config</span></span><br><span class="line">  <span class="attr">volumes:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">config-vol</span></span><br><span class="line">      <span class="attr">configMap:</span> &#123; <span class="attr">name:</span> <span class="string">app-config</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Secret"><a href="#Secret" class="headerlink" title="Secret"></a>Secret</h4><p>存储敏感信息（密码&#x2F;Token&#x2F;证书），数据 base64 编码（非加密），需配合 etcd 加密和 RBAC 使用：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">db-secret</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">dXNlcm5hbWU=</span>          <span class="comment"># echo -n &quot;username&quot; | base64</span></span><br><span class="line">  <span class="attr">password:</span> <span class="string">cGFzc3dvcmQ=</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">env:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">DB_PASSWORD</span></span><br><span class="line">          <span class="attr">valueFrom:</span></span><br><span class="line">            <span class="attr">secretKeyRef:</span> &#123; <span class="attr">name:</span> <span class="string">db-secret</span>, <span class="attr">key:</span> <span class="string">password</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>安全实践</strong>：使用 External Secrets Operator 对接 Vault；启用 etcd encryption at rest；配合 RBAC 限制 Secret 访问。</p>
+<h3 id="2-8-调度"><a href="#2-8-调度" class="headerlink" title="2.8 调度"></a>2.8 调度</h3><h4 id="亲和性-Affinity-与反亲和性-Anti-Affinity"><a href="#亲和性-Affinity-与反亲和性-Anti-Affinity" class="headerlink" title="亲和性 (Affinity) 与反亲和性 (Anti-Affinity)"></a>亲和性 (Affinity) 与反亲和性 (Anti-Affinity)</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">affinity:</span></span><br><span class="line">    <span class="attr">podAntiAffinity:</span>                       <span class="comment"># 高可用：Pod 分散到不同节点</span></span><br><span class="line">      <span class="attr">requiredDuringSchedulingIgnoredDuringExecution:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">labelSelector:</span></span><br><span class="line">            <span class="attr">matchLabels:</span> &#123; <span class="attr">app:</span> <span class="string">myapp</span> &#125;</span><br><span class="line">          <span class="attr">topologyKey:</span> <span class="string">kubernetes.io/hostname</span></span><br><span class="line">    <span class="attr">nodeAffinity:</span>                          <span class="comment"># 选择 GPU 节点</span></span><br><span class="line">      <span class="attr">requiredDuringSchedulingIgnoredDuringExecution:</span></span><br><span class="line">        <span class="attr">nodeSelectorTerms:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">matchExpressions:</span></span><br><span class="line">              <span class="bullet">-</span> &#123; <span class="attr">key:</span> <span class="string">node-type</span>, <span class="attr">operator:</span> <span class="string">In</span>, <span class="attr">values:</span> [<span class="string">gpu</span>, <span class="string">compute</span>] &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>requiredDuringScheduling...</code> 是硬要求；<code>preferredDuringScheduling...</code> 是软偏好。</p>
+<h4 id="污点-Taint-与容忍-Toleration"><a href="#污点-Taint-与容忍-Toleration" class="headerlink" title="污点 (Taint) 与容忍 (Toleration)"></a>污点 (Taint) 与容忍 (Toleration)</h4><p>污点在 Node 上，容忍在 Pod 上。没有对应容忍的 Pod 无法被调度到该 Node。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl taint nodes gpu-node-1 gpu=<span class="literal">true</span>:NoSchedule     <span class="comment"># 专用节点</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">tolerations:</span></span><br><span class="line">    <span class="bullet">-</span> &#123; <span class="attr">key:</span> <span class="string">gpu</span>, <span class="attr">operator:</span> <span class="string">Equal</span>, <span class="attr">value:</span> <span class="string">&quot;true&quot;</span>, <span class="attr">effect:</span> <span class="string">NoSchedule</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>污点效果：<strong>NoSchedule</strong>（不调度）、<strong>PreferNoSchedule</strong>（尽量不调度）、<strong>NoExecute</strong>（不调度+驱逐已有无容忍Pod）。</p>
+<h4 id="资源请求与限制"><a href="#资源请求与限制" class="headerlink" title="资源请求与限制"></a>资源请求与限制</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">resources:</span></span><br><span class="line">        <span class="attr">requests:</span> &#123; <span class="attr">cpu:</span> <span class="string">&quot;500m&quot;</span>, <span class="attr">memory:</span> <span class="string">&quot;256Mi&quot;</span> &#125;   <span class="comment"># 调度据此选节点</span></span><br><span class="line">        <span class="attr">limits:</span>   &#123; <span class="attr">cpu:</span> <span class="string">&quot;2&quot;</span>,    <span class="attr">memory:</span> <span class="string">&quot;512Mi&quot;</span> &#125;   <span class="comment"># 运行时上限（超内存→OOMKilled）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>QoS 类别</strong>：</p>
+<ul>
+<li><strong>Guaranteed</strong>：CPU&#x2F;Memory 的 <code>requests == limits</code>，最高优先级，最后被驱逐</li>
+<li><strong>Burstable</strong>：<code>requests &lt; limits</code>，中优先级</li>
+<li><strong>BestEffort</strong>：未设置 resources，最低优先级，最先被驱逐</li>
+</ul>
+<h4 id="拓扑分布约束-Topology-Spread-Constraints"><a href="#拓扑分布约束-Topology-Spread-Constraints" class="headerlink" title="拓扑分布约束 (Topology Spread Constraints)"></a>拓扑分布约束 (Topology Spread Constraints)</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">topologySpreadConstraints:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">maxSkew:</span> <span class="number">1</span>                              <span class="comment"># 两 zone 间 Pod 数差 ≤ 1</span></span><br><span class="line">      <span class="attr">topologyKey:</span> <span class="string">topology.kubernetes.io/zone</span></span><br><span class="line">      <span class="attr">whenUnsatisfiable:</span> <span class="string">DoNotSchedule</span></span><br><span class="line">      <span class="attr">labelSelector:</span></span><br><span class="line">        <span class="attr">matchLabels:</span> &#123; <span class="attr">app:</span> <span class="string">myapp</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-9-自动伸缩"><a href="#2-9-自动伸缩" class="headerlink" title="2.9 自动伸缩"></a>2.9 自动伸缩</h3><h4 id="HPA-Horizontal-Pod-Autoscaler"><a href="#HPA-Horizontal-Pod-Autoscaler" class="headerlink" title="HPA (Horizontal Pod Autoscaler)"></a>HPA (Horizontal Pod Autoscaler)</h4><p>基于 CPU&#x2F;Memory 或自定义指标自动调整副本数：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">autoscaling/v2</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">HorizontalPodAutoscaler</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">scaleTargetRef:</span></span><br><span class="line">    <span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line">    <span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">  <span class="attr">minReplicas:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">maxReplicas:</span> <span class="number">10</span></span><br><span class="line">  <span class="attr">metrics:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">Resource</span></span><br><span class="line">      <span class="attr">resource:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">cpu</span></span><br><span class="line">        <span class="attr">target:</span> &#123; <span class="attr">type:</span> <span class="string">Utilization</span>, <span class="attr">averageUtilization:</span> <span class="number">70</span> &#125;</span><br><span class="line">  <span class="attr">behavior:</span></span><br><span class="line">    <span class="attr">scaleDown:</span></span><br><span class="line">      <span class="attr">stabilizationWindowSeconds:</span> <span class="number">300</span>    <span class="comment"># 缩容冷静期 5 分钟</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>HPA 公式</strong>：<code>期望副本数 = ceil(当前副本数 × 当前指标值 / 目标指标值)</code><br>例如：3 副本，CPU 90%，目标 70% → <code>ceil(3 × 90/70) = 4</code></p>
+<h4 id="VPA-Vertical-Pod-Autoscaler"><a href="#VPA-Vertical-Pod-Autoscaler" class="headerlink" title="VPA (Vertical Pod Autoscaler)"></a>VPA (Vertical Pod Autoscaler)</h4><p>自动调整 Pod 的 CPU&#x2F;Memory requests 和 limits，调整时会重启 Pod（需配合 PDB）。</p>
+<h4 id="Cluster-Autoscaler"><a href="#Cluster-Autoscaler" class="headerlink" title="Cluster Autoscaler"></a>Cluster Autoscaler</h4><p>当 Pod 因资源不足 pending 时自动申请新节点加入集群；节点利用率偏低时自动释放节点。</p>
+<h3 id="2-10-网络模型-CNI"><a href="#2-10-网络模型-CNI" class="headerlink" title="2.10 网络模型 (CNI)"></a>2.10 网络模型 (CNI)</h3><p>K8s 网络基本要求：每个 Pod 独立 IP、同&#x2F;跨节点 Pod 直接通信（无需 NAT）、Pod 与 Service 可通信。</p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>Calico</th>
+<th>Flannel</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据平面</td>
+<td>BGP 三层路由 或 IPIP&#x2F;VXLAN 封装</td>
+<td>VXLAN &#x2F; Host-GW &#x2F; UDP</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>BGP 模式：无封装开销，接近原生网络</td>
+<td>VXLAN：轻微封装开销</td>
+</tr>
+<tr>
+<td>网络策略</td>
+<td>原生支持 NetworkPolicy</td>
+<td>不支持（需配合 Calico&#x2F;Cilium）</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>中等</td>
+<td>低</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>高性能、网络策略、大型集群</td>
+<td>简单场景、快速部署</td>
+</tr>
+</tbody></table>
+<p><strong>Flannel VXLAN 路径</strong>：Pod A → cni0 网桥 → flannel.1 (VTEP 封装 VXLAN) → 物理网卡 → Node2 flannel.1 (解封装) → cni0 → Pod B</p>
+<p><strong>Calico BGP 路径</strong>：Pod A → caliXXXX (veth) → 查路由表: 目标子网 via Node2 IP → 物理网卡 → 物理网络纯 IP 路由 → Node2 → Pod B</p>
+<h3 id="2-11-核心控制器工作原理"><a href="#2-11-核心控制器工作原理" class="headerlink" title="2.11 核心控制器工作原理"></a>2.11 核心控制器工作原理</h3><h4 id="Informer-模式"><a href="#Informer-模式" class="headerlink" title="Informer 模式"></a>Informer 模式</h4><p>Controller 基于 etcd Watch 实现事件驱动 + 水平触发：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">API Server → Watch → Reflector → DeltaFIFO → Indexer (本地缓存)</span><br><span class="line">                                                   ↓</span><br><span class="line">                                             Lister (读本地缓存)</span><br><span class="line">                                                   ↓</span><br><span class="line">                                             WorkQueue (去重+排队)</span><br><span class="line">                                                   ↓</span><br><span class="line">                                             Worker 协程 (调谐)</span><br></pre></td></tr></table></figure>
+
+<p>Informer 监听 API Server 变更，缓存到本地 Indexer，Lister 从本地缓存读取（避免频繁查 API Server），WorkQueue 去重后交给 Worker 执行调谐逻辑。</p>
+<h4 id="Deployment-Controller-调谐循环"><a href="#Deployment-Controller-调谐循环" class="headerlink" title="Deployment Controller 调谐循环"></a>Deployment Controller 调谐循环</h4><ol>
+<li>Watch Deployment 变更 → 获取对应 ReplicaSet 列表</li>
+<li>比较期望副本数 vs 当前副本数</li>
+<li>如果期望 Template 与当前 RS 不同 → 创建新 RS (滚动更新)</li>
+<li>按 maxSurge&#x2F;maxUnavailable 逐步伸缩新旧 RS</li>
+<li>旧 RS 副本数缩为 0 后保留 (用于回滚)</li>
+</ol>
+<h4 id="ReplicaSet-Controller-调谐循环"><a href="#ReplicaSet-Controller-调谐循环" class="headerlink" title="ReplicaSet Controller 调谐循环"></a>ReplicaSet Controller 调谐循环</h4><ol>
+<li>Watch RS &#x2F; Pod 变更 → Selector 匹配所属 Pod</li>
+<li><code>diff = desiredReplicas - currentReplicas</code></li>
+<li><code>diff &gt; 0</code> → 根据 Template 创建 Pod</li>
+<li><code>diff &lt; 0</code> → 按创建时间和状态排序删除 Pod</li>
+</ol>
+<hr>
+<h2 id="三、云原生生态云原生生态"><a href="#三、云原生生态云原生生态" class="headerlink" title="三、云原生生态云原生生态"></a>三、云原生生态云原生生态</h2><h3 id="3-1-Service-Mesh-—-Istio"><a href="#3-1-Service-Mesh-—-Istio" class="headerlink" title="3.1 Service Mesh — Istio"></a>3.1 Service Mesh — Istio</h3><p>Service Mesh 将流量管理、安全、可观测性从应用代码剥离到 Sidecar 代理层：</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Pod</span><span class="punctuation">:</span> <span class="string">[App Container] ←──localhost──→ [Envoy Sidecar]</span></span><br><span class="line">                                          <span class="attribute">│ mTLS</span></span><br><span class="line"><span class="attribute">                                   ┌──────┴──────┐</span></span><br><span class="line"><span class="attribute">                                   │  istiod     │ (控制面)</span></span><br><span class="line"><span class="attribute">                                   │  Pilot</span><span class="punctuation">:</span> <span class="string">流量管理     │</span></span><br><span class="line">                                   <span class="attribute">│  Citadel</span><span class="punctuation">:</span> <span class="string">证书签发   │</span></span><br><span class="line">                                   └─────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心能力：</strong></p>
+<p><strong>流量管理 — 灰度发布：</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.istio.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">VirtualService</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">hosts:</span> [<span class="string">reviews</span>]</span><br><span class="line">  <span class="attr">http:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">route:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">destination:</span> &#123; <span class="attr">host:</span> <span class="string">reviews</span>, <span class="attr">subset:</span> <span class="string">v1</span> &#125;</span><br><span class="line">          <span class="attr">weight:</span> <span class="number">90</span>           <span class="comment"># 90% 流量到 v1</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">destination:</span> &#123; <span class="attr">host:</span> <span class="string">reviews</span>, <span class="attr">subset:</span> <span class="string">v2</span> &#125;</span><br><span class="line">          <span class="attr">weight:</span> <span class="number">10</span>           <span class="comment"># 10% 到 v2 (金丝雀发布)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>安全</strong>：Envoy 自动为服务间通信提供 mTLS 加密，无需修改应用代码。</p>
+<p><strong>可观测性</strong>：Envoy 自动生成分布式追踪 (Jaeger&#x2F;Zipkin)、Prometheus 指标、访问日志。</p>
+<p><strong>故障注入</strong>：支持延迟注入和错误注入，用于韧性测试。</p>
+<h3 id="3-2-Serverless-—-Knative"><a href="#3-2-Serverless-—-Knative" class="headerlink" title="3.2 Serverless — Knative"></a>3.2 Serverless — Knative</h3><p>Knative 基于 K8s 构建 Serverless 平台，核心组件：</p>
+<ul>
+<li><strong>Serving</strong>：请求驱动的容器部署和自动伸缩（支持缩容到 0）</li>
+<li><strong>Eventing</strong>：事件驱动的松耦合架构（CloudEvents 标准）</li>
+</ul>
+<p><strong>冷启动优化</strong>：缩容到 0 节省成本 → <code>minScale: 1</code> 保持预热 → 小镜像加速拉取 → 合理 startupProbe 快速标记就绪。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">serving.knative.dev/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containerConcurrency:</span> <span class="number">100</span>     <span class="comment"># 每容器最多 100 并发</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">image:</span> <span class="string">myapp:latest</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-Helm"><a href="#3-3-Helm" class="headerlink" title="3.3 Helm"></a>3.3 Helm</h3><p>Kubernetes 的包管理器，通过 Chart（K8s 资源模板）实现应用一键部署和生命周期管理：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># values.yaml (用户配置)</span></span><br><span class="line"><span class="attr">replicaCount:</span> <span class="number">3</span></span><br><span class="line"><span class="attr">image:</span></span><br><span class="line">  <span class="attr">repository:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">tag:</span> <span class="string">&quot;1.25&quot;</span></span><br><span class="line"><span class="attr">service:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># templates/deployment.yaml (模板)</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> &#123;&#123; <span class="string">.Values.replicaCount</span> &#125;&#125;</span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">image:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; .Values.image.repository &#125;&#125;</span>:<span class="template-variable">&#123;&#123; .Values.image.tag &#125;&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>关键功能：模板渲染 (Go Template)、Release 管理 (<code>helm upgrade/rollback</code>)、Hooks (安装前后执行 Job)。</p>
+<h3 id="3-4-GitOps-—-ArgoCD-Flux"><a href="#3-4-GitOps-—-ArgoCD-Flux" class="headerlink" title="3.4 GitOps — ArgoCD &#x2F; Flux"></a>3.4 GitOps — ArgoCD &#x2F; Flux</h3><p>GitOps 核心理念：<strong>Git 仓库是声明式基础设施的唯一事实来源</strong>。</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">开发者 <span class="built_in">Push</span> K8s Manifests → Git 仓库 → ArgoCD 检测变更 (轮询/Webhook)</span><br><span class="line">  → 对比 Git 期望 vs 集群实际 → 自动/手动 Sync → 集群状态与 Git 一致</span><br></pre></td></tr></table></figure>
+
+<p>ArgoCD 核心概念：</p>
+<ul>
+<li><strong>Application</strong>：一组 K8s 资源集合，由 Git 仓库定义</li>
+<li><strong>Sync</strong>：将集群状态驱动到 Git 期望状态的过程</li>
+</ul>
+<hr>
+<h2 id="四、生产实践生产实践"><a href="#四、生产实践生产实践" class="headerlink" title="四、生产实践生产实践"></a>四、生产实践生产实践</h2><h3 id="4-1-资源配额"><a href="#4-1-资源配额" class="headerlink" title="4.1 资源配额"></a>4.1 资源配额</h3><p><strong>ResourceQuota</strong> 限制 namespace 总资源：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ResourceQuota</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">team-a-quota</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">hard:</span></span><br><span class="line">    <span class="attr">requests.cpu:</span> <span class="string">&quot;20&quot;</span></span><br><span class="line">    <span class="attr">requests.memory:</span> <span class="string">&quot;40Gi&quot;</span></span><br><span class="line">    <span class="attr">limits.cpu:</span> <span class="string">&quot;40&quot;</span></span><br><span class="line">    <span class="attr">limits.memory:</span> <span class="string">&quot;80Gi&quot;</span></span><br><span class="line">    <span class="attr">pods:</span> <span class="string">&quot;50&quot;</span></span><br><span class="line">    <span class="attr">services.loadbalancers:</span> <span class="string">&quot;2&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>LimitRange</strong> 限制单个容器资源范围并设置默认值：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">LimitRange</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">limits:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">Container</span></span><br><span class="line">      <span class="attr">default:</span> &#123; <span class="attr">cpu:</span> <span class="string">&quot;500m&quot;</span>, <span class="attr">memory:</span> <span class="string">&quot;256Mi&quot;</span> &#125;       <span class="comment"># 未设 limits 的默认值</span></span><br><span class="line">      <span class="attr">defaultRequest:</span> &#123; <span class="attr">cpu:</span> <span class="string">&quot;200m&quot;</span>, <span class="attr">memory:</span> <span class="string">&quot;128Mi&quot;</span> &#125; <span class="comment"># 未设 requests 的默认值</span></span><br><span class="line">      <span class="attr">max:</span> &#123; <span class="attr">cpu:</span> <span class="string">&quot;4&quot;</span>, <span class="attr">memory:</span> <span class="string">&quot;8Gi&quot;</span> &#125;                 <span class="comment"># 单容器上限</span></span><br><span class="line">      <span class="attr">min:</span> &#123; <span class="attr">cpu:</span> <span class="string">&quot;50m&quot;</span>, <span class="attr">memory:</span> <span class="string">&quot;64Mi&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-日志收集"><a href="#4-2-日志收集" class="headerlink" title="4.2 日志收集"></a>4.2 日志收集</h3><h4 id="EFK-Stack-Elasticsearch-Fluentd-Kibana"><a href="#EFK-Stack-Elasticsearch-Fluentd-Kibana" class="headerlink" title="EFK Stack (Elasticsearch + Fluentd + Kibana)"></a>EFK Stack (Elasticsearch + Fluentd + Kibana)</h4><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Pod <span class="built_in">stdout</span>/<span class="built_in">stderr</span> → /var/<span class="built_in">log</span>/containers/*.<span class="built_in">log</span> → Fluentd (DaemonSet)</span><br><span class="line">  → parse + enrich → Elasticsearch → Kibana (Dashboard查询)</span><br></pre></td></tr></table></figure>
+
+<p><strong>日志最佳实践</strong>：输出到 stdout&#x2F;stderr（不写文件）、使用 JSON 结构化日志、添加 <code>timestamp/level/service/traceId/message</code> 标准字段。</p>
+<h4 id="Loki-Grafana-Loki"><a href="#Loki-Grafana-Loki" class="headerlink" title="Loki (Grafana Loki)"></a>Loki (Grafana Loki)</h4><p>相比 EFK 更轻量，只索引标签（不索引日志内容），日志数据存对象存储 (S3&#x2F;GCS)。</p>
+<h3 id="4-3-监控-Prometheus-Grafana"><a href="#4-3-监控-Prometheus-Grafana" class="headerlink" title="4.3 监控 (Prometheus + Grafana)"></a>4.3 监控 (Prometheus + Grafana)</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Service<span class="built_in"> Discovery </span>→ Prometheus<span class="built_in"> Server </span>(抓取+存储TSDB) → Grafana Dashboard</span><br><span class="line">                                            ↓</span><br><span class="line">                                      Alertmanager (告警路由)</span><br></pre></td></tr></table></figure>
+
+<p><strong>四大黄金信号 (The Four Golden Signals)：</strong></p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>PromQL 示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>延迟</strong></td>
+<td><code>histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))</code></td>
+</tr>
+<tr>
+<td><strong>流量</strong></td>
+<td><code>rate(http_requests_total[5m])</code></td>
+</tr>
+<tr>
+<td><strong>错误</strong></td>
+<td><code>rate(http_requests_total&#123;status=~&quot;5..&quot;&#125;[5m]) / rate(http_requests_total[5m])</code></td>
+</tr>
+<tr>
+<td><strong>饱和度</strong></td>
+<td><code>100 - rate(node_cpu_seconds_total&#123;mode=&quot;idle&quot;&#125;[5m]) * 100</code></td>
+</tr>
+</tbody></table>
+<p><strong>USE 方法（资源层面）</strong>：Utilization（使用率）、Saturation（饱和度）、Errors（错误数）。</p>
+<h3 id="4-4-常见问题排查"><a href="#4-4-常见问题排查" class="headerlink" title="4.4 常见问题排查"></a>4.4 常见问题排查</h3><h4 id="Pod-一直-Pending"><a href="#Pod-一直-Pending" class="headerlink" title="Pod 一直 Pending"></a>Pod 一直 Pending</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe pod &lt;pod-name&gt;</span><br></pre></td></tr></table></figure>
+<p>常见原因：资源不足（扩容节点或调小 requests）、节点选择器不匹配（检查 <code>nodeSelector</code>&#x2F;<code>affinity</code>）、污点不容忍（检查 taint&#x2F;toleration）、PVC 无法绑定。</p>
+<h4 id="Pod-一直-CrashLoopBackOff"><a href="#Pod-一直-CrashLoopBackOff" class="headerlink" title="Pod 一直 CrashLoopBackOff"></a>Pod 一直 CrashLoopBackOff</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl logs &lt;pod-name&gt; --previous</span><br><span class="line">kubectl describe pod &lt;pod-name&gt;</span><br></pre></td></tr></table></figure>
+<p>常见原因：启动命令错误（应用立即退出）、依赖不可用（加 <code>initContainers</code>&#x2F;<code>startupProbe</code>）、OOMKilled（内存超限）、健康检查过严。</p>
+<h4 id="Service-无法访问"><a href="#Service-无法访问" class="headerlink" title="Service 无法访问"></a>Service 无法访问</h4><p>排查步骤：</p>
+<ol>
+<li><code>kubectl get endpoints &lt;svc-name&gt;</code> → 应有 Pod IP:Port</li>
+<li>检查 Service selector 是否匹配 Pod labels</li>
+<li>检查 <code>targetPort</code> 与容器监听端口一致</li>
+<li>检查 NetworkPolicy 是否阻止流量</li>
+<li>检查 kube-proxy 是否正常</li>
+</ol>
+<h4 id="节点-NotReady"><a href="#节点-NotReady" class="headerlink" title="节点 NotReady"></a>节点 NotReady</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe node &lt;node-name&gt;</span><br></pre></td></tr></table></figure>
+<p>常见原因：kubelet 异常、<code>MemoryPressure</code>&#x2F;<code>DiskPressure</code> 为 True、CNI 插件异常、与 API Server 网络不通。</p>
+<h4 id="DNS-解析异常"><a href="#DNS-解析异常" class="headerlink" title="DNS 解析异常"></a>DNS 解析异常</h4><p>检查 CoreDNS Pod (<code>kube-system</code>) 状态、Pod 的 <code>dnsPolicy</code> 和 <code>/etc/resolv.conf</code>、网络策略（UDP 53）。</p>
+<h4 id="快速诊断脚本"><a href="#快速诊断脚本" class="headerlink" title="快速诊断脚本"></a>快速诊断脚本</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl get deploy,pod,svc,ep -n &lt;namespace&gt;</span><br><span class="line">kubectl describe pod -l app=&lt;app-name&gt; -n &lt;namespace&gt; | grep -A5 Events</span><br><span class="line">kubectl top pod -n &lt;namespace&gt;</span><br><span class="line">kubectl get events -n &lt;namespace&gt; --sort-by=<span class="string">&#x27;.lastTimestamp&#x27;</span> | <span class="built_in">tail</span> -20</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-5-生产环境检查清单"><a href="#4-5-生产环境检查清单" class="headerlink" title="4.5 生产环境检查清单"></a>4.5 生产环境检查清单</h3><table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>✅ 资源 requests&#x2F;limits</td>
+<td>所有容器必须设置，避免 OOM &#x2F; CPU 饥饿</td>
+</tr>
+<tr>
+<td>✅ 存活&#x2F;就绪探针</td>
+<td>合理配置 livenessProbe 和 readinessProbe</td>
+</tr>
+<tr>
+<td>✅ PDB</td>
+<td>PodDisruptionBudget 保证自愿中断时最小可用数</td>
+</tr>
+<tr>
+<td>✅ HPA</td>
+<td>关键服务配置自动伸缩</td>
+</tr>
+<tr>
+<td>✅ 反亲和性</td>
+<td>配置 podAntiAffinity 实现跨节点&#x2F;跨区高可用</td>
+</tr>
+<tr>
+<td>✅ NetworkPolicy</td>
+<td>默认拒绝，按需放行（零信任网络）</td>
+</tr>
+<tr>
+<td>✅ RBAC</td>
+<td>最小权限原则，ServiceAccount 按需绑定</td>
+</tr>
+<tr>
+<td>✅ Pod安全标准</td>
+<td>使用 restricted 策略禁止特权容器</td>
+</tr>
+<tr>
+<td>✅ 优雅关闭</td>
+<td>应用处理 SIGTERM + <code>terminationGracePeriodSeconds</code></td>
+</tr>
+<tr>
+<td>✅ 监控+告警</td>
+<td>四大黄金信号覆盖，告警渠道畅通</td>
+</tr>
+<tr>
+<td>✅ 结构化日志</td>
+<td>JSON 格式输出到 stdout&#x2F;stderr</td>
+</tr>
+<tr>
+<td>✅ 备份</td>
+<td>etcd 定期备份，PV 数据快照策略</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、参考文献参考文献"><a href="#五、参考文献参考文献" class="headerlink" title="五、参考文献参考文献"></a>五、参考文献参考文献</h2><h3 id="Hypervisor-虚拟化"><a href="#Hypervisor-虚拟化" class="headerlink" title="Hypervisor 虚拟化"></a>Hypervisor 虚拟化</h3><p><a target="_blank" rel="noopener" href="https://www.ibm.com/cloud/learn/hypervisors">https://www.ibm.com/cloud/learn/hypervisors</a></p>
+<h3 id="容器化"><a href="#容器化" class="headerlink" title="容器化"></a>容器化</h3><p><a target="_blank" rel="noopener" href="https://www.ibm.com/cloud/learn/containers">https://www.ibm.com/cloud/learn/containers</a><br><a target="_blank" rel="noopener" href="https://www.ibm.com/cloud/learn/containerization">https://www.ibm.com/cloud/learn/containerization</a></p>
+<h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3><p><a target="_blank" rel="noopener" href="https://docs.docker.com/get-started/overview/">https://docs.docker.com/get-started/overview/</a><br><a target="_blank" rel="noopener" href="https://docs.docker.com/storage/storagedriver/overlayfs-driver/">https://docs.docker.com/storage/storagedriver/overlayfs-driver/</a><br><a target="_blank" rel="noopener" href="https://docs.docker.com/build/building/best-practices/">https://docs.docker.com/build/building/best-practices/</a></p>
+<h3 id="Kubernetes"><a href="#Kubernetes" class="headerlink" title="Kubernetes"></a>Kubernetes</h3><p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/overview/components/">https://kubernetes.io/docs/concepts/overview/components/</a><br><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/workloads/pods/">https://kubernetes.io/docs/concepts/workloads/pods/</a><br><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/services-networking/service/">https://kubernetes.io/docs/concepts/services-networking/service/</a><br><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/scheduling-eviction/">https://kubernetes.io/docs/concepts/scheduling-eviction/</a></p>
+<h3 id="云原生生态"><a href="#云原生生态" class="headerlink" title="云原生生态"></a>云原生生态</h3><p><a target="_blank" rel="noopener" href="https://istio.io/latest/docs/concepts/what-is-istio/">https://istio.io/latest/docs/concepts/what-is-istio/</a><br><a target="_blank" rel="noopener" href="https://knative.dev/docs/">https://knative.dev/docs/</a><br><a target="_blank" rel="noopener" href="https://argo-cd.readthedocs.io/">https://argo-cd.readthedocs.io/</a></p>
+<h3 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h3><p><a target="_blank" rel="noopener" href="https://prometheus.io/docs/introduction/overview/">https://prometheus.io/docs/introduction/overview/</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/web-crawler-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/web-crawler-design/" class="post-title-link" itemprop="url">分布式爬虫系统设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="一、核心需求"><a href="#一、核心需求" class="headerlink" title="一、核心需求"></a>一、核心需求</h2><table>
+<thead>
+<tr>
+<th>需求</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>大规模抓取</strong></td>
+<td>每天抓取数十亿网页</td>
+</tr>
+<tr>
+<td><strong>礼貌性抓取</strong></td>
+<td>遵守 robots.txt，不压垮目标站点</td>
+</tr>
+<tr>
+<td><strong>去重</strong></td>
+<td>同一个 URL 只抓一次</td>
+</tr>
+<tr>
+<td><strong>优先级调度</strong></td>
+<td>重要页面优先抓取</td>
+</tr>
+<tr>
+<td><strong>容错</strong></td>
+<td>爬虫节点宕机不影响整体进度</td>
+</tr>
+</tbody></table>
+<h2 id="二、系统架构"><a href="#二、系统架构" class="headerlink" title="二、系统架构"></a>二、系统架构</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────────────────────────────────┐</span><br><span class="line">│              URL Frontier                 │</span><br><span class="line">│  (优先级队列 + 布隆过滤器去重)             │</span><br><span class="line">└──────────────────┬───────────────────────┘</span><br><span class="line">                   │</span><br><span class="line">    ┌──────────────┼──────────────┐</span><br><span class="line">    │              │              │</span><br><span class="line"><span class="selector-attr">[爬虫节点1]</span>   <span class="selector-attr">[爬虫节点2]</span>   <span class="selector-attr">[爬虫节点N]</span></span><br><span class="line">    │              │              │</span><br><span class="line">    ├─ DNS解析     │              │</span><br><span class="line">    ├─ HTTP下载    │              │</span><br><span class="line">    ├─ Robots检查  │              │</span><br><span class="line">    ├─ <span class="selector-tag">HTML</span>解析    │              │</span><br><span class="line">    └─ 链接提取 → URL Frontier</span><br><span class="line">         │</span><br><span class="line">    <span class="selector-attr">[文档存储]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、URL-Frontier"><a href="#三、URL-Frontier" class="headerlink" title="三、URL Frontier"></a>三、URL Frontier</h2><h3 id="3-1-设计要点"><a href="#3-1-设计要点" class="headerlink" title="3.1 设计要点"></a>3.1 设计要点</h3><p>URL Frontier 是分布式爬虫的大脑，负责管理待爬取 URL 的调度和分发。核心功能：</p>
+<p><strong>去重</strong>：</p>
+<p>使用布隆过滤器检测 URL 是否已爬取。百亿级 URL，0.01% 误判率 → 约 24GB 内存。为了支持长期运行，定期（如每周）从持久化存储重建布隆过滤器。</p>
+<p><strong>礼貌性控制</strong>：</p>
+<p>同一域名的两次请求间隔 ≥ politeness_delay（通常 1-10 秒）。策略是按域名分配后端队列，爬虫节点从各域名队列中轮流取 URL：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">域名队列：</span><br><span class="line">  example<span class="selector-class">.com</span>  → <span class="selector-attr">[url1, url2, url3, ...]</span></span><br><span class="line">  wikipedia<span class="selector-class">.org</span> → <span class="selector-attr">[url4, url5, ...]</span></span><br><span class="line">  github<span class="selector-class">.com</span>    → <span class="selector-attr">[url6, ...]</span></span><br><span class="line"></span><br><span class="line">爬虫从 example<span class="selector-class">.com</span> 抓取一个 URL 后，必须等待 politeness_delay 才能再取该域名的 URL。</span><br><span class="line">这期间可以从其他域名队列取 URL，保持爬虫持续工作。</span><br></pre></td></tr></table></figure>
+
+<p><strong>优先级</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>URL 特征</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>高</td>
+<td>首页、热门页面、频繁更新的页面</td>
+<td>新闻首页</td>
+</tr>
+<tr>
+<td>中</td>
+<td>文章页、产品页</td>
+<td>博客文章、商品详情</td>
+</tr>
+<tr>
+<td>低</td>
+<td>用户评论页、历史归档</td>
+<td>2010 年的归档新闻</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-分布式实现"><a href="#3-2-分布式实现" class="headerlink" title="3.2 分布式实现"></a>3.2 分布式实现</h3><p>按域名分片避免多个爬虫同时爬同一域名：</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">URL</span> <span class="variable">Frontier</span> 分片策略：</span><br><span class="line">  <span class="variable">shard</span> <span class="operator">=</span> <span class="variable">hash</span><span class="punctuation">(</span><span class="variable">domain</span><span class="punctuation">)</span> <span class="operator">%</span> <span class="built_in">N</span></span><br><span class="line"></span><br><span class="line">这样就保证了同一域名的所有 <span class="built_in">URL</span> 都由同一组爬虫处理，</span><br><span class="line">无需额外的跨节点协调。</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、爬虫节点设计"><a href="#四、爬虫节点设计" class="headerlink" title="四、爬虫节点设计"></a>四、爬虫节点设计</h2><h3 id="4-1-抓取流程"><a href="#4-1-抓取流程" class="headerlink" title="4.1 抓取流程"></a>4.1 抓取流程</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 从 URL Frontier 获取一个 URL</span><br><span class="line"><span class="bullet">2.</span> DNS 解析 → IP 地址</span><br><span class="line"><span class="bullet">3.</span> 检查 robots.txt（可缓存，TTL 1 小时）</span><br><span class="line"><span class="bullet">4.</span> HTTP GET 请求（带 User-Agent、Referer 等头部）</span><br><span class="line"><span class="bullet">5.</span> 检查 HTTP 状态码</span><br><span class="line">   ├─ 200 → 提取链接，存储文档</span><br><span class="line">   ├─ 301/302 → 记录重定向，新 URL 加入队列（不计数原 URL）</span><br><span class="line">   ├─ 429 → 退避重试（指数延迟）</span><br><span class="line">   └─ 4xx/5xx → 记录错误，放弃或有限重试</span><br><span class="line"><span class="bullet">6.</span> 解析 HTML，提取所有 <span class="language-xml"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>&gt;</span></span> 链接</span><br><span class="line"><span class="bullet">7.</span> 新链接过滤后加入 URL Frontier</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-HTML-解析"><a href="#4-2-HTML-解析" class="headerlink" title="4.2 HTML 解析"></a>4.2 HTML 解析</h3><p>HTML 解析的目的是：</p>
+<ul>
+<li><strong>提取链接</strong>：所有 <code>&lt;a href=&quot;...&quot;&gt;</code> 标签，处理相对路径</li>
+<li><strong>提取内容</strong>：标题、正文、发布时间（用于搜索引擎索引）</li>
+<li><strong>规范化 URL</strong>：移除 fragment、排序 query 参数、去重协议（http vs https）</li>
+</ul>
+<h3 id="4-3-robots-txt-处理"><a href="#4-3-robots-txt-处理" class="headerlink" title="4.3 robots.txt 处理"></a>4.3 robots.txt 处理</h3><p>每个域名在首次抓取时需要下载并解析 robots.txt：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="params">User-agent:</span> <span class="operator">*</span></span><br><span class="line"><span class="params">Disallow:</span> <span class="operator">/</span>private<span class="symbol">/</span></span><br><span class="line"><span class="params">Disallow:</span> <span class="operator">/</span>admin<span class="symbol">/</span></span><br><span class="line"><span class="params">Crawl-delay:</span> <span class="number">5</span></span><br><span class="line"><span class="params">Allow:</span> <span class="operator">/</span>public<span class="operator">/</span></span><br></pre></td></tr></table></figure>
+
+<p>将此解析为规则集并缓存。每个爬虫节点在抓取 URL 前先检查是否被允许，减少对目标站点的压力。</p>
+<h2 id="五、去重策略"><a href="#五、去重策略" class="headerlink" title="五、去重策略"></a>五、去重策略</h2><h3 id="5-1-为什么去重如此重要"><a href="#5-1-为什么去重如此重要" class="headerlink" title="5.1 为什么去重如此重要"></a>5.1 为什么去重如此重要</h3><p>互联网上的页面存在大量重复链接：同一个页面被多个页面引用、URL 参数变化导致表面不同的 URL、HTTP&#x2F;HTTPS 双版本等。不去重会导致：</p>
+<ul>
+<li>浪费带宽重复抓取同一内容</li>
+<li>目标站点压力剧增</li>
+<li>存储大量重复数据</li>
+</ul>
+<h3 id="5-2-布隆过滤器方案"><a href="#5-2-布隆过滤器方案" class="headerlink" title="5.2 布隆过滤器方案"></a>5.2 布隆过滤器方案</h3><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">布隆过滤器配置：</span><br><span class="line">  n <span class="operator">=</span> <span class="number">100</span> 亿（预期 URL 数）</span><br><span class="line">  p <span class="operator">=</span> <span class="number">0.001</span>（误判率 <span class="number">0.1</span>%）</span><br><span class="line">  m <span class="operator">=</span> -<span class="number">100</span>亿 × ln(<span class="number">0.001</span>) / (ln2)² ≈ <span class="number">1440</span> 亿 bit ≈ <span class="number">168</span> GB</span><br><span class="line">  k <span class="operator">=</span> m/n × ln2 ≈ <span class="number">10</span></span><br><span class="line"></span><br><span class="line">这需要 <span class="number">168</span> GB 内存，过大。可以通过以下方式优化：</span><br></pre></td></tr></table></figure>
+
+<p><strong>优化方案</strong>：按域名分片的布隆过滤器</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">每个域名的布隆过滤器只需要覆盖该域名下的 URL 数量：</span><br><span class="line">  example.com 有<span class="number"> 1000 </span>万页面 →<span class="number"> 14 </span>MB 布隆过滤器</span><br><span class="line">  wikipedia.org 有<span class="number"> 600 </span>万页面 →<span class="number"> 9 </span>MB 布隆过滤器</span><br><span class="line"></span><br><span class="line">每个爬虫节点按域名加载对应的布隆过滤器，整体内存分散到所有节点。</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-URL-规范化"><a href="#5-3-URL-规范化" class="headerlink" title="5.3 URL 规范化"></a>5.3 URL 规范化</h3><p>在进入布隆过滤器之前，需要对 URL 做规范化（Canonicalization）：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">原始 URL: http:<span class="regexp">//</span>www.example.com:<span class="number">80</span>/path?b=<span class="number">2</span>&amp;a=<span class="number">1</span><span class="comment">#section</span></span><br><span class="line">规范化:   http:<span class="regexp">//</span>example.com/path?a=<span class="number">1</span>&amp;b=<span class="number">2</span></span><br><span class="line"></span><br><span class="line">处理规则：</span><br><span class="line">  - 协议转小写</span><br><span class="line">  - Host 转小写，去掉默认端口</span><br><span class="line">  - 路径标准化（<span class="regexp">/./</span> → <span class="regexp">/， /</span>a<span class="regexp">/../</span>b<span class="regexp">/ → /</span>b/）</span><br><span class="line">  - Query 参数按字母序排序</span><br><span class="line">  - 去掉 fragment (<span class="comment">#xxx)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、内容提取与存储"><a href="#六、内容提取与存储" class="headerlink" title="六、内容提取与存储"></a>六、内容提取与存储</h2><h3 id="6-1-内容去重"><a href="#6-1-内容去重" class="headerlink" title="6.1 内容去重"></a>6.1 内容去重</h3><p>即使 URL 不同，页面内容也可能完全相同（镜像站、CDN 等）。除了 URL 去重，还需要内容去重。使用 <strong>SimHash</strong> 或 <strong>MD5</strong> 签名来实现：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">对于每个抓取的页面：</span><br><span class="line"><span class="bullet">  1.</span> 提取正文文本</span><br><span class="line"><span class="bullet">  2.</span> 计算 MD5 哈希</span><br><span class="line"><span class="bullet">  3.</span> 如果哈希已存在 → 此页面是重复内容，跳过</span><br><span class="line"><span class="bullet">  4.</span> 如果哈希不存在 → 存储并记录</span><br></pre></td></tr></table></figure>
+
+<p>SimHash 的额外优势：两个页面即使内容不完全一致，如果 SimHash 的汉明距离很小（&lt; 3），说明它们高度相似，可能是镜像站或转载，可以选择只保留一个版本。</p>
+<h3 id="6-2-存储"><a href="#6-2-存储" class="headerlink" title="6.2 存储"></a>6.2 存储</h3><table>
+<thead>
+<tr>
+<th>数据</th>
+<th>存储</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始 HTML</td>
+<td>对象存储 (S3&#x2F;HDFS)</td>
+<td>压缩后存储</td>
+</tr>
+<tr>
+<td>结构化数据</td>
+<td>宽表 (HBase&#x2F;Cassandra)</td>
+<td>URL、标题、时间、关键词</td>
+</tr>
+<tr>
+<td>链接图</td>
+<td>图数据库或 K-V 存储</td>
+<td>URL → {引用该 URL 的页面列表}</td>
+</tr>
+<tr>
+<td>爬虫状态</td>
+<td>Redis</td>
+<td>当前进度、速率、错误率</td>
+</tr>
+</tbody></table>
+<h2 id="七、爬虫陷阱与反爬对抗"><a href="#七、爬虫陷阱与反爬对抗" class="headerlink" title="七、爬虫陷阱与反爬对抗"></a>七、爬虫陷阱与反爬对抗</h2><h3 id="7-1-常见陷阱"><a href="#7-1-常见陷阱" class="headerlink" title="7.1 常见陷阱"></a>7.1 常见陷阱</h3><table>
+<thead>
+<tr>
+<th>陷阱类型</th>
+<th>表现</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>无穷日历页</strong></td>
+<td>某个博客按日期归档，日期链接无穷无尽</td>
+<td>限制路径深度、限制同域名下的链接数量</td>
+</tr>
+<tr>
+<td><strong>Session ID 陷阱</strong></td>
+<td>每次访问生成新的 session ID 参数导致 URL 无限增多</td>
+<td>URL 规范化时去掉 session 参数</td>
+</tr>
+<tr>
+<td><strong>动态页面</strong></td>
+<td>页面内容根据参数不断变化（搜索页、过滤页）</td>
+<td>识别低价值页面类型，降低优先级或直接跳过</td>
+</tr>
+<tr>
+<td><strong>重定向循环</strong></td>
+<td>A → B → C → A</td>
+<td>限制重定向次数（≤ 5 次），记录重定向链</td>
+</tr>
+</tbody></table>
+<h3 id="7-2-反爬对抗"><a href="#7-2-反爬对抗" class="headerlink" title="7.2 反爬对抗"></a>7.2 反爬对抗</h3><p>现代网站大量使用反爬技术，企业级爬虫需要相应策略：</p>
+<ul>
+<li><strong>IP 代理池</strong>：维护数千个代理 IP，每个域名分配不同的出口 IP</li>
+<li><strong>User-Agent 轮换</strong>：模拟不同浏览器和设备的 User-Agent</li>
+<li><strong>渲染引擎</strong>：对于 SPA (React&#x2F;Vue) 页面，使用 Headless Chrome 渲染后再提取内容</li>
+<li><strong>行为模拟</strong>：鼠标移动、滚动等，降低被检测为爬虫的概率</li>
+</ul>
+<h2 id="八、容量估算"><a href="#八、容量估算" class="headerlink" title="八、容量估算"></a>八、容量估算</h2><p>假设目标：每天抓取 10 亿网页</p>
+<ul>
+<li>平均页面大小 100KB → 每天下载 10亿 × 100KB &#x3D; 100TB</li>
+<li>平均抓取速度 50 页&#x2F;秒&#x2F;节点 → 需要 10亿 &#x2F; (50 × 86400) ≈ 230 个爬虫节点</li>
+<li>考虑网络延迟和处理开销，实际需要 300-500 个节点</li>
+</ul>
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>分布式爬虫的核心挑战是<strong>规模</strong>和<strong>礼貌性</strong>的统一。URL Frontier 的优先级调度和域名分片策略保证了公平高效的抓取，布隆过滤器提供了 O(1) 的去重能力，URL 规范化和 SimHash 去重则进一步减少了存储浪费。Google、CommonCrawl 等大型搜索引擎都在此架构基础上做了各自的优化——比如 Google 使用自研的 Caffeine 索引系统处理实时更新，CommonCrawl 每两个月抓取一次全量快照作为公开数据集。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/whatsapp-architecture-case-study/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/whatsapp-architecture-case-study/" class="post-title-link" itemprop="url">WhatsApp 日处理400亿消息的架构</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>WhatsApp 是全球最大的即时通讯应用，日处理 400 亿条消息，高峰期每秒 700 万条消息（2015 年数据，用户从 9 亿增长到 20 亿+后规模更大）。支撑这个规模的核心是一台只有约 50 名工程师维护的后端系统——这得益于 Erlang&#x2F;OTP 的并发模型和精心设计的消息架构。</p>
+<h2 id="一、技术选型：为什么用-Erlang"><a href="#一、技术选型：为什么用-Erlang" class="headerlink" title="一、技术选型：为什么用 Erlang"></a>一、技术选型：为什么用 Erlang</h2><p>WhatsApp 的创始人 Jan Koum 选择了 Erlang，一个相对小众的函数式编程语言。Erlang 的核心优势：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>轻量级进程</strong></td>
+<td>每个 Erlang 进程只占 ~300 字节，一台机器可运行数百万进程</td>
+</tr>
+<tr>
+<td><strong>Actor 模型</strong></td>
+<td>每个连接映射为一个 Erlang 进程，进程间通过消息传递通信</td>
+</tr>
+<tr>
+<td><strong>热更新</strong></td>
+<td>不停止服务即可更新代码</td>
+</tr>
+<tr>
+<td><strong>容错</strong></td>
+<td>“Let it crash” 哲学 + Supervisor 树自动重启故障进程</td>
+</tr>
+<tr>
+<td><strong>分布式原生</strong></td>
+<td>内置跨节点通信，多台机器像一个整体</td>
+</tr>
+</tbody></table>
+<p>在 WhatsApp 的架构中，每个用户会话就是一个 Erlang 进程——这意味着 1 亿在线用户 &#x3D; 1 亿个 Erlang 进程，在几百台服务器上就可以承载。</p>
+<h2 id="二、FreeBSD-YAWS"><a href="#二、FreeBSD-YAWS" class="headerlink" title="二、FreeBSD + YAWS"></a>二、FreeBSD + YAWS</h2><p>WhatsApp 使用 FreeBSD 作为服务器操作系统，Web 服务器使用 YAWS（Yet Another Web Server），同样是 Erlang 编写的。</p>
+<p>选择 FreeBSD 的理由：</p>
+<ul>
+<li>更好的网络栈性能（相比 Linux）</li>
+<li>更稳定的长时间运行表现</li>
+<li>更简单的系统调优</li>
+</ul>
+<h2 id="三、消息投递流程"><a href="#三、消息投递流程" class="headerlink" title="三、消息投递流程"></a>三、消息投递流程</h2><p>消息的生命周期：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">发送方 <span class="selector-tag">A</span> → WhatsApp 服务器 → 接收方 <span class="selector-tag">B</span></span><br></pre></td></tr></table></figure>
+
+<p>具体流程：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. A 发送消息 <span class="string">&quot;Hello&quot;</span> 给 <span class="keyword">B</span></span><br><span class="line"><span class="number">2</span>. A 的设备通过长连接（MMS/XMPP）发送到 WhatsApp 服务器</span><br><span class="line"><span class="number">3</span>. 服务器在内存中查找 <span class="keyword">B</span> 的会话（另一个 Erlang 进程）</span><br><span class="line">   ├─ <span class="keyword">B</span> 在线 → 直接将消息投递到 <span class="keyword">B</span> 的连接进程</span><br><span class="line">   ├─ <span class="keyword">B</span> 离线 → 消息存入 <span class="keyword">B</span> 的离线消息队列</span><br><span class="line">   └─ <span class="keyword">B</span> 不存在 → 返回错误</span><br><span class="line"><span class="number">4</span>. 服务器返回 ACK 给 A（单勾 = 已发送）</span><br><span class="line"><span class="number">5</span>. <span class="keyword">B</span> 收到消息 → 服务器返回第二个 ACK（双勾 = 已送达）</span><br><span class="line"><span class="number">6</span>. <span class="keyword">B</span> 打开消息（Blue Ticks）→ 服务器返回第三个 ACK（双蓝勾 = 已读）</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、离线消息存储"><a href="#四、离线消息存储" class="headerlink" title="四、离线消息存储"></a>四、离线消息存储</h2><p>用户离线时的消息存储在服务端，上线后一次拉取。WhatsApp 早期使用 MySQL，后来根据需求做了优化：</p>
+<ul>
+<li>每条消息（包括多媒体）的元数据存储在 MySQL</li>
+<li>消息正文和附件在本地 SSD 缓存，定期清理</li>
+<li>消息队列按 receiver_id 分片，确保同一用户的所有消息在同一台机器上处理</li>
+</ul>
+<h2 id="五、多媒体消息处理"><a href="#五、多媒体消息处理" class="headerlink" title="五、多媒体消息处理"></a>五、多媒体消息处理</h2><p>WhatsApp 每天处理数十亿张图片、视频和语音消息。多媒体消息的处理流程：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 发送方上传图片至 WhatsApp 多媒体服务器</span><br><span class="line"><span class="bullet">2.</span> 服务器压缩/优化图片（降低流量消耗）</span><br><span class="line"><span class="bullet">3.</span> 发送方收到媒体 ID</span><br><span class="line"><span class="bullet">4.</span> 将媒体 ID 作为普通消息发送</span><br><span class="line"><span class="bullet">5.</span> 接收方通过媒体 ID 下载图片</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、端到端加密"><a href="#六、端到端加密" class="headerlink" title="六、端到端加密"></a>六、端到端加密</h2><p>WhatsApp 使用 Signal 协议实现端到端加密，保证只有通信双方能读取消息内容——WhatsApp 自己也无法解密。</p>
+<p>加密流程简化：</p>
+<ol>
+<li>双方通过 X3DH（Extended Triple Diffie-Hellman）协议交换公钥</li>
+<li>使用 Double Ratchet Algorithm 为每条消息生成新的对称密钥</li>
+<li>即使某条消息的密钥被破解，其他消息仍然安全（前向安全性）</li>
+</ol>
+<p>加密在客户端执行，WhatsApp 服务器只负责传输加密后的二进制数据。</p>
+<h2 id="七、扩展性"><a href="#七、扩展性" class="headerlink" title="七、扩展性"></a>七、扩展性</h2><p>WhatsApp 的关键扩展性设计：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>用户级分片</strong></td>
+<td>按 user_id 哈希分配到不同服务器，同一用户的请求始终路由到同一台服务器</td>
+</tr>
+<tr>
+<td><strong>无共享架构</strong></td>
+<td>不同服务器之间不共享数据库连接或状态，每个分片完全独立</td>
+</tr>
+<tr>
+<td><strong>数据库分离</strong></td>
+<td>用户数据（关系、资料）、消息数据、多媒体数据分别由不同的数据库集群负责</td>
+</tr>
+<tr>
+<td><strong>读写分离</strong></td>
+<td>消息写入走主库，消息读取可以使用从库</td>
+</tr>
+</tbody></table>
+<h2 id="八、容量增长"><a href="#八、容量增长" class="headerlink" title="八、容量增长"></a>八、容量增长</h2><p>WhatsApp 从 50 人团队支撑 4.5 亿用户，到 Facebook 收购后扩展到 20 亿+：</p>
+<ul>
+<li><strong>4.5 亿用户（2014）</strong>：约 50 名工程师，~700 台服务器，Erlang&#x2F;FreeBSD</li>
+<li><strong>20 亿+ 用户（2020）</strong>：整合 Facebook 基础设施（将部分 MySQL 迁移到 Facebook 的 RocksDB 方案），增加多数据中心支持</li>
+</ul>
+<p>核心经验：Erlang&#x2F;OTP 的并发模型使得少量服务器可以承载海量连接——每个连接 ~300 字节，1 亿连接只需 ~30GB 内存（加上消息缓冲约 100GB）。这在其他语言（如 Java 的线程模型）下是不可能的——1 亿个 Java Thread（每个 ~1MB 栈）需要 100TB 内存。</p>
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>WhatsApp 的架构是”极简主义”的典范——用 Erlang&#x2F;OTP 的轻量级进程模型，每个用户会话一个进程，配合 FreeBSD + YAWS，用极小的团队和服务器资源支撑了全球最大的消息系统。其设计哲学：用正确的抽象（Actor 模型）应对并发，用无共享架构保证可扩展性，用端到端加密保证隐私。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/zab-protocol/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/zab-protocol/" class="post-title-link" itemprop="url">ZAB 协议 (ZooKeeper)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>ZAB（ZooKeeper Atomic Broadcast）是 ZooKeeper 内部使用的共识协议，专门为 ZooKeeper 的”主从架构 + 高性能写入”场景设计。与 Raft 和 Paxos 同为共识协议，但 ZAB 更侧重写入性能和顺序保证。</p>
+<h2 id="一、协议概述"><a href="#一、协议概述" class="headerlink" title="一、协议概述"></a>一、协议概述</h2><p>ZAB 协议包括两个模式：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>说明</th>
+<th>触发条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>崩溃恢复</strong> (Leader Election)</td>
+<td>选举新 Leader</td>
+<td>Leader 宕机或集群启动</td>
+</tr>
+<tr>
+<td><strong>消息广播</strong> (Atomic Broadcast)</td>
+<td>Leader 将写请求原子广播给所有 Follower</td>
+<td>正常运行期间</td>
+</tr>
+</tbody></table>
+<p>ZooKeeper 将所有写请求转发给 Leader，Leader 通过 ZAB 协议将写操作作为事务（Proposal）原子广播给所有 Follower。</p>
+<h2 id="二、消息广播（正常运行）"><a href="#二、消息广播（正常运行）" class="headerlink" title="二、消息广播（正常运行）"></a>二、消息广播（正常运行）</h2><p>消息广播是 ZAB 的稳态模式，流程如下：</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Client 写请求 → <span class="built_in">Leader</span> → 生成 Proposal → 广播给所有 Follower</span><br><span class="line"></span><br><span class="line"><span class="built_in">Leader</span>    Follower1   Follower2</span><br><span class="line">  │           │           │</span><br><span class="line">  ├─Propose──→│           │     <span class="number">1</span>. <span class="built_in">Leader</span> 生成 Proposal 并广播</span><br><span class="line">  │           │           │</span><br><span class="line">  │←──ACK────┤           │     <span class="number">2</span>. Follower 将 Proposal 写入磁盘并返回 ACK</span><br><span class="line">  │           ├──ACK─────→│</span><br><span class="line">  │           │           │</span><br><span class="line">  ├─Commit───→│           │     <span class="number">3</span>. <span class="built_in">Leader</span> 收到超过半数的 ACK</span><br><span class="line">  │           │           │       向所有 Follower 广播 Commit</span><br><span class="line">  │           ├──Commit──→│</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Proposal</strong>：Leader 为每个写请求生成一个全局唯一、单调递增的 <code>zxid</code>（ZooKeeper Transaction ID）。zxid 的高 32 位是 epoch（Leader 任期号），低 32 位是递增计数器。</li>
+<li><strong>ACK</strong>：Follower 接收到 Proposal 后写入本地事务日志，然后回复 ACK。</li>
+<li><strong>Commit</strong>：Leader 收到超过半数的 ACK 后，向所有 Follower 发送 Commit 消息，Follower 将事务应用到内存数据中。</li>
+</ul>
+<h2 id="三、崩溃恢复（Leader-选举）"><a href="#三、崩溃恢复（Leader-选举）" class="headerlink" title="三、崩溃恢复（Leader 选举）"></a>三、崩溃恢复（Leader 选举）</h2><p>当 Leader 宕机时，Follower 进入崩溃恢复模式：</p>
+<h3 id="3-1-选举流程"><a href="#3-1-选举流程" class="headerlink" title="3.1 选举流程"></a>3.1 选举流程</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 所有 Follower 转变为 LOOKING 状态</span><br><span class="line"><span class="bullet">2.</span> 每个节点投票给自己（投给 zxid 最大的节点）</span><br><span class="line"><span class="bullet">3.</span> 收到其他人的投票后，与自己的投票比较：</span><br><span class="line">   └→ 如果对方 zxid 更大 → 改投对方</span><br><span class="line">   └→ 如果 zxid 相同 → 投 myid 较大的</span><br><span class="line"><span class="bullet">4.</span> 某个节点获得超过半数选票 → 成为新 Leader</span><br><span class="line"><span class="bullet">5.</span> 新 Leader 通知所有 Follower 进入消息广播模式</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-恢复阶段"><a href="#3-2-恢复阶段" class="headerlink" title="3.2 恢复阶段"></a>3.2 恢复阶段</h3><p>新 Leader 当选后，需要确保所有 Follower 的数据一致：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Leader 找出所有 Follower 中最新的 zxid（记为 max_zxid）</span><br><span class="line">Leader 向所有 Follower 发起同步：</span><br><span class="line">  ├→ Follower A: 我最后提交到 <span class="attribute">zxid</span>=100</span><br><span class="line">  ├→ Follower B: 我最后提交到 <span class="attribute">zxid</span>=98</span><br><span class="line">  └→ Leader: 把 101~max_zxid 的事务发给 B，补全差距</span><br><span class="line"></span><br><span class="line">只有当集群中超过半数节点完成同步后，Leader 才开始处理新的写请求</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、ZAB-与-Raft-的对比"><a href="#四、ZAB-与-Raft-的对比" class="headerlink" title="四、ZAB 与 Raft 的对比"></a>四、ZAB 与 Raft 的对比</h2><p>ZAB 和 Raft 都实现了主从复制 + 原子广播，但设计侧重点不同：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>ZAB</th>
+<th>Raft</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>设计目标</strong></td>
+<td>ZooKeeper 专用</td>
+<td>通用共识协议</td>
+</tr>
+<tr>
+<td><strong>写入模式</strong></td>
+<td>Leader 处理所有写操作</td>
+<td>Leader 处理所有写操作</td>
+</tr>
+<tr>
+<td><strong>Leader 选举</strong></td>
+<td>zxid 最大 + myid 最大</td>
+<td>Term 最大 + 日志最新</td>
+</tr>
+<tr>
+<td><strong>Follower 落后处理</strong></td>
+<td>Leader 主动同步</td>
+<td>Leader 发送 AppendEntries</td>
+</tr>
+<tr>
+<td><strong>读操作</strong></td>
+<td>默认从 Follower 读（可能旧数据）</td>
+<td>默认从 Leader 读（强一致性）</td>
+</tr>
+<tr>
+<td><strong>提交条件</strong></td>
+<td>过半 ACK</td>
+<td>过半 ACK</td>
+</tr>
+</tbody></table>
+<p>ZAB 的选举条件（优先事务最新提交最多的节点，其次选择 ID 大的节点）与 Raft 有微妙差异——ZAB 更侧重”数据最新”，而 Raft 则综合考量”Term 最新 + 日志长度”，对安全性提供更强的理论保障。</p>
+<h2 id="五、典型应用场景"><a href="#五、典型应用场景" class="headerlink" title="五、典型应用场景"></a>五、典型应用场景</h2><p>由于 ZAB 专为 ZooKeeper 设计，它的所有应用都通过 ZooKeeper 暴露：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>分布式锁</strong></td>
+<td>利用 ZK 的临时顺序节点实现互斥锁</td>
+</tr>
+<tr>
+<td><strong>服务注册与发现</strong></td>
+<td>利用 ZK 的 Watcher 机制通知服务上下线</td>
+</tr>
+<tr>
+<td><strong>配置中心</strong></td>
+<td>利用 ZK 的统一配置存储</td>
+</tr>
+<tr>
+<td><strong>Leader 选举</strong></td>
+<td>利用 ZK 的临时节点争夺</td>
+</tr>
+</tbody></table>
+<h2 id="六、小结"><a href="#六、小结" class="headerlink" title="六、小结"></a>六、小结</h2><p>ZAB 是专为 ZooKeeper 场景优化的共识协议。相比 Raft 的通用性，ZAB 在选举效率和读写分离方面有针对性优化。理解 ZAB 的两个模式（消息广播和崩溃恢复）就理解了 ZooKeeper 如何在高吞吐写入和强一致性之间取得平衡。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/api-gateway/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/api-gateway/" class="post-title-link" itemprop="url">API 网关</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-1-网关的作用"><a href="#1-1-网关的作用" class="headerlink" title="1.1 网关的作用"></a>1.1 网关的作用</h3><p>网关是所有外部请求进入微服务体系的第一道关口，做的是”横切关注点”的抽象：</p>
+<figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">外部请求</span><br><span class="line">  │</span><br><span class="line">  ▼</span><br><span class="line">┌──────────────────────────────────────────┐</span><br><span class="line">│                  网关                     │</span><br><span class="line">│                                          │</span><br><span class="line">│  <span class="number">1.</span> 路由转发  →  /api/<span class="built_in">order</span>/** → <span class="built_in">order</span>-svc</span><br><span class="line">│  <span class="number">2.</span> 鉴权认证  →  <span class="type">JWT</span> 校验 / <span class="type">OAuth2</span>       │</span><br><span class="line">│  <span class="number">3.</span> 限流      →  令牌桶 / 漏桶           │</span><br><span class="line">│  <span class="number">4.</span> 日志      →  请求/响应日志统一采集    │</span><br><span class="line">│  <span class="number">5.</span> 协议转换  →  <span class="type">HTTP</span> → gRPC / <span class="type">WebSocket</span> │</span><br><span class="line">│  <span class="number">6.</span> 负载均衡  →  <span class="type">Round</span> <span class="type">Robin</span> 分发        │</span><br><span class="line">│  <span class="number">7.</span> 灰度路由  →  <span class="type">Header</span> 染色 → 金丝雀实例 │</span><br><span class="line">│                                          │</span><br><span class="line">└──────────────────────────────────────────┘</span><br><span class="line">  │</span><br><span class="line">  ▼</span><br><span class="line">内部微服务</span><br></pre></td></tr></table></figure>
+
+<p>网关的本质是把每个微服务都需要处理的基础设施逻辑上提到网关层，让业务开发关注”做什么”而不是”怎么做身份校验&#x2F;限流&#x2F;日志”。但注意：<strong>网关不宜承载重业务逻辑</strong>——它是流量入口，逻辑越重延迟越大，影响全站。</p>
+<h3 id="1-2-Spring-Cloud-Gateway"><a href="#1-2-Spring-Cloud-Gateway" class="headerlink" title="1.2 Spring Cloud Gateway"></a>1.2 Spring Cloud Gateway</h3><p>Spring Cloud Gateway 基于 <strong>WebFlux（Reactor + Netty）</strong>，非阻塞 I&#x2F;O，性能和资源利用率远超传统 Servlet 容器。</p>
+<p><strong>核心三要素</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Route</td>
+<td>路由规则，ID + 目标 URI + 断言 + 过滤器</td>
+<td>把 <code>/api/order/**</code> 转到 order 服务</td>
+</tr>
+<tr>
+<td>Predicate</td>
+<td>断言，匹配路由条件</td>
+<td><code>Path=/api/order/**</code></td>
+</tr>
+<tr>
+<td>Filter</td>
+<td>过滤器，对请求&#x2F;响应做加工</td>
+<td><code>AddRequestHeader=X-Color, blue</code></td>
+</tr>
+</tbody></table>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-service</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span>            <span class="comment"># lb:// 启用负载均衡</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span>                  <span class="comment"># 去掉 /api</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">AddRequestHeader=X-Source,</span> <span class="string">gateway</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">user-service</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://user-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/user/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">RequestRateLimiter</span>       <span class="comment"># 限流</span></span><br><span class="line">              <span class="attr">args:</span></span><br><span class="line">                <span class="attr">redis-rate-limiter:</span></span><br><span class="line">                  <span class="attr">replenishRate:</span> <span class="number">10</span>          <span class="comment"># 每秒填充令牌数</span></span><br><span class="line">                  <span class="attr">burstCapacity:</span> <span class="number">20</span>          <span class="comment"># 令牌桶容量</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">canary-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service-canary</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Header=X-Canary,</span> <span class="literal">true</span>          <span class="comment"># Header 中含有 X-Canary=true</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>自定义 GatewayFilter</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AuthFilter</span> <span class="keyword">implements</span> <span class="title class_">GlobalFilter</span>, Ordered &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Mono&lt;Void&gt; <span class="title function_">filter</span><span class="params">(ServerWebExchange exchange, GatewayFilterChain chain)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">token</span> <span class="operator">=</span> exchange.getRequest().getHeaders().getFirst(<span class="string">&quot;Authorization&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isEmpty(token)) &#123;</span><br><span class="line">            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);</span><br><span class="line">            <span class="keyword">return</span> exchange.getResponse().setComplete();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// JWT 校验逻辑...</span></span><br><span class="line">        <span class="keyword">return</span> chain.filter(exchange);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getOrder</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">100</span>; <span class="comment">// 优先级最高</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-Zuul-1-x-vs-Zuul-2-x-vs-Gateway"><a href="#1-3-Zuul-1-x-vs-Zuul-2-x-vs-Gateway" class="headerlink" title="1.3 Zuul 1.x vs Zuul 2.x vs Gateway"></a>1.3 Zuul 1.x vs Zuul 2.x vs Gateway</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Zuul 1.x</th>
+<th>Zuul 2.x</th>
+<th>Spring Cloud Gateway</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>底层实现</td>
+<td>Servlet 2.5（阻塞）</td>
+<td>Netty（非阻塞）</td>
+<td>WebFlux + Netty</td>
+</tr>
+<tr>
+<td>线程模型</td>
+<td>每连接一个线程</td>
+<td>事件驱动</td>
+<td>事件驱动</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>差（线程切换开销大）</td>
+<td>好</td>
+<td>好</td>
+</tr>
+<tr>
+<td>Spring 支持</td>
+<td>Spring Cloud Netflix</td>
+<td>非 Spring 官方</td>
+<td>Spring 官方</td>
+</tr>
+<tr>
+<td>维护状态</td>
+<td>仅修 Bug</td>
+<td>慢</td>
+<td>活跃</td>
+</tr>
+</tbody></table>
+<p><strong>结论</strong>：新项目直接用 <strong>Spring Cloud Gateway</strong>。它不仅是 Spring 官方力推，底层 WebFlux 也代表着 Java 未来的方向（响应式编程）。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/base-theory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/base-theory/" class="post-title-link" itemprop="url">BASE 理论</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-1-定义"><a href="#1-1-定义" class="headerlink" title="1.1 定义"></a>1.1 定义</h3><p>BASE 理论由 eBay 架构师 Dan Pritchett 提出，是 AP 系统的设计哲学，与 ACID 相对：</p>
+<ul>
+<li><strong>Basically Available（基本可用）</strong>：系统出现故障时允许损失部分可用性——响应时间可能变长，或部分非核心功能降级——但保证核心功能仍然可用。</li>
+<li><strong>Soft State（软状态）</strong>：系统中的数据允许存在中间状态，且该中间状态不会影响系统的整体可用性。数据在不同副本之间可以有一段时间的不一致。</li>
+<li><strong>Eventually Consistent（最终一致性）</strong>：系统中的数据副本在经过一段时间的同步后，最终能够达到一致的状态。</li>
+</ul>
+<h3 id="1-2-BASE-与-ACID-对比"><a href="#1-2-BASE-与-ACID-对比" class="headerlink" title="1.2 BASE 与 ACID 对比"></a>1.2 BASE 与 ACID 对比</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>ACID</th>
+<th>BASE</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>核心思想</td>
+<td>强一致性优先</td>
+<td>可用性优先</td>
+</tr>
+<tr>
+<td>一致性模型</td>
+<td>强一致性</td>
+<td>最终一致性</td>
+</tr>
+<tr>
+<td>典型场景</td>
+<td>金融交易、订单扣款</td>
+<td>社交动态、商品评论、库存缓存</td>
+</tr>
+<tr>
+<td>系统复杂度</td>
+<td>事务管理复杂</td>
+<td>需设计冲突检测和补偿逻辑</td>
+</tr>
+<tr>
+<td>可扩展性</td>
+<td>难以横向扩展</td>
+<td>易于横向扩展</td>
+</tr>
+<tr>
+<td>响应延迟</td>
+<td>较高（锁等待、同步）</td>
+<td>较低</td>
+</tr>
+</tbody></table>
+<p><strong>工程实践中的融合</strong>：现代大型系统几乎不会在全局层面严格遵守 ACID。通常的做法是：<strong>在需要强一致性的核心链路使用 ACID 事务（如订单创建），在非核心链路使用 BASE 模式（如库存缓存同步、社交动态推送）</strong>。这种融合被称为”柔性事务”或”最终一致性事务”，我们会在分布式事务章节深入讨论。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/b-plus-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/b-plus-tree/" class="post-title-link" itemprop="url">B+Tree 深度解析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>这是后端工程师最需要深入理解的数据结构——没有之一。InnoDB 的索引组织、查询性能、磁盘 I&#x2F;O 模型全都建立在一棵 B+Tree 上。</p>
+<h4 id="为什么是-B-Tree-而不是-BST-红黑树？"><a href="#为什么是-B-Tree-而不是-BST-红黑树？" class="headerlink" title="为什么是 B+Tree 而不是 BST&#x2F;红黑树？"></a>为什么是 B+Tree 而不是 BST&#x2F;红黑树？</h4><p>答案关键词：<strong>磁盘 I&#x2F;O</strong>。</p>
+<p>数据库索引是存在磁盘上的，数据量远超内存容量。一次磁盘寻道约 5-10ms，一次内存访问约 100ns——差距是 5 万到 10 万倍。对于数据库来说，”算法复杂度 O(log n)”不是用 CPU 执行步数衡量的，而是用<strong>磁盘 I&#x2F;O 次数</strong>衡量的。</p>
+<p>B+Tree 的核心设计目标：<strong>矮胖</strong>——让树的高度尽可能低，从而减少磁盘 I&#x2F;O 次数。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">B</span>+<span class="selector-tag">Tree</span> 结构 (InnoDB 典型: m=<span class="number">3</span> 阶, 实际可达 <span class="number">1000</span>+ 阶):</span><br><span class="line"></span><br><span class="line">                     <span class="selector-attr">[30 | 60]</span>              ← 非叶子节点 (存索引键 + 子节点指针)</span><br><span class="line">                   /     |     \</span><br><span class="line">          <span class="selector-attr">[10|20]</span>      <span class="selector-attr">[40|50]</span>      <span class="selector-attr">[70|80]</span>  ← 非叶子节点</span><br><span class="line">          /  |  \      /  |  \      /  |  \</span><br><span class="line">        <span class="selector-attr">[1-9]</span><span class="selector-attr">[10-19]</span><span class="selector-attr">[20-29]</span><span class="selector-attr">[30-39]</span><span class="selector-attr">[40-49]</span><span class="selector-attr">[50-59]</span><span class="selector-attr">[60-69]</span><span class="selector-attr">[70-79]</span><span class="selector-attr">[80-89]</span>  ← 叶子节点</span><br><span class="line">        ←→    ←→    ←→    ←→    ←→    ←→    ←→    ←→    ←→</span><br><span class="line">                    所有叶子节点通过双向链表串联 ←→</span><br></pre></td></tr></table></figure>
+
+<p><strong>B+Tree 选择矩形而非三角的原因 —— 扇出 (Fanout)：</strong></p>
+<p>每个 InnoDB Page 是 16KB。假设主键为 8 bytes 的 BIGINT，指针为 6 bytes（页号），一个索引记录 14 bytes。一个 16KB 的 Page 可以存约 1170 个索引项（实际受 Page Header 等开销影响，约 1000 个）。</p>
+<p>这就是扇出 (fanout) ≈ 1000——每个非叶子节点可以指向约 1000 个子节点。</p>
+<ul>
+<li><strong>高度 h&#x3D;1</strong>（只有根和叶子）：可容纳约 1,000 条记录</li>
+<li><strong>高度 h&#x3D;2</strong>：可容纳约 1,000 × 1,000 &#x3D; 1,000,000 条记录</li>
+<li><strong>高度 h&#x3D;3</strong>：可容纳约 1,000³ &#x3D; 1,000,000,000 条记录</li>
+</ul>
+<p>一行数据 1KB 时，叶子节点每个 Page 存 16 条记录。3 层 B+Tree 可以支撑 (1000² × 16) ≈ 1600万行——查一条数据最多只需要 3 次磁盘 I&#x2F;O。如果要存几十亿行，树高最多 4 层。</p>
+<p>作为对比：如果是一棵二叉树（BST&#x2F;红黑树），即使完全平衡，1 亿行数据约 2^27 需要约 27 层——也就是最多 27 次磁盘 I&#x2F;O，比 B+Tree 的 3-4 次差了近 10 倍。</p>
+<p><strong>这就是 InnoDB 选 B+Tree 最根本的原因——极致的磁盘 I&#x2F;O 优化。</strong></p>
+<h4 id="B-Tree-vs-B-Tree-的关键区别"><a href="#B-Tree-vs-B-Tree-的关键区别" class="headerlink" title="B-Tree vs B+Tree 的关键区别"></a>B-Tree vs B+Tree 的关键区别</h4><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>B-Tree</th>
+<th>B+Tree (InnoDB 实际使用)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据存储位置</td>
+<td>所有节点都存数据</td>
+<td><strong>仅叶子节点存数据</strong></td>
+</tr>
+<tr>
+<td>非叶子节点</td>
+<td>索引 + 数据</td>
+<td><strong>仅索引（占空间极小）</strong></td>
+</tr>
+<tr>
+<td>叶子节点之间</td>
+<td>没有链接</td>
+<td><strong>双向链表串联</strong></td>
+</tr>
+<tr>
+<td>范围查询</td>
+<td>需要回溯（中序遍历）</td>
+<td>叶子链表顺序扫描即可 O(k)</td>
+</tr>
+<tr>
+<td>扇出</td>
+<td>较小（因为存数据）</td>
+<td><strong>极大（因为只存索引）</strong></td>
+</tr>
+</tbody></table>
+<p>B+Tree 把数据集中在叶子节点，非叶子节点只存键值 + 指针，同样的 16KB Page 能放下更多索引项 → 更高的扇出 → 更矮的树 → 更少的 I&#x2F;O。</p>
+<h4 id="聚簇索引-Clustered-Index-组织"><a href="#聚簇索引-Clustered-Index-组织" class="headerlink" title="聚簇索引 (Clustered Index) 组织"></a>聚簇索引 (Clustered Index) 组织</h4><p>InnoDB 的主键索引就是聚簇索引——数据行直接存储在 B+Tree 的叶子节点上，而非叶子的 Value 就是一个 Page 指针。这与 MyISAM 的”数据文件独立、索引存数据地址”完全不同：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">InnoDB 聚簇索引:                          MyISAM 非聚簇索引:</span><br><span class="line">B+Tree 叶子节点                            B+Tree 叶子节点</span><br><span class="line">┌─────────────┐                         ┌─────────────┐</span><br><span class="line">│ <span class="attribute">PK</span>=100      │                         │ <span class="attribute">PK</span>=100      │</span><br><span class="line">│ <span class="attribute">col1</span>=<span class="string">&#x27;Alice&#x27;</span>│  ← 整行数据在这里！        │ 数据地址 #7 │ ───→ [数据文件 #7]</span><br><span class="line">│ <span class="attribute">col2</span>=<span class="string">&#x27;NY&#x27;</span>   │                         └─────────────┘</span><br><span class="line">│ <span class="built_in">..</span>.         │</span><br><span class="line">└─────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>聚簇索引的优势：主键查询一次 B+Tree 就能拿到完整行数据。劣势：二级索引的叶子节点存的是主键值（而不是数据地址），所以通过二级索引查询需要<strong>回表</strong>——先查二级索引拿到主键，再查聚簇索引拿到行数据。这就是为什么建议用覆盖索引避免回表。</p>
+<blockquote>
+<p>InnoDB 索引的详细分析（包括页内结构、联合索引、索引优化策略）参见 <a href="..%5Cdata%5Cmysql.md">MySQL 深度解析</a>。</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/cap-theorem/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/cap-theorem/" class="post-title-link" itemprop="url">CAP 定理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-1-定义与历史"><a href="#1-1-定义与历史" class="headerlink" title="1.1 定义与历史"></a>1.1 定义与历史</h3><p>CAP 定理由 Eric Brewer 于 2000 年提出，后经 Seth Gilbert 和 Nancy Lynch 在 2002 年形式化证明，是分布式系统领域最基础也是最著名的定理之一。CAP 是以下三个属性的首字母缩写：</p>
+<ul>
+<li><strong>Consistency（一致性）</strong>：所有节点在同一时刻看到相同的数据。注意这里的”一致性”与 ACID 中的 C 不同——CAP 中的 C 近似于”强一致性”或”线性一致性”，即写操作完成后，所有后续的读操作都能读到最新写入的值。</li>
+<li><strong>Availability（可用性）</strong>：每个非故障节点在合理时间内都能返回一个非错误的响应。注意这并不意味着返回的数据是”最新”的，只要求服务能响应。</li>
+<li><strong>Partition Tolerance（分区容错性）</strong>：当网络分区（节点之间通信中断）发生时，系统仍然能够继续运行。</li>
+</ul>
+<h3 id="1-2-为什么不能同时满足"><a href="#1-2-为什么不能同时满足" class="headerlink" title="1.2 为什么不能同时满足"></a>1.2 为什么不能同时满足</h3><p>理解 CAP 的关键在于：<strong>网络分区是不可避免的</strong>。在分布式系统中，节点间的网络通信可能随时中断，这不是一个可选项——它会发生。因此 P（分区容错性）在实际系统中是一个必须满足的条件。</p>
+<p>当网络分区发生时，系统面临一个关键抉择：是选择一致性（C），阻塞或拒绝请求直到分区恢复；还是选择可用性（A），允许各分区独立响应请求，接受数据不一致？</p>
+<p>以双节点主从复制为例：主节点负责写，从节点同步数据。当网络断开后：</p>
+<ul>
+<li>如果继续让从节点处理读请求 → 牺牲一致性（从节点数据可能过期）</li>
+<li>如果拒绝从节点的读请求 → 牺牲可用性（从节点不可用，尽管自身正常运行）</li>
+</ul>
+<h3 id="1-3-CA-CP-AP-取舍"><a href="#1-3-CA-CP-AP-取舍" class="headerlink" title="1.3 CA &#x2F; CP &#x2F; AP 取舍"></a>1.3 CA &#x2F; CP &#x2F; AP 取舍</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>选择</th>
+<th>典型场景</th>
+<th>代表系统</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CP</td>
+<td>一致性 + 分区容错</td>
+<td>金融转账、库存扣减</td>
+<td>ZooKeeper, etcd, Consul</td>
+</tr>
+<tr>
+<td>AP</td>
+<td>可用性 + 分区容错</td>
+<td>社交动态、用户信息</td>
+<td>Eureka, Cassandra, DynamoDB</td>
+</tr>
+<tr>
+<td>CA</td>
+<td>一致性 + 可用性</td>
+<td>无网络分区（单机）</td>
+<td>传统关系型数据库（单机）</td>
+</tr>
+</tbody></table>
+<p><strong>关键的认知转变</strong>：早期很多系统声称自己是 CA 系统，但这其实是一个伪命题。在真实分布式环境中，CA 意味着系统在分区发生时直接不可用——因为既不选择 C 也不选择 A。实际上，CA 只在单机系统或局域网无故障的理想条件下才成立。真正生产级的分布式系统必须在 CP 和 AP 之间做权衡。</p>
+<h3 id="1-4-实际系统中的权衡"><a href="#1-4-实际系统中的权衡" class="headerlink" title="1.4 实际系统中的权衡"></a>1.4 实际系统中的权衡</h3><p><strong>Eureka 的 CP → AP 演化</strong>：Spring Cloud 生态中，Eureka 最初设计强调分区容错和可用性，牺牲了强一致性。当 Eureka Server 集群出现网络分区时，各节点仍然可以接受服务注册和查询请求，即使数据存在短暂不一致。这是因为服务发现的容忍度较高——“宁可返回一个可能宕机的服务节点，也不拒绝所有请求”。</p>
+<p><strong>Nacos 的 AP + CP 混合模式</strong>：Nacos 默认采用 AP 模式，通过 Distro 协议实现最终一致性服务注册；同时支持切换到 CP 模式（基于 Raft），适用于对一致性要求较高的配置管理场景。这种”同一系统、两种模式”的设计打破了 CAP 二选一的刻板印象，实际上 CAP 指的是在分区发生时的一致性&#x2F;可用性选择，而非整个系统只能取其一。</p>
+<p><strong>现实中的 CAP 并非二元对立</strong>：</p>
+<ul>
+<li>系统可以在正常情况下同时提供 C 和 A</li>
+<li>仅在网络分区时才需要在 C 和 A 之间做取舍</li>
+<li>不同业务模块可以有不同选择（Nacos 配置中心选 CP，注册中心选 AP）</li>
+<li>可以通过”概率性 CAP”理解：将延迟超过某个阈值视为一种轻度分区，此时系统仍需做选择</li>
+</ul>
+<h3 id="1-5-PACELC-扩展"><a href="#1-5-PACELC-扩展" class="headerlink" title="1.5 PACELC 扩展"></a>1.5 PACELC 扩展</h3><p>PACELC 是对 CAP 的重要补充，由 Daniel J. Abadi 在 2010 年提出：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">如果发生网络分区 (P)：</span><br><span class="line">  如何在 <span class="selector-tag">A</span> 和 C 之间选择 (A/C)</span><br><span class="line">否则 (Else)：</span><br><span class="line">  如何在延迟 (L) 和一致性 (C) 之间选择 (L/C)</span><br></pre></td></tr></table></figure>
+
+<p>PACELC 指出，即使在正常运行（无分区）的情况下，系统设计也面临延迟与一致性的权衡，因为强一致性（如同步复制）必然带来更高的响应延迟。</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>有分区时</th>
+<th>无分区时</th>
+<th>分类</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZooKeeper</td>
+<td>C</td>
+<td>C</td>
+<td>PC&#x2F;EC</td>
+</tr>
+<tr>
+<td>Cassandra</td>
+<td>A</td>
+<td>L</td>
+<td>PA&#x2F;EL</td>
+</tr>
+<tr>
+<td>DynamoDB</td>
+<td>A</td>
+<td>L</td>
+<td>PA&#x2F;EL</td>
+</tr>
+<tr>
+<td>MongoDB（默认）</td>
+<td>C</td>
+<td>L</td>
+<td>PC&#x2F;EL</td>
+</tr>
+<tr>
+<td>CockroachDB</td>
+<td>C</td>
+<td>L</td>
+<td>PC&#x2F;EL</td>
+</tr>
+</tbody></table>
+<p>理解 PACELC 有助于我们在设计系统时不仅考虑极端的网络故障场景，也要考虑日常运行中”低延迟”与”强一致”的平衡。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/chain-of-responsibility/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/chain-of-responsibility/" class="post-title-link" itemprop="url">责任链模式 — Filter/Interceptor/Pipeline</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>意图</strong>：将多个处理对象连成一条链，沿着这条链传递请求，直到有对象处理它为止。</p>
+<p><strong>UML 简述</strong>：多个 Handler 组成链表，每个持有后继引用，请求沿链传递直到被处理。</p>
+<p><strong>Servlet Filter —— 责任链的标准实现</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LoggingFilter</span> <span class="keyword">implements</span> <span class="title class_">Filter</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest req, ServletResponse resp,</span></span><br><span class="line"><span class="params">                         FilterChain chain)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;&gt;&gt;&gt; 请求到达: &quot;</span> + req.getRemoteAddr());</span><br><span class="line">        chain.doFilter(req, resp);  <span class="comment">// 传递给下一个 Filter</span></span><br><span class="line">        System.out.println(<span class="string">&quot;&lt;&lt;&lt; 响应返回&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Tomcat 中的 <code>ApplicationFilterChain</code> 持有 <code>Filter[]</code> 数组和位置指针 <code>pos</code>，逐个调用 filter 并递归传递 <code>this</code>（FilterChain）到链尾，最终调用 <code>servlet.service()</code>。</p>
+<p><strong>Spring Interceptor</strong>：层次在 Filter 之后、Controller 之前，可以实现 <code>preHandle</code>（返回 false 终止链）、<code>postHandle</code>、<code>afterCompletion</code>。比 Filter 更精细——可以拿到 Handler 对象且天然支持 Spring Bean。</p>
+<p><strong>Filter vs Interceptor 对比</strong></p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Servlet Filter</th>
+<th>Spring Interceptor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>容器</td>
+<td>Servlet 容器（Tomcat）</td>
+<td>Spring IoC 容器</td>
+</tr>
+<tr>
+<td>粒度</td>
+<td>URL 级别</td>
+<td>Handler 方法级别</td>
+</tr>
+<tr>
+<td>能力</td>
+<td>只能拿到 Request&#x2F;Response</td>
+<td>可以拿到 Handler 对象</td>
+</tr>
+<tr>
+<td>能否访问 Spring Bean</td>
+<td>需要额外处理</td>
+<td>天然支持</td>
+</tr>
+</tbody></table>
+<p><strong>Netty ChannelPipeline —— 双向责任链</strong>：<code>ChannelPipeline</code> 是 <code>ChannelHandlerContext</code> 组成的双向链表，同时支持 Inbound（Decoder → Handler）和 Outbound（Encoder 逆序），将责任链发挥到了极致。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/posts/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/posts/">1</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/posts/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/16/">16</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/posts/page/9/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

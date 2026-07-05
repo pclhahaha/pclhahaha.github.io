@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 JDK 7: Segment 分段锁123456ConcurrentHashMap  └── Segment[] (固定数量, 默认 16, 不支持扩容)        ├── Segment&lt;K,V&gt; extends ReentrantLock        │     ├── count (volatile)        │     └── HashEntry&lt;K,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ConcurrentHashMap 深度解析">
+<meta property="og:url" content="http://pclhahaha.github.io/java-concurrenthashmap/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 JDK 7: Segment 分段锁123456ConcurrentHashMap  └── Segment[] (固定数量, 默认 16, 不支持扩容)        ├── Segment&lt;K,V&gt; extends ReentrantLock        │     ├── count (volatile)        │     └── HashEntry&lt;K,">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="ConcurrentHashMap">
+<meta property="article:tag" content="CAS">
+<meta property="article:tag" content="并发扩容">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/java-concurrenthashmap/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/java-concurrenthashmap/","path":"java-concurrenthashmap/","title":"ConcurrentHashMap 深度解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ConcurrentHashMap 深度解析 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-JDK-7-Segment-%E5%88%86%E6%AE%B5%E9%94%81"><span class="nav-number">1.</span> <span class="nav-text">1.1 JDK 7: Segment 分段锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-JDK-8-CAS-synchronized-%E2%80%94-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">1.2 JDK 8: CAS + synchronized — 为什么重构?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-put-%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">1.3 put 流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%8D%8F%E5%90%8C%E6%89%A9%E5%AE%B9-transfer"><span class="nav-number">4.</span> <span class="nav-text">1.4 多线程协同扩容 (transfer)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-CounterCell-%E8%AE%A1%E6%95%B0%E6%96%B9%E6%A1%88"><span class="nav-number">5.</span> <span class="nav-text">1.5 CounterCell 计数方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-get-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E9%9C%80%E8%A6%81%E5%8A%A0%E9%94%81"><span class="nav-number">6.</span> <span class="nav-text">1.6 get 为什么不需要加锁?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8-Map-%E5%AF%B9%E6%AF%94"><span class="nav-number">7.</span> <span class="nav-text">1.7 线程安全 Map 对比</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-concurrenthashmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ConcurrentHashMap 深度解析 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ConcurrentHashMap 深度解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E9%9B%86%E5%90%88/" itemprop="url" rel="index"><span itemprop="name">集合</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-JDK-7-Segment-分段锁"><a href="#1-1-JDK-7-Segment-分段锁" class="headerlink" title="1.1 JDK 7: Segment 分段锁"></a>1.1 JDK 7: Segment 分段锁</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap</span><br><span class="line">  └── Segment<span class="selector-attr">[]</span> (固定数量, 默认 <span class="number">16</span>, 不支持扩容)</span><br><span class="line">        ├── Segment&lt;K,V&gt; extends ReentrantLock</span><br><span class="line">        │     ├── count (volatile)</span><br><span class="line">        │     └── HashEntry&lt;K,V&gt;<span class="selector-attr">[]</span> <span class="selector-tag">table</span> (segment 内部小 HashMap)</span><br><span class="line">        └── Segment&lt;K,V&gt; ...</span><br></pre></td></tr></table></figure>
+
+<p>每个 Segment 持有一把独立的 ReentrantLock, 写操作只需锁对应 Segment, 并发度 &#x3D; segment 数量:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">put</span><span class="params">(K key, V value)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (hash &gt;&gt;&gt; segmentShift) &amp; segmentMask;</span><br><span class="line">    Segment&lt;K,V&gt; s = segments[j];</span><br><span class="line">    <span class="keyword">return</span> s.put(key, hash, value, <span class="literal">false</span>);   <span class="comment">// Segment.put 内 tryLock() 或 lock()</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>size() 妥协</strong>: 先无锁尝试 3 次 (通过 modCount 检查并发修改), 失败后才锁全部 Segment 统计。</p>
+<p><strong>缺陷</strong>: Segment 数量固定, 粒度有限; 跨 Segment 操作需全锁。</p>
+<h3 id="1-2-JDK-8-CAS-synchronized-—-为什么重构"><a href="#1-2-JDK-8-CAS-synchronized-—-为什么重构" class="headerlink" title="1.2 JDK 8: CAS + synchronized — 为什么重构?"></a>1.2 JDK 8: CAS + synchronized — 为什么重构?</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>JDK 7</th>
+<th>JDK 8</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据结构</td>
+<td>Segment[] + HashEntry[]</td>
+<td>Node[] + 链表 + 红黑树</td>
+</tr>
+<tr>
+<td>锁粒度</td>
+<td>Segment 级</td>
+<td><strong>桶级</strong> (synchronized 锁桶头节点)</td>
+</tr>
+<tr>
+<td>锁机制</td>
+<td>ReentrantLock</td>
+<td>CAS(无冲突) + synchronized(有冲突)</td>
+</tr>
+<tr>
+<td>扩容</td>
+<td>Segment 独立扩容</td>
+<td><strong>多线程协同扩容</strong></td>
+</tr>
+<tr>
+<td>计数</td>
+<td>Segment.count</td>
+<td>CounterCell[] + baseCount (LongAdder 方案)</td>
+</tr>
+</tbody></table>
+<p><strong>为什么弃用 ReentrantLock?</strong></p>
+<ol>
+<li>JDK 6 起 synchronized 做了偏向锁→轻量级→重量级的逐步升级, 低竞争场景性能接近 ReentrantLock</li>
+<li>锁粒度缩小到桶级后, 如果用 ReentrantLock, 最坏情况每个桶一个 AQS 队列, 内存不可接受</li>
+<li>CAS 用于无锁插入空桶, synchronized 仅用于冲突时锁桶头, 两种机制互补</li>
+</ol>
+<h3 id="1-3-put-流程"><a href="#1-3-put-流程" class="headerlink" title="1.3 put 流程"></a>1.3 put 流程</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> V <span class="title function_">putVal</span><span class="params">(K key, V value, <span class="type">boolean</span> onlyIfAbsent)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> spread(key.hashCode());   <span class="comment">// (h ^ (h&gt;&gt;&gt;16)) &amp; HASH_BITS</span></span><br><span class="line">    <span class="keyword">for</span> (Node&lt;K,V&gt;[] tab = table;;) &#123;    <span class="comment">// ******* 自旋 CAS 循环</span></span><br><span class="line">        Node&lt;K,V&gt; f; <span class="type">int</span> n, i, fh;</span><br><span class="line">        <span class="comment">// (1) table 未初始化 → CAS 初始化 (sizeCtl=-1 表示初始化中)</span></span><br><span class="line">        <span class="keyword">if</span> (tab == <span class="literal">null</span> || (n = tab.length) == <span class="number">0</span>) tab = initTable();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// (2) 桶为空 → CAS 插入 (无锁)</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((f = tabAt(tab, i = (n-<span class="number">1</span>)&amp;hash)) == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (casTabAt(tab, i, <span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">Node</span>&lt;K,V&gt;(hash,key,value,<span class="literal">null</span>))) <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// (3) ForwardingNode (hash==MOVED) → 当前在扩容, 协助扩容</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((fh = f.hash) == MOVED) tab = helpTransfer(tab, f);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// (4) 桶非空且不在扩容 → synchronized 锁桶头节点</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (f) &#123;           <span class="comment">// 只锁当前桶的头节点!</span></span><br><span class="line">                <span class="keyword">if</span> (tabAt(tab, i) == f) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (fh &gt;= <span class="number">0</span>) &#123;       <span class="comment">// 链表遍历/尾插</span></span><br><span class="line">                        <span class="keyword">for</span> (Node&lt;K,V&gt; e = f;; ++binCount) &#123; <span class="comment">/* 查找 key, 尾插 */</span> &#125;</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (f <span class="keyword">instanceof</span> TreeBin) &#123;  <span class="comment">// 红黑树</span></span><br><span class="line">                        ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key, value);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD) treeifyBin(tab, i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    addCount(<span class="number">1L</span>, binCount);    <span class="comment">// 计数 +1, 可能触发扩容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>sizeCtl 状态机</strong> — 一个字段控制所有状态:</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sizeCtl =  <span class="number">0</span>       : 默认初始容量</span><br><span class="line">sizeCtl = 正数      : <span class="type">threshold</span> (扩容阈值 = capacity * <span class="number">0.75</span>)</span><br><span class="line">sizeCtl = -<span class="number">1</span>       : 正在初始化 <span class="type">table</span></span><br><span class="line">sizeCtl = -(<span class="number">1</span>+n)   : 正在扩容, 低16位表示 (<span class="type">n</span>-<span class="number">1</span>) 个线程参与</span><br><span class="line">                     例如 -<span class="number">3</span> → <span class="number">2</span> 个线程正在协助扩容</span><br></pre></td></tr></table></figure>
+
+<p><code>initTable</code> 源码关键部分:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> ((tab = table) == <span class="literal">null</span> || tab.length == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> ((sc = sizeCtl) &lt; <span class="number">0</span>) Thread.<span class="keyword">yield</span>();     <span class="comment">// 其他线程在初始化</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (U.compareAndSwapInt(<span class="built_in">this</span>, SIZECTL, sc, -<span class="number">1</span>)) &#123;  <span class="comment">// CAS 抢初始化权</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// ...创建 table, 设置 sizeCtl = n - (n&gt;&gt;&gt;2) = 0.75n</span></span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123; sizeCtl = sc; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-多线程协同扩容-transfer"><a href="#1-4-多线程协同扩容-transfer" class="headerlink" title="1.4 多线程协同扩容 (transfer)"></a>1.4 多线程协同扩容 (transfer)</h3><p>JDK 8 最大亮点 — 多个写线程一起参与扩容:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心: CAS 抢迁移任务区间 [transferIndex-stride, transferIndex)</span></span><br><span class="line"><span class="type">int</span> <span class="variable">stride</span> <span class="operator">=</span> Math.max((n &gt;&gt;&gt; <span class="number">3</span>) / NCPU, MIN_TRANSFER_STRIDE); <span class="comment">// 每线程步长最小 16</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// transferIndex 从 n 开始递减 (从旧表末尾向前推进)</span></span><br><span class="line"><span class="comment">// 线程 CAS 抢区间:</span></span><br><span class="line"><span class="keyword">if</span> (U.compareAndSwapInt(<span class="built_in">this</span>, TRANSFERINDEX, nextIndex,</span><br><span class="line">         nextBound = (nextIndex &gt; stride ? nextIndex - stride : <span class="number">0</span>))) &#123;</span><br><span class="line">    bound = nextBound;</span><br><span class="line">    i = nextIndex - <span class="number">1</span>;   <span class="comment">// 从区间末尾开始迁移</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>扩容过程</strong>:</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">旧 table (n=64), stride=16:</span></span><br><span class="line"><span class="section">+-----------------------------------------------------------+</span></span><br><span class="line"><span class="section">| 0..15 | 16..31 | 32..47 | 48..63 |</span></span><br><span class="line"><span class="section">+-----------------------------------------------------------+</span></span><br><span class="line"><span class="code">   ↑        ↑        ↑        ↑</span></span><br><span class="line"><span class="code">  线程C    线程B    线程A    (transferIndex 从 64→0)</span></span><br><span class="line"></span><br><span class="line">线程迁移完每个桶后放置 ForwardingNode (hash==MOVED):</span><br><span class="line"><span class="code">  其他线程访问到此桶 → 调用 helpTransfer 协助扩容</span></span><br><span class="line"><span class="code">  其他线程 get 此桶   → ForwardingNode.find() 去 nextTable 查找</span></span><br><span class="line"></span><br><span class="line">所有桶迁移完成 → 替换 table = nextTable, sizeCtl = 1.5n</span><br></pre></td></tr></table></figure>
+
+<p><strong>线程退出机制</strong>: 每个线程完成所分配区间后 CAS 递减 sizeCtl 中记录的参与线程数, 最后一个退出线程负责 <code>finishing</code> 收尾 (替换 table, 更新 sizeCtl)。</p>
+<h3 id="1-5-CounterCell-计数方案"><a href="#1-5-CounterCell-计数方案" class="headerlink" title="1.5 CounterCell 计数方案"></a>1.5 CounterCell 计数方案</h3><p>基于 <code>Striped64</code> (LongAdder 模板):</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@sun</span>.misc.Contended</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">CounterCell</span> &#123; <span class="keyword">volatile</span> <span class="type">long</span> value; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> <span class="type">long</span> baseCount;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> CounterCell[] counterCells;</span><br><span class="line"></span><br><span class="line"><span class="comment">// size ≈ baseCount + sum(counterCells[i].value)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>addCount</code> 流程: 先 CAS <code>baseCount</code>, 失败则 CAS 更新某个 <code>CounterCell</code>, 多次失败后扩容 <code>counterCells</code> (2倍), 最终使用 <code>ThreadLocalRandom.getProbe()</code> 分散到不同 Cell。</p>
+<p><code>size()</code> 返回的是<strong>近似快照</strong>, 非精确值 — 统计期间可能有并发修改。</p>
+<h3 id="1-6-get-为什么不需要加锁"><a href="#1-6-get-为什么不需要加锁" class="headerlink" title="1.6 get 为什么不需要加锁?"></a>1.6 get 为什么不需要加锁?</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">get</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> spread(key.hashCode());</span><br><span class="line">    <span class="keyword">if</span> ((e = tabAt(tab, (n - <span class="number">1</span>) &amp; h)) != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (e.hash == h &amp;&amp; key.equals(e.key)) <span class="keyword">return</span> e.val;     <span class="comment">// 头匹配</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (e.hash &lt; <span class="number">0</span>) <span class="keyword">return</span> e.find(h, key).val; <span class="comment">// TreeBin / ForwardingNode</span></span><br><span class="line">        <span class="keyword">else</span> &#123; <span class="keyword">while</span> ((e = e.next) != <span class="literal">null</span>) &#123; <span class="comment">/* 链表遍历 */</span> &#125; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>无锁读的保证:</p>
+<ol>
+<li><code>Node.val</code> 和 <code>Node.next</code> 都是 <code>volatile</code> 修饰</li>
+<li><code>table</code> 数组 <code>volatile</code> 修饰, <code>tabAt</code> 通过 <code>U.getObjectVolatile</code> 读取保证每次读主存最新值</li>
+<li>扩容用尾插法, 已存在节点不被修改; <code>ForwardingNode.find()</code> 去 <code>nextTable</code> 查找</li>
+<li>迭代器是<strong>弱一致性</strong> (weakly consistent), 不抛 <code>ConcurrentModificationException</code></li>
+</ol>
+<h3 id="1-7-线程安全-Map-对比"><a href="#1-7-线程安全-Map-对比" class="headerlink" title="1.7 线程安全 Map 对比"></a>1.7 线程安全 Map 对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Hashtable</th>
+<th>synchronizedMap</th>
+<th>ConcurrentHashMap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>锁机制</td>
+<td>全方法 synchronized</td>
+<td>mutex 全表锁</td>
+<td>CAS + volatile + synchronized(桶级)</td>
+</tr>
+<tr>
+<td>读并发度</td>
+<td>1</td>
+<td>1</td>
+<td>极高 (几乎无锁)</td>
+</tr>
+<tr>
+<td>写并发度</td>
+<td>1</td>
+<td>1</td>
+<td>高 (桶级锁)</td>
+</tr>
+<tr>
+<td>null 键&#x2F;值</td>
+<td>不支持</td>
+<td>委托底层 Map</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>迭代器</td>
+<td>fail-fast</td>
+<td>fail-fast</td>
+<td>弱一致性</td>
+</tr>
+<tr>
+<td>性能(高并发)</td>
+<td>极差</td>
+<td>极差</td>
+<td>极好</td>
+</tr>
+</tbody></table>
+<hr>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/ConcurrentHashMap/" rel="tag"># ConcurrentHashMap</a>
+              <a href="/tags/CAS/" rel="tag"># CAS</a>
+              <a href="/tags/%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9/" rel="tag"># 并发扩容</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/java-fork-join/" rel="prev" title="Fork&#x2F;Join 框架与工作窃取">
+                  <i class="fa fa-angle-left"></i> Fork/Join 框架与工作窃取
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/java-completablefuture/" rel="next" title="CompletableFuture 详解">
+                  CompletableFuture 详解 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

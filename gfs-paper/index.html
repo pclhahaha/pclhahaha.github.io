@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="GFS 是 Google 于 2003 年发表的经典分布式文件系统论文（《The Google File System》），其系统设计思想深刻影响了后续分布式存储系统的发展（HDFS 即为 GFS 的开源实现）。本节从前提假设、系统架构、一致性模型和系统交互四个方面分析 GFS 的核心设计。 1.1 前提与假设GFS 在设计之初就明确了其与众不同的假设条件，这些假设决定了 GFS 很多与传统文件系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GFS 论文解读">
+<meta property="og:url" content="http://pclhahaha.github.io/gfs-paper/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="GFS 是 Google 于 2003 年发表的经典分布式文件系统论文（《The Google File System》），其系统设计思想深刻影响了后续分布式存储系统的发展（HDFS 即为 GFS 的开源实现）。本节从前提假设、系统架构、一致性模型和系统交互四个方面分析 GFS 的核心设计。 1.1 前提与假设GFS 在设计之初就明确了其与众不同的假设条件，这些假设决定了 GFS 很多与传统文件系">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://pclhahaha.github.io/distributed/image-20200127153256454.png">
+<meta property="og:image" content="http://pclhahaha.github.io/distributed/image-20200127205351882.png">
+<meta property="og:image" content="http://pclhahaha.github.io/distributed/image-20200127213256584.png">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="GFS">
+<meta property="article:tag" content="分布式文件系统">
+<meta property="article:tag" content="Google">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://pclhahaha.github.io/distributed/image-20200127153256454.png">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/gfs-paper/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/gfs-paper/","path":"gfs-paper/","title":"GFS 论文解读"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GFS 论文解读 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%89%8D%E6%8F%90%E4%B8%8E%E5%81%87%E8%AE%BE"><span class="nav-number">1.</span> <span class="nav-text">1.1 前提与假设</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">1.2 系统架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-Chunk-Size"><span class="nav-number">2.1.</span> <span class="nav-text">1.2.1 Chunk Size</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-%E5%85%83%E6%95%B0%E6%8D%AE%EF%BC%88Metadata%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">1.2.2 元数据（Metadata）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%B8%80%E8%87%B4%E6%80%A7%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">1.3 一致性模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-1-%E4%BF%9D%E9%9A%9C%EF%BC%88Guarantees%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">1.3.1 保障（Guarantees）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-2-%E5%AF%B9%E5%BA%94%E7%94%A8%E5%B1%82%E7%9A%84%E5%90%AF%E7%A4%BA"><span class="nav-number">3.2.</span> <span class="nav-text">1.3.2 对应用层的启示</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E7%B3%BB%E7%BB%9F%E4%BA%A4%E4%BA%92"><span class="nav-number">4.</span> <span class="nav-text">1.4 系统交互</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-1-%E4%B8%BB%E5%89%AF%E6%9C%AC%E5%8F%8A%E5%86%99%E9%A1%BA%E5%BA%8F"><span class="nav-number">4.1.</span> <span class="nav-text">1.4.1 主副本及写顺序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-2-%E6%95%B0%E6%8D%AE%E6%B5%81%E8%A7%A3%E8%80%A6"><span class="nav-number">4.2.</span> <span class="nav-text">1.4.2 数据流解耦</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Master-%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">1.5 Master 的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-1-Namespace-%E7%AE%A1%E7%90%86%E4%B8%8E%E9%94%81"><span class="nav-number">5.1.</span> <span class="nav-text">1.5.1 Namespace 管理与锁</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E5%AE%B9%E9%94%99%E4%B8%8E%E8%AF%8A%E6%96%AD"><span class="nav-number">6.</span> <span class="nav-text">1.6 容错与诊断</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/gfs-paper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="GFS 论文解读 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GFS 论文解读
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>GFS 是 Google 于 2003 年发表的经典分布式文件系统论文（《The Google File System》），其系统设计思想深刻影响了后续分布式存储系统的发展（HDFS 即为 GFS 的开源实现）。本节从前提假设、系统架构、一致性模型和系统交互四个方面分析 GFS 的核心设计。</p>
+<h3 id="1-1-前提与假设"><a href="#1-1-前提与假设" class="headerlink" title="1.1 前提与假设"></a>1.1 前提与假设</h3><p>GFS 在设计之初就明确了其与众不同的假设条件，这些假设决定了 GFS 很多与传统文件系统截然不同的设计决策：</p>
+<ul>
+<li><strong>节点&#x2F;组件失效是常态</strong>：廉价的商用服务器随时可能故障，因此监控、异常检测、容错和自动恢复是系统必备特性，而非可选增强</li>
+<li><strong>存储文件尺寸较大，通常是 GB 级别</strong>：IO 操作和 block size 需要针对大文件重新设计</li>
+<li><strong>写文件主要是 append 操作，随机写几乎不存在；读文件主要是顺序读，随机读较少</strong>：需要关注写的原子性，并针对 append 进行深度性能优化</li>
+<li><strong>系统设计主要关注高吞吐量（throughput），而不是低响应延迟（latency）</strong>：批量数据处理场景下吞吐量远比单次延迟重要</li>
+</ul>
+<h3 id="1-2-系统架构"><a href="#1-2-系统架构" class="headerlink" title="1.2 系统架构"></a>1.2 系统架构</h3><p><img src="/distributed/image-20200127153256454.png" alt="image-20200127153256454"></p>
+<p>GFS 集群由一个 <strong>Master</strong> 和多个 <strong>Chunkserver</strong> 组成，被多个 <strong>Client</strong> 访问。文件被分割为固定大小的 <strong>chunk</strong>。</p>
+<ul>
+<li><strong>chunk</strong>：文件存储在固定大小的 chunk 中，每个 chunk 由一个全局唯一的 64 位 chunk handle 标识</li>
+<li><strong>Master</strong>：维护文件系统的所有元数据，包括 namespace（文件命名空间）、access control 信息、文件到 chunk 的映射、所有 chunk 的当前位置。同时控制系统活动，包括 chunk lease management（租约管理）、孤立 chunk 的垃圾回收、chunkserver 之间的 chunk 迁移。Master 与 chunkserver 之间通过 HeartBeat 心跳信息进行通信，包括下达指令和收集状态</li>
+<li><strong>Chunkserver</strong>：出于可靠性的考虑，chunk 一般在多个 chunkserver 上进行 3 副本存储。Chunkserver 不缓存文件——因为 Linux 系统的 buffer cache 已经缓存了热点数据，在 chunkserver 上再做一层缓存没有额外收益</li>
+<li><strong>Client</strong>：客户端不针对文件进行缓存，只对元数据进行缓存。原因：大部分应用需要扫描大文件，太大无法缓存；不做缓存也自然避免了缓存一致性问题</li>
+</ul>
+<h4 id="1-2-1-Chunk-Size"><a href="#1-2-1-Chunk-Size" class="headerlink" title="1.2.1 Chunk Size"></a>1.2.1 Chunk Size</h4><p>GFS 的 chunk size 为 <strong>64MB</strong>，远大于典型文件系统的 block size。利用 lazy space allocation（延迟空间分配）避免了内部碎片造成的空间浪费。</p>
+<p>较大的 chunk size 提供了以下好处：</p>
+<ul>
+<li>减少 Client 与 Master 的交互次数（一次交互可获取更大的操作范围）</li>
+<li>Client 与 Chunkserver 保持较长的 TCP 持久连接，减少连接建立开销</li>
+<li>减小 Master 上存储的元数据体积，使元数据可以全部存储在内存中，带来极快的查找性能</li>
+</ul>
+<p>副作用：一个小文件可能仅占用一个 chunk，当多客户端同时访问该文件时，承载该 chunk 的 chunkserver 会成为热点。</p>
+<h4 id="1-2-2-元数据（Metadata）"><a href="#1-2-2-元数据（Metadata）" class="headerlink" title="1.2.2 元数据（Metadata）"></a>1.2.2 元数据（Metadata）</h4><p>Master 存储三种类型的元数据：</p>
+<ol>
+<li>文件和 chunk 的 namespace</li>
+<li>文件到 chunk 的映射</li>
+<li>每个 chunk 的副本位置</li>
+</ol>
+<p>前两种元数据通过 <strong>operation log</strong> 持久化存储在 Master 的本地磁盘，并备份到远程机器上。</p>
+<h5 id="Chunk-Locations"><a href="#Chunk-Locations" class="headerlink" title="Chunk Locations"></a>Chunk Locations</h5><p>Master 不持久化存储 chunk 位置信息——而是在启动时以及 chunkserver 加入集群时，通过询问 chunkserver 来获取其持有的 chunk 列表。这种设计避免了 Master 与 chunkserver 之间因为保持 chunk 位置信息一致而带来的复杂性（chunkserver 自身就是 chunk 位置的最权威信息源）。</p>
+<h5 id="Operation-Log"><a href="#Operation-Log" class="headerlink" title="Operation Log"></a>Operation Log</h5><p>operation log 不仅是元数据的唯一持久化存储，也定义了并发操作的逻辑时间线——文件和 chunk 以及它们的版本都可以通过逻辑创建时间来唯一确定。</p>
+<p>元数据的变更需要在对客户端可见之前完成持久化（写入本地磁盘并同步到远程机器），Master 通过批量收集日志记录来减少对系统吞吐量的影响。</p>
+<p>Master 通过<strong>重放 operation log</strong> 来恢复文件系统状态。为缩短恢复时间，当 operation log 超过特定大小时，Master 会保存一个 <strong>checkpoint</strong>——恢复时只需加载最近的 checkpoint 并重放其后的 log。Checkpoint 以类似 B 树的形式组织，能够直接映射到内存中并且不需要额外解析就能用于 namespace 查找。生成 checkpoint 时，Master 切换到新的 operation log 文件，并在单独线程中异步创建 checkpoint；恢复时会验证 checkpoint 的完整性，跳过不完整的 checkpoint。</p>
+<h3 id="1-3-一致性模型"><a href="#1-3-一致性模型" class="headerlink" title="1.3 一致性模型"></a>1.3 一致性模型</h3><h4 id="1-3-1-保障（Guarantees）"><a href="#1-3-1-保障（Guarantees）" class="headerlink" title="1.3.1 保障（Guarantees）"></a>1.3.1 保障（Guarantees）</h4><p>文件 namespace 的修改（例如文件的创建）保证原子性——这些操作全部由 Master 处理：namespace 加锁保证原子性和正确性，operation log 定义了这些操作的全局总序。</p>
+<p>文件块在修改之后的状态取决于修改的类型、是否成功、是否是并发操作。下表总结了各种情况下的结果：</p>
+<p><img src="/distributed/image-20200127205351882.png" alt="image-20200127205351882"></p>
+<p>其中 <strong>defined</strong> 表示文件块是一致的，并且对其的修改是完整可见的。随机写由于可能覆盖原有数据，因此在并发的情况下不能保证每次操作的可见性（可能出现 <strong>consistent but undefined</strong> 的状态——所有客户端看到相同的内容，但内容可能是多次写入的交错混合）。</p>
+<p>GFS 通过以下两点来保证文件块在一系列成功修改之后的可见性，并保证包含最后一次修改：</p>
+<ol>
+<li>在其所有副本上按照<strong>相同的顺序</strong>应用修改</li>
+<li>使用 <strong>chunk version number</strong> 检测过期副本（版本号不匹配），过期副本会很快被垃圾回收清除</li>
+</ol>
+<p>GFS 通过 Master 与所有 chunkserver 之间的定期握手检测失效的 chunkserver，并通过 <strong>checksum</strong> 检测数据损坏。一旦问题被发现，数据会从有效副本中恢复。只有在所有副本在 GFS 响应之前都丢失的情况下数据才算真正丢失（时间窗口通常为几分钟），并且 GFS 不会返回损坏的数据，而是返回明确的错误。</p>
+<h4 id="1-3-2-对应用层的启示"><a href="#1-3-2-对应用层的启示" class="headerlink" title="1.3.2 对应用层的启示"></a>1.3.2 对应用层的启示</h4><p>GFS 的一致性模型是”弱化版”的——它不保证所有场景下的强一致性，而是将部分责任上移到应用层：</p>
+<ul>
+<li>尽量使用 <strong>append</strong> 写操作（而非随机写），append 的原子性保证每条记录至少被原子地写入一次</li>
+<li>应用层采用 <strong>checkpoint 机制</strong>来标记一致的数据点</li>
+<li>应用层的记录应能 <strong>自我验证（checksum）</strong> 和 <strong>自我识别（unique identifier）</strong>，以检测和去除重复或损坏的数据</li>
+</ul>
+<p>这种”放宽文件系统一致性要求、由应用层承担部分责任”的设计哲学，是 GFS 能够在廉价硬件上实现高吞吐的核心原因之一。</p>
+<h3 id="1-4-系统交互"><a href="#1-4-系统交互" class="headerlink" title="1.4 系统交互"></a>1.4 系统交互</h3><h4 id="1-4-1-主副本及写顺序"><a href="#1-4-1-主副本及写顺序" class="headerlink" title="1.4.1 主副本及写顺序"></a>1.4.1 主副本及写顺序</h4><p>Master 从一个 chunk 的所有副本中选择一个发放 <strong>lease（租约）</strong>，该副本称为<strong>主副本（Primary）</strong>。主副本对所有对该 chunk 的写操作选择一个序列化顺序，所有副本按此顺序执行写操作。Master 发放给主副本的 lease 初始超时时间为 60s，后续主副本通过 chunkserver 与 Master 之间的心跳信息发送延长租约的请求。</p>
+<p>下图展示了一次写操作的控制流与数据流：</p>
+<p><img src="/distributed/image-20200127213256584.png" alt="image-20200127213256584"></p>
+<ul>
+<li><strong>步骤 1</strong>：Client 向 Master 询问 chunk 的主副本及所有次副本的位置。如当前没有主副本（lease 已过期），Master 选择一个副本下发 lease，使其成为新的主副本</li>
+<li><strong>步骤 2</strong>：Master 响应主副本及次副本的位置，Client 缓存该信息。此后只有当主副本无法访问或主副本响应为不再持有 lease 时，Client 才需要再次访问 Master</li>
+<li><strong>步骤 3</strong>：Client 向<strong>所有</strong>副本推送数据（以任意顺序），Chunkserver 将数据缓存在 LRU buffer 中</li>
+<li><strong>步骤 4</strong>：Client 发送写请求到主副本，主副本为它收到的所有写操作分配一个连续的序列号，按序列号顺序应用到本地</li>
+<li><strong>步骤 5</strong>：主副本将写请求转发给次副本，次副本按主副本指定的序列号顺序应用</li>
+<li><strong>步骤 6</strong>：次副本响应主副本写入完成</li>
+<li><strong>步骤 7</strong>：主副本响应 Client。若有任何副本写入出错，错误上报给 Client，由 Client 发起重试</li>
+</ul>
+<p>注意：过大的写操作或跨越 chunk 边界的写操作，GFS Client 会将其拆分为多个独立的写操作——因此并发写操作可能导致文件块中混杂来自不同 Client 的数据片段。</p>
+<h4 id="1-4-2-数据流解耦"><a href="#1-4-2-数据流解耦" class="headerlink" title="1.4.2 数据流解耦"></a>1.4.2 数据流解耦</h4><p>GFS 一个关键设计是<strong>数据流与控制流的解耦</strong>：控制流从 Client → 主副本 → 次副本传递，而数据流以**数据管道（pipeline）**的形式在一条精心选择的 chunkserver 链路上线性传输。这种设计充分利用了每台机器的网络带宽，避开网络瓶颈和高延迟链路，最大化全双工带宽利用率，最小化推送数据的总延迟。</p>
+<h3 id="1-5-Master-的操作"><a href="#1-5-Master-的操作" class="headerlink" title="1.5 Master 的操作"></a>1.5 Master 的操作</h3><h4 id="1-5-1-Namespace-管理与锁"><a href="#1-5-1-Namespace-管理与锁" class="headerlink" title="1.5.1 Namespace 管理与锁"></a>1.5.1 Namespace 管理与锁</h4><p>Master 通过 namespace 锁保证文件操作的原子性和正确性，operation log 定义操作的全局顺序。GFS 的 namespace 是扁平的，没有传统文件系统的目录层级概念——路径只是逻辑上的命名约定，不对应物理目录结构。</p>
+<h3 id="1-6-容错与诊断"><a href="#1-6-容错与诊断" class="headerlink" title="1.6 容错与诊断"></a>1.6 容错与诊断</h3><p>GFS 在容错方面依赖于三个核心机制：</p>
+<ul>
+<li><strong>Master 高可用</strong>：Master 元数据通过 operation log 持久化到本地磁盘并远程备份，配合 shadow master（只读副本）在主 Master 故障时提供只读服务</li>
+<li><strong>Chunk 多副本</strong>：chunk 默认 3 副本存储在不同机架的不同 chunkserver 上，任何单点故障不影响数据可用性</li>
+<li><strong>数据完整性检测</strong>：通过 checksum 检测数据损坏并自动从正常副本恢复；通过 chunk version number 检测并回收过期的陈旧副本</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/GFS/" rel="tag"># GFS</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag"># 分布式文件系统</a>
+              <a href="/tags/Google/" rel="tag"># Google</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/gossip-protocol/" rel="prev" title="Gossip 协议">
+                  <i class="fa fa-angle-left"></i> Gossip 协议
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/fst-finite-state-transducer/" rel="next" title="FST 有限状态转换器">
+                  FST 有限状态转换器 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

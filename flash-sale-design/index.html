@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="秒杀是电商系统中最极端的场景——瞬时流量是平时的数千倍，库存扣减必须绝对正确（超卖是资损事故），用户体验还要好。设计秒杀系统的本质是：如何用最少资源，安全地让最想买的人抢到商品。 一、业务特点与挑战12345        瞬时极高并发           &#x2F;  \          &#x2F;    \         &#x2F;      \库存不超卖 ─────── 用户体验好（不卡、不白屏、不重复提交）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="秒杀系统设计">
+<meta property="og:url" content="http://pclhahaha.github.io/flash-sale-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="秒杀是电商系统中最极端的场景——瞬时流量是平时的数千倍，库存扣减必须绝对正确（超卖是资损事故），用户体验还要好。设计秒杀系统的本质是：如何用最少资源，安全地让最想买的人抢到商品。 一、业务特点与挑战12345        瞬时极高并发           &#x2F;  \          &#x2F;    \         &#x2F;      \库存不超卖 ─────── 用户体验好（不卡、不白屏、不重复提交）">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="秒杀">
+<meta property="article:tag" content="限流">
+<meta property="article:tag" content="MQ">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/flash-sale-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/flash-sale-design/","path":"flash-sale-design/","title":"秒杀系统设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>秒杀系统设计 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%9A%E5%8A%A1%E7%89%B9%E7%82%B9%E4%B8%8E%E6%8C%91%E6%88%98"><span class="nav-number">1.</span> <span class="nav-text">一、业务特点与挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%AE%B9%E9%87%8F%E4%BC%B0%E7%AE%97"><span class="nav-number">2.</span> <span class="nav-text">二、容量估算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%89%8D%E7%AB%AF%E5%B1%82%E4%BC%98%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">三、前端层优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%BD%91%E5%85%B3%E5%B1%82"><span class="nav-number">4.</span> <span class="nav-text">四、网关层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Redis-%E9%A2%84%E5%87%8F%E5%BA%93%E5%AD%98%E2%80%94%E2%80%94%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91"><span class="nav-number">5.</span> <span class="nav-text">五、Redis 预减库存——核心逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%BC%82%E6%AD%A5%E5%90%8C%E6%AD%A5%E5%88%B0-MySQL"><span class="nav-number">6.</span> <span class="nav-text">六、异步同步到 MySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7"><span class="nav-number">7.</span> <span class="nav-text">七、熔断降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B%E8%B7%AF%E5%BE%84"><span class="nav-number">8.</span> <span class="nav-text">八、架构演进路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">九、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/flash-sale-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="秒杀系统设计 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          秒杀系统设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>秒杀是电商系统中最极端的场景——瞬时流量是平时的数千倍，库存扣减必须绝对正确（超卖是资损事故），用户体验还要好。设计秒杀系统的本质是：<strong>如何用最少资源，安全地让最想买的人抢到商品。</strong></p>
+<h2 id="一、业务特点与挑战"><a href="#一、业务特点与挑战" class="headerlink" title="一、业务特点与挑战"></a>一、业务特点与挑战</h2><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">        瞬时极高并发</span><br><span class="line">           /  <span class="string">\</span></span><br><span class="line">          /    <span class="string">\</span></span><br><span class="line">         /      <span class="string">\</span></span><br><span class="line">库存不超卖 ─────── 用户体验好（不卡、不白屏、不重复提交）</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心挑战</strong>：</p>
+<ul>
+<li>瞬时流量可能是平时的 100~1000 倍</li>
+<li>库存扣减必须在并发下绝对正确</li>
+<li>用户体感要流畅（页面快速响应）</li>
+</ul>
+<h2 id="二、容量估算"><a href="#二、容量估算" class="headerlink" title="二、容量估算"></a>二、容量估算</h2><p>假设：10 万库存的 iPhone，100 万人同时抢购。</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">峰值 QPS ≈ <span class="number">100</span> 万（实际集中在前 <span class="number">0</span>.<span class="number">5</span> 秒）</span><br><span class="line"></span><br><span class="line">数据库 TPS：单机 MySQL 约 <span class="number">3000~5000</span> TPS</span><br><span class="line">Redis 单机：<span class="number">10</span> 万 QPS（读），<span class="number">8</span> 万 QPS（写）</span><br><span class="line"></span><br><span class="line">结论：流量不能直接打到数据库，必须在前面拦截 <span class="number">99</span>% 以上。</span><br></pre></td></tr></table></figure>
+
+<p><strong>分层拦截漏斗</strong>：</p>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">100</span><span class="comment">% 请求（100 万 QPS）</span></span><br><span class="line">   │  前端：静态化 + 按钮置灰 + 防抖 ─→ 拦截 <span class="number">40</span><span class="comment">%</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">60</span> 万 QPS</span><br><span class="line">   │  CDN + 边缘限流 ─→ 拦截 <span class="number">30</span><span class="comment">%</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">30</span> 万 QPS</span><br><span class="line">   │  API 网关限流 + 用户维度排队 ─→ 拦截 <span class="number">80</span><span class="comment">%</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">6</span> 万 QPS</span><br><span class="line">   │  Redis 预减库存 ─→ 拦截 <span class="number">90</span><span class="comment">%（库存只有 10 万）</span></span><br><span class="line">   ↓</span><br><span class="line"><span class="number">6</span>,<span class="number">000</span> QPS</span><br><span class="line">   │  MQ 异步排队写入 MySQL</span><br><span class="line">   ↓</span><br><span class="line">最终到达 DB：~<span class="number">3000</span> TPS（MySQL 可承受）</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、前端层优化"><a href="#三、前端层优化" class="headerlink" title="三、前端层优化"></a>三、前端层优化</h2><ul>
+<li><strong>静态化</strong>：秒杀页面做成纯静态 HTML，提前推送到 CDN。唯一动态的是”库存数量”和”按钮状态”，通过异步接口获取</li>
+<li><strong>按钮防抖</strong>：点击后置灰 3 秒，禁止重复提交</li>
+<li><strong>验证码滑块</strong>：抢购按钮点击时弹出，人机识别</li>
+<li><strong>页面版本控制</strong>：秒杀 URL 动态加签，每场活动不同 URL，防止提前暴露</li>
+</ul>
+<h2 id="四、网关层"><a href="#四、网关层" class="headerlink" title="四、网关层"></a>四、网关层</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx 单 IP 限流：每 IP 每秒最多 10 个请求</span></span><br><span class="line">limit_req_zone <span class="variable">$binary_remote_addr</span> <span class="attribute">zone</span>=seckill:10m <span class="attribute">rate</span>=10r/s;</span><br><span class="line"></span><br><span class="line"><span class="comment"># URI 级别限流：秒杀接口每秒最多 50000 请求</span></span><br><span class="line">limit_req_zone <span class="variable">$uri</span> <span class="attribute">zone</span>=seckill_uri:10m <span class="attribute">rate</span>=50000r/s;</span><br></pre></td></tr></table></figure>
+
+<p><strong>黑白名单</strong>：白名单（内部测试&#x2F;VIP 用户）走独立通道；黑名单（检测到异常行为的 IP&#x2F;设备）动态加入，实时拦截。</p>
+<p><strong>排队机制</strong>：用户进入页面后先获取”排队 Token”，服务端用 Redis 有序集合按时间戳排序，批次放行。拿到 Token 才能进入真正的抢购接口。</p>
+<h2 id="五、Redis-预减库存——核心逻辑"><a href="#五、Redis-预减库存——核心逻辑" class="headerlink" title="五、Redis 预减库存——核心逻辑"></a>五、Redis 预减库存——核心逻辑</h2><p>这是秒杀系统最重要的设计。库存不直接扣减 MySQL，而是先扣 Redis：</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 活动开始前：将库存总数 <span class="keyword">SET</span> 到 Redis</span><br><span class="line">   <span class="keyword">SET</span> <span class="comment">seckill:stock:12345 100000</span></span><br><span class="line"></span><br><span class="line">2. 用户抢购时：</span><br><span class="line">   stock <span class="comment">= DECR seckill:stock:12345</span></span><br><span class="line">   if <span class="comment">stock &lt; 0:</span></span><br><span class="line">       return <span class="comment">&quot;已售罄&quot;</span></span><br><span class="line">   if <span class="comment">stock &gt;= 0:</span></span><br><span class="line">       发送异步消息到 Kafka → 异步同步到 <span class="comment">MySQL</span></span><br><span class="line"></span><br><span class="line">3. 关键：stock <span class="comment">&lt; 0</span> 时回滚</span><br><span class="line">   INCR <span class="comment">seckill:stock:12345</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么用 DECR 而不是先 GET 再 SET？</strong> Redis 单线程模型下，DECR 是原子操作。先 GET 再 SET 在并发下会产生竞态条件。</p>
+<p><strong>防止重复抢购</strong>（Lua 脚本原子操作）：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 原子操作：判断用户是否抢过 + 扣库存</span></span><br><span class="line"><span class="keyword">local</span> uid = KEYS[<span class="number">1</span>]</span><br><span class="line"><span class="keyword">local</span> stock_key = KEYS[<span class="number">2</span>]</span><br><span class="line"><span class="keyword">local</span> bought_key = KEYS[<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 检查是否已抢过</span></span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">&quot;SISMEMBER&quot;</span>, bought_key, uid) == <span class="number">1</span> <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>  <span class="comment">-- 已抢过</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 扣库存</span></span><br><span class="line"><span class="keyword">local</span> stock = redis.call(<span class="string">&quot;DECR&quot;</span>, stock_key)</span><br><span class="line"><span class="keyword">if</span> stock &lt; <span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">    redis.call(<span class="string">&quot;INCR&quot;</span>, stock_key)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>  <span class="comment">-- 已售罄</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 记录已抢</span></span><br><span class="line">redis.call(<span class="string">&quot;SADD&quot;</span>, bought_key, uid)</span><br><span class="line"><span class="keyword">return</span> <span class="number">1</span>  <span class="comment">-- 抢购成功</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、异步同步到-MySQL"><a href="#六、异步同步到-MySQL" class="headerlink" title="六、异步同步到 MySQL"></a>六、异步同步到 MySQL</h2><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Redis 扣减成功 → 发送 Kafka 消息 → 消费者批量写入 MySQL</span><br><span class="line">                  &#123; user_id, item_id, order_id, <span class="built_in">timestamp</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>消息丢失怎么办？</strong> Kafka 持久化 + ACK 确认 + 定时对账任务（对比 Redis 库存 vs MySQL 订单数，自动补单或告警）。</p>
+<h2 id="七、熔断降级"><a href="#七、熔断降级" class="headerlink" title="七、熔断降级"></a>七、熔断降级</h2><p><strong>熔断</strong>：错误率 &gt; 50%（滑动窗口）→ 断路器打开 → 快速返回”系统繁忙” → 冷却 30s → 半开放少量探测 → 正常则恢复。</p>
+<p><strong>降级</strong>：关闭非核心功能（推荐列表、购物车、积分），返回兜底数据”抢购太火爆，请稍后重试”。</p>
+<p><strong>隔离</strong>：秒杀服务使用独立机器、独立 Redis、独立数据库。即使秒杀链路崩溃，不影响主站下单&#x2F;支付&#x2F;浏览。</p>
+<h2 id="八、架构演进路径"><a href="#八、架构演进路径" class="headerlink" title="八、架构演进路径"></a>八、架构演进路径</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">第一版（初创期）：单体应用 + MySQL</span><br><span class="line">  └── 问题：秒杀把主库打挂，影响全站</span><br><span class="line">       ↓</span><br><span class="line">第二版（成长期）：Redis 缓存预减库存</span><br><span class="line">  └── 问题：Redis 和 MySQL 数据不一致</span><br><span class="line">       ↓</span><br><span class="line">第三版（成熟期）：前端静态化 + 网关限流 + Redis + MQ + 独立部署</span><br><span class="line">  └── 问题：热点商品导致 Redis 单分片过热</span><br><span class="line">       ↓</span><br><span class="line">第四版（规模化）：Redis 多副本 + 本地缓存 Caffeine 兜底 + 服务物理隔离</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>秒杀系统设计的核心是一句话：<strong>在流量到达数据库之前，用多层漏斗拦截掉 99% 的请求</strong>。前端静态化 + 网关限流 + Redis 原子库存预扣 + MQ 异步消峰，这四层构成了标准方案。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/%E7%A7%92%E6%9D%80/" rel="tag"># 秒杀</a>
+              <a href="/tags/%E9%99%90%E6%B5%81/" rel="tag"># 限流</a>
+              <a href="/tags/MQ/" rel="tag"># MQ</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/flink-stream-processing/" rel="prev" title="Flink 实时计算">
+                  <i class="fa fa-angle-left"></i> Flink 实时计算
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/feed-stream-design/" rel="next" title="Feed 流系统设计">
+                  Feed 流系统设计 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

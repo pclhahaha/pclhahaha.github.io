@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="前言系统设计是高级工程师的核心能力，也是面试和日常工作中最考验综合素养的环节。本文不堆砌术语，而是聚焦思考过程与权衡逻辑——为什么选 A 而不是 B，在什么条件下可以打破常规。 读完本文，你将掌握一套可复用的分析框架，并理解四个经典场景下的架构演进路径。  一、系统设计方法论1.1 需求分析：先问”为谁解决什么问题”接到一个系统设计题时，大多数人的第一反应是画架构图。但在此之前，必须先回答两个问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统设计方法论与案例">
+<meta property="og:url" content="http://pclhahaha.github.io/system-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="前言系统设计是高级工程师的核心能力，也是面试和日常工作中最考验综合素养的环节。本文不堆砌术语，而是聚焦思考过程与权衡逻辑——为什么选 A 而不是 B，在什么条件下可以打破常规。 读完本文，你将掌握一套可复用的分析框架，并理解四个经典场景下的架构演进路径。  一、系统设计方法论1.1 需求分析：先问”为谁解决什么问题”接到一个系统设计题时，大多数人的第一反应是画架构图。但在此之前，必须先回答两个问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/system-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/system-design/","path":"system-design/","title":"系统设计方法论与案例"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>系统设计方法论与案例 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E6%96%B9%E6%B3%95%E8%AE%BA"><span class="nav-number">2.</span> <span class="nav-text">一、系统设计方法论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90%EF%BC%9A%E5%85%88%E9%97%AE%E2%80%9D%E4%B8%BA%E8%B0%81%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%E2%80%9D"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 需求分析：先问”为谁解决什么问题”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%AE%B9%E9%87%8F%E4%BC%B0%E7%AE%97%EF%BC%9A%E6%95%B0%E5%AD%97%E4%B8%8D%E4%BC%9A%E8%AF%B4%E8%B0%8E"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 容量估算：数字不会说谎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E8%AE%BE%E8%AE%A1%EF%BC%9ASQL-vs-NoSQL-%E7%9A%84%E6%8A%89%E6%8B%A9"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 数据模型设计：SQL vs NoSQL 的抉择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E6%9E%B6%E6%9E%84%E5%9B%BE%E7%BB%98%E5%88%B6%E5%8E%9F%E5%88%99"><span class="nav-number">2.4.</span> <span class="nav-text">1.4 架构图绘制原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E6%89%A9%E5%B1%95%E6%A8%A1%E5%BC%8F%EF%BC%9A%E4%BB%8E%E5%8D%95%E6%9C%BA%E5%88%B0%E5%88%86%E5%B8%83%E5%BC%8F"><span class="nav-number">2.5.</span> <span class="nav-text">1.5 扩展模式：从单机到分布式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E9%9D%9E%E5%8A%9F%E8%83%BD%E6%80%A7%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.6.</span> <span class="nav-text">1.6 非功能性设计</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%B8%B8%E7%94%A8%E7%BB%84%E4%BB%B6%E9%80%89%E5%9E%8B%E9%80%9F%E6%9F%A5"><span class="nav-number">3.</span> <span class="nav-text">六、常用组件选型速查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E7%BC%93%E5%AD%98"><span class="nav-number">3.1.</span> <span class="nav-text">6.1 缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">3.2.</span> <span class="nav-text">6.2 消息队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">3.3.</span> <span class="nav-text">6.3 数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-%E6%90%9C%E7%B4%A2"><span class="nav-number">3.4.</span> <span class="nav-text">6.4 搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-%E5%88%86%E5%B8%83%E5%BC%8F%E5%8D%8F%E8%B0%83"><span class="nav-number">3.5.</span> <span class="nav-text">6.5 分布式协调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-%E5%85%B6%E4%BB%96%E5%B8%B8%E7%94%A8%E7%BB%84%E4%BB%B6"><span class="nav-number">3.6.</span> <span class="nav-text">6.6 其他常用组件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%BB%8F%E5%85%B8%E6%A1%88%E4%BE%8B%E7%B4%A2%E5%BC%95"><span class="nav-number">4.</span> <span class="nav-text">七、经典案例索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">八、总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E7%9A%84%E6%A0%B8%E5%BF%83%E6%80%9D%E7%BB%B4"><span class="nav-number">5.1.</span> <span class="nav-text">系统设计的核心思维</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E4%B8%AA%E6%A1%88%E4%BE%8B%E7%9A%84%E5%85%B1%E9%80%9A%E6%A8%A1%E5%BC%8F"><span class="nav-number">5.2.</span> <span class="nav-text">四个案例的共通模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E7%9A%84%E8%AF%9D"><span class="nav-number">5.3.</span> <span class="nav-text">最后的话</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/system-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="系统设计方法论与案例 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          系统设计方法论与案例
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>系统设计是高级工程师的核心能力，也是面试和日常工作中最考验综合素养的环节。本文不堆砌术语，而是聚焦<strong>思考过程</strong>与<strong>权衡逻辑</strong>——为什么选 A 而不是 B，在什么条件下可以打破常规。</p>
+<p>读完本文，你将掌握一套可复用的分析框架，并理解四个经典场景下的架构演进路径。</p>
+<hr>
+<h2 id="一、系统设计方法论"><a href="#一、系统设计方法论" class="headerlink" title="一、系统设计方法论"></a>一、系统设计方法论</h2><h3 id="1-1-需求分析：先问”为谁解决什么问题”"><a href="#1-1-需求分析：先问”为谁解决什么问题”" class="headerlink" title="1.1 需求分析：先问”为谁解决什么问题”"></a>1.1 需求分析：先问”为谁解决什么问题”</h3><p>接到一个系统设计题时，大多数人的第一反应是画架构图。但在此之前，必须先回答两个问题：</p>
+<p><strong>功能性需求（Functional Requirements）</strong></p>
+<ul>
+<li>用户是谁？核心使用场景是什么？</li>
+<li>系统的输入和输出分别是什么？</li>
+<li>是否有隐含的业务约束（如短链不可重复、库存不可超卖）？</li>
+</ul>
+<p><strong>非功能性需求（Non-Functional Requirements）</strong></p>
+<ul>
+<li>可用性：几个 9？（99.9% → 年宕机 8.76h，99.99% → 52.56min）</li>
+<li>一致性：强一致还是最终一致？</li>
+<li>延迟：P99 延迟需要控制在多少毫秒内？</li>
+<li>扩展性：未来 3 年的用户增长预期是多少？</li>
+</ul>
+<blockquote>
+<p><strong>一个好的系统设计，60% 的时间花在澄清需求上，30% 花在分析瓶颈上，10% 才真正画图。</strong></p>
+</blockquote>
+<p>通用分析框架——<strong>场景七问</strong>：</p>
+<ol>
+<li>用户是谁？有多少？</li>
+<li>用户在什么场景下使用？</li>
+<li>读写比例是多少？</li>
+<li>数据量有多大？增长曲线如何？</li>
+<li>有没有热点数据或热点用户？</li>
+<li>能容忍多长的延迟？</li>
+<li>能容忍多长的不一致窗口？</li>
+</ol>
+<hr>
+<h3 id="1-2-容量估算：数字不会说谎"><a href="#1-2-容量估算：数字不会说谎" class="headerlink" title="1.2 容量估算：数字不会说谎"></a>1.2 容量估算：数字不会说谎</h3><p>容量估算是方案可行性的第一道关卡。核心公式：</p>
+<p><strong>QPS（Queries Per Second）</strong></p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">QPS</span> <span class="operator">=</span> DAU × 人均请求次数 / <span class="number">86400</span> × 峰谷比</span><br></pre></td></tr></table></figure>
+<ul>
+<li>峰谷比一般取 3~5（假设一天请求的 80% 集中在 20% 时间）</li>
+<li>例：1000 万 DAU，人均 20 次请求，峰谷比 5</li>
+<li>QPS ≈ 10M × 20 &#x2F; 86400 × 5 ≈ <strong>11,574</strong></li>
+</ul>
+<p><strong>存储估算</strong></p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">存储量 <span class="operator">=</span> 单条数据大小 × 日新增量 × 保留天数 × 副本数</span><br></pre></td></tr></table></figure>
+<ul>
+<li>单条数据大小 &#x3D; 业务字段 + 索引空间 + 元数据开销（通常 ×1.5 ~ ×2）</li>
+<li>副本：数据库主从 ×2、消息队列持久化 ×3、对象存储 ×3</li>
+</ul>
+<p><strong>带宽估算</strong></p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">带宽 <span class="operator">=</span> QPS × 单次响应大小</span><br></pre></td></tr></table></figure>
+<ul>
+<li>例：QPS 10000，单次响应 5KB，带宽 ≈ 50MB&#x2F;s ≈ 400Mbps</li>
+</ul>
+<p><strong>实践经验</strong>：</p>
+<ul>
+<li>不要追求精确数字，估算的精度在 ±50% 以内即可</li>
+<li>关注数量级：是 MB 还是 GB，是 Mbps 还是 Gbps</li>
+<li><strong>瓶颈一定在最贵或最慢的组件上</strong>：磁盘 IO、网络带宽、数据库连接数</li>
+</ul>
+<hr>
+<h3 id="1-3-数据模型设计：SQL-vs-NoSQL-的抉择"><a href="#1-3-数据模型设计：SQL-vs-NoSQL-的抉择" class="headerlink" title="1.3 数据模型设计：SQL vs NoSQL 的抉择"></a>1.3 数据模型设计：SQL vs NoSQL 的抉择</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>SQL (MySQL&#x2F;PostgreSQL)</th>
+<th>NoSQL (MongoDB&#x2F;Cassandra)</th>
+<th>KV (Redis&#x2F;DynamoDB)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Schema</td>
+<td>严格，DDL 变更需审批</td>
+<td>灵活，文档级扩展</td>
+<td>Key-Value，无 Schema</td>
+</tr>
+<tr>
+<td>事务</td>
+<td>ACID，成熟</td>
+<td>有限支持</td>
+<td>Redis 有 Lua 原子操作</td>
+</tr>
+<tr>
+<td>查询</td>
+<td>复杂 JOIN、子查询</td>
+<td>聚合管道</td>
+<td>仅按 Key 查</td>
+</tr>
+<tr>
+<td>扩展</td>
+<td>垂直扩展为主，分库分表复杂</td>
+<td>天然支持水平扩展</td>
+<td>天然支持分片</td>
+</tr>
+<tr>
+<td>一致性</td>
+<td>强一致</td>
+<td>最终一致（可调）</td>
+<td>主从有延迟</td>
+</tr>
+</tbody></table>
+<p><strong>选择策略</strong>：</p>
+<ol>
+<li>需要<strong>事务 + 复杂关联查询</strong> → SQL</li>
+<li>需要<strong>海量写入 + 灵活 Schema</strong> → NoSQL</li>
+<li>需要<strong>超高并发读 + 简单 KV 访问</strong> → Redis</li>
+<li>需要<strong>全文搜索 + 聚合分析</strong> → Elasticsearch</li>
+<li><strong>混合方案是常态</strong>：MySQL 做存储层，Redis 做缓存层，ES 做搜索层</li>
+</ol>
+<hr>
+<h3 id="1-4-架构图绘制原则"><a href="#1-4-架构图绘制原则" class="headerlink" title="1.4 架构图绘制原则"></a>1.4 架构图绘制原则</h3><p>好的架构图是<strong>沟通工具</strong>，而不是艺术品。四项原则：</p>
+<ol>
+<li><strong>分层清晰</strong>：客户端 → CDN → 网关 → 业务服务 → 数据层，自上而下</li>
+<li><strong>标注流向</strong>：箭头 + 协议（HTTP&#x2F;gRPC&#x2F;MySQL Protocol&#x2F;Redis Protocol）</li>
+<li><strong>区分核心与辅助</strong>：核心链路用实线，辅助链路（监控&#x2F;日志&#x2F;配置）用虚线</li>
+<li><strong>同步 vs 异步</strong>：同步调用用实线，异步消息用虚线 + 队列图标</li>
+</ol>
+<p>典型的分层架构：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────┐</span><br><span class="line">│  客户端层：App <span class="symbol">/</span> Web <span class="symbol">/</span> SDK                       │</span><br><span class="line">├───────────┬─────────────────────────────────────┤</span><br><span class="line">│  接入层   │  CDN <span class="symbol">/</span> DNS 智能解析 <span class="symbol">/</span> 负载均衡        │</span><br><span class="line">├───────────┴─────────────────────────────────────┤</span><br><span class="line">│  网关层   │  API Gateway <span class="symbol">/</span> 限流 <span class="symbol">/</span> 认证 <span class="symbol">/</span> 路由      │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  服务层   │  微服务集群 <span class="symbol">/</span> 无状态 <span class="symbol">/</span> 水平可扩展       │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  中间件层  │  MQ <span class="symbol">/</span> Cache <span class="symbol">/</span> 分布式协调              │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  数据层   │  DB 主从 <span class="symbol">/</span> 冷热分离 <span class="symbol">/</span> 读写分离         │</span><br><span class="line">├─────────────────────────────────────────────────┤</span><br><span class="line">│  基础设施  │  K8s <span class="symbol">/</span> 监控 <span class="symbol">/</span> 日志 <span class="symbol">/</span> CI-CD            │</span><br><span class="line">└─────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-5-扩展模式：从单机到分布式"><a href="#1-5-扩展模式：从单机到分布式" class="headerlink" title="1.5 扩展模式：从单机到分布式"></a>1.5 扩展模式：从单机到分布式</h3><p><strong>垂直扩展（Scale Up）</strong></p>
+<ul>
+<li>优点：实现简单，无需改代码</li>
+<li>缺点：硬件有上限，单点故障风险</li>
+<li>适用：初创期、数据量 &lt; 100GB、QPS &lt; 1000</li>
+</ul>
+<p><strong>水平扩展（Scale Out）</strong></p>
+<ul>
+<li>优点：理论上无限扩展，容错性强</li>
+<li>缺点：引入分布式复杂度（一致性问题、数据分片、服务发现）</li>
+<li>适用：成长期以后的所有阶段</li>
+</ul>
+<p><strong>缓存策略梯度</strong></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">本地缓存（Caffeine）→ 分布式缓存（Redis <span class="keyword">Cluster</span>）→ 多级缓存（近端 + 远端）</span><br><span class="line">命中率递减 ←──────────────────── 延迟递增 ────────────────────→</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据库读写分离</strong></p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">写入 → <span class="keyword">Master</span> <span class="title">→ Binlog</span> 同步 → <span class="literal">Slave</span> → 读取</span><br><span class="line">      └── 延迟窗口（通常 <span class="tag">&lt; 1s，网络抖动时可能 &gt;</span> <span class="number">10s</span>）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>问题：主从延迟导致的”写后立刻读”不一致</li>
+<li>解决：关键业务强制读主库，或通过缓存标记”刚写入的 Key”</li>
+</ul>
+<p><strong>异步化</strong></p>
+<ul>
+<li>任何非核心链路的操作都应该异步化：发通知、记日志、统计分析</li>
+<li>核心思想：<strong>先返回成功，再慢慢做</strong></li>
+</ul>
+<p><strong>CDN 加速</strong></p>
+<ul>
+<li>静态资源（图片&#x2F;视频&#x2F;JS&#x2F;CSS）推送到 CDN，距离用户最近的边缘节点响应</li>
+<li>动态内容可以通过 CDN 的边缘计算（Edge Functions）做部分逻辑</li>
+</ul>
+<hr>
+<h3 id="1-6-非功能性设计"><a href="#1-6-非功能性设计" class="headerlink" title="1.6 非功能性设计"></a>1.6 非功能性设计</h3><p><strong>高可用（High Availability）</strong></p>
+<ul>
+<li>消除单点故障：主从、多副本、多机房</li>
+<li>自动故障转移：主从切换 &lt; 30s（MySQL MHA &#x2F; Orchestrator）</li>
+<li>健康检查 + 自动摘除：一致性 Hash + 虚拟节点</li>
+</ul>
+<p><strong>一致性（Consistency）</strong></p>
+<ul>
+<li>强一致：分布式事务（2PC &#x2F; TCC &#x2F; Saga）</li>
+<li>最终一致：本地消息表 + 定时补偿</li>
+<li>缓解策略：读主库、版本号校验、CAS 操作</li>
+</ul>
+<p><strong>可扩展（Scalability）</strong></p>
+<ul>
+<li>无状态设计：Session 外置到 Redis，服务实例可任意扩缩</li>
+<li>分库分表：按业务维度（订单库&#x2F;用户库）→ 按数据维度（用户 ID Hash）</li>
+<li>数据迁移方案：双写 + 灰度切流 + 数据校验</li>
+</ul>
+<p><strong>可维护（Maintainability）</strong></p>
+<ul>
+<li>可观测性三件套：Logging（日志） + Metrics（指标） + Tracing（链路追踪）</li>
+<li>配置中心（Apollo &#x2F; Nacos）：动态配置，无需重启</li>
+<li>灰度发布 &#x2F; 蓝绿部署：低风险上线</li>
+</ul>
+<p><strong>安全性（Security）</strong></p>
+<ul>
+<li>防刷：验证码 + IP 限流 + 设备指纹 + 行为分析</li>
+<li>数据安全：传输加密（TLS）、存储加密（AES）、脱敏展示</li>
+<li>权限控制：最小权限原则，API 级别的 RBAC</li>
+</ul>
+<hr>
+<hr>
+<h2 id="六、常用组件选型速查"><a href="#六、常用组件选型速查" class="headerlink" title="六、常用组件选型速查"></a>六、常用组件选型速查</h2><h3 id="6-1-缓存"><a href="#6-1-缓存" class="headerlink" title="6.1 缓存"></a>6.1 缓存</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>适用场景</th>
+<th>关键特性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Redis Cluster</td>
+<td>分布式缓存 &#x2F; 分布式锁 &#x2F; 排行榜 &#x2F; 计数器</td>
+<td>单线程 10 万 QPS，支持 16384 槽位</td>
+</tr>
+<tr>
+<td>Redis Sentinel</td>
+<td>高可用缓存</td>
+<td>自动故障转移，至少 3 节点</td>
+</tr>
+<tr>
+<td>Caffeine</td>
+<td>JVM 本地缓存</td>
+<td>极低延迟，&lt; 1μs，LRU&#x2F;W-TinyLFU</td>
+</tr>
+<tr>
+<td>Memcached</td>
+<td>纯 KV 缓存</td>
+<td>多线程，简单可靠，不支持持久化</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>绝大多数场景选 Redis，生态成熟</li>
+<li>追求极致延迟且数据量小 → Caffeine 本地缓存</li>
+<li>简单 KV 且无需持久化 → Memcached</li>
+</ul>
+<hr>
+<h3 id="6-2-消息队列"><a href="#6-2-消息队列" class="headerlink" title="6.2 消息队列"></a>6.2 消息队列</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>吞吐量</th>
+<th>延迟</th>
+<th>可靠性</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kafka</td>
+<td>百万 QPS</td>
+<td>毫秒级</td>
+<td>极高</td>
+<td>日志&#x2F;埋点&#x2F;大数据管道</td>
+</tr>
+<tr>
+<td>RocketMQ</td>
+<td>十万 QPS</td>
+<td>毫秒级</td>
+<td>极高</td>
+<td>电商交易&#x2F;分布式事务</td>
+</tr>
+<tr>
+<td>Pulsar</td>
+<td>百万 QPS</td>
+<td>毫秒级</td>
+<td>极高</td>
+<td>多租户&#x2F;云原生</td>
+</tr>
+<tr>
+<td>RabbitMQ</td>
+<td>万级 QPS</td>
+<td>微秒级</td>
+<td>高</td>
+<td>低延迟路由&#x2F;复杂拓扑</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>大数据 &#x2F; 日志采集 → Kafka（业务和日志 MQ 必须隔离）</li>
+<li>电商交易 &#x2F; 金融 → RocketMQ（阿里系首选）</li>
+<li>复杂路由（多 exchange → 多 queue）→ RabbitMQ</li>
+<li>新技术栈用 Pulsar（存算分离，灵活）</li>
+</ul>
+<hr>
+<h3 id="6-3-数据库"><a href="#6-3-数据库" class="headerlink" title="6.3 数据库"></a>6.3 数据库</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>类型</th>
+<th>适用场景</th>
+<th>扩展方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MySQL</td>
+<td>关系型</td>
+<td>通用 OLTP 业务</td>
+<td>分库分表 &#x2F; 读写分离</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>关系型</td>
+<td>复杂查询 &#x2F; GIS &#x2F; 分析</td>
+<td>分区表 &#x2F; FDW</td>
+</tr>
+<tr>
+<td>TiDB</td>
+<td>NewSQL</td>
+<td>MySQL 无法分表的场景</td>
+<td>自动分片（Raft）</td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td>文档型</td>
+<td>灵活 Schema &#x2F; 日志存储</td>
+<td>自动分片</td>
+</tr>
+<tr>
+<td>HBase</td>
+<td>列式</td>
+<td>海量稀疏数据 &#x2F; 时序</td>
+<td>Region 分裂</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>90% 的业务场景 MySQL 足够</li>
+<li>Schema 不固定、快速迭代 → MongoDB</li>
+<li>大数据量 + 分布式的强需求 → TiDB</li>
+<li>海量时序数据 → HBase 或专门时序库（InfluxDB&#x2F;TDengine）</li>
+</ul>
+<hr>
+<h3 id="6-4-搜索"><a href="#6-4-搜索" class="headerlink" title="6.4 搜索"></a>6.4 搜索</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>核心能力</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Elasticsearch</td>
+<td>全文搜索 + 聚合分析</td>
+<td>站内搜索、日志分析、多维排行</td>
+</tr>
+<tr>
+<td>Solr</td>
+<td>全文搜索</td>
+<td>传统企业搜索</td>
+</tr>
+<tr>
+<td>Lucene</td>
+<td>底层库</td>
+<td>需自建搜索服务的场景</td>
+</tr>
+</tbody></table>
+<p><strong>Elasticsearch 使用要点</strong>：</p>
+<ul>
+<li>主分片数在创建 Index 时确定，后期不可改（只能 Reindex）</li>
+<li>每天数据量较大时，按天建 Index：<code>logs-2026.07.05</code></li>
+<li>Refresh 间隔默认 1s，近实时（写入后最多 1s 可搜到）</li>
+<li>内存分配给 JVM 不超过 32GB（压缩指针优化阈值）</li>
+<li>堆内存不超过机器内存的 50%，剩余给 OS 文件缓存（Lucene 依赖）</li>
+</ul>
+<hr>
+<h3 id="6-5-分布式协调"><a href="#6-5-分布式协调" class="headerlink" title="6.5 分布式协调"></a>6.5 分布式协调</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>一致性协议</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZooKeeper</td>
+<td>ZAB</td>
+<td>成熟稳定，CP 系统，Java 生态标配</td>
+</tr>
+<tr>
+<td>etcd</td>
+<td>Raft</td>
+<td>简洁，Go 编写，K8s 标配</td>
+</tr>
+<tr>
+<td>Consul</td>
+<td>Raft</td>
+<td>内置健康检查 + DNS 服务发现</td>
+</tr>
+<tr>
+<td>Nacos</td>
+<td>Raft (CP) &#x2F; Distro (AP)</td>
+<td>阿里开源，配置 + 服务发现一体</td>
+</tr>
+</tbody></table>
+<p><strong>选型建议</strong>：</p>
+<ul>
+<li>与 K8s 配合 → etcd</li>
+<li>传统 Java 微服务（Dubbo）→ ZooKeeper 或 Nacos</li>
+<li>简单 KV 配置 + 服务发现 → Nacos（功能最全）</li>
+<li>多数据中心 → Consul</li>
+</ul>
+<hr>
+<h3 id="6-6-其他常用组件"><a href="#6-6-其他常用组件" class="headerlink" title="6.6 其他常用组件"></a>6.6 其他常用组件</h3><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>推荐组件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>对象存储</td>
+<td>腾讯云 COS &#x2F; 阿里云 OSS &#x2F; MinIO</td>
+<td>图片、视频、文件存储，CDN 分发</td>
+</tr>
+<tr>
+<td>网关</td>
+<td>Kong &#x2F; Nginx &#x2F; OpenResty</td>
+<td>API 限流、鉴权、路由</td>
+</tr>
+<tr>
+<td>RPC 框架</td>
+<td>gRPC &#x2F; Dubbo &#x2F; Thrift</td>
+<td>服务间通信</td>
+</tr>
+<tr>
+<td>配置中心</td>
+<td>Apollo &#x2F; Nacos</td>
+<td>动态配置、灰度发布</td>
+</tr>
+<tr>
+<td>监控</td>
+<td>Prometheus + Grafana</td>
+<td>指标采集与可视化</td>
+</tr>
+<tr>
+<td>链路追踪</td>
+<td>Jaeger &#x2F; SkyWalking</td>
+<td>分布式调用链追踪</td>
+</tr>
+<tr>
+<td>日志中心</td>
+<td>ELK (ES + Logstash + Kibana)</td>
+<td>日志收集、检索、分析</td>
+</tr>
+<tr>
+<td>容器编排</td>
+<td>Kubernetes (K8s)</td>
+<td>服务部署与调度</td>
+</tr>
+<tr>
+<td>CI&#x2F;CD</td>
+<td>Jenkins &#x2F; GitLab CI &#x2F; GitHub Actions</td>
+<td>持续集成与部署</td>
+</tr>
+<tr>
+<td>定时任务</td>
+<td>XXL-JOB &#x2F; Elastic-Job</td>
+<td>分布式定时任务调度</td>
+</tr>
+</tbody></table>
+<h2 id="七、经典案例索引"><a href="#七、经典案例索引" class="headerlink" title="七、经典案例索引"></a>七、经典案例索引</h2><p>以下案例是方法论的具体应用，每篇独立成文：</p>
+<table>
+<thead>
+<tr>
+<th>案例</th>
+<th>核心考点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="/url-shortener-design/">短链系统</a></td>
+<td>Base62 编码、301&#x2F;302 重定向、过期策略</td>
+</tr>
+<tr>
+<td><a href="/flash-sale-design/">秒杀系统</a></td>
+<td>Redis 原子库存预扣、Kafka 异步削峰、熔断降级</td>
+</tr>
+<tr>
+<td><a href="/feed-stream-design/">Feed 流</a></td>
+<td>推拉模型、Timeline 聚合、大 V 扩散优化</td>
+</tr>
+<tr>
+<td><a href="/leaderboard-design/">排行榜</a></td>
+<td>Redis ZSet 实时排行、分片归并、多维过滤</td>
+</tr>
+<tr>
+<td><a href="/instant-messaging-design/">即时通讯</a></td>
+<td>WebSocket 长连接、消息可靠性、写扩散 vs 读扩散</td>
+</tr>
+<tr>
+<td><a href="/video-streaming-design/">视频流</a></td>
+<td>CDN 分层缓存、自适应码率、直播 vs 点播</td>
+</tr>
+<tr>
+<td><a href="/object-storage-design/">对象存储</a></td>
+<td>扁平 Key-Value 模型、纠删码、11 个 9 持久性</td>
+</tr>
+<tr>
+<td><a href="/search-engine-design/">搜索引擎</a></td>
+<td>爬虫→倒排索引→分片查询→BM25 排序</td>
+</tr>
+<tr>
+<td><a href="/payment-system-design/">支付系统</a></td>
+<td>幂等设计、TCC 分布式事务、对账系统</td>
+</tr>
+<tr>
+<td><a href="/location-service-design/">地理位置</a></td>
+<td>GeoHash 空间索引、司机匹配算法、ETA 预估</td>
+</tr>
+<tr>
+<td><a href="/notification-system-design/">通知系统</a></td>
+<td>Push&#x2F;短信&#x2F;邮件&#x2F;站内信、优先级分级、防打扰</td>
+</tr>
+<tr>
+<td><a href="/web-crawler-design/">分布式爬虫</a></td>
+<td>Bloom Filter 去重、礼貌性调度、URL 规范化</td>
+</tr>
+</tbody></table>
+<h2 id="八、总结"><a href="#八、总结" class="headerlink" title="八、总结"></a>八、总结</h2><h3 id="系统设计的核心思维"><a href="#系统设计的核心思维" class="headerlink" title="系统设计的核心思维"></a>系统设计的核心思维</h3><ol>
+<li><strong>先澄清，后设计</strong>：不理解需求就画图，是工程师常犯的错误</li>
+<li><strong>先估算，后架构</strong>：数字能帮你快速否决不可行的方案</li>
+<li><strong>先简单，后复杂</strong>：从单机 → 缓存 → MQ → 微服务，别一上来就分布式</li>
+<li><strong>先核心，后优化</strong>：主线跑通再谈缓存、限流、降级</li>
+<li><strong>先业务，后技术</strong>：技术选型服务于业务需求，而非反过来</li>
+</ol>
+<h3 id="四个案例的共通模式"><a href="#四个案例的共通模式" class="headerlink" title="四个案例的共通模式"></a>四个案例的共通模式</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────┐</span><br><span class="line">│  需求分析     │ ← 搞清楚读写比例、数据量、延迟要求</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  容量估算     │ ← 算出 QPS、存储、带宽的数量级</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  核心瓶颈识别  │ ← 是读瓶颈？写瓶颈？热点？数据倾斜？</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  架构设计     │ ← 分层 + 组件选型 + 数据流设计</span><br><span class="line">└──────┬───────┘</span><br><span class="line">       ↓</span><br><span class="line">┌──────────────┐</span><br><span class="line">│  优化演进     │ ← 缓存 → MQ → 读写分离 → 分库分表 → 微服务</span><br><span class="line">└──────────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="最后的话"><a href="#最后的话" class="headerlink" title="最后的话"></a>最后的话</h3><p>系统设计不是背诵方案，而是<strong>在约束条件下做权衡</strong>。关键能力不是知道 Reddit 或 Twitter 用什么架构（那都是事后总结），而是面对一个模糊的需求和现实的资源限制时，能够推导出合适的方案。</p>
+<p>记住：<strong>没有完美的架构，只有适合当前阶段的架构。</strong> Trade-off 永远是系统设计的核心关键词——在一致性、可用性、分区容忍性之间取舍，在性能与成本之间平衡，在开发效率与运维复杂度之间抉择。</p>
+<p>这篇文章覆盖的系统设计方法，是为了帮你建立一套思考框架。真正掌握它，需要在项目中反复实践与复盘。共勉。</p>
+<hr>
+<p><em>全文完。如需讨论或指正，欢迎在评论区留言。</em></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/testing-system/" rel="prev" title="后端测试体系">
+                  <i class="fa fa-angle-left"></i> 后端测试体系
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/spring-boot-autoconfig/" rel="next" title="Spring Boot 自动配置原理">
+                  Spring Boot 自动配置原理 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

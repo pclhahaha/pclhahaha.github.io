@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="RPC（Remote Procedure Call）和异步编程是后端开发中两个独立又相互交织的领域。RPC 解决的是”如何跨网络调用远程服务”，异步编程解决的是”如何在等待时不让线程空闲”。当两者结合——异步 RPC——就构成了现代高性能微服务通信的基础。 一、RPC：跨网络的函数调用RPC 的核心理念是让远程调用看起来像本地调用。你调 userService.getUserById(100)，而">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RPC 与异步编程">
+<meta property="og:url" content="http://pclhahaha.github.io/java-rpc-async/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="RPC（Remote Procedure Call）和异步编程是后端开发中两个独立又相互交织的领域。RPC 解决的是”如何跨网络调用远程服务”，异步编程解决的是”如何在等待时不让线程空闲”。当两者结合——异步 RPC——就构成了现代高性能微服务通信的基础。 一、RPC：跨网络的函数调用RPC 的核心理念是让远程调用看起来像本地调用。你调 userService.getUserById(100)，而">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-08T04:00:00.000Z">
+<meta property="article:modified_time" content="2020-03-08T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="gRPC">
+<meta property="article:tag" content="RPC">
+<meta property="article:tag" content="CompletableFuture">
+<meta property="article:tag" content="异步编程">
+<meta property="article:tag" content="RxJava">
+<meta property="article:tag" content="Reactor">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/java-rpc-async/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/java-rpc-async/","path":"java-rpc-async/","title":"RPC 与异步编程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RPC 与异步编程 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81RPC%EF%BC%9A%E8%B7%A8%E7%BD%91%E7%BB%9C%E7%9A%84%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">一、RPC：跨网络的函数调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 调用流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-gRPC-%E4%B8%8E-Protocol-Buffers"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 gRPC 与 Protocol Buffers</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B%EF%BC%9A%E4%B8%8D%E8%AE%A9%E7%BA%BF%E7%A8%8B%E9%97%B2%E7%9D%80"><span class="nav-number">2.</span> <span class="nav-text">二、异步编程：不让线程闲着</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%BC%82%E6%AD%A5"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 为什么需要异步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-CompletableFuture"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 CompletableFuture</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%93%8D%E5%BA%94%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%9A%E4%BB%8E-Future-%E5%88%B0-Stream"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 响应式编程：从 Future 到 Stream</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%BC%82%E6%AD%A5-RPC%EF%BC%9A%E4%B8%A4%E8%80%85%E7%BB%93%E5%90%88%E7%9A%84%E5%AE%9E%E8%B7%B5"><span class="nav-number">3.</span> <span class="nav-text">三、异步 RPC：两者结合的实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">四、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-rpc-async/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RPC 与异步编程 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RPC 与异步编程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-03-08 12:00:00" itemprop="dateCreated datePublished" datetime="2020-03-08T12:00:00+08:00">2020-03-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>RPC（Remote Procedure Call）和异步编程是后端开发中两个独立又相互交织的领域。RPC 解决的是”如何跨网络调用远程服务”，异步编程解决的是”如何在等待时不让线程空闲”。当两者结合——异步 RPC——就构成了现代高性能微服务通信的基础。</p>
+<h2 id="一、RPC：跨网络的函数调用"><a href="#一、RPC：跨网络的函数调用" class="headerlink" title="一、RPC：跨网络的函数调用"></a>一、RPC：跨网络的函数调用</h2><p>RPC 的核心理念是让远程调用看起来像本地调用。你调 <code>userService.getUserById(100)</code>，而不关心这个服务在哪个 IP 的哪个端口上。</p>
+<h3 id="1-1-调用流程"><a href="#1-1-调用流程" class="headerlink" title="1.1 调用流程"></a>1.1 调用流程</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">客户端                            服务端</span><br><span class="line">  │                                │</span><br><span class="line">  ├─ <span class="number">1</span>. 序列化请求 (protobuf)       │</span><br><span class="line">  ├─ <span class="number">2</span>. 发送到网络                  │</span><br><span class="line">  │                                ├─ <span class="number">3</span>. 反序列化请求</span><br><span class="line">  │                                ├─ <span class="number">4</span>. 执行业务逻辑</span><br><span class="line">  │                                ├─ <span class="number">5</span>. 序列化响应</span><br><span class="line">  │                                ├─ <span class="number">6</span>. 发送回网络</span><br><span class="line">  ├─ <span class="number">7</span>. 反序列化响应               │</span><br><span class="line">  ├─ <span class="number">8</span>. 返回结果给调用方            │</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-gRPC-与-Protocol-Buffers"><a href="#1-2-gRPC-与-Protocol-Buffers" class="headerlink" title="1.2 gRPC 与 Protocol Buffers"></a>1.2 gRPC 与 Protocol Buffers</h3><p>gRPC 是 Google 开源的高性能 RPC 框架，基于 HTTP&#x2F;2 协议，使用 Protocol Buffers 作为接口定义语言和序列化协议。</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// user.proto</span></span><br><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">service </span><span class="title class_">UserService</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> GetUser (GetUserRequest) <span class="keyword">returns</span> (User)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> ListUsers (ListUsersRequest) <span class="keyword">returns</span> (stream User)</span>;  <span class="comment">// 服务端流</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> UpdateUsers (stream User) <span class="keyword">returns</span> (UpdateResult)</span>;     <span class="comment">// 客户端流</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> Chat (stream Message) <span class="keyword">returns</span> (stream Message)</span>;       <span class="comment">// 双向流</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">GetUserRequest</span> &#123;</span><br><span class="line">  <span class="type">int64</span> user_id = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>gRPC 支持四种调用模式——一元调用（传统请求-响应）、服务端流、客户端流、双向流。详细内容参见 <a href="/grpc-protobuf/">gRPC 与 Protocol Buffers</a>。</p>
+<h2 id="二、异步编程：不让线程闲着"><a href="#二、异步编程：不让线程闲着" class="headerlink" title="二、异步编程：不让线程闲着"></a>二、异步编程：不让线程闲着</h2><h3 id="2-1-为什么需要异步"><a href="#2-1-为什么需要异步" class="headerlink" title="2.1 为什么需要异步"></a>2.1 为什么需要异步</h3><p>在传统的同步阻塞模型中，一个请求对应一个线程：</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Request → [<span class="keyword">Thread</span>-<span class="number">1</span>] → 查询数据库（阻塞 <span class="number">100</span>ms）→ 等待 Redis（阻塞 <span class="number">20</span>ms） → 返回</span><br></pre></td></tr></table></figure>
+
+<p>整个等待期间线程完全空闲，但占用了内存（每个线程约 1MB 栈）。1000 个并发请求 &#x3D; 1000 个线程 &#x3D; 1GB 内存。如果请求延迟增加，线程池打满，系统崩溃。</p>
+<p>异步编程的核心思想：<strong>在等待 I&#x2F;O 时不阻塞线程，去处理其他请求</strong>。</p>
+<h3 id="2-2-CompletableFuture"><a href="#2-2-CompletableFuture" class="headerlink" title="2.2 CompletableFuture"></a>2.2 CompletableFuture</h3><p>Java 8 引入的 CompletableFuture 是异步编程的基础工具：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 异步查询用户 + 异步查询订单 → 合并结果</span></span><br><span class="line">CompletableFuture&lt;User&gt; userFuture = </span><br><span class="line">    CompletableFuture.supplyAsync(() -&gt; userService.getUser(id));</span><br><span class="line"></span><br><span class="line">CompletableFuture&lt;List&lt;Order&gt;&gt; ordersFuture = </span><br><span class="line">    CompletableFuture.supplyAsync(() -&gt; orderService.getOrders(id));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 等待两者都完成，然后合并</span></span><br><span class="line"><span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> userFuture</span><br><span class="line">    .thenCombine(ordersFuture, (user, orders) -&gt; </span><br><span class="line">        user.getName() + <span class="string">&quot; has &quot;</span> + orders.size() + <span class="string">&quot; orders&quot;</span>)</span><br><span class="line">    .exceptionally(ex -&gt; <span class="string">&quot;Error: &quot;</span> + ex.getMessage())</span><br><span class="line">    .join();</span><br></pre></td></tr></table></figure>
+
+<p>CompletableFuture 的核心方法：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>thenApply()</code></td>
+<td>转换结果（同步）</td>
+</tr>
+<tr>
+<td><code>thenCompose()</code></td>
+<td>串联异步操作</td>
+</tr>
+<tr>
+<td><code>thenCombine()</code></td>
+<td>合并两个异步结果</td>
+</tr>
+<tr>
+<td><code>allOf()</code></td>
+<td>等待所有完成</td>
+</tr>
+<tr>
+<td><code>exceptionally()</code></td>
+<td>异常处理</td>
+</tr>
+</tbody></table>
+<p>详细内容参见 <a href="/java-completablefuture/">CompletableFuture 详解</a>。</p>
+<h3 id="2-3-响应式编程：从-Future-到-Stream"><a href="#2-3-响应式编程：从-Future-到-Stream" class="headerlink" title="2.3 响应式编程：从 Future 到 Stream"></a>2.3 响应式编程：从 Future 到 Stream</h3><p>CompletableFuture 处理单次异步结果，但遇到流式数据（如 WebSocket 实时消息、Kafka 消息流）就不够了。响应式编程将”数据流 + 操作符”的组合抽象提升到一等公民。</p>
+<p>Reactive Streams 规范定义了四个核心接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Publisher</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">subscribe</span><span class="params">(Subscriber&lt;? <span class="built_in">super</span> T&gt; s)</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Subscriber</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">onSubscribe</span><span class="params">(Subscription s)</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">onNext</span><span class="params">(T t)</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">onError</span><span class="params">(Throwable t)</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">onComplete</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Subscription</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">request</span><span class="params">(<span class="type">long</span> n)</span>;  <span class="comment">// 背压：下游告诉上游我能处理多少</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">cancel</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Project Reactor（Spring WebFlux 的基础）提供了 <code>Flux</code>（0-N 个元素）和 <code>Mono</code>（0-1 个元素）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;User&gt; users = userRepository.findAll()</span><br><span class="line">    .filter(u -&gt; u.getAge() &gt; <span class="number">18</span>)</span><br><span class="line">    .map(User::getName)</span><br><span class="line">    .take(<span class="number">10</span>);</span><br></pre></td></tr></table></figure>
+
+<p>详细内容参见 <a href="/reactive-programming/">响应式编程 — RxJava &#x2F; Reactor</a>。</p>
+<h2 id="三、异步-RPC：两者结合的实践"><a href="#三、异步-RPC：两者结合的实践" class="headerlink" title="三、异步 RPC：两者结合的实践"></a>三、异步 RPC：两者结合的实践</h2><p>gRPC 原生支持异步调用和流式调用——这正是 RPC 和异步编程的结合点：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 异步 RPC 调用</span></span><br><span class="line">stub.getUser(request, <span class="keyword">new</span> <span class="title class_">StreamObserver</span>&lt;User&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onNext</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        <span class="comment">// 收到响应</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onError</span><span class="params">(Throwable t)</span> &#123;</span><br><span class="line">        <span class="comment">// 错误处理</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onCompleted</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 调用完成</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、小结"><a href="#四、小结" class="headerlink" title="四、小结"></a>四、小结</h2><p>RPC 解决的是分布式通信，异步编程解决的是并发效率。两者结合——异步 RPC——是现代微服务通信的主流范式。gRPC + CompletableFuture&#x2F;Reactor 构成了 Spring 生态中从 RPC 到异步编程的完整技术栈。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/gRPC/" rel="tag"># gRPC</a>
+              <a href="/tags/RPC/" rel="tag"># RPC</a>
+              <a href="/tags/CompletableFuture/" rel="tag"># CompletableFuture</a>
+              <a href="/tags/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/" rel="tag"># 异步编程</a>
+              <a href="/tags/RxJava/" rel="tag"># RxJava</a>
+              <a href="/tags/Reactor/" rel="tag"># Reactor</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/java-concurrency/" rel="prev" title="Java 并发编程">
+                  <i class="fa fa-angle-left"></i> Java 并发编程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/cgroups/" rel="next" title="Linux Cgroups 学习笔记">
+                  Linux Cgroups 学习笔记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

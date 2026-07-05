@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Meta（原 Facebook）的社交图谱是世界上最大的图结构之一。为了在数十亿用户和数万亿条关系上提供亚毫秒级的读取速度，Meta 运行着全球最大的 Memcached 集群——部署在上万台服务器上，处理每秒数十亿次请求。 一、为什么是 MemcachedMeta 早在 2008 年就选择了 Memcached 而非 Redis。原因：    考量 Memcached Redis    内存效率">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Meta Memcached 架构——十亿请求&#x2F;秒的缓存系统">
+<meta property="og:url" content="http://pclhahaha.github.io/meta-memcached-case-study/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Meta（原 Facebook）的社交图谱是世界上最大的图结构之一。为了在数十亿用户和数万亿条关系上提供亚毫秒级的读取速度，Meta 运行着全球最大的 Memcached 集群——部署在上万台服务器上，处理每秒数十亿次请求。 一、为什么是 MemcachedMeta 早在 2008 年就选择了 Memcached 而非 Redis。原因：    考量 Memcached Redis    内存效率">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="缓存">
+<meta property="article:tag" content="Memcached">
+<meta property="article:tag" content="Meta">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/meta-memcached-case-study/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/meta-memcached-case-study/","path":"meta-memcached-case-study/","title":"Meta Memcached 架构——十亿请求/秒的缓存系统"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Meta Memcached 架构——十亿请求/秒的缓存系统 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-Memcached"><span class="nav-number">1.</span> <span class="nav-text">一、为什么是 Memcached</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">二、整体架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%AF%BB%E8%B7%AF%E5%BE%84"><span class="nav-number">3.</span> <span class="nav-text">三、读路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%86%99%E8%B7%AF%E5%BE%84"><span class="nav-number">4.</span> <span class="nav-text">四、写路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Lease-%E6%9C%BA%E5%88%B6%E9%98%B2%E7%BC%93%E5%AD%98%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="nav-number">5.</span> <span class="nav-text">五、Lease 机制防缓存不一致</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81Memcached-%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">六、Memcached 集群管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81Gutter-Pool%E2%80%94%E2%80%94%E9%9B%AA%E5%B4%A9%E4%BF%9D%E6%8A%A4"><span class="nav-number">7.</span> <span class="nav-text">七、Gutter Pool——雪崩保护</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%8D%95%E6%9C%BA%E4%BC%98%E5%8C%96"><span class="nav-number">8.</span> <span class="nav-text">八、单机优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-%E5%8C%BA%E5%9F%9F%E5%A4%B1%E6%95%88%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B-Regional-Invalidation-Daemon"><span class="nav-number">8.1.</span> <span class="nav-text">8.1 区域失效守护进程 (Regional Invalidation Daemon)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-Slab-%E5%88%86%E9%85%8D%E5%99%A8%E8%87%AA%E5%8A%A8%E8%B0%83%E6%95%B4"><span class="nav-number">8.2.</span> <span class="nav-text">8.2 Slab 分配器自动调整</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%85%B3%E9%94%AE%E6%95%B0%E6%8D%AE"><span class="nav-number">9.</span> <span class="nav-text">九、关键数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">10.</span> <span class="nav-text">十、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/meta-memcached-case-study/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Meta Memcached 架构——十亿请求&#x2F;秒的缓存系统 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Meta Memcached 架构——十亿请求/秒的缓存系统
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Meta（原 Facebook）的社交图谱是世界上最大的图结构之一。为了在数十亿用户和数万亿条关系上提供亚毫秒级的读取速度，Meta 运行着全球最大的 Memcached 集群——部署在上万台服务器上，处理每秒数十亿次请求。</p>
+<h2 id="一、为什么是-Memcached"><a href="#一、为什么是-Memcached" class="headerlink" title="一、为什么是 Memcached"></a>一、为什么是 Memcached</h2><p>Meta 早在 2008 年就选择了 Memcached 而非 Redis。原因：</p>
+<table>
+<thead>
+<tr>
+<th>考量</th>
+<th>Memcached</th>
+<th>Redis</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>内存效率</strong></td>
+<td>极简 slab 分配器，额外开销极小</td>
+<td>丰富的对象模型，有额外内存开销</td>
+</tr>
+<tr>
+<td><strong>多线程</strong></td>
+<td>原生多线程，多核利用率高</td>
+<td>早期单线程（6.0 后才引入多线程 IO）</td>
+</tr>
+<tr>
+<td><strong>简单性</strong></td>
+<td>纯 K-V，不支持持久化</td>
+<td>支持持久化、复制、集群</td>
+</tr>
+<tr>
+<td><strong>运维</strong></td>
+<td>无状态，重启即清空</td>
+<td>有数据持久化，重启需恢复</td>
+</tr>
+</tbody></table>
+<p>这些设计决定了 Memcached 是<strong>纯缓存</strong>的理想选择——数据可以丢失，速度和内存效率更重要。</p>
+<h2 id="二、整体架构"><a href="#二、整体架构" class="headerlink" title="二、整体架构"></a>二、整体架构</h2><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">          <span class="selector-attr">[Web 服务器集群]</span></span><br><span class="line">           (PHP/Facebook Hack)</span><br><span class="line">                │</span><br><span class="line">      ┌─────────┼─────────┐</span><br><span class="line">      │         │         │</span><br><span class="line"><span class="selector-attr">[Memcached 集群]</span>  │   <span class="selector-attr">[MySQL 集群]</span></span><br><span class="line">(分布式缓存层)   │   (持久化存储)</span><br><span class="line">      │         │         │</span><br><span class="line">      └─────────┼─────────┘</span><br><span class="line">                │</span><br><span class="line">      <span class="selector-attr">[TAO 图数据库]</span></span><br><span class="line">(关联 Memcached + MySQL)</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、读路径"><a href="#三、读路径" class="headerlink" title="三、读路径"></a>三、读路径</h2><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> Web 服务器收到用户请求 &quot;获取用户 A 的好友列表&quot;</span><br><span class="line"><span class="bullet">2.</span> 计算 Cache Key: &quot;friendlist:&#123;userA&#125;&quot;</span><br><span class="line"><span class="bullet">3.</span> 查询 Memcached → </span><br><span class="line">   ├─ 命中 → 直接返回（T &lt; 1ms）</span><br><span class="line">   └─ 未命中 → </span><br><span class="line"><span class="bullet">       4.</span> 查询 TAO/MySQL 获取好友列表</span><br><span class="line"><span class="bullet">       5.</span> 将结果写入 Memcached (TTL = 1h)</span><br><span class="line"><span class="bullet">       6.</span> 返回结果</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、写路径"><a href="#四、写路径" class="headerlink" title="四、写路径"></a>四、写路径</h2><p>Meta 对缓存一致性的处理是<strong>旁路缓存</strong>模式：</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 更新 MySQL: <span class="keyword">UPDATE</span> friends <span class="keyword">SET</span> status = <span class="string">&#x27;active&#x27;</span> <span class="keyword">WHERE</span> user_id = ?</span><br><span class="line"><span class="number">2.</span> 删除 Memcached 中的相关 <span class="keyword">Key</span>: <span class="keyword">DELETE</span> friendlist:&#123;userid&#125;</span><br><span class="line">   （注意：是删除，不是更新。下次读时自动重建缓存）</span><br></pre></td></tr></table></figure>
+
+<p>为什么是删除而非更新？</p>
+<ul>
+<li>在并发环境下，先更新后删除避免了数据不一致窗口</li>
+<li>如果写多读少，更新缓存是浪费（写了之后可能没人读就过期了）</li>
+<li>删除比更新简单（不需要知道新值）</li>
+</ul>
+<p>如果删除失败怎么办？Meta 通过 <strong>Lease 机制</strong>防止缓存不一致问题。</p>
+<h2 id="五、Lease-机制防缓存不一致"><a href="#五、Lease-机制防缓存不一致" class="headerlink" title="五、Lease 机制防缓存不一致"></a>五、Lease 机制防缓存不一致</h2><p>核心问题：两个并发请求导致的缓存与数据库不一致（”thundering herd”的变种）：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">时序:</span></span><br><span class="line"><span class="section">T1: 用户 A 的缓存过期 → 请求1 查询 MySQL（旧版本）</span></span><br><span class="line"><span class="section">T2: 请求2 更新 MySQL（新版本）→ 删除缓存</span></span><br><span class="line"><span class="section">T3: 请求1 将 MySQL 返回的旧版本写入缓存</span></span><br><span class="line"><span class="section">结果: 缓存中是旧版本，数据库是新版本——永久不一致直到缓存下次过期</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Lease 解决方案</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 请求1 发现缓存未命中 → Memcached 颁发一个 Lease Token（有效期 5s）</span><br><span class="line"><span class="bullet">2.</span> 请求1 查询 MySQL，拿到旧版本数据</span><br><span class="line"><span class="bullet">3.</span> 在 T2 时刻，请求2 更新 MySQL + 删除缓存 + 使 Lease Token 失效</span><br><span class="line"><span class="bullet">4.</span> 请求1 携带 Lease Token 写入缓存</span><br><span class="line"><span class="bullet">5.</span> Memcached 发现 Lease Token 已失效 → 拒绝写入</span><br><span class="line"><span class="bullet">6.</span> 下次请求重新填充缓存 → 从 MySQL 读最新值</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、Memcached-集群管理"><a href="#六、Memcached-集群管理" class="headerlink" title="六、Memcached 集群管理"></a>六、Memcached 集群管理</h2><p>Meta 的 Memcached 集群分布在上万台服务器上。客户端通过一致性哈希确定 key 所在节点：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">集群分片策略:</span><br><span class="line">  ┌─ [分片<span class="number">0</span>] → memcache-<span class="keyword">node</span><span class="title">-1</span>, memcache-<span class="keyword">node</span><span class="title">-2</span> (主备)</span><br><span class="line">  ├─ [分片<span class="number">1</span>] → memcache-<span class="keyword">node</span><span class="title">-3</span>, memcache-<span class="keyword">node</span><span class="title">-4</span></span><br><span class="line">  ├─ ...</span><br><span class="line">  └─ [分片N] → memcache-<span class="keyword">node</span><span class="title">-(2N-1</span>), memcache-<span class="keyword">node</span><span class="title">-2N</span></span><br><span class="line"></span><br><span class="line">Key routing:</span><br><span class="line">  <span class="keyword">node</span> <span class="title">= hash</span>(key) % N  (一致性哈希环)</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、Gutter-Pool——雪崩保护"><a href="#七、Gutter-Pool——雪崩保护" class="headerlink" title="七、Gutter Pool——雪崩保护"></a>七、Gutter Pool——雪崩保护</h2><p>当某个 Memcached 节点宕机时，按一致性哈希分配的流量会全部落到下一个节点上，可能导致级联故障。Meta 引入了<strong>Gutter Pool</strong>概念：</p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">正常情况：</span><br><span class="line">  <span class="built_in">key</span> → 主 Memcached 节点 → 命中/未命中 → 正常流程</span><br><span class="line"></span><br><span class="line">节点宕机：</span><br><span class="line">  <span class="built_in">key</span> → 主 Memcached 节点(宕机) → </span><br><span class="line">        ├─ Gutter Pool（备用的小型缓存集群，临时承接流量）</span><br><span class="line">        └─ MySQL 查询</span><br></pre></td></tr></table></figure>
+
+<p>Gutter Pool 是每个 Web 服务器本地的几个备用 Memcached 实例，只有在主集群不可用时才启用。宕机节点的缓存数据会丢失，但 Gutter Pool 防止了 MySQL 被流量瞬间打垮。</p>
+<h2 id="八、单机优化"><a href="#八、单机优化" class="headerlink" title="八、单机优化"></a>八、单机优化</h2><p>Meta 对 Memcached 做了深度定制：</p>
+<table>
+<thead>
+<tr>
+<th>优化</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>UDP 协议</strong></td>
+<td>读取使用 UDP（减少连接建立开销），写入使用 TCP</td>
+</tr>
+<tr>
+<td><strong>Slab 自动调整</strong></td>
+<td>Facebook 修改的 slab 自动平衡算法</td>
+</tr>
+<tr>
+<td><strong>连接池复用</strong></td>
+<td>每个 Web 服务器维持与 Memcached 的长连接池</td>
+</tr>
+<tr>
+<td><strong>批量请求</strong></td>
+<td>使用 <code>get_multi</code> 批量拉取多个 key</td>
+</tr>
+</tbody></table>
+<h3 id="8-1-区域失效守护进程-Regional-Invalidation-Daemon"><a href="#8-1-区域失效守护进程-Regional-Invalidation-Daemon" class="headerlink" title="8.1 区域失效守护进程 (Regional Invalidation Daemon)"></a>8.1 区域失效守护进程 (Regional Invalidation Daemon)</h3><p>Meta 面临一个独特的挑战：当用户的数据在一个数据中心被更新后，其他区域的数据中心需要及时感知缓存失效。Meta 的解决方案是部署专门的 <strong>mcsqueal</strong> 守护进程。</p>
+<p>这个守护进程监视 MySQL 的 commit log（类似 binlog 监听），当检测到数据库更新时，它向对应区域的 Memcached 集群发送失效指令。关键设计在于：mcsqueal 先等待数据库的主从复制完成后，才发送失效到副本区域——这避免了”先失效缓存、后读到旧数据”的竞争条件。Meta 选择了<strong>可以容忍短暂读到旧数据</strong>的最终一致性，以换取系统的可扩展性。</p>
+<h3 id="8-2-Slab-分配器自动调整"><a href="#8-2-Slab-分配器自动调整" class="headerlink" title="8.2 Slab 分配器自动调整"></a>8.2 Slab 分配器自动调整</h3><p>标准 Memcached 的 Slab 分配器需要手动调整 slab 大小比例。Meta 修改后的版本能根据实际请求模式<strong>动态自适应调整 slab 分配</strong>——当观察到某类大小的对象访问频率激增时，自动为其分配更多内存页，最大化缓存命中率而无需人工干预。</p>
+<h2 id="九、关键数据"><a href="#九、关键数据" class="headerlink" title="九、关键数据"></a>九、关键数据</h2><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>峰值 QPS</td>
+<td>数十亿&#x2F;秒</td>
+</tr>
+<tr>
+<td>缓存命中率</td>
+<td>&gt; 98%（大量热点数据）</td>
+</tr>
+<tr>
+<td>缓存延迟</td>
+<td>&lt; 1ms (单机)</td>
+</tr>
+<tr>
+<td>集群规模</td>
+<td>上万个 Memcached 实例</td>
+</tr>
+<tr>
+<td>总缓存容量</td>
+<td>多个 PB</td>
+</tr>
+</tbody></table>
+<h2 id="十、小结"><a href="#十、小结" class="headerlink" title="十、小结"></a>十、小结</h2><p>Meta 的 Memcached 架构证明了：简单的系统可以处理极其复杂的负载——只要设计得当。核心经验包括：Lease 机制解决缓存不一致问题，Gutter Pool 防止雪崩故障，UDP 读取降低协议开销——这些都是在超大规模场景下才能验证的设计智慧，也是系统设计的经典范式。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/%E7%BC%93%E5%AD%98/" rel="tag"># 缓存</a>
+              <a href="/tags/Memcached/" rel="tag"># Memcached</a>
+              <a href="/tags/Meta/" rel="tag"># Meta</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/microservice/" rel="prev" title="微服务架构">
+                  <i class="fa fa-angle-left"></i> 微服务架构
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/mcp-protocol-guide/" rel="next" title="MCP 协议详解">
+                  MCP 协议详解 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="虚拟化能够充分利用硬件资源，在同一套硬件上运行多个虚拟机相比只运行一个操作系统显然更具经济优势。在此基础上，云计算产业得以快速发展。下表列出了虚拟化的主要类型：    虚拟化类型 特点    桌面虚拟化 Virtual desktop infrastructure 服务端提供虚拟化桌面、Local desktop virtualization 本地虚拟化不同操作系统桌面   网络虚拟化 softw">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes 核心概念">
+<meta property="og:url" content="http://pclhahaha.github.io/kubernetes-core/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="虚拟化能够充分利用硬件资源，在同一套硬件上运行多个虚拟机相比只运行一个操作系统显然更具经济优势。在此基础上，云计算产业得以快速发展。下表列出了虚拟化的主要类型：    虚拟化类型 特点    桌面虚拟化 Virtual desktop infrastructure 服务端提供虚拟化桌面、Local desktop virtualization 本地虚拟化不同操作系统桌面   网络虚拟化 softw">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://pclhahaha.github.io/infra/virtualization/figure1.gif">
+<meta property="og:image" content="http://pclhahaha.github.io/infra/virtualization/figure4-20200205001204791.gif">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="K8s">
+<meta property="article:tag" content="Pod">
+<meta property="article:tag" content="Service">
+<meta property="article:tag" content="Ingress">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://pclhahaha.github.io/infra/virtualization/figure1.gif">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/kubernetes-core/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/kubernetes-core/","path":"kubernetes-core/","title":"Kubernetes 核心概念"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Kubernetes 核心概念 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81Hypervisor-%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">一、Hypervisor 虚拟化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Type-1-vs-Type-2"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Type 1 vs. Type 2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Hypervisor-%E7%9A%84%E4%B8%BB%E6%B5%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Hypervisor 的主流实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E6%A0%B8%E5%BF%83%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 核心虚拟化技术原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 参考文献</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/kubernetes-core/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Kubernetes 核心概念 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kubernetes 核心概念
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AE%B9%E5%99%A8%E5%8C%96/" itemprop="url" rel="index"><span itemprop="name">容器化</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>虚拟化能够充分利用硬件资源，在同一套硬件上运行多个虚拟机相比只运行一个操作系统显然更具经济优势。在此基础上，云计算产业得以快速发展。下表列出了虚拟化的主要类型：</p>
+<table>
+<thead>
+<tr>
+<th>虚拟化类型</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>桌面虚拟化</td>
+<td>Virtual desktop infrastructure 服务端提供虚拟化桌面、Local desktop virtualization 本地虚拟化不同操作系统桌面</td>
+</tr>
+<tr>
+<td>网络虚拟化</td>
+<td>software-defined networking (SDN)、network function virtualization (NFV)</td>
+</tr>
+<tr>
+<td>存储虚拟化</td>
+<td>云存储</td>
+</tr>
+<tr>
+<td>数据虚拟化</td>
+<td>将应用层与数据存储层间的传输透明化，应用层不用关心底层是如何存储的</td>
+</tr>
+<tr>
+<td>数据中心虚拟化</td>
+<td>可以在一个数据中心上虚拟化出多个数据中心</td>
+</tr>
+<tr>
+<td>CPU虚拟化</td>
+<td>可以理解为 Hypervisor 虚拟化</td>
+</tr>
+<tr>
+<td>GPU虚拟化</td>
+<td>Pass-through GPUs、Shared vGPUs</td>
+</tr>
+</tbody></table>
+<h2 id="一、Hypervisor-虚拟化"><a href="#一、Hypervisor-虚拟化" class="headerlink" title="一、Hypervisor 虚拟化"></a>一、Hypervisor 虚拟化</h2><p>Hypervisor 是介于虚拟机操作系统与硬件层之间的一层薄薄的软件层，是对硬件层的虚拟化，它允许多个操作系统共享相同的硬件资源。运行在 Hypervisor 之上的操作系统就是 VM (virtual machine)，而 Hypervisor 又称为 VMM (virtual machine monitor)。</p>
+<p><img src="/infra/virtualization/figure1.gif" alt="显示常用硬件虚拟化的简单分层架构"></p>
+<h3 id="1-1-Type-1-vs-Type-2"><a href="#1-1-Type-1-vs-Type-2" class="headerlink" title="1.1 Type 1 vs. Type 2"></a>1.1 Type 1 vs. Type 2</h3><p>Hypervisor 分为如下两类：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>特点</th>
+<th>优势</th>
+<th>劣势</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Type 1</td>
+<td>又称为 bare-metal hypervisors，直接运行在底层硬件之上，与 CPU，内存，磁盘等交互</td>
+<td>性能高，安全性高</td>
+<td>需要独立的管理机器来管理虚拟机以及硬件</td>
+</tr>
+<tr>
+<td>Type 2</td>
+<td>作为一个应用运行在底层操作系统上，通常用于个人 PC 而不是服务器</td>
+<td>便于个人开发者安装多个虚拟机</td>
+<td>由于 Hypervisor 和硬件中间隔了一层操作系统，存在延迟；底层操作系统一旦被侵入，上层的虚拟机也容易被侵入</td>
+</tr>
+</tbody></table>
+<p><strong>架构示意（文字描述）：</strong></p>
+<ul>
+<li><strong>Type 1</strong>：<code>硬件 → Hypervisor → VM1/VM2... → 各VM内Guest OS + App</code></li>
+<li><strong>Type 2</strong>：<code>硬件 → Host OS → Hypervisor应用 → VM1/VM2... → 各VM内Guest OS + App</code></li>
+</ul>
+<p>Type 1 去掉了 Host OS 这一层，VM 内的 Guest OS 通过 Hypervisor 直接与硬件交互，没有中间的上下文切换损耗，因此性能更优。这也是数据中心和生产环境几乎全部使用 Type 1 的原因。</p>
+<h3 id="1-2-Hypervisor-的主流实现"><a href="#1-2-Hypervisor-的主流实现" class="headerlink" title="1.2 Hypervisor 的主流实现"></a>1.2 Hypervisor 的主流实现</h3><table>
+<thead>
+<tr>
+<th>实现</th>
+<th>类型</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ESXi hypervisor</td>
+<td>Type 1</td>
+<td>VMware 出品，适用于数据中心的服务器虚拟化，管理 VMware 虚拟机</td>
+</tr>
+<tr>
+<td>vSphere</td>
+<td>Type 1</td>
+<td>VMware 出品，ESXi 的完整版，需要付费，附带 vSphere 环境的管理服务器</td>
+</tr>
+<tr>
+<td>VMware Fusion</td>
+<td>Type 2</td>
+<td>VMware 出品，适用于 Mac 操作系统</td>
+</tr>
+<tr>
+<td>Workstation</td>
+<td>Type 2</td>
+<td>VMware 出品，适用于 Linux、Windows 操作系统</td>
+</tr>
+<tr>
+<td>VirtualBox</td>
+<td>Type 2</td>
+<td>免费，适用于 Mac、Linux、Windows 操作系统，目前属于 Oracle</td>
+</tr>
+<tr>
+<td>Hyper-V</td>
+<td>Type 1</td>
+<td>微软出品，安装后直接运行在硬件之上，原 Windows 操作系统对硬件资源优先级较高</td>
+</tr>
+<tr>
+<td>Citrix XenServer</td>
+<td>Type 1</td>
+<td>适用于 Linux、Windows 操作系统</td>
+</tr>
+<tr>
+<td>KVM</td>
+<td>Type 1</td>
+<td>开源 Hypervisor，嵌入 Linux 内核，主流的 Linux 虚拟化技术都基于此。KVM 补全了 QEMU（纯软件实现的虚拟化），当处理器支持时使用 KVM，否则 fallback 到 QEMU</td>
+</tr>
+</tbody></table>
+<p><img src="/infra/virtualization/figure4-20200205001204791.gif" alt="KVM hypervisor的高级别视图"></p>
+<table>
+<thead>
+<tr>
+<th>实现</th>
+<th>类型</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Xen</td>
+<td>Type 1</td>
+<td>支持 Intel 和 ARM 架构，支持 Paravirtualization 半虚拟化，支持硬件辅助的全虚拟化</td>
+</tr>
+<tr>
+<td>Red Hat Hypervisor</td>
+<td>Type 1</td>
+<td>基于 KVM，在此基础上添加了一系列基础设施</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-核心虚拟化技术原理"><a href="#1-3-核心虚拟化技术原理" class="headerlink" title="1.3 核心虚拟化技术原理"></a>1.3 核心虚拟化技术原理</h3><p><strong>全虚拟化 (Full Virtualization)</strong>：Guest OS 无需任何修改即可运行。Hypervisor 通过<strong>二进制翻译 (Binary Translation)</strong> 截获 Guest OS 的特权指令，将其翻译为安全指令后再在物理硬件上执行。VMware ESXi 早期就采用这种方式，兼容性最好但性能开销较大。</p>
+<p><strong>半虚拟化 (Paravirtualization)</strong>：Guest OS 需要修改内核，通过 <strong>hypercall</strong> 接口直接与 Hypervisor 通信，不再需要二进制翻译。代表性的有 Xen PV 模式。性能优于全虚拟化，但需要对 Guest OS 进行修改。</p>
+<p><strong>硬件辅助虚拟化</strong>：Intel VT-x 和 AMD-V 在 CPU 中增加了新的特权级（VMX root&#x2F;non-root mode），使得 Guest OS 执行特权指令时会触发 <strong>VM-Exit</strong>，CPU 切换到 root mode 由 Hypervisor 处理，处理完成后通过 VMLAUNCH&#x2F;VMRESUME 恢复 Guest OS 执行。KVM 和 Xen HVM 都基于此技术。</p>
+<p><strong>内存虚拟化</strong>：Hypervisor 维护 Guest 物理地址 (GPA) 到 Host 物理地址 (HPA) 的映射，即<strong>影子页表 (Shadow Page Table)</strong>。现代 CPU 支持的 <strong>EPT (Intel) &#x2F; NPT (AMD)</strong> 将二次地址翻译交给硬件完成，大幅降低了内存虚拟化的开销。</p>
+<p><strong>I&#x2F;O 虚拟化</strong>：从纯软件模拟 (QEMU) → 半虚拟化驱动 (virtio，通过共享内存 vring 与 Hypervisor 通信) → 设备直通 (SR-IOV &#x2F; PCI Passthrough，物理设备直接分配给 VM)，性能逐步接近裸机。</p>
+<h3 id="1-4-参考文献"><a href="#1-4-参考文献" class="headerlink" title="1.4 参考文献"></a>1.4 参考文献</h3><p><a target="_blank" rel="noopener" href="https://www.ibm.com/cloud/learn/hypervisors">https://www.ibm.com/cloud/learn/hypervisors</a></p>
+<hr>
+<pre><code class="language-yaml">
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+              <a href="/tags/K8s/" rel="tag"># K8s</a>
+              <a href="/tags/Pod/" rel="tag"># Pod</a>
+              <a href="/tags/Service/" rel="tag"># Service</a>
+              <a href="/tags/Ingress/" rel="tag"># Ingress</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/logical-clocks/" rel="prev" title="Lamport 逻辑时钟 &#x2F; Vector Clock">
+                  <i class="fa fa-angle-left"></i> Lamport 逻辑时钟 / Vector Clock
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/jwt-authentication/" rel="next" title="JWT 认证机制">
+                  JWT 认证机制 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

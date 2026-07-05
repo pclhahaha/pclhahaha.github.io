@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一、进程与线程1.1 进程进程是操作系统资源分配的基本单位。内核通过 PCB（Process Control Block，即 task_struct）管理每个进程，其中包含 PID、进程状态、打开的文件描述符表、内存映射、信号处理表、调度信息等。 进程状态转换（Linux task_struct 中的 __state）： 123创建(fork) → 就绪(TASK_RUNNING) → 运行(正在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统">
+<meta property="og:url" content="http://pclhahaha.github.io/os/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="一、进程与线程1.1 进程进程是操作系统资源分配的基本单位。内核通过 PCB（Process Control Block，即 task_struct）管理每个进程，其中包含 PID、进程状态、打开的文件描述符表、内存映射、信号处理表、调度信息等。 进程状态转换（Linux task_struct 中的 __state）： 123创建(fork) → 就绪(TASK_RUNNING) → 运行(正在">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-12-31T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="IO">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="进程">
+<meta property="article:tag" content="内存管理">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/os/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/os/","path":"os/","title":"操作系统"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>操作系统 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">一、进程与线程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%8D%8F%E7%A8%8B"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 协程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%E5%BC%80%E9%94%80%E5%88%86%E6%9E%90"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 上下文切换开销分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">二、内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 虚拟内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%BC%BA%E9%A1%B5%E4%B8%AD%E6%96%AD%EF%BC%88Page-Fault%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 缺页中断（Page Fault）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 内存分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6%E4%B8%8E%E4%BA%A4%E6%8D%A2"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 内存回收与交换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 内存映射与零拷贝</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C%E4%B8%8E%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 内存屏障与缓存一致性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.</span> <span class="nav-text">三、文件系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-VFS-%E4%B8%8E-inode"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 VFS 与 inode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-ext4-%E4%B8%8E-xfs-%E7%AE%80%E4%BB%8B"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 ext4 与 xfs 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Page-Cache"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 Page Cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Direct-I-O-vs-Buffered-I-O"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 Direct I&#x2F;O vs Buffered I&#x2F;O</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 日志文件系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%EF%BC%9A%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0%E8%B0%83%E4%BC%98%E9%80%9F%E6%9F%A5"><span class="nav-number">4.</span> <span class="nav-text">附：生产环境内核参数调优速查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81I-O-%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">四、I&#x2F;O 模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E4%BA%94%E7%A7%8D-I-O-%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 五种 I&#x2F;O 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-select-poll-epoll-%E5%8E%9F%E7%90%86%E5%AF%B9%E6%AF%94"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 select &#x2F; poll &#x2F; epoll 原理对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-io-uring"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 io_uring</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6"><span class="nav-number">6.</span> <span class="nav-text">五、进程调度</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-CFS-%E5%AE%8C%E5%85%A8%E5%85%AC%E5%B9%B3%E8%B0%83%E5%BA%A6%E5%99%A8"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 CFS 完全公平调度器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 调度策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-CPU-%E4%BA%B2%E5%92%8C%E6%80%A7"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 CPU 亲和性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 负载均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-NUMA-%E6%9E%B6%E6%9E%84%E5%AF%B9%E5%90%8E%E7%AB%AF%E5%BA%94%E7%94%A8%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 NUMA 架构对后端应用的影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E4%B8%8E%E5%86%85%E6%A0%B8"><span class="nav-number">7.</span> <span class="nav-text">六、Linux 系统调用与内核</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E7%94%A8%E6%88%B7%E6%80%81-%E5%86%85%E6%A0%B8%E6%80%81%E5%88%87%E6%8D%A2"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 用户态&#x2F;内核态切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E5%B8%B8%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 常用系统调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-proc-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%B8%B8%E7%94%A8%E6%96%87%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 &#x2F;proc 文件系统常用文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%80%A7%E8%83%BD%E6%8E%92%E6%9F%A5"><span class="nav-number">8.</span> <span class="nav-text">七、性能排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-CPU-%E6%8E%92%E6%9F%A5"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 CPU 排查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E5%86%85%E5%AD%98%E6%8E%92%E6%9F%A5"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 内存排查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-I-O-%E6%8E%92%E6%9F%A5"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 I&#x2F;O 排查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-%E7%BB%BC%E5%90%88%E5%B7%A5%E5%85%B7"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 综合工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-5-%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98%E6%A1%88%E4%BE%8B"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 常见性能问题案例</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/os/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="操作系统 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-01 00:00:00" itemprop="dateCreated datePublished" datetime="2020-01-01T00:00:00+08:00">2020-01-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">CS基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="一、进程与线程"><a href="#一、进程与线程" class="headerlink" title="一、进程与线程"></a>一、进程与线程</h2><h3 id="1-1-进程"><a href="#1-1-进程" class="headerlink" title="1.1 进程"></a>1.1 进程</h3><p>进程是操作系统资源分配的基本单位。内核通过 PCB（Process Control Block，即 <code>task_struct</code>）管理每个进程，其中包含 PID、进程状态、打开的文件描述符表、内存映射、信号处理表、调度信息等。</p>
+<p><strong>进程状态转换</strong>（Linux <code>task_struct</code> 中的 <code>__state</code>）：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">创建(fork) → 就绪(TASK<span class="emphasis">_RUNNING) → 运行(正在CPU上) → 终止(EXIT_ZOMBIE/EXIT_DEAD)</span></span><br><span class="line"><span class="emphasis">                ↑                    ↓</span></span><br><span class="line"><span class="emphasis">          等待IO/信号/锁 ← 睡眠(TASK_INTERRUPTIBLE/TASK_</span>UNINTERRUPTIBLE)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>TASK_INTERRUPTIBLE</code>：可被信号唤醒（如等待 socket 数据的进程）。</li>
+<li><code>TASK_UNINTERRUPTIBLE</code>：不可被信号中断（如等待磁盘 I&#x2F;O 完成的 D 状态）。<code>ps aux</code> 中看到 D 状态的进程就是此状态，通常意味着 I&#x2F;O 瓶颈。</li>
+<li><code>TASK_STOPPED</code>：收到 SIGSTOP 或调试时被暂停。</li>
+<li><code>EXIT_ZOMBIE</code>：进程已退出，但父进程尚未调用 <code>waitpid()</code> 回收——即僵尸进程。</li>
+</ul>
+<p><strong>fork 与 exec</strong>：</p>
+<p><code>fork()</code> 通过写时复制（Copy-On-Write, COW）创建子进程——子进程共享父进程的物理页，仅当一方写入时才真正复制。<code>execve()</code> 替换当前进程的地址空间，加载新程序。这意味着 <code>fork</code> 的代价很低（只复制页表和 task_struct），而 <code>exec</code> 的开销主要在于加载 ELF 文件、建立新地址空间。</p>
+<blockquote>
+<p><strong>生产经验</strong>：Redis 在生成 RDB 快照时调用 <code>fork()</code>，利用 COW 避免阻塞主线程。但如果进程内存 50GB，<code>fork</code> 仍需复制页表，耗时可能达数百毫秒，触发 latency spike。这也是 Redis 建议单实例不超过 10-20GB 内存的原因之一。</p>
+</blockquote>
+<p><strong>孤儿进程与僵尸进程</strong>：</p>
+<ul>
+<li>孤儿进程：父进程先于子进程退出，子进程被 init（PID 1）收养，init 会定期 <code>waitpid()</code> 清理。</li>
+<li>僵尸进程：子进程已退出但父进程未回收。大量僵尸进程会耗尽 PID，导致无法创建新进程。</li>
+</ul>
+<p>排查命令：<code>ps aux | grep Z</code> 或 <code>top</code> 看 zombie 计数。根治方式：父进程注册 SIGCHLD 信号处理函数调用 <code>waitpid()</code>，或显式忽略 SIGCHLD（<code>signal(SIGCHLD, SIG_IGN)</code>）。</p>
+<p><strong>进程间通信（IPC）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>特点</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>管道 (pipe&#x2F;FIFO)</td>
+<td>单向、字节流、内核缓冲区</td>
+<td>shell &#96;</td>
+</tr>
+<tr>
+<td>信号 (signal)</td>
+<td>异步通知，信息量小</td>
+<td>SIGTERM 优雅关闭</td>
+</tr>
+<tr>
+<td>消息队列</td>
+<td>有边界的消息，支持按类型读取</td>
+<td>POSIX mq</td>
+</tr>
+<tr>
+<td>共享内存</td>
+<td>最快，需配合信号量同步</td>
+<td>高性能 IPC</td>
+</tr>
+<tr>
+<td>信号量</td>
+<td>进程间同步原语</td>
+<td>生产者-消费者</td>
+</tr>
+<tr>
+<td>Socket</td>
+<td>通用，支持跨主机</td>
+<td>网络通信</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-线程"><a href="#1-2-线程" class="headerlink" title="1.2 线程"></a>1.2 线程</h3><p>线程是 CPU 调度的基本单位。同一进程的线程共享地址空间、文件描述符表、信号处理等，但各自拥有独立的栈、寄存器和线程局部存储（TLS）。</p>
+<p><strong>内核线程 vs 用户线程</strong>：</p>
+<ul>
+<li>内核线程（1:1 模型）：每个用户线程对应一个内核调度实体。Linux 通过 <code>clone()</code> 系统调用创建线程，与进程共用 <code>task_struct</code>，只是资源共享标识不同。POSIX Threads (pthread) 即 1:1 模型。</li>
+<li>用户线程（N:1 模型）：多用户线程映射到一个内核线程，由用户态调度器管理。优势是上下文切换零开销，劣势是一旦某个线程阻塞整个进程阻塞。曾经 Java “green thread” 即此模型。</li>
+<li>混合模型（M:N 模型）：Go runtime 的 GMP 模型是经典案例——M 个 goroutine 映射到 N 个 OS 线程，runtime 调度器负责在 OS 线程上调度 goroutine。</li>
+</ul>
+<p><strong>多线程优势</strong>：利用多核并行、重叠计算与 I&#x2F;O、共享地址空间使数据传递更简单。</p>
+<p><strong>多线程开销</strong>：<code>pthread_create()</code> 涉及 <code>clone()</code> 系统调用、内核栈分配等，耗时约 10-50μs。线程栈默认 8MB（Linux glibc），1000 个线程占用 8GB 虚拟内存。频繁的上下文切换带来 cache miss 和 TLB flush 开销。</p>
+<h3 id="1-3-协程"><a href="#1-3-协程" class="headerlink" title="1.3 协程"></a>1.3 协程</h3><p>协程是用户态的轻量级执行单元，由程序自身调度而非 OS。优势是切换成本远低于线程上下文切换（仅需保存少量寄存器，不陷入内核）。</p>
+<p><strong>有栈协程 vs 无栈协程</strong>：</p>
+<ul>
+<li>有栈协程：每个协程拥有独立栈，可以在任意调用深度中暂停和恢复。Go goroutine、Lua coroutine 属于有栈协程。Goroutine 初始栈仅 2KB，可动态增长，因此可以轻松创建百万级 goroutine。</li>
+<li>无栈协程：不维护独立栈，通过编译器将协程体转换为状态机。C++20 coroutine、JavaScript async&#x2F;await、Kotlin suspend 均属此类。优势是内存开销极小（通常仅为状态对象大小），劣势是只能在已知暂停点挂起（即”染色”问题）。</li>
+</ul>
+<p><strong>Go goroutine 原理简述</strong>：</p>
+<p>Goroutine 运行在 GMP 模型上——G（goroutine）、M（OS 线程）、P（逻辑处理器，默认等于 GOMAXPROCS）。当 goroutine 执行系统调用阻塞时，M 与 P 分离，P 绑定新 M 继续执行其他 G，原 M 等待系统调用返回后 G 放回队列。</p>
+<p>Goroutine 在以下时机触发调度：channel 操作、<code>time.Sleep</code>、<code>sync.Mutex</code> 操作、函数调用（在栈增长检查点插入）等。Go 1.14+ 加入了基于信号的抢占式调度，通过 SIGURG 信号打断长时间运行的 goroutine，解决死循环 goroutine 长时间占据线程的问题。</p>
+<p><strong>核心 vs 线程创建开销对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>资源类型</th>
+<th>创建耗时</th>
+<th>初始栈大小</th>
+<th>内存占用</th>
+<th>数量上限</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OS 线程 (pthread)</td>
+<td>~10-50 μs</td>
+<td>8MB (glibc)</td>
+<td>~16KB (task_struct + kernel stack)</td>
+<td>~数千</td>
+</tr>
+<tr>
+<td>Go goroutine</td>
+<td>~2-4 μs</td>
+<td>2KB (动态增长)</td>
+<td>~4KB</td>
+<td>~百万级</td>
+</tr>
+<tr>
+<td>Java Virtual Thread</td>
+<td>~1-3 μs</td>
+<td>~几百字节 (stack chunk)</td>
+<td>~1KB</td>
+<td>~百万级</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>实战建议</strong>：传统 thread-per-request 模型（如 Tomcat 200 线程池）在 10K QPS 下上下文切换成为瓶颈。协程模型（Go&#x2F;虚拟线程）允许每请求一个协程而不必担心 OS 线程开销。但需警惕：协程数量爆发时内存膨胀和 GC 压力同样会成为瓶颈。</p>
+</blockquote>
+<p><strong>Java Loom Virtual Thread</strong>：</p>
+<p>Java 21 正式发布的 Virtual Thread（基于 Loom 项目）是 JVM 级别的有栈协程。与传统的 Platform Thread（1:1 映射到 OS 线程）不同，Virtual Thread 由 JVM 调度器管理，在遇到阻塞 I&#x2F;O 时自动将底层 OS 线程释放给其他 Virtual Thread。优点是与现有 Java 生态无缝兼容，无需引入 async&#x2F;await 风格的 API 变更。</p>
+<h3 id="1-4-上下文切换开销分析"><a href="#1-4-上下文切换开销分析" class="headerlink" title="1.4 上下文切换开销分析"></a>1.4 上下文切换开销分析</h3><p>上下文切换包括：保存当前进程&#x2F;线程的寄存器、程序计数器、栈指针 → 加载新进程&#x2F;线程的对应状态。这三类切换开销差异显著：</p>
+<table>
+<thead>
+<tr>
+<th>切换类型</th>
+<th>典型耗时</th>
+<th>关键开销</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>进程切换</td>
+<td>3-5 μs</td>
+<td>页表切换、TLB 全部失效、L1&#x2F;L2 cache 变冷</td>
+</tr>
+<tr>
+<td>线程切换（同进程）</td>
+<td>1-2 μs</td>
+<td>页表不变、TLB 保留、但寄存器&#x2F;栈&#x2F;L1 cache 仍受影响</td>
+</tr>
+<tr>
+<td>协程切换</td>
+<td>~10 ns</td>
+<td>仅保存&#x2F;恢复少量寄存器，无内核态切换、无 TLB 失效</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>生产经验</strong>：高并发服务器中，每秒数十万次线程上下文切换意味着 CPU 有 30-50% 时间消耗在切换本身。<code>pidstat -w</code> 可观察进程级别的上下文切换率。优化方向：减少线程数、使用协程模型、增大线程池与任务粒度的比值。</p>
+</blockquote>
+<hr>
+<h2 id="二、内存管理"><a href="#二、内存管理" class="headerlink" title="二、内存管理"></a>二、内存管理</h2><h3 id="2-1-虚拟内存"><a href="#2-1-虚拟内存" class="headerlink" title="2.1 虚拟内存"></a>2.1 虚拟内存</h3><p>虚拟内存为每个进程提供独立的地址空间（Linux 32 位下 3G 用户空间 + 1G 内核空间，64 位下 128TB 用户空间 + 128TB 内核空间）。CPU 通过 MMU（Memory Management Unit）将虚拟地址转换为物理地址。</p>
+<p><strong>页表与多级页表</strong>：</p>
+<p>页表是虚拟页号到物理页框号的映射表。x86-64 使用四级页表（PGD→PUD→PMD→PTE），每级 9 位索引，加上页内 12 位偏移，构成 48 位虚拟地址（256TB）。多级页表的好处是稀疏——未使用的虚拟地址区域无需分配中间页表，大幅节约内存。（4 级页表完整填充需 4KB×512⁴ &#x3D; 256TB 地址空间的代价，但实际仅按需分配）。</p>
+<p><strong>TLB（Translation Lookaside Buffer）</strong>：</p>
+<p>TLB 是 CPU 内的高速缓存，缓存最近使用的虚拟页到物理页的映射。TLB 命中延迟 &lt; 1 cycle，未命中需走页表遍历（4 次内存访问，约 50-100 cycles）。上下文切换时，进程切换会导致 TLB 全部失效（除非使用 PCID 技术）。</p>
+<p><strong>HugePage（大页）</strong>：</p>
+<p>默认页大小为 4KB。对于大内存应用（如 JVM 堆、数据库 Buffer Pool），4KB 页表条目数激增，TLB 覆盖范围有限（TLB 条目数约 64-1024 条，4KB 页覆盖仅 256KB-4MB）。</p>
+<ul>
+<li>2MB HugePage（PMD 级别映射）：TLB 覆盖范围扩大 512 倍。</li>
+<li>1GB HugePage（PUD 级别映射）：TLB 覆盖范围扩大 262144 倍。</li>
+</ul>
+<blockquote>
+<p><strong>生产经验</strong>：MySQL&#x2F;PostgreSQL&#x2F;Redis&#x2F;JVM 均可通过配置启用 HugePage，能提升 5-15% 的吞吐。配置方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> 512 &gt; /proc/sys/vm/nr_hugepages    <span class="comment"># 预留 512 个 2MB 大页</span></span><br><span class="line"><span class="comment"># JVM 使用: -XX:+UseLargePages</span></span><br></pre></td></tr></table></figure></blockquote>
+<p><strong>透明大页（THP，Transparent Huge Pages）</strong>：</p>
+<p>内核自动尝试将连续 4KB 页合并为 2MB 大页，对应用透明。但 THP 的压缩&#x2F;分裂过程可能造成延迟抖动——数据库类应用通常建议禁用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> never &gt; /sys/kernel/mm/transparent_hugepage/enabled</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-缺页中断（Page-Fault）"><a href="#2-2-缺页中断（Page-Fault）" class="headerlink" title="2.2 缺页中断（Page Fault）"></a>2.2 缺页中断（Page Fault）</h3><p>当 CPU 访问的虚拟地址在页表中不存在（或权限不对）时，触发缺页中断：</p>
+<ul>
+<li><strong>Minor Fault</strong>：物理页已分配但未建立页表映射（如 <code>mmap</code> 后首次访问、COW 触发）。处理时间约 1-10 μs。</li>
+<li><strong>Major Fault</strong>：物理页不在内存中，需从磁盘&#x2F;swap 读取。处理时间约 1-10 ms——与内存访问相差 5-6 个数量级。</li>
+<li><strong>Invalid Fault</strong>：访问非法地址，触发 SIGSEGV。</li>
+</ul>
+<blockquote>
+<p><strong>排查命令</strong>：<code>ps -o min_flt,maj_flt -p &lt;PID&gt;</code> 查看进程的缺页次数。JVM 启动时大量 minor fault 是正常的（堆内存按需分配）。但运行时持续产生 major fault 说明内存不足、频繁 swap，需要扩容或降配 heap。</p>
+</blockquote>
+<h3 id="2-3-内存分配"><a href="#2-3-内存分配" class="headerlink" title="2.3 内存分配"></a>2.3 内存分配</h3><p><strong>brk 与 mmap</strong>：</p>
+<p>用户态内存分配（<code>malloc</code>）通过两种系统调用向内核申请内存：</p>
+<ul>
+<li><code>brk/sbrk</code>：调整数据段边界（program break），申请的是堆顶的连续区域。释放时高地址内存未全部释放则低处无法归还内核，易产生内存碎片。</li>
+<li><code>mmap</code>：在进程地址空间中映射一块独立区域，可独立释放，无碎片问题。每次调用至少分配一页（4KB），有系统调用开销。</li>
+</ul>
+<p>glibc 的 <code>malloc</code> 策略：小内存（默认 &lt; 128KB）用 <code>brk</code>，大内存用 <code>mmap</code>。可通过 <code>mallopt()</code> 调整阈值。</p>
+<p><strong>jemalloc 与 tcmalloc</strong>：</p>
+<p>glibc 的 <code>ptmalloc</code> 在多线程环境下存在严重的锁竞争和内存碎片问题。两种替代方案成为工业标准：</p>
+<ul>
+<li><strong>jemalloc</strong>（Facebook）：以 Arenas 为核心，将内存划分为多个独立区域，线程分散到不同 Arena 减少竞争。对内存碎片控制极优，是 Redis、RocksDB 的默认分配器。通过 <code>LD_PRELOAD=libjemalloc.so</code> 即可替换。核心调优参数：<code>narenas</code>（arena 数量）、<code>lg_dirty_mult</code>（脏页回收阈值）。</li>
+<li><strong>tcmalloc</strong>（Google）：以 CentralCache + ThreadCache 两层缓存实现低锁竞争，对小对象分配极快。Golang 早期即使用 tcmalloc 思路设计内存分配器。优势是多线程下分配&#x2F;释放的性能。</li>
+</ul>
+<p><strong>Broker&#x2F;Router 类应用</strong>（如 Kafka、RocketMQ）：属于消息量极大、大量小对象生灭频繁的场景，常替换为 jemalloc 以减少碎片和 RSS 占用。</p>
+<blockquote>
+<p><strong>生产经验</strong>：替换分配器后应用 RSS 降低 20-40% 是常态。验证命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LD_PRELOAD=/usr/lib/libjemalloc.so.2 ./your_app</span><br><span class="line"><span class="comment"># 或通过环境变量</span></span><br><span class="line"><span class="built_in">export</span> LD_PRELOAD=/usr/lib/libtcmalloc.so.4</span><br></pre></td></tr></table></figure></blockquote>
+<h3 id="2-4-内存回收与交换"><a href="#2-4-内存回收与交换" class="headerlink" title="2.4 内存回收与交换"></a>2.4 内存回收与交换</h3><p>Linux 内存回收分两条路径：</p>
+<ol>
+<li><strong>后台回收</strong>：<code>kswapd</code> 内核线程在空闲内存低于阈值（<code>vm.watermark_scale_factor</code> 相关）时异步回收。</li>
+<li><strong>直接回收</strong>：进程分配内存时发现内存不足，在分配路径上同步回收（<code>direct reclaim</code>），导致分配延迟显著增加。</li>
+</ol>
+<p><strong>swappiness</strong>（<code>/proc/sys/vm/swappiness</code>，默认 60）：</p>
+<p>控制内核回收时优先回收 page cache 还是换出匿名页。值越大越倾向于 swap。对于纯缓存类服务（如 Redis），建议设为 0-10（优先淘汰 cache）；对于有大量冷匿名页的场景，可设高些。</p>
+<p><strong>OOM Killer</strong>：</p>
+<p>当内存彻底耗尽且回收无果时，OOM Killer 根据 <code>oom_score</code> 选择进程杀死。<code>oom_score</code> 综合考虑进程内存占用、运行时间、<code>oom_score_adj</code> 等因素。关键进程可通过降低 <code>oom_score_adj</code> 保护：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> -1000 &gt; /proc/&lt;PID&gt;/oom_score_adj  <span class="comment"># 完全排除</span></span><br></pre></td></tr></table></figure>
+<p><code>dmesg | grep -i oom</code> 可回溯 OOM 事件日志。</p>
+<h3 id="2-5-内存映射与零拷贝"><a href="#2-5-内存映射与零拷贝" class="headerlink" title="2.5 内存映射与零拷贝"></a>2.5 内存映射与零拷贝</h3><p><code>mmap</code> 将文件映射到内存，访问时按需加载（Demand Paging）。<code>mmap</code> 写入可通过 <code>msync</code> 或自动回写持久化。优势是省去用户态与内核态的数据拷贝（文件 → page cache → 用户缓冲区 变为 文件 → page cache，用户直接访问 page cache）。</p>
+<p><strong>零拷贝技术对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>数据路径</th>
+<th>拷贝次数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>传统 read+write</td>
+<td>磁盘→内核→用户→内核→socket</td>
+<td>4 次上下文切换 + 2 次 CPU 拷贝 + 2 次 DMA 拷贝</td>
+</tr>
+<tr>
+<td>sendfile</td>
+<td>磁盘→内核(page cache)→socket</td>
+<td>2 次上下文切换 + 1 次 CPU 拷贝 + 2 次 DMA 拷贝</td>
+</tr>
+<tr>
+<td>sendfile + DMA Gather</td>
+<td>磁盘→内核→socket（DMA Gather）</td>
+<td>2 次上下文切换 + 0 次 CPU 拷贝 + 2 次 DMA 拷贝</td>
+</tr>
+<tr>
+<td>splice</td>
+<td>两个 fd 间通过 pipe 在内核空间传输</td>
+<td>2 次上下文切换 + 0 次 CPU 拷贝</td>
+</tr>
+</tbody></table>
+<p>Kafka 和 Nginx 均使用 <code>sendfile</code> 实现静态文件传输的零拷贝。但注意零拷贝绕过了用户态，无法对数据做加工处理（如 SSL 加密、压缩）。</p>
+<p><strong>mmap 在消息队列中的应用</strong>：</p>
+<p>Kafka 利用 <code>mmap</code> 将索引文件和分段日志映射到内存，Broker 读取消息时直接通过 page cache 实现文件读取的零拷贝——消息从磁盘到网络不需要经过用户态拷贝。但 mmap 并非完美：当 page cache 容量不足以容纳活跃的写数据时，mmap 的性能会断崖式下降。</p>
+<p>RocketMQ 则采用了不同的策略——使用 <code>mmap</code> 映射 CommitLog 写入，通过 <code>MappedByteBuffer</code> 批量刷盘，配合堆外缓存在文件 I&#x2F;O 和网络 I&#x2F;O 之间形成了高效的管道。</p>
+<h3 id="2-6-内存屏障与缓存一致性"><a href="#2-6-内存屏障与缓存一致性" class="headerlink" title="2.6 内存屏障与缓存一致性"></a>2.6 内存屏障与缓存一致性</h3><p><strong>MESI 协议</strong>是现代多核 CPU 缓存一致性的基础。每个 cache line 处于四种状态之一：Modified（已修改）、Exclusive（独占）、Shared（共享）、Invalid（失效）。多核并发写同一 cache line 时会触发状态迁移和 cache line 在核间传递，即 cache line bouncing——一个典型的性能杀手。</p>
+<p><strong>内存屏障</strong>：编译器优化和 CPU 乱序执行可能导致内存操作的实际顺序与代码顺序不一致。内存屏障（memory barrier&#x2F;fence）用于强制顺序约束：</p>
+<ul>
+<li>StoreStore Barrier：保证在此之前的 store 完成后才执行后续 store。</li>
+<li>StoreLoad Barrier：最强的屏障（也是 <code>mfence</code>），保证之前所有 store 完成后才执行后续 load。x86 上 <code>lock</code> 前缀指令隐含着 StoreLoad 语义。</li>
+<li>LoadLoad &#x2F; LoadStore Barrier：分别是 load-load 和 load-store 的顺序保证。</li>
+</ul>
+<p><strong>JVM 中的应用</strong>：</p>
+<ul>
+<li><code>volatile</code> 变量的写在 x86 上生成 <code>lock addl $0x0, (%rsp)</code>（StoreLoad barrier），保证写后可见。</li>
+<li><code>synchronized</code> 的 monitor enter 和 exit 分别插入对应屏障。</li>
+<li><code>Unsafe.putOrderedObject</code> &#x2F; <code>AtomicInteger.lazySet</code> 只保证有序不保证立即可见（无 StoreLoad barrier），在特定场景下更高效。</li>
+</ul>
+<hr>
+<h2 id="三、文件系统"><a href="#三、文件系统" class="headerlink" title="三、文件系统"></a>三、文件系统</h2><h3 id="3-1-VFS-与-inode"><a href="#3-1-VFS-与-inode" class="headerlink" title="3.1 VFS 与 inode"></a>3.1 VFS 与 inode</h3><p>VFS（Virtual File System）是 Linux 的文件系统抽象层，定义了统一的接口（<code>file_operations</code>、<code>inode_operations</code>、<code>address_space_operations</code>），使上层无需关心底层文件系统类型。VFS 管理的四大核心对象：</p>
+<ul>
+<li><strong>super_block</strong>：挂载的文件系统元信息。</li>
+<li><strong>inode</strong>：文件&#x2F;目录的元数据（大小、权限、时间戳、数据块位置）。</li>
+<li><strong>dentry</strong>：目录项缓存，加速路径解析。</li>
+<li><strong>file</strong>：进程打开的文件，包含偏移量、访问模式等运行时信息。</li>
+</ul>
+<p><strong>硬链接 vs 软链接</strong>：</p>
+<ul>
+<li>硬链接：目录项直接指向同一 inode，共享数据块。删除原文件不影响硬链接（引用计数 &gt; 0）。不可跨文件系统，不可链接目录。</li>
+<li>软链接（符号链接）：独立 inode，存储目标路径字符串。可跨文件系统，可链接目录。目标删除后变成悬空链接。</li>
+</ul>
+<h3 id="3-2-ext4-与-xfs-简介"><a href="#3-2-ext4-与-xfs-简介" class="headerlink" title="3.2 ext4 与 xfs 简介"></a>3.2 ext4 与 xfs 简介</h3><p><strong>ext4</strong>：Linux 使用最广泛的文件系统。最大支持 1EB 卷、16TB 单文件。使用 extent 代替 ext3 的间接块映射，提升大文件性能。支持延迟分配（delayed allocation）和日志校验。适合通用场景和中小文件。</p>
+<p><strong>xfs</strong>：SGI 开发的高性能 64 位日志文件系统。使用 B+ 树（B-tree）管理空闲空间和 inode，分配和回收极快。支持动态 inode 分配、在线扩容（不可缩容）、极高的并发性能（分配组 AG 设计）。适合大文件和高并发场景，是 RHEL 7+ 的默认文件系统。</p>
+<blockquote>
+<p><strong>生产建议</strong>：MySQL&#x2F;Kafka 的数据目录推荐 xfs，ext4 的 <code>data=ordered</code> 模式对写密集场景性能略差。但需要缩容的场景选 ext4。此外，文件系统挂载参数对性能影响巨大——<strong>noatime</strong> 选项禁止更新文件访问时间戳，可显著减少元数据写入（所有生产数据盘均应添加此选项）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -o noatime,nodiratime /dev/sdb1 /data</span><br></pre></td></tr></table></figure></blockquote>
+<h3 id="3-3-Page-Cache"><a href="#3-3-Page-Cache" class="headerlink" title="3.3 Page Cache"></a>3.3 Page Cache</h3><p>Page Cache 是 Linux 最核心的 I&#x2F;O 缓存机制。所有通过 <code>read/write</code> 进行的文件 I&#x2F;O 都经过 page cache（除非使用 Direct I&#x2F;O）。Page Cache 本质是内核中以页（4KB）为单位缓存文件数据的 Radix Tree（Linux 4.x 后改为 XArray）。</p>
+<p><strong>writeback（回写）机制</strong>：</p>
+<p>应用调用 <code>write()</code> 后数据写入 page cache 即返回（writeback 模式），并不立即写入磁盘。内核在以下时机触发脏页回写：</p>
+<ol>
+<li>定时回写：<code>dirty_writeback_centisecs</code>（默认 5 秒）触发一次。</li>
+<li>脏页比例超过 <code>dirty_background_ratio</code>（默认 10%）时后台回写。</li>
+<li>脏页比例超过 <code>dirty_ratio</code>（默认 20%）时，写入进程自身执行回写（阻塞式）。</li>
+<li>用户调用 <code>fsync/fdatasync/sync</code>。</li>
+</ol>
+<blockquote>
+<p><strong>生产经验</strong>：高写入应用可通过调大脏页比例减少回写频率，但会增加宕机丢失数据和磁盘突发写负载。调整：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysctl -w vm.dirty_background_ratio=5</span><br><span class="line">sysctl -w vm.dirty_ratio=10</span><br></pre></td></tr></table></figure></blockquote>
+<p><strong>fsync vs fdatasync</strong>：</p>
+<ul>
+<li><code>fsync</code>：文件数据 + 元数据（inode 大小、时间戳等）全部刷盘。通常导致两次磁盘写入（数据+日志）。</li>
+<li><code>fdatasync</code>：仅刷文件数据，若元数据中仅大小变化也刷。比 fsync 少一次磁盘 I&#x2F;O。</li>
+<li>Kafka 使用 <code>flush.fdatasync</code> 配置项控制刷盘策略。</li>
+</ul>
+<h3 id="3-4-Direct-I-O-vs-Buffered-I-O"><a href="#3-4-Direct-I-O-vs-Buffered-I-O" class="headerlink" title="3.4 Direct I&#x2F;O vs Buffered I&#x2F;O"></a>3.4 Direct I&#x2F;O vs Buffered I&#x2F;O</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Buffered I&#x2F;O</th>
+<th>Direct I&#x2F;O</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Page Cache</td>
+<td>使用</td>
+<td>绕过</td>
+</tr>
+<tr>
+<td>写延迟</td>
+<td>低（写内存）</td>
+<td>高（直接落盘）</td>
+</tr>
+<tr>
+<td>读命中</td>
+<td>可命中缓存</td>
+<td>每次读磁盘</td>
+</tr>
+<tr>
+<td>内存拷贝</td>
+<td>内核→用户</td>
+<td>无需额外拷贝（DMA→用户）</td>
+</tr>
+<tr>
+<td>对齐要求</td>
+<td>无</td>
+<td>需要扇区对齐（512B）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>生产建议</strong>：数据库（如 MySQL InnoDB）和消息队列（Kafka）倾向使用 Direct I&#x2F;O，因为自身实现了 Buffer Pool 和缓存管理，page cache 反而导致双重缓存浪费内存。应用自身有缓存策略的场景应使用 Direct I&#x2F;O。</p>
+</blockquote>
+<h3 id="3-5-日志文件系统"><a href="#3-5-日志文件系统" class="headerlink" title="3.5 日志文件系统"></a>3.5 日志文件系统</h3><p>日志（Journal&#x2F;Journaling）保证文件系统在崩溃后的快速恢复和一致性：</p>
+<ul>
+<li><strong>物理日志</strong>：记录数据块的完整修改前后值。体积大但最安全。</li>
+<li><strong>逻辑日志</strong>：记录元数据变化操作（如”修改 inode X 的 size 字段”）。恢复时需要回放操作，快于物理日志。</li>
+</ul>
+<p>ext4 提供三种日志模式：</p>
+<ul>
+<li><code>data=journal</code>：数据和元数据都写日志。最安全但性能最差。</li>
+<li><code>data=ordered</code>（默认）：先写数据块，再写元数据日志。保证文件内容不出现垃圾数据（跨 inode 元数据可能不完整）。</li>
+<li><code>data=writeback</code>：只写元数据日志，数据块任意时序写回。最快但崩溃后新文件可能包含旧数据。</li>
+</ul>
+<p>xfs 只对元数据做日志（逻辑日志），不对文件数据做日志。</p>
+<blockquote>
+<p><strong>崩溃恢复实测</strong>：ext4 崩溃后启动时执行 <code>journal replay</code> 恢复日志，脏页数据可能丢失；使用 <code>data=ordered</code> 模式能保证文件内容一致性但不保证新文件一定被看到。数据库在崩溃后必须执行 WAL 重放来恢复未持久化的事务数据——这是为什么文件系统的 Journal 不能替代数据库 WAL。</p>
+</blockquote>
+<hr>
+<h2 id="附：生产环境内核参数调优速查"><a href="#附：生产环境内核参数调优速查" class="headerlink" title="附：生产环境内核参数调优速查"></a>附：生产环境内核参数调优速查</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>推荐值</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vm.swappiness</code></td>
+<td>1（纯缓存类服务）&#x2F; 10-20（通用）</td>
+<td>减少不必要的 swap</td>
+</tr>
+<tr>
+<td><code>vm.dirty_background_ratio</code></td>
+<td>5</td>
+<td>提前触发后台回写，避免突发</td>
+</tr>
+<tr>
+<td><code>vm.dirty_ratio</code></td>
+<td>10</td>
+<td>降低回写阻塞概率</td>
+</tr>
+<tr>
+<td><code>vm.dirty_expire_centisecs</code></td>
+<td>3000 (30s)</td>
+<td>脏页过期时间</td>
+</tr>
+<tr>
+<td><code>vm.min_free_kbytes</code></td>
+<td>131072 (128MB)</td>
+<td>给内核留足回收缓冲</td>
+</tr>
+<tr>
+<td><code>vm.overcommit_memory</code></td>
+<td>0（启发式）&#x2F; 1（允许 overcommit）</td>
+<td>JVM&#x2F;Redis 场景避免 OOM 假阳性</td>
+</tr>
+<tr>
+<td><code>vm.zone_reclaim_mode</code></td>
+<td>0</td>
+<td>禁止 NUMA 节点内单独回收（跨节点访问优于 swap）</td>
+</tr>
+<tr>
+<td><code>net.core.somaxconn</code></td>
+<td>65535</td>
+<td>增大 TCP accept 队列</td>
+</tr>
+<tr>
+<td><code>fs.file-max</code></td>
+<td>6553560</td>
+<td>全局文件描述符上限</td>
+</tr>
+<tr>
+<td><code>kernel.threads-max</code></td>
+<td>与内存相关</td>
+<td>限制总线程数防止线程泄漏拖垮系统</td>
+</tr>
+</tbody></table>
+<p>应用这些参数后写入 <code>/etc/sysctl.d/99-app.conf</code> 并通过 <code>sysctl -p</code> 使其立即生效。</p>
+<hr>
+<h2 id="四、I-O-模型"><a href="#四、I-O-模型" class="headerlink" title="四、I&#x2F;O 模型"></a>四、I&#x2F;O 模型</h2><h3 id="4-1-五种-I-O-模型"><a href="#4-1-五种-I-O-模型" class="headerlink" title="4.1 五种 I&#x2F;O 模型"></a>4.1 五种 I&#x2F;O 模型</h3><table>
+<thead>
+<tr>
+<th>模型</th>
+<th>发起方式</th>
+<th>数据拷贝方式</th>
+<th>是否阻塞</th>
+<th>典型系统调用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>阻塞 I&#x2F;O (BIO)</td>
+<td>同步</td>
+<td>同步</td>
+<td>全程阻塞</td>
+<td><code>read/write</code>（默认）</td>
+</tr>
+<tr>
+<td>非阻塞 I&#x2F;O (NIO)</td>
+<td>同步（轮询）</td>
+<td>同步</td>
+<td>返回 EAGAIN 时不阻塞</td>
+<td><code>read</code> + <code>O_NONBLOCK</code></td>
+</tr>
+<tr>
+<td>I&#x2F;O 多路复用</td>
+<td>同步（事件通知）</td>
+<td>同步</td>
+<td>事件等待时阻塞</td>
+<td><code>select/poll/epoll</code></td>
+</tr>
+<tr>
+<td>信号驱动 I&#x2F;O</td>
+<td>信号通知</td>
+<td>同步</td>
+<td>不阻塞</td>
+<td><code>sigaction</code> + <code>F_SETSIG</code></td>
+</tr>
+<tr>
+<td>异步 I&#x2F;O (AIO)</td>
+<td>异步</td>
+<td>异步</td>
+<td>全程不阻塞</td>
+<td><code>aio_read/aio_write</code>（POSIX）</td>
+</tr>
+</tbody></table>
+<p>关键理解：前四种模型的第二阶段（数据从内核到用户）都是阻塞的；只有真正异步 I&#x2F;O（第 5 种）两阶段均不阻塞。</p>
+<p>实际上 POSIX AIO 在 Linux 上实现不佳（基于线程池模拟），生产使用极少。真正成熟的异步 I&#x2F;O 是 Linux 5.1 引入的 <strong>io_uring</strong>。</p>
+<h3 id="4-2-select-poll-epoll-原理对比"><a href="#4-2-select-poll-epoll-原理对比" class="headerlink" title="4.2 select &#x2F; poll &#x2F; epoll 原理对比"></a>4.2 select &#x2F; poll &#x2F; epoll 原理对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>select</th>
+<th>poll</th>
+<th>epoll</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据结构</td>
+<td>位图 (fd_set)</td>
+<td>链表 (pollfd)</td>
+<td>红黑树 + 就绪链表</td>
+</tr>
+<tr>
+<td>最大 fd 数</td>
+<td>1024 (FD_SETSIZE)</td>
+<td>无限制</td>
+<td>无限制</td>
+</tr>
+<tr>
+<td>时间复杂度</td>
+<td>O(n) 遍历所有 fd</td>
+<td>O(n) 遍历所有 fd</td>
+<td>O(1) 仅遍历就绪 fd</td>
+</tr>
+<tr>
+<td>内核&#x2F;用户态拷贝</td>
+<td>每次调用全量拷贝</td>
+<td>每次调用全量拷贝</td>
+<td>fd 注册一次，事件通知时仅拷贝就绪事件</td>
+</tr>
+<tr>
+<td>触发模式</td>
+<td>水平触发 (LT)</td>
+<td>水平触发 (LT)</td>
+<td>水平触发 + 边缘触发 (LT&#x2F;ET)</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>fd 数 &lt; 100</td>
+<td>fd 数 &lt; 1000</td>
+<td>高并发 (10K+)</td>
+</tr>
+</tbody></table>
+<p><strong>epoll 实现机制</strong>：</p>
+<p><code>epoll_create()</code> 在内核创建 eventpoll 对象，包含：</p>
+<ul>
+<li><strong>红黑树</strong>（rbtree）：存储所有注册的 fd，用于 <code>epoll_ctl</code> 的 O(log n) 增删。</li>
+<li><strong>就绪链表</strong>（rdllist）：存储已就绪的 fd。当 fd 就绪时，内核调用 <code>ep_poll_callback</code> 将事件节点插入就绪链表。</li>
+<li><strong>等待队列</strong>：<code>epoll_wait</code> 时进程在此等待。</li>
+</ul>
+<p>这种设计使得 <code>epoll_wait</code> 仅需遍历就绪链表（而非所有 fd），实现 O(1) 级事件获取。</p>
+<p><strong>LT（Level Triggered）与 ET（Edge Triggered）</strong>：</p>
+<ul>
+<li><strong>LT（水平触发）</strong>：只要 fd 仍有数据可读&#x2F;可写，每次 <code>epoll_wait</code> 都会返回该事件。是默认模式，编程简单但可能多触发。</li>
+<li><strong>ET（边缘触发）</strong>：仅在 fd 状态发生变化时通知一次（如不可读→可读）。必须配合非阻塞 I&#x2F;O，一次性读空&#x2F;写空，否则可能丢失事件。优势是减少事件通知次数，适合高吞吐场景。</li>
+</ul>
+<blockquote>
+<p><strong>生产经验</strong>：Nginx 使用 ET 模式 + 非阻塞 socket，在一次事件中循环读写直到 EAGAIN，最大化吞吐。除非确有必要，否则使用 LT 就够了——ET 的编程复杂度高，收益有限。</p>
+</blockquote>
+<h3 id="4-3-io-uring"><a href="#4-3-io-uring" class="headerlink" title="4.3 io_uring"></a>4.3 io_uring</h3><p>io_uring 是 Linux 5.1 引入的革命性异步 I&#x2F;O 接口，解决了两大问题：1) 真正的异步（非线程池模拟）；2) 极低的系统调用开销。</p>
+<p><strong>核心设计</strong>：通过两个共享内存环形缓冲区（ring buffer）与内核通信：</p>
+<ul>
+<li><strong>提交队列（SQ, Submission Queue）</strong>：用户态写入 I&#x2F;O 请求 → 内核消费。</li>
+<li><strong>完成队列（CQ, Completion Queue）</strong>：内核写入 I&#x2F;O 完成事件 → 用户态消费。</li>
+</ul>
+<p>用户态提交请求时无需系统调用（使用 <code>IORING_SETUP_SQPOLL</code> 模式时内核线程持续轮询 SQ）只需修改共享内存；同样获取完成事件时也只需读取共享内存。在最佳场景下单次 I&#x2F;O 的 CPU 开销比传统方式降低 50-90%。</p>
+<p>io_uring 支持几乎所有 I&#x2F;O 操作类型（read&#x2F;write&#x2F;fsync&#x2F;send&#x2F;recv&#x2F;accept&#x2F;connect 等），且支持批量提交（SQE array）和批量收割（CQE array）以摊薄开销。</p>
+<p>ScyllaDB（Seastar 框架）、RocksDB 的异步 I&#x2F;O 实现已迁移到 io_uring。Java 17+ 通过 Foreign Function &amp; Memory API（Panama）可调用 io_uring。</p>
+<hr>
+<h2 id="五、进程调度"><a href="#五、进程调度" class="headerlink" title="五、进程调度"></a>五、进程调度</h2><h3 id="5-1-CFS-完全公平调度器"><a href="#5-1-CFS-完全公平调度器" class="headerlink" title="5.1 CFS 完全公平调度器"></a>5.1 CFS 完全公平调度器</h3><p>Linux 默认调度器 CFS（Completely Fair Scheduler）自 2.6.23 引入。设计理念：每个可运行进程应获得公平的 CPU 份额。</p>
+<p><strong>核心数据结构</strong>：红黑树，key 为进程的 <code>vruntime</code>（虚拟运行时间）——实际运行时间按 nice 值加权后的归一化值。CFS 每次选择 <code>vruntime</code> 最小的进程（即红黑树最左节点）运行。</p>
+<p><strong>调度周期与时间片</strong>：</p>
+<ul>
+<li><code>sched_min_granularity_ns</code>（默认 0.75ms）：一个进程至少运行的时间。</li>
+<li><code>sched_latency_ns</code>（默认 6ms）：期望所有可运行进程都获得 CPU 的周期。如果进程数太多，每个进程的时间片按 <code>调度周期 / 进程数</code> 动态计算。</li>
+</ul>
+<p><strong>nice 值与权重</strong>：nice 值 [-20, 19]，对应权重（约 1.25^n 缩放）。nice 每降低 1 级，CPU 份额增加约 10%。内核维护 <code>sched_prio_to_weight</code> 数组精密映射 nice 到权重。</p>
+<h3 id="5-2-调度策略"><a href="#5-2-调度策略" class="headerlink" title="5.2 调度策略"></a>5.2 调度策略</h3><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>优先级范围</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SCHED_NORMAL</code> (SCHED_OTHER)</td>
+<td>nice -20~19</td>
+<td>CFS 调度，默认策略</td>
+</tr>
+<tr>
+<td><code>SCHED_BATCH</code></td>
+<td>nice -20~19</td>
+<td>类似 NORMAL，但唤醒频率低，适合批处理</td>
+</tr>
+<tr>
+<td><code>SCHED_FIFO</code></td>
+<td>实时优先级 1~99</td>
+<td>静态优先级，不抢占不轮转，运行到主动放弃或更高优先级抢占</td>
+</tr>
+<tr>
+<td><code>SCHED_RR</code></td>
+<td>实时优先级 1~99</td>
+<td>时间片轮转，同优先级下轮流运行</td>
+</tr>
+<tr>
+<td><code>SCHED_DEADLINE</code></td>
+<td>-</td>
+<td>基于 EDF (Earliest Deadline First) 的实时调度</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>注意</strong>：<code>SCHED_FIFO/RR</code> 是实时调度策略，优先级高于所有 <code>SCHED_NORMAL</code> 进程。应用错误使用实时策略可导致系统被 Starve（饥饿），SSH 都无法连接。</p>
+</blockquote>
+<h3 id="5-3-CPU-亲和性"><a href="#5-3-CPU-亲和性" class="headerlink" title="5.3 CPU 亲和性"></a>5.3 CPU 亲和性</h3><p><code>taskset</code> 可以将进程绑定到指定的 CPU 核心：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">taskset -c 0-3,8-11 &lt;pid&gt;        <span class="comment"># 绑定到 CPU 0-3 和 8-11（同一 NUMA node）</span></span><br><span class="line">taskset -c 0-3 &lt;<span class="built_in">command</span>&gt;         <span class="comment"># 启动并绑定</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>绑定原因</strong>：避免跨 NUMA node 的内存访问延迟（远端内存访问 2x 延迟）、提高 L1&#x2F;L2 cache 命中率、降低 TLB miss。</p>
+<p>也可以在代码中通过 <code>pthread_setaffinity_np()</code> 或 <code>sched_setaffinity()</code> 设置线程级亲和性。Netty 的 NioEventLoop、DPDK 的 lcore 均使用此技术。</p>
+<h3 id="5-4-负载均衡"><a href="#5-4-负载均衡" class="headerlink" title="5.4 负载均衡"></a>5.4 负载均衡</h3><p>CFS 在每个调度 tick 检查 CPU 的负载平衡状态。主要涉及：</p>
+<ul>
+<li><strong>CPU 级别的负载均衡</strong>：每个调度域的负载均衡周期，将任务从忙 CPU 迁移到闲 CPU。</li>
+<li><strong>NUMA 级别的负载均衡</strong>：尽量避免跨 NUMA node 迁移，优先在同 NUMA node 内平衡。</li>
+</ul>
+<p>负载均衡的决策由 <code>sd-&gt;balance_interval</code>（调度域平衡间隔）、<code>imbalance_pct</code>（不平衡阈值）等参数控制。可通过 <code>/proc/sys/kernel/sched_*</code> 调整。</p>
+<h3 id="5-5-NUMA-架构对后端应用的影响"><a href="#5-5-NUMA-架构对后端应用的影响" class="headerlink" title="5.5 NUMA 架构对后端应用的影响"></a>5.5 NUMA 架构对后端应用的影响</h3><p>多路服务器通常采用 NUMA（Non-Uniform Memory Access）架构——每个 CPU socket 拥有本地内存（本地 node 访问延迟 ~100ns，远端 node 访问延迟 ~200-300ns）。</p>
+<p><strong>NUMA 陷阱</strong>：</p>
+<ul>
+<li><strong>跨 NUMA 内存分配</strong>：进程分配到 Node 0 的 CPU 但内存分配到了 Node 1，导致每次内存访问都有 2x 延迟变高。<code>numastat -p &lt;PID&gt;</code> 可查看进程在各 NUMA node 上的内存分布。</li>
+<li><strong>CPU 迁移</strong>: 进程&#x2F;线程在不同 NUMA node 间漂移会导致本地 cache 和 TLB 全部失效。</li>
+<li><strong>内存交错模式</strong>：如果系统 BIOS 中启用了 Node Interleaving，内存跨 node 均匀分配，保证所有 CPU 访问延迟一致但整体访问延迟更高（适合不确定 NUMA 优化的场景）。</li>
+</ul>
+<p><strong>优化策略</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">numactl --cpunodebind=0 --membind=0 &lt;<span class="built_in">command</span>&gt;      <span class="comment"># 绑定到同一 NUMA node</span></span><br><span class="line">numactl --cpunodebind=0 --preferred=0 &lt;<span class="built_in">command</span>&gt;    <span class="comment"># 优先使用 Node 0 内存，不足时跨 node</span></span><br></pre></td></tr></table></figure>
+<p>高效应用（如 DPDK、Redis、数据库）应尽量部署在单一 NUMA node 内，必要时启动多实例分 node 绑定。<code>lscpu</code> 可查看服务器 NUMA 拓扑。</p>
+<hr>
+<h2 id="六、Linux-系统调用与内核"><a href="#六、Linux-系统调用与内核" class="headerlink" title="六、Linux 系统调用与内核"></a>六、Linux 系统调用与内核</h2><h3 id="6-1-用户态-内核态切换"><a href="#6-1-用户态-内核态切换" class="headerlink" title="6.1 用户态&#x2F;内核态切换"></a>6.1 用户态&#x2F;内核态切换</h3><p>CPU 通过特权级别（x86 的 Ring 0<del>3，ARM 的 EL0</del>EL3）隔离用户态和内核态。系统调用是用户态主动进入内核态的唯一合法入口（中断和异常是硬件触发）。</p>
+<p><strong>系统调用流程</strong>：</p>
+<ol>
+<li>用户程序调用 glibc 封装的函数（如 <code>read()</code>）。</li>
+<li>glibc 将系统调用号存入 <code>rax</code>，参数存入 <code>rdi/rsi/rdx/r10/r8/r9</code>。</li>
+<li>执行 <code>syscall</code> 指令（x86-64），CPU 切换到内核栈、提升特权级。</li>
+<li>内核 <code>entry_SYSCALL_64</code> 处理入口，根据 <code>rax</code> 调用系统调用表中的对应函数。</li>
+<li>执行完成后通过 <code>sysret</code> 返回用户态。</li>
+</ol>
+<p><strong>切换开销</strong>：单次系统调用耗时约 50-200ns（不含业务逻辑），主要开销在于：保存&#x2F;恢复寄存器、切换栈、TLB&#x2F;Cache 影响。持续高频的系统调用会显著拖累吞吐——这也是 io_uring 和 DPDK 设计核心理念（减少&#x2F;消除系统调用）。</p>
+<h3 id="6-2-常用系统调用"><a href="#6-2-常用系统调用" class="headerlink" title="6.2 常用系统调用"></a>6.2 常用系统调用</h3><table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>功能</th>
+<th>生产场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>read/write</code></td>
+<td>文件读写</td>
+<td>通用 I&#x2F;O</td>
+</tr>
+<tr>
+<td><code>sendfile</code></td>
+<td>文件→socket 零拷贝</td>
+<td>Nginx&#x2F;Kafka 静态文件发送</td>
+</tr>
+<tr>
+<td><code>splice</code></td>
+<td>两个 fd 间零拷贝传输</td>
+<td>Nginx 代理场景</td>
+</tr>
+<tr>
+<td><code>mmap</code></td>
+<td>文件映射到内存</td>
+<td>数据库 WAL 读取、JVM 堆外内存</td>
+</tr>
+<tr>
+<td><code>madvise</code></td>
+<td>给内核内存使用建议</td>
+<td><code>MADV_DONTNEED</code> 回收、<code>MADV_HUGEPAGE</code> 启用大页</td>
+</tr>
+<tr>
+<td><code>mlock</code></td>
+<td>锁定内存不 swap</td>
+<td>加密密钥存储、JVM <code>-XX:+UseLargePages</code></td>
+</tr>
+<tr>
+<td><code>prctl</code></td>
+<td>进程控制（名称、core dump 等）</td>
+<td>守护进程改名</td>
+</tr>
+<tr>
+<td><code>setrlimit</code></td>
+<td>资源限制</td>
+<td><code>nofile</code>（文件描述符限制）、<code>nproc</code>（进程数限制）</td>
+</tr>
+<tr>
+<td><code>epoll_create/wait</code></td>
+<td>I&#x2F;O 多路复用</td>
+<td>所有 Reactor 模型网络框架</td>
+</tr>
+<tr>
+<td><code>futex</code></td>
+<td>快速用户态锁</td>
+<td><code>pthread_mutex</code>、<code>Semaphore</code> 的底层实现</td>
+</tr>
+</tbody></table>
+<h3 id="6-3-proc-文件系统常用文件"><a href="#6-3-proc-文件系统常用文件" class="headerlink" title="6.3 &#x2F;proc 文件系统常用文件"></a>6.3 &#x2F;proc 文件系统常用文件</h3><table>
+<thead>
+<tr>
+<th>文件路径</th>
+<th>内容</th>
+<th>排查场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/proc/cpuinfo</code></td>
+<td>CPU 型号、核心数、cache 大小</td>
+<td>确认 CPU 规格</td>
+</tr>
+<tr>
+<td><code>/proc/meminfo</code></td>
+<td>内存总量&#x2F;空闲&#x2F;buffer&#x2F;cache&#x2F;swap</td>
+<td>内存水位分析</td>
+</tr>
+<tr>
+<td><code>/proc/&lt;pid&gt;/status</code></td>
+<td>进程内存、线程数、fd 数</td>
+<td>单进程资源画像</td>
+</tr>
+<tr>
+<td><code>/proc/&lt;pid&gt;/maps</code></td>
+<td>进程虚拟内存映射详情</td>
+<td>内存横向分析</td>
+</tr>
+<tr>
+<td><code>/proc/&lt;pid&gt;/fd/</code></td>
+<td>进程打开的文件描述符</td>
+<td>fd leak 排查</td>
+</tr>
+<tr>
+<td><code>/proc/&lt;pid&gt;/limits</code></td>
+<td>进程资源限制 (ulimit)</td>
+<td>检查 nofile 生效</td>
+</tr>
+<tr>
+<td><code>/proc/&lt;pid&gt;/sched</code></td>
+<td>进程调度策略和优先级</td>
+<td>检查实时调度</td>
+</tr>
+<tr>
+<td><code>/proc/&lt;pid&gt;/smaps</code></td>
+<td>详细内存映射（含 RSS&#x2F;PSS&#x2F;swap）</td>
+<td>精准内存分析</td>
+</tr>
+<tr>
+<td><code>/proc/interrupts</code></td>
+<td>中断分布（含 CPU 亲和性）</td>
+<td>网卡中断均衡</td>
+</tr>
+<tr>
+<td><code>/proc/net/dev</code></td>
+<td>网卡收发包统计</td>
+<td>网络流量分析</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、性能排查"><a href="#七、性能排查" class="headerlink" title="七、性能排查"></a>七、性能排查</h2><h3 id="7-1-CPU-排查"><a href="#7-1-CPU-排查" class="headerlink" title="7.1 CPU 排查"></a>7.1 CPU 排查</h3><p><strong>top</strong> 是最直观的实时 CPU 观察工具。关键指标：</p>
+<ul>
+<li><code>us</code>（user）：用户态 CPU 占比。高则程序计算密集或频繁系统调用。</li>
+<li><code>sy</code>（system）：内核态 CPU 占比。持续 &gt;20% 意味着系统调用开销大或中断密集。</li>
+<li><code>ni</code>（nice）：低优先级用户态 CPU 占比。</li>
+<li><code>id</code>（idle）：空闲 CPU 占比。</li>
+<li><code>wa</code>（iowait）：CPU 等待 I&#x2F;O 完成的时间占比。高 <code>wa</code> 通常是磁盘瓶颈，而非 CPU 问题（此时 CPU 实际上是空闲的，只是被计入等待）。</li>
+<li><code>si/</code>（softirq）：软中断占比。高 <code>si</code> 通常是网卡中断处理开销大。</li>
+</ul>
+<p><strong>mpstat</strong>（每 CPU 使用率）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mpstat -P ALL 1           <span class="comment"># 每秒输出各 CPU 使用率</span></span><br></pre></td></tr></table></figure>
+<p>可快速判断负载是否均衡、是否存在单 CPU 打满的整体瓶颈。</p>
+<p><strong>pidstat</strong>（进程级别 CPU）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u 1              <span class="comment"># 每秒输出进程 CPU 使用率</span></span><br><span class="line">pidstat -w 1              <span class="comment"># 进程上下文切换率（cswch: 自发切换, nvcswch: 非自发切换）</span></span><br><span class="line">pidstat -t -p &lt;PID&gt; 1     <span class="comment"># 查看进程的线程级 CPU 分布</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>实战</strong>：Java 应用中，通过 <code>pidstat -t -p &lt;PID&gt;</code> 识别占 CPU 最高的线程 TID → 转十六进制 → 在线程 dump（<code>jstack &lt;PID&gt;</code>）中搜索 <code>nid=0x&lt;TID&gt;</code>，定位到具体代码。</p>
+</blockquote>
+<h3 id="7-2-内存排查"><a href="#7-2-内存排查" class="headerlink" title="7.2 内存排查"></a>7.2 内存排查</h3><p><strong>free</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">free -h</span><br><span class="line"><span class="comment">#              total   used    free    shared  buff/cache   available</span></span><br><span class="line"><span class="comment"># Mem:          62Gi   18Gi    8.0Gi   2.0Gi   36Gi         41Gi</span></span><br></pre></td></tr></table></figure>
+<p>关键：<code>available</code> 才是真正可用的内存（≈ free + 可回收的 buffer&#x2F;cache）。<code>free</code> 低但 <code>available</code> 高是正常的（Linux 倾向将空闲内存用作 page cache）。</p>
+<p><strong>vmstat</strong>（虚拟内存统计）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vmstat 1</span><br><span class="line"><span class="comment"># r  b   swpd   free   buff  cache   si   so   bi   bo   in   cs</span></span><br><span class="line"><span class="comment"># 2  0      0  8000M  2000M  36000M   0    0    0  100  500  3000</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>si/so</code>：swap in&#x2F;out。持续非零说明内存不足在 swap。</li>
+<li><code>bi/bo</code>：block in&#x2F;out（磁盘读写 KB&#x2F;s）。高 <code>bi</code> 可能是缺页中断读盘。</li>
+<li><code>r</code>：可运行进程数。持续 &gt; CPU 核数说明 CPU 瓶颈。</li>
+<li><code>b</code>：在不可中断睡眠的进程数。持续 &gt;0 说明 I&#x2F;O 瓶颈。</li>
+</ul>
+<p><strong>pmap</strong>（进程内存映射）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pmap -x &lt;PID&gt; | <span class="built_in">sort</span> -k3 -rn | <span class="built_in">head</span> -20    <span class="comment"># 按 RSS 排序，找内存占用大户</span></span><br></pre></td></tr></table></figure>
+<p>分析 JVM 堆外内存泄漏的利器：如果 <code>pmap</code> 中大量 <code>anon</code> 段接近堆大小，可能是 DirectByteBuffer 或 Native memory 泄漏。</p>
+<h3 id="7-3-I-O-排查"><a href="#7-3-I-O-排查" class="headerlink" title="7.3 I&#x2F;O 排查"></a>7.3 I&#x2F;O 排查</h3><p><strong>iostat</strong>（磁盘 I&#x2F;O 统计）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iostat -x 1</span><br><span class="line"><span class="comment"># r/s w/s  rkB/s wkB/s  await  r_await  w_await  %util</span></span><br><span class="line"><span class="comment">#  0  200     0  40000    3.0      0.0      3.0   60.0</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>await</code>：I&#x2F;O 平均响应时间（ms）。持续 &gt;10ms 说明磁盘延迟高（HDD 正常约 5-15ms，SSD 应 &lt;1ms）。</li>
+<li><code>%util</code>：设备繁忙时间占比。注意 SSD 并发 I&#x2F;O 时 100% util 不代表瓶颈（NVMe 有队列并行），但 HDD 的 100% util 通常是瓶颈。</li>
+<li><code>svctm</code>：平均服务时间。低于 <code>await</code> 说明排队严重。</li>
+</ul>
+<p><strong>iotop</strong>（进程级 I&#x2F;O）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iotop -o                   <span class="comment"># 仅显示有 I/O 活动的进程</span></span><br><span class="line">iotop -p &lt;PID&gt;             <span class="comment"># 查看特定进程</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-4-综合工具"><a href="#7-4-综合工具" class="headerlink" title="7.4 综合工具"></a>7.4 综合工具</h3><p><strong>sar</strong>（System Activity Reporter）可回溯历史数据（通过 <code>sysstat</code> 服务的 10 分钟采集周期）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sar -u 1 10              <span class="comment"># CPU 使用率</span></span><br><span class="line">sar -r 1 10              <span class="comment"># 内存使用</span></span><br><span class="line">sar -n DEV 1 10          <span class="comment"># 网络流量</span></span><br><span class="line">sar -b 1 10              <span class="comment"># I/O 速率</span></span><br><span class="line">sar -f /var/log/sa/saXX  <span class="comment"># 查看历史数据（如 sa04 代表当月 4 号）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>perf</strong>（性能分析）——生产环境最关键的工具：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">perf top -g              <span class="comment"># 实时热点函数 + 调用栈</span></span><br><span class="line">perf record -g -p &lt;PID&gt; -- <span class="built_in">sleep</span> 30   <span class="comment"># 采样 30 秒</span></span><br><span class="line">perf report -g           <span class="comment"># 查看报告（火焰图）</span></span><br><span class="line">perf <span class="built_in">stat</span> -p &lt;PID&gt; -- <span class="built_in">sleep</span> 10        <span class="comment"># 事件计数（instructions/cycles/cache-miss/branch-miss）</span></span><br></pre></td></tr></table></figure>
+<p>火焰图（FlameGraph）是 perf 报告的可视化形式，直观展示 CPU 时间在不同函数栈中的分布。</p>
+<h3 id="7-5-常见性能问题案例"><a href="#7-5-常见性能问题案例" class="headerlink" title="7.5 常见性能问题案例"></a>7.5 常见性能问题案例</h3><p><strong>案例 1：CPU iowait 高企</strong></p>
+<p>现象：<code>top</code> 显示 <code>wa</code> 持续 &gt;30%，应用响应缓慢。<br>分析：<code>iostat -x 1</code> 确认磁盘 <code>await</code> &gt;50ms，<code>%util</code> 接近 100%。<code>iotop</code> 发现大量顺序写。<br>根因：应用日志 <code>fsync</code> 同步刷盘频率过高。<br>解决：调大日志缓冲区、合并写、使用异步日志（如 Log4j2 AsyncAppender 或直接上 Kafka 日志收集）。</p>
+<p><strong>案例 2：频繁 Full GC 导致 STW</strong></p>
+<p>现象：服务周期性超时，<code>jstat -gc</code> 显示 Full GC 频率异常。<br>分析：<code>pmap -x</code> 发现堆外内存 RSS 占用极大（Direct Memory），结合 GC 日志，确认是堆外内存不足触发 <code>System.gc()</code>。<br>根因：<code>-XX:MaxDirectMemorySize</code> 未配置，默认与 <code>-Xmx</code> 相同，大量 DirectByteBuffer 未及时回收。<br>解决：显式设置 <code>-XX:MaxDirectMemorySize</code>，升级到使用 <code>Cleaner</code> 管理直接内存的框架版本。</p>
+<p><strong>案例 3：页表争抢导致性能瓶颈</strong></p>
+<p>现象：32 核服务器上 32 线程应用，<code>perf top</code> 中 <code>clear_page</code> 和 <code>page_fault</code> 占比高。<br>分析：线程频繁分配新内存触发 COW 和 minor fault，内核锁争抢（<code>pte_offset_map_lock</code> 在 <code>perf</code> 热点中）。<br>根因：高频内存分配（如每次请求创建大量临时对象），内存分配路径上的内核锁无法 1:32 扩展。<br>解决：使用对象池、栈上分配（逃逸分析优化）、替换为 jemalloc 减少分配路径上的竞争。</p>
+<p><strong>案例 4：Redis fork 延迟</strong></p>
+<p>现象：Redis 定期 fork 时响应延迟抖动 &gt;100ms。<br>分析：<code>info stats</code> 显示 <code>latest_fork_usec &gt; 100000</code>。Redis 进程 RSS 已超过 20GB。<br>根因：<code>fork</code> 需要复制父进程所有页表（RSS&#x2F;PAGE_SIZE 条 PTE），20GB → 500 万条 PTE，逐一复制耗时 &gt;100ms。<br>解决：拆分大实例为多个小实例（单实例 &lt;10GB）、启用 THP（减少 PTE 条目数）、或使用 Redis Cluster 水平扩展。</p>
+<blockquote>
+<p><strong>总结</strong>：操作系统知识对后端工程师的价值不在于记住所有内核参数，而在于——当生产环境出问题时，能沿着进程状态、内存路径、I&#x2F;O 栈、调度行为这条线索，快速定位瓶颈是从哪里产生的。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/IO/" rel="tag"># IO</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag"># 操作系统</a>
+              <a href="/tags/%E8%BF%9B%E7%A8%8B/" rel="tag"># 进程</a>
+              <a href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="tag"># 内存管理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/HTTP/" rel="prev" title="HTTPS">
+                  <i class="fa fa-angle-left"></i> HTTPS
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/network/" rel="next" title="计算机网络">
+                  计算机网络 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

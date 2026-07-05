@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Kafka Streams 是 Kafka 生态内置的流处理库。与 Flink 的外部集群模式不同，Kafka Streams 只是一个 Java 库——你把它嵌入到任何 Java 应用中，无需独立的集群。 一、Kafka Streams vs Flink   维度 Kafka Streams Flink    部署 Java 库，嵌入应用 独立集群   状态 本地 RocksDB 本地&amp;#x2F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka Streams 流处理">
+<meta property="og:url" content="http://pclhahaha.github.io/kafka-streams/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Kafka Streams 是 Kafka 生态内置的流处理库。与 Flink 的外部集群模式不同，Kafka Streams 只是一个 Java 库——你把它嵌入到任何 Java 应用中，无需独立的集群。 一、Kafka Streams vs Flink   维度 Kafka Streams Flink    部署 Java 库，嵌入应用 独立集群   状态 本地 RocksDB 本地&amp;#x2F">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据工程">
+<meta property="article:tag" content="流处理">
+<meta property="article:tag" content="Kafka">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/kafka-streams/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/kafka-streams/","path":"kafka-streams/","title":"Kafka Streams 流处理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Kafka Streams 流处理 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81Kafka-Streams-vs-Flink"><span class="nav-number">1.</span> <span class="nav-text">一、Kafka Streams vs Flink</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">二、核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#KStream-vs-KTable"><span class="nav-number">2.1.</span> <span class="nav-text">KStream vs KTable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C"><span class="nav-number">2.2.</span> <span class="nav-text">核心操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">三、状态管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81KSQL%E2%80%94%E2%80%94%E6%B5%81%E5%BC%8F-SQL"><span class="nav-number">4.</span> <span class="nav-text">四、KSQL——流式 SQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%B2%BE%E7%A1%AE%E4%B8%80%E6%AC%A1"><span class="nav-number">5.</span> <span class="nav-text">五、精确一次</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">6.</span> <span class="nav-text">六、适用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/kafka-streams/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Kafka Streams 流处理 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kafka Streams 流处理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Kafka Streams 是 Kafka 生态内置的流处理库。与 Flink 的外部集群模式不同，Kafka Streams 只是一个 Java 库——你把它嵌入到任何 Java 应用中，无需独立的集群。</p>
+<h2 id="一、Kafka-Streams-vs-Flink"><a href="#一、Kafka-Streams-vs-Flink" class="headerlink" title="一、Kafka Streams vs Flink"></a>一、Kafka Streams vs Flink</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Kafka Streams</th>
+<th>Flink</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>部署</td>
+<td>Java 库，嵌入应用</td>
+<td>独立集群</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>本地 RocksDB</td>
+<td>本地&#x2F;远程 RocksDB</td>
+</tr>
+<tr>
+<td>扩展</td>
+<td>应用实例数 &#x3D; Kafka 分区数</td>
+<td>独立扩缩</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>KSQL (Kafka SQL)</td>
+<td>Flink SQL (完整 ANSI)</td>
+</tr>
+<tr>
+<td>精确一次</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>毫秒级</td>
+<td>毫秒级</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>简单流处理、Kafka 重度用户</td>
+<td>复杂流处理、多数据源</td>
+</tr>
+</tbody></table>
+<h2 id="二、核心概念"><a href="#二、核心概念" class="headerlink" title="二、核心概念"></a>二、核心概念</h2><h3 id="KStream-vs-KTable"><a href="#KStream-vs-KTable" class="headerlink" title="KStream vs KTable"></a>KStream vs KTable</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// KStream: 事件流，每个事件独立</span></span><br><span class="line">KStream&lt;String, Order&gt; orders = builder.stream(<span class="string">&quot;orders&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// KTable: 变更日志，每个 key 只保留最新值</span></span><br><span class="line">KTable&lt;String, User&gt; users = builder.table(<span class="string">&quot;users&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 流表 JOIN：事件到达时关联当前最新的用户信息</span></span><br><span class="line">orders.join(users, (order, user) -&gt; enrich(order, user))</span><br><span class="line">      .to(<span class="string">&quot;enriched-orders&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="核心操作"><a href="#核心操作" class="headerlink" title="核心操作"></a>核心操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">KStream&lt;String, PageView&gt; views = builder.stream(<span class="string">&quot;pageviews&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 窗口聚合：每 5 分钟统计 PV</span></span><br><span class="line">views.groupByKey()</span><br><span class="line">     .windowedBy(TimeWindows.of(Duration.ofMinutes(<span class="number">5</span>)))</span><br><span class="line">     .count()</span><br><span class="line">     .toStream()</span><br><span class="line">     .to(<span class="string">&quot;pviews-per-5min&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 过滤 + 转换 + 分流</span></span><br><span class="line">views.filter((key, view) -&gt; view.getDuration() &gt; <span class="number">10000</span>)</span><br><span class="line">     .mapValues(v -&gt; <span class="keyword">new</span> <span class="title class_">EngagedView</span>(v))</span><br><span class="line">     .to(<span class="string">&quot;engaged-views&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、状态管理"><a href="#三、状态管理" class="headerlink" title="三、状态管理"></a>三、状态管理</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">StreamsBuilder</span> <span class="variable">builder</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StreamsBuilder</span>();</span><br><span class="line"></span><br><span class="line">KStream&lt;String, Event&gt; events = builder.stream(<span class="string">&quot;events&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 有状态处理：使用 KeyValueStore</span></span><br><span class="line">events.groupByKey()</span><br><span class="line">      .aggregate(</span><br><span class="line">          () -&gt; <span class="keyword">new</span> <span class="title class_">HashSet</span>&lt;&gt;(),                               <span class="comment">// 初始化</span></span><br><span class="line">          (key, event, seen) -&gt; &#123; seen.add(event.getId()); <span class="keyword">return</span> seen; &#125;,  <span class="comment">// 更新</span></span><br><span class="line">          Materialized.as(<span class="string">&quot;seen-events-store&quot;</span>)                 <span class="comment">// 状态存储名</span></span><br><span class="line">      );</span><br></pre></td></tr></table></figure>
+
+<p>默认使用本地 RocksDB 存储状态。如果应用重启，状态从 Kafka 内部的 changelog topic 恢复——Kafka Streams 自动把每次状态变更写入一个专用的内部 topic。</p>
+<h2 id="四、KSQL——流式-SQL"><a href="#四、KSQL——流式-SQL" class="headerlink" title="四、KSQL——流式 SQL"></a>四、KSQL——流式 SQL</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建流</span></span><br><span class="line"><span class="keyword">CREATE</span> STREAM orders (</span><br><span class="line">    order_id <span class="type">BIGINT</span>,</span><br><span class="line">    user_id <span class="type">BIGINT</span>,</span><br><span class="line">    amount <span class="type">DECIMAL</span>(<span class="number">10</span>,<span class="number">2</span>)</span><br><span class="line">) <span class="keyword">WITH</span> (KAFKA_TOPIC<span class="operator">=</span><span class="string">&#x27;orders&#x27;</span>, VALUE_FORMAT<span class="operator">=</span><span class="string">&#x27;JSON&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 实时聚合</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> hourly_stats <span class="keyword">AS</span></span><br><span class="line"><span class="keyword">SELECT</span> user_id, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> order_count, <span class="built_in">SUM</span>(amount) <span class="keyword">AS</span> total</span><br><span class="line"><span class="keyword">FROM</span> orders</span><br><span class="line"><span class="keyword">WINDOW</span> TUMBLING (SIZE <span class="number">1</span> <span class="keyword">HOUR</span>)</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> user_id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 流表 JOIN</span></span><br><span class="line"><span class="keyword">SELECT</span> o.order_id, u.name, o.amount</span><br><span class="line"><span class="keyword">FROM</span> orders o <span class="keyword">JOIN</span> users u <span class="keyword">ON</span> o.user_id <span class="operator">=</span> u.user_id;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、精确一次"><a href="#五、精确一次" class="headerlink" title="五、精确一次"></a>五、精确一次</h2><p>Kafka Streams 的精确一次依赖于 Kafka 的事务机制：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 消费消息 → 处理 → 写入输出 topic + 提交 offset</span><br><span class="line">   这三步在同一个 Kafka 事务中完成</span><br><span class="line"><span class="bullet">2.</span> 失败 → 事务回滚，offset 不提交 → 重试</span><br><span class="line"><span class="bullet">3.</span> 成功 → 事务提交</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、适用场景"><a href="#六、适用场景" class="headerlink" title="六、适用场景"></a>六、适用场景</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>选择</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据源只有 Kafka</td>
+<td><strong>Kafka Streams</strong></td>
+</tr>
+<tr>
+<td>多数据源（Kafka + DB + File）</td>
+<td>Flink</td>
+</tr>
+<tr>
+<td>团队不熟悉 Java</td>
+<td>Flink SQL &#x2F; KSQL</td>
+</tr>
+<tr>
+<td>复杂事件处理（CEP）</td>
+<td>Flink</td>
+</tr>
+<tr>
+<td>已有的 Spring Boot 服务加流处理</td>
+<td><strong>Kafka Streams</strong></td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>Kafka Streams 的核心价值是”零运维的流处理”——没有独立集群、没有额外的部署步骤。适合 Kafka 重度用户、简单到中等复杂度的流处理场景。一旦需要多数据源 JOIN、CEP 或复杂窗口，Flink 就是更好的选择。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" rel="tag"># 数据工程</a>
+              <a href="/tags/%E6%B5%81%E5%A4%84%E7%90%86/" rel="tag"># 流处理</a>
+              <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/langgraph-guide/" rel="prev" title="LangGraph 实战">
+                  <i class="fa fa-angle-left"></i> LangGraph 实战
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/java-string-pool/" rel="next" title="字符串常量池与 String.intern()">
+                  字符串常量池与 String.intern() <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

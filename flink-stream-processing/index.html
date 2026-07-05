@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Flink 是当前最主流的流处理引擎。相比 Spark Streaming 的微批处理（micro-batch），Flink 是真正的逐事件处理，延迟可以从秒级降到毫秒级。 一、Flink vs Spark Streaming   维度 Spark Streaming Flink    处理模型 微批（micro-batch，通常1-10秒） 逐事件（event-by-event）   延迟 秒级">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink 实时计算">
+<meta property="og:url" content="http://pclhahaha.github.io/flink-stream-processing/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Flink 是当前最主流的流处理引擎。相比 Spark Streaming 的微批处理（micro-batch），Flink 是真正的逐事件处理，延迟可以从秒级降到毫秒级。 一、Flink vs Spark Streaming   维度 Spark Streaming Flink    处理模型 微批（micro-batch，通常1-10秒） 逐事件（event-by-event）   延迟 秒级">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据工程">
+<meta property="article:tag" content="Flink">
+<meta property="article:tag" content="流处理">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/flink-stream-processing/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/flink-stream-processing/","path":"flink-stream-processing/","title":"Flink 实时计算"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Flink 实时计算 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81Flink-vs-Spark-Streaming"><span class="nav-number">1.</span> <span class="nav-text">一、Flink vs Spark Streaming</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">二、核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Watermark%E2%80%94%E2%80%94%E5%A4%84%E7%90%86%E4%B9%B1%E5%BA%8F%E6%95%B0%E6%8D%AE"><span class="nav-number">2.1.</span> <span class="nav-text">Watermark——处理乱序数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B2%BE%E7%A1%AE%E4%B8%80%E6%AC%A1%EF%BC%88Exactly-Once%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">精确一次（Exactly-Once）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81Flink-SQL%E2%80%94%E2%80%94%E6%B5%81%E6%89%B9%E4%B8%80%E4%BD%93"><span class="nav-number">3.</span> <span class="nav-text">三、Flink SQL——流批一体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86%E4%B8%8E-RocksDB"><span class="nav-number">4.</span> <span class="nav-text">四、状态管理与 RocksDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E9%83%A8%E7%BD%B2%E6%A8%A1%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">五、部署模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">六、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/flink-stream-processing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Flink 实时计算 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Flink 实时计算
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Flink 是当前最主流的流处理引擎。相比 Spark Streaming 的微批处理（micro-batch），Flink 是真正的逐事件处理，延迟可以从秒级降到毫秒级。</p>
+<h2 id="一、Flink-vs-Spark-Streaming"><a href="#一、Flink-vs-Spark-Streaming" class="headerlink" title="一、Flink vs Spark Streaming"></a>一、Flink vs Spark Streaming</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Spark Streaming</th>
+<th>Flink</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>处理模型</td>
+<td>微批（micro-batch，通常1-10秒）</td>
+<td>逐事件（event-by-event）</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>秒级</td>
+<td>毫秒级</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>有限（依赖外部存储）</td>
+<td>内置 RocksDB 状态后端</td>
+</tr>
+<tr>
+<td>精确一次</td>
+<td>支持（但有限制）</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td>窗口</td>
+<td>基于批次时间</td>
+<td>事件时间 + Watermark</td>
+</tr>
+<tr>
+<td>SQL 支持</td>
+<td>Spark SQL</td>
+<td>Flink SQL（ANSI SQL 兼容）</td>
+</tr>
+</tbody></table>
+<h2 id="二、核心概念"><a href="#二、核心概念" class="headerlink" title="二、核心概念"></a>二、核心概念</h2><h3 id="Watermark——处理乱序数据"><a href="#Watermark——处理乱序数据" class="headerlink" title="Watermark——处理乱序数据"></a>Watermark——处理乱序数据</h3><p>现实世界中事件到达顺序可能是乱的。Watermark 是 Flink 判断事件时间窗口”已完成”的机制：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">事件时间: <span class="number">10</span>:<span class="number">00</span>  <span class="number">10</span>:<span class="number">01</span>  <span class="number">10</span>:<span class="number">03</span>  <span class="number">10</span>:<span class="number">02</span>(延迟到达)  <span class="number">10</span>:<span class="number">04</span>  <span class="number">10</span>:<span class="number">05</span></span><br><span class="line">                                              ↑</span><br><span class="line">                              Watermark = <span class="number">10</span>:<span class="number">04</span> → <span class="number">10:00-10:03</span> 的窗口可以关闭了</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> events (</span><br><span class="line">    event_time <span class="type">TIMESTAMP</span>(<span class="number">3</span>),</span><br><span class="line">    user_id STRING,</span><br><span class="line">    action STRING,</span><br><span class="line">    WATERMARK <span class="keyword">FOR</span> event_time <span class="keyword">AS</span> event_time <span class="operator">-</span> <span class="type">INTERVAL</span> <span class="string">&#x27;5&#x27;</span> <span class="keyword">SECOND</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="精确一次（Exactly-Once）"><a href="#精确一次（Exactly-Once）" class="headerlink" title="精确一次（Exactly-Once）"></a>精确一次（Exactly-Once）</h3><p>Flink 通过 Checkpoint 机制实现精确一次语义：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> Flink 定期触发 <span class="keyword">Checkpoint</span>（比如每 <span class="number">60</span> 秒）</span><br><span class="line"><span class="number">2.</span> 暂停数据处理 → 保存所有算子的当前状态（RocksDB <span class="keyword">Snapshot</span>）→ 保存 Kafka <span class="keyword">offset</span></span><br><span class="line"><span class="number">3.</span> 状态保存到持久化存储（S3/HDFS）</span><br><span class="line"><span class="number">4.</span> 故障恢复时：从最近的 <span class="keyword">Checkpoint</span> 恢复状态 + 从保存的 <span class="keyword">offset</span> 重放 Kafka</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Flink-SQL——流批一体"><a href="#三、Flink-SQL——流批一体" class="headerlink" title="三、Flink SQL——流批一体"></a>三、Flink SQL——流批一体</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 实时统计每 5 分钟的 PV</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    TUMBLE_START(event_time, <span class="type">INTERVAL</span> <span class="string">&#x27;5&#x27;</span> <span class="keyword">MINUTE</span>) <span class="keyword">AS</span> window_start,</span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> pv</span><br><span class="line"><span class="keyword">FROM</span> events</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> TUMBLE(event_time, <span class="type">INTERVAL</span> <span class="string">&#x27;5&#x27;</span> <span class="keyword">MINUTE</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- Top-N 热门商品（实时更新）</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> item_id, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> cnt,</span><br><span class="line">           <span class="built_in">ROW_NUMBER</span>() <span class="keyword">OVER</span> (<span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">DESC</span>) <span class="keyword">as</span> rn</span><br><span class="line">    <span class="keyword">FROM</span> orders</span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> item_id</span><br><span class="line">) <span class="keyword">WHERE</span> rn <span class="operator">&lt;=</span> <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、状态管理与-RocksDB"><a href="#四、状态管理与-RocksDB" class="headerlink" title="四、状态管理与 RocksDB"></a>四、状态管理与 RocksDB</h2><p>Flink 的算子状态默认存储在内存中。大规模状态（如用户会话、去重集合）使用 RocksDB 作为状态后端：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">state.backend:</span> <span class="string">rocksdb</span></span><br><span class="line"><span class="attr">state.backend.rocksdb.localdir:</span> <span class="string">/tmp/flink-state</span></span><br><span class="line"><span class="attr">state.checkpoints.dir:</span> <span class="string">s3://bucket/flink/checkpoints/</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>RocksDB 将状态持久化到本地 SSD，内存只做缓存</li>
+<li>Checkpoint 时 RocksDB 做增量快照到 S3——只上传变化的部分，节省网络和存储</li>
+<li>故障恢复时从 S3 拉取最近 Checkpoint 的 RocksDB 文件</li>
+</ul>
+<h2 id="五、部署模式"><a href="#五、部署模式" class="headerlink" title="五、部署模式"></a>五、部署模式</h2><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>适用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Session</strong></td>
+<td>开发测试</td>
+<td>共享集群资源，多个 Job 共享 JM&#x2F;TM</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td>生产推荐</td>
+<td>一个 Job 一个集群，资源隔离</td>
+</tr>
+</tbody></table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 提交 Flink Job</span></span><br><span class="line">flink run-application -t yarn-application \</span><br><span class="line">  -Djobmanager.memory.process.size=4096m \</span><br><span class="line">  -Dtaskmanager.memory.process.size=8192m \</span><br><span class="line">  -Dtaskmanager.numberOfTaskSlots=4 \</span><br><span class="line">  -c com.example.StreamJob \</span><br><span class="line">  s3://bucket/jars/stream-job.jar</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、小结"><a href="#六、小结" class="headerlink" title="六、小结"></a>六、小结</h2><p>Flink 的核心价值是”低延迟 + 精确一次 + 事件时间语义”。实时数仓、实时风控、实时推荐这些对延迟敏感的场景，Flink 是首选方案。如果你的延迟要求是”秒级”，Spark Streaming 可能够用；如果是”毫秒级”，必须 Flink。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" rel="tag"># 数据工程</a>
+              <a href="/tags/Flink/" rel="tag"># Flink</a>
+              <a href="/tags/%E6%B5%81%E5%A4%84%E7%90%86/" rel="tag"># 流处理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/function-calling-guide/" rel="prev" title="Function Calling 与 Tool Use">
+                  <i class="fa fa-angle-left"></i> Function Calling 与 Tool Use
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/flash-sale-design/" rel="next" title="秒杀系统设计">
+                  秒杀系统设计 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

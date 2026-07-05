@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Spring 源码解析一、Spring 基础概念1.1 EnvironmentEnvironment 表示当前 Spring 应用运行的环境，包括了该应用的 profile 和 property 信息。 1.2 BeanFactory 与 BeanDefinitionBeanFactory 是 Spring IOC 容器的基础接口，负责管理 bean 的实例化、配置和装配。 loadBeanDef">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 源码解析">
+<meta property="og:url" content="http://pclhahaha.github.io/java-spring/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Spring 源码解析一、Spring 基础概念1.1 EnvironmentEnvironment 表示当前 Spring 应用运行的环境，包括了该应用的 profile 和 property 信息。 1.2 BeanFactory 与 BeanDefinitionBeanFactory 是 Spring IOC 容器的基础接口，负责管理 bean 的实例化、配置和装配。 loadBeanDef">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://pclhahaha.github.io/java/spring/1158841-20190707171658626-1389392187.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/spring/AopNamespaceHandler.png">
+<meta property="og:image" content="http://pclhahaha.github.io/java/spring/image002.jpg">
+<meta property="article:published_time" content="2020-01-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-01-03T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="AOP">
+<meta property="article:tag" content="源码分析">
+<meta property="article:tag" content="Spring Boot">
+<meta property="article:tag" content="IOC">
+<meta property="article:tag" content="Tomcat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://pclhahaha.github.io/java/spring/1158841-20190707171658626-1389392187.png">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/java-spring/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/java-spring/","path":"java-spring/","title":"Spring 源码解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring 源码解析 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Spring 源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81Spring-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">一、Spring 基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Environment"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 Environment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-BeanFactory-%E4%B8%8E-BeanDefinition"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 BeanFactory 与 BeanDefinition</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#loadBeanDefinitions"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">loadBeanDefinitions()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-Aware-%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.4 Aware 接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Bean-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.5 Bean 的生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-Ordered"><span class="nav-number">1.1.5.</span> <span class="nav-text">1.6 Ordered</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-Autowired-Qualifier-Primary"><span class="nav-number">1.1.6.</span> <span class="nav-text">1.7 @Autowired &#x2F; @Qualifier &#x2F; @Primary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-ApplicationListener"><span class="nav-number">1.1.7.</span> <span class="nav-text">1.8 ApplicationListener</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Spring-IOC"><span class="nav-number">1.2.</span> <span class="nav-text">二、Spring IOC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-BeanFactory"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 BeanFactory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Bean-%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Bean 配置方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#XML-%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">XML 配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E8%A7%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">注解扫描</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-FactoryBean"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 FactoryBean</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81Spring-AOP"><span class="nav-number">1.3.</span> <span class="nav-text">三、Spring AOP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Java-Dynamic-Proxy"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 Java Dynamic Proxy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Spring-Boot-%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">1.4.</span> <span class="nav-text">四、Spring Boot 启动过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-SpringApplication-run"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 SpringApplication.run()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Spring-Boot-%E8%87%AA%E5%8A%A8%E5%8C%96%E9%85%8D%E7%BD%AE"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 Spring Boot 自动化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#META-INF-spring-factories"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">META-INF&#x2F;spring.factories</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-AbstractApplicationContext-refresh"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 AbstractApplicationContext.refresh()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Spring-XSD-%E6%89%A9%E5%B1%95%E6%9C%BA%E5%88%B6"><span class="nav-number">1.5.</span> <span class="nav-text">五、Spring XSD 扩展机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-XSD-%E6%A6%82%E8%BF%B0"><span class="nav-number">1.5.1.</span> <span class="nav-text">5.1 XSD 概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-XML-%E9%85%8D%E7%BD%AE%E8%A7%A3%E6%9E%90"><span class="nav-number">1.5.2.</span> <span class="nav-text">5.2 XML 配置解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E8%87%AA%E5%AE%9A%E4%B9%89-XML-%E9%85%8D%E7%BD%AE%E6%89%A9%E5%B1%95"><span class="nav-number">1.5.3.</span> <span class="nav-text">5.3 自定义 XML 配置扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-spring-schemas-%E4%B8%8E-spring-handlers"><span class="nav-number">1.5.4.</span> <span class="nav-text">5.4 spring.schemas 与 spring.handlers</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#spring-schemas"><span class="nav-number">1.5.4.1.</span> <span class="nav-text">spring.schemas</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#spring-handlers"><span class="nav-number">1.5.4.2.</span> <span class="nav-text">spring.handlers</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-Spring-%E5%90%84%E6%A8%A1%E5%9D%97%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">1.5.5.</span> <span class="nav-text">5.5 Spring 各模块命名空间处理器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81Tomcat-%E4%B8%AD%E9%83%A8%E7%BD%B2-Spring-Web-%E5%BA%94%E7%94%A8"><span class="nav-number">1.6.</span> <span class="nav-text">六、Tomcat 中部署 Spring Web 应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-Servlet-%E5%AE%B9%E5%99%A8"><span class="nav-number">1.6.1.</span> <span class="nav-text">6.1 Servlet 容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Tomcat-%E4%B8%AD-war-%E7%9A%84%E9%83%A8%E7%BD%B2"><span class="nav-number">1.6.1.1.</span> <span class="nav-text">Tomcat 中 war 的部署</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-ContextLoaderListener"><span class="nav-number">1.6.2.</span> <span class="nav-text">6.2 ContextLoaderListener</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-WebApplicationContext-%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="nav-number">1.6.3.</span> <span class="nav-text">6.3 WebApplicationContext 的创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-DispatcherServlet"><span class="nav-number">1.6.4.</span> <span class="nav-text">6.4 DispatcherServlet</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DispatcherServlet-%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="nav-number">1.6.4.1.</span> <span class="nav-text">DispatcherServlet 的创建</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81Spring-%E5%AF%B9-WebSocket-%E7%9A%84%E6%94%AF%E6%8C%81"><span class="nav-number">1.7.</span> <span class="nav-text">七、Spring 对 WebSocket 的支持</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-WebSocket-%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.7.1.</span> <span class="nav-text">7.1 WebSocket 协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.7.1.1.</span> <span class="nav-text">适用场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E5%AE%9E%E7%8E%B0-WebSocket-Server"><span class="nav-number">1.7.2.</span> <span class="nav-text">7.2 实现 WebSocket Server</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%B9%B6%E9%85%8D%E7%BD%AE-WebSocketHandler"><span class="nav-number">1.7.2.1.</span> <span class="nav-text">创建并配置 WebSocketHandler</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-%E5%AE%9A%E5%88%B6%E5%8C%96%E6%8F%A1%E6%89%8B%E8%BF%87%E7%A8%8B"><span class="nav-number">1.7.3.</span> <span class="nav-text">7.3 定制化握手过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-WebSocketHandler-%E7%9A%84%E5%8C%85%E8%A3%85"><span class="nav-number">1.7.4.</span> <span class="nav-text">7.4 WebSocketHandler 的包装</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">2.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">3.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/java-spring/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring 源码解析 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring 源码解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-04 00:00:00" itemprop="dateCreated datePublished" datetime="2020-01-04T00:00:00+08:00">2020-01-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Spring-源码解析"><a href="#Spring-源码解析" class="headerlink" title="Spring 源码解析"></a>Spring 源码解析</h1><h2 id="一、Spring-基础概念"><a href="#一、Spring-基础概念" class="headerlink" title="一、Spring 基础概念"></a>一、Spring 基础概念</h2><h3 id="1-1-Environment"><a href="#1-1-Environment" class="headerlink" title="1.1 Environment"></a>1.1 Environment</h3><p>Environment 表示当前 Spring 应用运行的环境，包括了该应用的 profile 和 property 信息。</p>
+<h3 id="1-2-BeanFactory-与-BeanDefinition"><a href="#1-2-BeanFactory-与-BeanDefinition" class="headerlink" title="1.2 BeanFactory 与 BeanDefinition"></a>1.2 BeanFactory 与 BeanDefinition</h3><p>BeanFactory 是 Spring IOC 容器的基础接口，负责管理 bean 的实例化、配置和装配。</p>
+<h4 id="loadBeanDefinitions"><a href="#loadBeanDefinitions" class="headerlink" title="loadBeanDefinitions()"></a>loadBeanDefinitions()</h4><p>关于 BeanDefinition 的加载，以 <code>XmlWebApplicationContext</code> 类的 <code>loadBeanDefinitions()</code> 方法为例，其通过 <code>XmlBeanDefinitionReader</code> 从 XML 配置文件中读取 bean definition。</p>
+<blockquote>
+<p>📖 独立文章：<a href="/spring-bean-lifecycle/">Spring Bean 完整生命周期</a></p>
+</blockquote>
+<h3 id="1-4-Aware-接口"><a href="#1-4-Aware-接口" class="headerlink" title="1.4 Aware 接口"></a>1.4 Aware 接口</h3><p>Aware 接口是 Spring 提供的一系列回调接口，实现 <code>XXXAware</code> 接口的 bean 可以通过回调的方式由 Spring 容器将框架内部的对象通知该 bean。</p>
+<p>但实现 <code>XXXAware</code> 接口本身并不会自动带来任何功能，只是表明这是一个待处理的 bean。实际的处理由 <code>BeanPostProcessor</code> 的实现类来进行。例如 <code>ApplicationContextAwareProcessor</code> 负责处理 <code>ApplicationContextAware</code> 接口。</p>
+<p>常见的 Aware 接口包括：</p>
+<ul>
+<li><code>BeanNameAware</code> — 获取 bean 在容器中的名称</li>
+<li><code>BeanFactoryAware</code> — 获取当前 BeanFactory</li>
+<li><code>ApplicationContextAware</code> — 获取当前 ApplicationContext</li>
+</ul>
+<h3 id="1-5-Bean-的生命周期"><a href="#1-5-Bean-的生命周期" class="headerlink" title="1.5 Bean 的生命周期"></a>1.5 Bean 的生命周期</h3><p>Bean 的生命周期大致流程：</p>
+<ol>
+<li>实例化（Instantiation）</li>
+<li>属性填充（Populate Properties）</li>
+<li><code>BeanNameAware</code> &#x2F; <code>BeanFactoryAware</code> &#x2F; <code>ApplicationContextAware</code> 回调</li>
+<li><code>BeanPostProcessor.postProcessBeforeInitialization()</code></li>
+<li><code>InitializingBean.afterPropertiesSet()</code> 或 <code>@PostConstruct</code> 或 <code>init-method</code></li>
+<li><code>BeanPostProcessor.postProcessAfterInitialization()</code></li>
+<li>Bean 就绪，可被使用</li>
+<li>容器关闭时调用 <code>DisposableBean.destroy()</code> 或 <code>@PreDestroy</code> 或 <code>destroy-method</code></li>
+</ol>
+<p>其中 <code>InitializingBean</code> 接口参与 bean 初始化阶段的生命周期管理。</p>
+<h3 id="1-6-Ordered"><a href="#1-6-Ordered" class="headerlink" title="1.6 Ordered"></a>1.6 Ordered</h3><p><code>Ordered</code> 接口用于定义 bean 或组件的执行顺序，在多处理器（如多个 <code>BeanPostProcessor</code>）叠加时尤其重要。<code>@Order</code> 注解是其便捷替代方式。</p>
+<h3 id="1-7-Autowired-Qualifier-Primary"><a href="#1-7-Autowired-Qualifier-Primary" class="headerlink" title="1.7 @Autowired &#x2F; @Qualifier &#x2F; @Primary"></a>1.7 @Autowired &#x2F; @Qualifier &#x2F; @Primary</h3><ul>
+<li><code>@Autowired</code>：自动注入依赖，默认按类型注入。</li>
+<li><code>@Qualifier</code>：配合 <code>@Autowired</code> 使用，按名称限定注入的 bean。</li>
+<li><code>@Primary</code>：当存在多个同类型的 bean 时，标记优先注入的 bean。</li>
+</ul>
+<h3 id="1-8-ApplicationListener"><a href="#1-8-ApplicationListener" class="headerlink" title="1.8 ApplicationListener"></a>1.8 ApplicationListener</h3><p><code>ApplicationListener</code> 是 Spring 的事件监听机制，通过实现该接口可以监听 Spring 容器中发布的各种事件（如 <code>ContextRefreshedEvent</code>、<code>ContextClosedEvent</code> 等）。</p>
+<h2 id="二、Spring-IOC"><a href="#二、Spring-IOC" class="headerlink" title="二、Spring IOC"></a>二、Spring IOC</h2><h3 id="2-1-BeanFactory"><a href="#2-1-BeanFactory" class="headerlink" title="2.1 BeanFactory"></a>2.1 BeanFactory</h3><p>BeanFactory 是 Spring IOC 容器的顶层接口，<code>ApplicationContext</code> 是其子接口，在 BeanFactory 的基础上增加了事件发布、国际化等企业级功能。默认实现是 <code>DefaultListableBeanFactory</code>。</p>
+<h3 id="2-2-Bean-配置方式"><a href="#2-2-Bean-配置方式" class="headerlink" title="2.2 Bean 配置方式"></a>2.2 Bean 配置方式</h3><h4 id="XML-配置"><a href="#XML-配置" class="headerlink" title="XML 配置"></a>XML 配置</h4><p>传统的配置方式，通过 <code>&lt;bean&gt;</code> 标签在 XML 文件中定义 bean。</p>
+<h4 id="注解扫描"><a href="#注解扫描" class="headerlink" title="注解扫描"></a>注解扫描</h4><ul>
+<li><code>&lt;context:annotation-config&gt;</code>：针对已在 Spring 容器中注册过的 bean，激活注解驱动的注入。</li>
+<li><code>&lt;context:component-scan base-package=&quot;com.xxx&quot;/&gt;</code>：不仅具备 <code>&lt;context:annotation-config&gt;</code> 的所有功能，还可以在指定的 package 下扫描并注册对应的 bean。</li>
+<li>当两者同时存在时，<code>&lt;context:annotation-config&gt;</code> 会被忽略。</li>
+</ul>
+<h3 id="2-3-FactoryBean"><a href="#2-3-FactoryBean" class="headerlink" title="2.3 FactoryBean"></a>2.3 FactoryBean</h3><p><code>FactoryBean</code> 不是普通的 bean，它作为一个工厂类，配置后实际生成的是其 <code>getObject()</code> 方法返回的对象。示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyFactoryBean</span> <span class="keyword">implements</span> <span class="title class_">FactoryBean</span>&lt;MyObject&gt; &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> MyObject <span class="title function_">getObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">MyObject</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; getObjectType() &#123;</span><br><span class="line">        <span class="keyword">return</span> MyObject.class;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isSingleton</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Spring-AOP"><a href="#三、Spring-AOP" class="headerlink" title="三、Spring AOP"></a>三、Spring AOP</h2><p>Spring AOP 本质上是基于动态代理实现的，通过为原本的类生成代理类来实现对其功能的增强。</p>
+<p>参考阅读：<a target="_blank" rel="noopener" href="https://juejin.im/post/5b06bf2df265da0de2574ee1">Spring AOP 源码分析</a></p>
+<h3 id="3-1-Java-Dynamic-Proxy"><a href="#3-1-Java-Dynamic-Proxy" class="headerlink" title="3.1 Java Dynamic Proxy"></a>3.1 Java Dynamic Proxy</h3><p>JDK 动态代理基于接口实现，被代理的对象必须实现至少一个接口。Spring 默认优先使用 JDK 动态代理。</p>
+<blockquote>
+<p>📖 独立文章：<a href="/aop-jdk-vs-cglib/">Spring AOP — JDK动态代理 vs CGLIB</a></p>
+</blockquote>
+<h2 id="四、Spring-Boot-启动过程"><a href="#四、Spring-Boot-启动过程" class="headerlink" title="四、Spring Boot 启动过程"></a>四、Spring Boot 启动过程</h2><p>先来一段众所周知的 Spring Boot 启动入口代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Application</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-1-SpringApplication-run"><a href="#4-1-SpringApplication-run" class="headerlink" title="4.1 SpringApplication.run()"></a>4.1 SpringApplication.run()</h3><p><code>SpringApplication.run()</code> 的核心逻辑如下，各步骤已添加注释：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Run the Spring application, creating and refreshing a new</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> ApplicationContext&#125;.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> args the application arguments (usually passed from a Java main method)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> a running &#123;<span class="doctag">@link</span> ApplicationContext&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> ConfigurableApplicationContext <span class="title function_">run</span><span class="params">(String... args)</span> &#123;</span><br><span class="line">    <span class="type">StopWatch</span> <span class="variable">stopWatch</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StopWatch</span>();</span><br><span class="line">    stopWatch.start();</span><br><span class="line">    <span class="type">ConfigurableApplicationContext</span> <span class="variable">context</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    Collection&lt;SpringBootExceptionReporter&gt; exceptionReporters = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    configureHeadlessProperty();</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取META-INF/spring.factories中配置的SpringApplicationRunListener类型的监听器</span></span><br><span class="line"><span class="comment">     * 默认只有一个listener是org.springframework.boot.context.event.EventPublishingRunListener</span></span><br><span class="line"><span class="comment">     **/</span></span><br><span class="line">    <span class="type">SpringApplicationRunListeners</span> <span class="variable">listeners</span> <span class="operator">=</span> getRunListeners(args);</span><br><span class="line">    <span class="comment">//EventPublishingRunListener发布ApplicationStartingEvent事件</span></span><br><span class="line">    listeners.starting();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="type">ApplicationArguments</span> <span class="variable">applicationArguments</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DefaultApplicationArguments</span>(args);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 创建并配置Environment（主要是PropertySource和Profile）</span></span><br><span class="line"><span class="comment">         * 之后调用监听器的environmentPrepared方法，触发EventPublishingRunListener发布ApplicationEnvironmentPreparedEvent事件</span></span><br><span class="line"><span class="comment">         * 将Environment与Application绑定</span></span><br><span class="line"><span class="comment">         **/</span></span><br><span class="line">        <span class="type">ConfigurableEnvironment</span> <span class="variable">environment</span> <span class="operator">=</span> prepareEnvironment(listeners, applicationArguments);</span><br><span class="line">        <span class="comment">//设置spring.beaninfo.ignore系统属性</span></span><br><span class="line">        configureIgnoreBeanInfo(environment);</span><br><span class="line">        <span class="comment">//打印banner</span></span><br><span class="line">        <span class="type">Banner</span> <span class="variable">printedBanner</span> <span class="operator">=</span> printBanner(environment);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * 根据应用类型创建ApplicationContext</span></span><br><span class="line"><span class="comment">        * 例如web应用创建的是AnnotationConfigServletWebServerApplicationContext</span></span><br><span class="line"><span class="comment">        **/</span></span><br><span class="line">        context = createApplicationContext();</span><br><span class="line">        <span class="comment">//获取配置的异常上报类，用于后续异常上报</span></span><br><span class="line">        exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[] &#123; ConfigurableApplicationContext.class &#125;, context);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * prepareContext内部逻辑：</span></span><br><span class="line"><span class="comment">        * 1. postProcessApplicationContext：配置bean工厂的beanNameGenerator，ConversionService及context的resourceLoader</span></span><br><span class="line"><span class="comment">        * 2. applyInitializers使用META-INF/spring.factories中配置的ApplicationContextInitializer初始化ApplicationContext，默认配了7个</span></span><br><span class="line"><span class="comment">        * 3. 调用监听器的contextPrepared方法，触发EventPublishingRunListener发布ApplicationContextInitializedEvent</span></span><br><span class="line"><span class="comment">        * 4. 获取beanFactory并配置（默认是DefaultListableBeanFactory，此时已有几个spring内部的bean已注册），如注册springApplicationArguments单例类，设置allowBeanDefinitionOverriding参数等，配置懒加载LazyInitializationBeanFactoryPostProcessor</span></span><br><span class="line"><span class="comment">        * 5. 加载bean，看源码是支持xml读取，annotation扫描，甚至groovy，实际上只加载了入口类也就是上面的Application类，将其注册为单例并获取了其注解原数据，即<span class="doctag">@SpringBootApplication</span>注解</span></span><br><span class="line"><span class="comment">        * 6. 调用监听器的contextLoaded方法，触发EventPublishingRunListener发布ApplicationPreparedEvent</span></span><br><span class="line"><span class="comment">        **/</span></span><br><span class="line">        prepareContext(context, environment, listeners, applicationArguments, printedBanner);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 调用AbstractApplicationContext的refresh方法，然后注册shutdownhook，这一步核心其实就是spring的启动了，这个在第4.3节展开</span></span><br><span class="line"><span class="comment">         **/</span></span><br><span class="line">        refreshContext(context);</span><br><span class="line">        afterRefresh(context, applicationArguments);</span><br><span class="line">        stopWatch.stop();</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">this</span>.logStartupInfo) &#123;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">StartupInfoLogger</span>(<span class="built_in">this</span>.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//调用监听器的started方法，触发EventPublishingRunListener发布ApplicationStartedEvent</span></span><br><span class="line">        listeners.started(context);</span><br><span class="line">        <span class="comment">//调用ApplicationRunner，然后调用CommandLineRunner</span></span><br><span class="line">        callRunners(context, applicationArguments);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">        <span class="comment">//里面有一步是：调用监听器的failed方法，触发EventPublishingRunListener发布ApplicationFailedEvent</span></span><br><span class="line">        handleRunFailure(context, ex, exceptionReporters, listeners);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(ex);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//调用监听器的running方法，触发EventPublishingRunListener发布ApplicationReadyEvent</span></span><br><span class="line">        listeners.running(context);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">        handleRunFailure(context, ex, exceptionReporters, <span class="literal">null</span>);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(ex);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> context;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到 Spring Boot 的启动是在 Spring 启动的基础上增加了一些特性，例如根据应用类型推断并指定 <code>ApplicationContext</code> 的具体实现，各阶段事件的发布（提供了一个扩展点），调用 <code>ApplicationRunner</code>、<code>CommandLineRunner</code>（又一个扩展点）等。</p>
+<p>下面是一张详细的启动流程图，可以参考该图一步步看源码：</p>
+<p><img src="/java/spring/1158841-20190707171658626-1389392187.png" alt="启动流程图"></p>
+<blockquote>
+<p><strong>推荐方式</strong>：先粗读一遍源码，然后对应用进行 debug，一步步看执行逻辑以及每个步骤执行完毕后的数据以及状态，可以对细节有更好的理解。例如，有些变量是在构造器初始化时加载的配置，这个光看源码很难看到。</p>
+</blockquote>
+<h3 id="4-2-Spring-Boot-自动化配置"><a href="#4-2-Spring-Boot-自动化配置" class="headerlink" title="4.2 Spring Boot 自动化配置"></a>4.2 Spring Boot 自动化配置</h3><blockquote>
+<p>📖 独立文章：<a href="/spring-boot-autoconfig/">Spring Boot 自动配置原理</a></p>
+</blockquote>
+<h4 id="META-INF-spring-factories"><a href="#META-INF-spring-factories" class="headerlink" title="META-INF&#x2F;spring.factories"></a>META-INF&#x2F;spring.factories</h4><p><code>META-INF/spring.factories</code> 配置文件的工作原理：</p>
+<ol>
+<li>配置是 K&#x2F;V 对，key 是接口的全限定名，value 是该接口的实现类的名字，可以是逗号分隔的多个值，示例如下：</li>
+</ol>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">example</span>.MyService=<span class="built_in">example</span>.MyServiceImpl1,<span class="built_in">example</span>.MyServiceImpl2</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p><code>META-INF/spring.factories</code> 配置文件可在多个 jar 中配置，基于这个我们可以实现自己的自动配置类，并将其配置在自己的 jar 的 <code>META-INF/spring.factories</code> 配置文件中，Spring Boot 会帮我们完成自动配置。</p>
+</li>
+<li><p>Spring Boot 自带的 <code>META-INF/spring.factories</code> 配置文件里已经配置了许多这样的配置项。</p>
+</li>
+<li><p>借助 Spring 框架的 <code>SpringFactoriesLoader</code> 可以加载 <code>META-INF/spring.factories</code> 配置文件。<code>SpringFactoriesLoader</code> 属于 Spring 框架私有的一种扩展方案，其主要功能就是从指定的配置文件 <code>META-INF/spring.factories</code> 加载配置。</p>
+</li>
+</ol>
+<blockquote>
+<p>这很像 Java 的 SPI 加载机制。</p>
+</blockquote>
+<h3 id="4-3-AbstractApplicationContext-refresh"><a href="#4-3-AbstractApplicationContext-refresh" class="headerlink" title="4.3 AbstractApplicationContext.refresh()"></a>4.3 AbstractApplicationContext.refresh()</h3><p>上面 Spring Boot 启动过程中提到调用了 <code>AbstractApplicationContext</code> 的 <code>refresh()</code> 方法，它就是 Spring 启动时执行的核心方法，里面的执行顺序是固定的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">refresh</span><span class="params">()</span> <span class="keyword">throws</span> BeansException, IllegalStateException &#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="built_in">this</span>.startupShutdownMonitor) &#123;</span><br><span class="line">        <span class="comment">// Prepare this context for refreshing.</span></span><br><span class="line">        prepareRefresh();</span><br><span class="line">        <span class="comment">// Tell the subclass to refresh the internal bean factory.</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * obtainFreshBeanFactory()方法内部调用refreshBeanFactory()，其默认实现由AbstractRefreshableApplicationContext提供，</span></span><br><span class="line"><span class="comment">         * 逻辑是：销毁原来的bean，关闭原来的bean factory，创建新的DefaultListableBeanFactory，调用loadBeanDefinitions()方法加载bean；</span></span><br><span class="line"><span class="comment">         * 不过在spring boot的情况下这里的实现是AnnotationConfigServletWebServerApplicationContext类，</span></span><br><span class="line"><span class="comment">         * 并不会销毁原来的bean以及bean factory。</span></span><br><span class="line"><span class="comment">         **/</span></span><br><span class="line">        <span class="type">ConfigurableListableBeanFactory</span> <span class="variable">beanFactory</span> <span class="operator">=</span> obtainFreshBeanFactory();</span><br><span class="line">        <span class="comment">// Prepare the bean factory for use in this context.</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 摘自该方法的注释，主要是配置bean factory</span></span><br><span class="line"><span class="comment">         * Configure the factory&#x27;s standard context characteristics,</span></span><br><span class="line"><span class="comment">         * such as the context&#x27;s ClassLoader and post-processors.</span></span><br><span class="line"><span class="comment">         **/</span></span><br><span class="line">        prepareBeanFactory(beanFactory);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// Allows post-processing of the bean factory in context subclasses.</span></span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 摘自该方法的注释，主要是注册BeanPostProcessors</span></span><br><span class="line"><span class="comment">             * Modify the application context&#x27;s internal bean factory after its standard</span></span><br><span class="line"><span class="comment">             * initialization. All bean definitions will have been loaded, but no beans</span></span><br><span class="line"><span class="comment">             * will have been instantiated yet. This allows for registering special</span></span><br><span class="line"><span class="comment">             * BeanPostProcessors etc in certain ApplicationContext implementations.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            postProcessBeanFactory(beanFactory);</span><br><span class="line">            <span class="comment">// Invoke factory processors registered as beans in the context.</span></span><br><span class="line">            <span class="comment">// 这一步会调用BeanFactoryPostProcessor，其中有一个是ConfigurationClassPostProcessor，</span></span><br><span class="line">            <span class="comment">// 扫描@Configuration注解标注的类，并完成相应的bean definition的注册</span></span><br><span class="line">            invokeBeanFactoryPostProcessors(beanFactory);</span><br><span class="line">            <span class="comment">// Register bean processors that intercept bean creation.</span></span><br><span class="line">            registerBeanPostProcessors(beanFactory);</span><br><span class="line">            <span class="comment">// Initialize message source for this context.</span></span><br><span class="line">            initMessageSource();</span><br><span class="line">            <span class="comment">// Initialize event multicaster for this context.</span></span><br><span class="line">            initApplicationEventMulticaster();</span><br><span class="line">            <span class="comment">// Initialize other special beans in specific context subclasses.</span></span><br><span class="line">            <span class="comment">// web应用的情况下会检查是否有WebServer，若没有则新建一个WebServer，spring boot默认是tomcat</span></span><br><span class="line">            onRefresh();</span><br><span class="line">            <span class="comment">// Check for listener beans and register them.</span></span><br><span class="line">            <span class="comment">// 注册ApplicationListener类型的bean，并将之前发过的ApplicationEvent再发一遍</span></span><br><span class="line">            registerListeners();</span><br><span class="line">            <span class="comment">// Instantiate all remaining (non-lazy-init) singletons.</span></span><br><span class="line">            <span class="comment">// 完成bean factory的初始化，并将剩余的未实例化的单例bean实例化</span></span><br><span class="line">            finishBeanFactoryInitialization(beanFactory);</span><br><span class="line">            <span class="comment">// Last step: publish corresponding event.</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            * Finish the refresh of this context, invoking the LifecycleProcessor&#x27;s</span></span><br><span class="line"><span class="comment">            * onRefresh() method and publishing the</span></span><br><span class="line"><span class="comment">            * &#123;@link org.springframework.context.event.ContextRefreshedEvent&#125;.</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            finishRefresh();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (BeansException ex) &#123;</span><br><span class="line">            <span class="keyword">if</span> (logger.isWarnEnabled()) &#123;</span><br><span class="line">                logger.warn(<span class="string">&quot;Exception encountered during context initialization - &quot;</span> +</span><br><span class="line">                        <span class="string">&quot;cancelling refresh attempt: &quot;</span> + ex);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// Destroy already created singletons to avoid dangling resources.</span></span><br><span class="line">            destroyBeans();</span><br><span class="line">            <span class="comment">// Reset &#x27;active&#x27; flag.</span></span><br><span class="line">            cancelRefresh(ex);</span><br><span class="line">            <span class="comment">// Propagate exception to caller.</span></span><br><span class="line">            <span class="keyword">throw</span> ex;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// Reset common introspection caches in Spring&#x27;s core, since we</span></span><br><span class="line">            <span class="comment">// might not ever need metadata for singleton beans anymore...</span></span><br><span class="line">            resetCommonCaches();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>refresh()</code> 方法的每一步逻辑都相当复杂，涉及 Spring bean 容器的很多特性以及扩展点，上面的注释对每一步做了简要说明，后续可以结合源码深入研究每一处的细节。</p>
+<h2 id="五、Spring-XSD-扩展机制"><a href="#五、Spring-XSD-扩展机制" class="headerlink" title="五、Spring XSD 扩展机制"></a>五、Spring XSD 扩展机制</h2><p>自 Spring 2.0 版本开始，Spring 提供了一种基于 XML Schema Definition（XSD）扩展 XML 配置的机制，用于定义和配置 bean。基于该机制你可以定义自己的 XML 配置中的 tag 以及相应的解析器，并将解析后的 bean 放到 Spring IOC 容器中。</p>
+<p>这带来的好处是通过定制一些命名空间及其中的 XML 标签，来简化使用 bean 时所需要的 XML 配置，而不是使用 <code>&lt;bean/&gt;</code> 标签来进行复杂的配置。例如我们可以通过 <code>&lt;aop/&gt;</code> 标签配置一个 AOP 的 bean。</p>
+<h3 id="5-1-XSD-概述"><a href="#5-1-XSD-概述" class="headerlink" title="5.1 XSD 概述"></a>5.1 XSD 概述</h3><p>XSD（XML Schema Definition）用于表示一个 XML 文档中的元素必须遵守的一组规则。区别于 XML 原生的 DTD（Document Type Definitions），XSD 提供了定义元素及其包含的属性的数据类型的能力，以及命名空间的能力。</p>
+<p>通过在 XML 文件中使用两个特殊属性：<code>xsi:schemaLocation</code> 或 <code>xsi:noNamespaceSchemaLocation</code>，被指定的 schema 可以用来验证该 XML 是否符合 XSD 的定义（这一过程称为 <em>assessment</em>）。<code>xsi</code> 是名字空间 <code>http://www.w3.org/2001/XMLSchema-instance</code> 的传统前缀。</p>
+<p>下面是一个 Spring 项目的 XML 配置文件，可以看到其使用了 <code>xsi:schemaLocation</code> 属性指定了一系列 xsd，用于验证该 XML 文件是否符合各个 xsd 的定义：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;</span></span></span><br><span class="line"><span class="string"><span class="tag">http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- bean definitions here --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>一个 schema 包含如下几个组成部分：</p>
+<blockquote>
+<ul>
+<li><strong>元素声明</strong>（Element declaration），定义了元素的性质。包括：元素名字、目标名字空间。一个非常重要的性质是元素的类型，它限制了元素包含哪些属性与子元素。在 XSD 1.1 标准中，可以根据属性的值来有条件定义元素类型。一个元素可以属于一个替换群（substitution group），如果元素 E 在元素 H 的替换群中，那么 schema 许可 H 出现的地方 E 都可以出现。元素可以有完整性（integrity）约束；唯一性（uniqueness）约束，确定特定值在该元素为根的子树中是独一无二的；引用（referential）约束，确定值必须匹配一些其它元素的标识符。元素声明可以是全局的或局部的，允许同一个名字被用于一个实例文档的不同部分的不相关的元素。</li>
+<li><strong>属性声明</strong>（Attribute declaration），定义了属性的性质。包括：属性名字、目标名字空间，属性类型限制了属性可以取哪些值，也可以指出属性的缺省值或固定值。</li>
+<li><strong>简单与复杂数据类型</strong>（Simple and complex type）</li>
+<li><strong>模型群</strong>（model group）与<strong>属性群</strong>（attribute group）定义。这实际上是宏：被命名的元素的群与属性的群，可在许多数据类型定义中被重用。</li>
+<li><strong>属性使用</strong>（attribute use）表示复杂数据类型与属性声明的关系，指出属性是必需的还是可选的。</li>
+<li><strong>元素粒子</strong>（element particle）类似于表示复杂类型与元素的关系，指出元素在上下文中出现的最大与最小次数。内容模型可以包括<strong>模型群粒子</strong>，在语法上相当于非终结符：定义了允许的元素序列的选择与重复的单位。此外，<strong>通配符粒子</strong>表示了一套元素或元素序列。</li>
+</ul>
+<p>其它更专门的 schema component 包括 annotations, assertions, notations，以及包含了 schema 整体信息的 <strong>schema component</strong>。</p>
+</blockquote>
+<p>以上内容摘抄自维基百科。XSD 的核心价值在于：定义了规范之后，我们相当于获得了一套标准 XML 元素用来定义 XML 配置文档，后续配套对应的 bean 解析机制即可实现对 bean 配置的扩展。</p>
+<h3 id="5-2-XML-配置解析"><a href="#5-2-XML-配置解析" class="headerlink" title="5.2 XML 配置解析"></a>5.2 XML 配置解析</h3><p><code>NamespaceHandler</code> 是 Spring 中处理自定义命名空间的核心接口，每个 XML 命名空间对应一个 <code>NamespaceHandler</code>。<code>BeanDefinitionParser</code> 负责将特定的 XML 元素解析为 <code>BeanDefinition</code>。</p>
+<p><img src="/java/spring/AopNamespaceHandler.png" alt="AopNamespaceHandler"></p>
+<p><code>XmlBeanDefinitionReader</code> 负责从 XML 配置文件中读取 bean definition。在解析过程中，遇到自定义命名空间的元素时，会查找对应的 <code>NamespaceHandler</code>，并委派给相应的 <code>BeanDefinitionParser</code> 进行解析。</p>
+<h3 id="5-3-自定义-XML-配置扩展"><a href="#5-3-自定义-XML-配置扩展" class="headerlink" title="5.3 自定义 XML 配置扩展"></a>5.3 自定义 XML 配置扩展</h3><p>按照 Spring 官方文档，创建一个新的 XML 配置扩展需要四步：</p>
+<ol>
+<li><strong>编写 XML Schema</strong>（Authoring）：描述自定义元素的 XSD 文件。</li>
+<li><strong>编写 NamespaceHandler</strong>（Coding）：实现自定义的 <code>NamespaceHandler</code>。</li>
+<li><strong>编写 BeanDefinitionParser</strong>（Coding）：实现一个或多个 <code>BeanDefinitionParser</code>，这是真正做解析工作的地方。</li>
+<li><strong>注册到 Spring</strong>（Registering）：将以上组件注册到 Spring 中。</li>
+</ol>
+<h3 id="5-4-spring-schemas-与-spring-handlers"><a href="#5-4-spring-schemas-与-spring-handlers" class="headerlink" title="5.4 spring.schemas 与 spring.handlers"></a>5.4 spring.schemas 与 spring.handlers</h3><h4 id="spring-schemas"><a href="#spring-schemas" class="headerlink" title="spring.schemas"></a>spring.schemas</h4><p><code>PluggableSchemaResolver</code> 类是 Spring 加载 XML schema 的核心类，默认寻找 jar 的 <code>META-INF/spring.schemas</code> 文件，<code>spring.schemas</code> 格式如下（以 <code>spring-aop</code> 包为例）：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-2.0.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">2.0</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-2.5.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">2.5</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-3.0.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">3.0</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-3.1.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">3.1</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-3.2.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">3.2</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-4.0.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">4.0</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-4.1.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">4.1</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop-4.2.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">4.2</span>.xsd</span><br><span class="line">http\:<span class="regexp">//</span>www.springframework.org<span class="regexp">/schema/</span>aop<span class="regexp">/spring-aop.xsd=org/</span>springframework<span class="regexp">/aop/</span>config/spring-aop-<span class="number">4.2</span>.xsd</span><br></pre></td></tr></table></figure>
+
+<p>可以看到其一般格式是 <code>systemId=schema-location</code>，systemId 一般是 url，也就是在 Spring 的 XML 配置中引用的，schema-location 指向具体的 xsd 文件。</p>
+<p><code>DelegatingEntityResolver</code> 负责将 XML 文件的解析委派给 <code>PluggableSchemaResolver</code>，<code>XmlBeanDefinitionReader</code> 负责从 XML 配置文件中读取 bean definition。</p>
+<h4 id="spring-handlers"><a href="#spring-handlers" class="headerlink" title="spring.handlers"></a>spring.handlers</h4><p>Spring 框架的每一个 XML namespace 都有其对应的 <code>NamespaceHandler</code>，一般在对应模块的 jar 的 <code>META-INF/spring.handlers</code> 文件中定义。你也可以定义自己的 namespace 以及对应的 <code>NamespaceHandler</code>，这意味着基于 XML 配置的机制提供了可定制化、可扩展的能力。</p>
+<h3 id="5-5-Spring-各模块命名空间处理器"><a href="#5-5-Spring-各模块命名空间处理器" class="headerlink" title="5.5 Spring 各模块命名空间处理器"></a>5.5 Spring 各模块命名空间处理器</h3><p>以下是 Spring 各模块及其对应的 <code>NamespaceHandler</code>：</p>
+<p><strong>Spring Core：</strong></p>
+<table>
+<thead>
+<tr>
+<th>namespace</th>
+<th>NamespaceHandler</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>aop</td>
+<td>AopNamespaceHandler</td>
+</tr>
+<tr>
+<td>c</td>
+<td>SimpleConstructorNamespaceHandler</td>
+</tr>
+<tr>
+<td>cache</td>
+<td>CacheNamespaceHandler</td>
+</tr>
+<tr>
+<td>context</td>
+<td>ContextNamespaceHandler</td>
+</tr>
+<tr>
+<td>jdbc</td>
+<td>JdbcNamespaceHandler</td>
+</tr>
+<tr>
+<td>jee</td>
+<td>JeeNamespaceHandler</td>
+</tr>
+<tr>
+<td>jms</td>
+<td>JmsNamespaceHandler</td>
+</tr>
+<tr>
+<td>lang</td>
+<td>LangNamespaceHandler</td>
+</tr>
+<tr>
+<td>mvc</td>
+<td>MvcNamespaceHandler</td>
+</tr>
+<tr>
+<td>oxm</td>
+<td>OxmNamespaceHandler</td>
+</tr>
+<tr>
+<td>p</td>
+<td>SimplePropertyNamespaceHandler</td>
+</tr>
+<tr>
+<td>task</td>
+<td>TaskNamespaceHandler</td>
+</tr>
+<tr>
+<td>tx</td>
+<td>TxNamespaceHandler</td>
+</tr>
+<tr>
+<td>util</td>
+<td>UtilNamespaceHandler</td>
+</tr>
+</tbody></table>
+<p><strong>Spring Security：</strong></p>
+<table>
+<thead>
+<tr>
+<th>namespace</th>
+<th>NamespaceHandler</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>security</td>
+<td>SecurityNamespaceHandler</td>
+</tr>
+<tr>
+<td>oauth</td>
+<td>OAuthSecurityNamespaceHandler</td>
+</tr>
+</tbody></table>
+<p><strong>Spring Integration：</strong></p>
+<table>
+<thead>
+<tr>
+<th>namespace</th>
+<th>NamespaceHandler</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>int</td>
+<td>IntegrationNamespaceHandler</td>
+</tr>
+<tr>
+<td>amqp</td>
+<td>AmqpNamespaceHandler</td>
+</tr>
+<tr>
+<td>event</td>
+<td>EventNamespaceHandler</td>
+</tr>
+<tr>
+<td>feed</td>
+<td>FeedNamespaceHandler</td>
+</tr>
+<tr>
+<td>file</td>
+<td>FileNamespaceHandler</td>
+</tr>
+<tr>
+<td>ftp</td>
+<td>FtpNamespaceHandler</td>
+</tr>
+<tr>
+<td>gemfire</td>
+<td>GemfireIntegrationNamespaceHandler</td>
+</tr>
+<tr>
+<td>groovy</td>
+<td>GroovyNamespaceHandler</td>
+</tr>
+<tr>
+<td>http</td>
+<td>HttpNamespaceHandler</td>
+</tr>
+<tr>
+<td>ip</td>
+<td>IpNamespaceHandler</td>
+</tr>
+<tr>
+<td>jms</td>
+<td>JmsNamespaceHandler</td>
+</tr>
+<tr>
+<td>jmx</td>
+<td>JmxNamespaceHandler</td>
+</tr>
+<tr>
+<td>mail</td>
+<td>MailNamespaceHandler</td>
+</tr>
+<tr>
+<td>redis</td>
+<td>RedisNamespaceHandler</td>
+</tr>
+<tr>
+<td>rmi</td>
+<td>RmiNamespaceHandler</td>
+</tr>
+<tr>
+<td>script</td>
+<td>ScriptNamespaceHandler</td>
+</tr>
+<tr>
+<td>security</td>
+<td>IntegrationSecurityNamespaceHandler</td>
+</tr>
+<tr>
+<td>sftp</td>
+<td>SftpNamespaceHandler</td>
+</tr>
+<tr>
+<td>stream</td>
+<td>StreamNamespaceHandler</td>
+</tr>
+<tr>
+<td>twitter</td>
+<td>TwitterNamespaceHandler</td>
+</tr>
+<tr>
+<td>ws</td>
+<td>WsNamespaceHandler</td>
+</tr>
+<tr>
+<td>xml</td>
+<td>IntegrationXmlNamespaceHandler</td>
+</tr>
+<tr>
+<td>xmpp</td>
+<td>XmppNamespaceHandler</td>
+</tr>
+</tbody></table>
+<h2 id="六、Tomcat-中部署-Spring-Web-应用"><a href="#六、Tomcat-中部署-Spring-Web-应用" class="headerlink" title="六、Tomcat 中部署 Spring Web 应用"></a>六、Tomcat 中部署 Spring Web 应用</h2><h3 id="6-1-Servlet-容器"><a href="#6-1-Servlet-容器" class="headerlink" title="6.1 Servlet 容器"></a>6.1 Servlet 容器</h3><p>Java 的 Web 应用是基于 Servlet 的，Tomcat 是业界广泛使用的 Servlet 容器。下图是 Tomcat 的容器模型：</p>
+<p><img src="/java/spring/image002.jpg" alt="Tomcat 容器模型"></p>
+<p>推荐阅读以下文章了解 Servlet 与 Tomcat 的原理：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet/index.html">Servlet 工作原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html">Tomcat 系统架构与设计模式（一）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/">Tomcat 系统架构与设计模式（二）</a></li>
+<li><a target="_blank" rel="noopener" href="http://objcoding.com/2019/05/30/tomcat-architecture/">Tomcat 架构解析</a></li>
+</ul>
+<h4 id="Tomcat-中-war-的部署"><a href="#Tomcat-中-war-的部署" class="headerlink" title="Tomcat 中 war 的部署"></a>Tomcat 中 war 的部署</h4><p>Web 应用以 war 包的形式部署在 Tomcat 中，<code>web.xml</code> 是 web 应用的部署配置文件，其中主要配置元素如下：</p>
+<table>
+<thead>
+<tr>
+<th>元素</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>servlet</td>
+<td>指定 servlet</td>
+</tr>
+<tr>
+<td>servlet-mapping</td>
+<td>指定 servlet 与 url 之间的映射关系</td>
+</tr>
+<tr>
+<td>filter</td>
+<td>指定 filter</td>
+</tr>
+<tr>
+<td>filter-mapping</td>
+<td>指定 filter 与 url 之间的映射关系</td>
+</tr>
+<tr>
+<td>listener</td>
+<td>指定监听器监听 servlet 上下文事件</td>
+</tr>
+<tr>
+<td>context-param</td>
+<td>servlet 上下文初始化参数</td>
+</tr>
+<tr>
+<td>welcome-file-list</td>
+<td>一般用于指定欢迎页，如 index.jsp</td>
+</tr>
+</tbody></table>
+<h3 id="6-2-ContextLoaderListener"><a href="#6-2-ContextLoaderListener" class="headerlink" title="6.2 ContextLoaderListener"></a>6.2 ContextLoaderListener</h3><p>在 Tomcat 中启动 Spring，也就是启动并初始化 Spring 上下文，在 web 应用中该上下文就是 <code>WebApplicationContext</code>。</p>
+<p><code>WebApplicationContext</code> 可以通过在 <code>web.xml</code> 中配置 <code>ContextLoaderListener</code> 这个 listener 实现初始化：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>ContextLoaderListener</code> 实现了 <code>ServletContextListener</code>，该接口定义了两个方法可监听 Servlet 的初始化与销毁。该接口的实现类有三种方式可接收这两个通知事件：</p>
+<ol>
+<li>定义在 <code>web.xml</code> 配置文件中（本文描述的方式）；</li>
+<li>加上 <code>@WebListener</code> 注解；</li>
+<li>通过 <code>ServletContext.addListener()</code> 方法添加。</li>
+</ol>
+<blockquote>
+<p>如果使用了 <code>Log4jConfigListener</code>，需要在 <code>web.xml</code> 中将该 listener 配置在 <code>ContextLoaderListener</code> 之后。</p>
+</blockquote>
+<h3 id="6-3-WebApplicationContext-的创建"><a href="#6-3-WebApplicationContext-的创建" class="headerlink" title="6.3 WebApplicationContext 的创建"></a>6.3 WebApplicationContext 的创建</h3><p><code>ContextLoaderListener</code> 将具体的创建 <code>WebApplicationContext</code> 的操作委派给 <code>ContextLoader</code> 执行，其关键方法是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> WebApplicationContext <span class="title function_">initWebApplicationContext</span><span class="params">(ServletContext servletContext)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>initWebApplicationContext</code> 先创建一个 <code>WebApplicationContext</code>，然后完成配置并调用 <code>refresh()</code> 方法。</p>
+<ol>
+<li><p><code>WebApplicationContext</code> 的默认实现是 <code>XmlWebApplicationContext</code>（配置在 <code>spring-web</code> 包中的 <code>ContextLoader.properties</code> 文件中），可以通过指定 <code>contextClass</code> 参数指定 <code>WebApplicationContext</code> 的实现。</p>
+</li>
+<li><p><code>WebApplicationContext</code> 初始化的配置文件地址可以通过在 <code>web.xml</code> 文件中的 <code>context-param</code> 配置节中配置 <code>contextConfigLocation</code> 参数指定，如：</p>
+</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">context-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">param-value</span>&gt;</span></span><br><span class="line">        classpath*:config/spring/local/appcontext-*.xml,</span><br><span class="line">        classpath*:config/spring/appcontext-*.xml</span><br><span class="line">    <span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">context-param</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>存在多个配置文件地址的情况下，后面文件中定义的 bean definition 会覆盖前面的。</p>
+</blockquote>
+<p>还有一些其他的可配置参数可以影响 <code>WebApplicationContext</code> 的创建，这里没有全部列出，这些一般也是非常用的功能。</p>
+<ol start="3">
+<li>调用 <code>refresh()</code> 方法实际上是调用了 <code>AbstractApplicationContext</code> 的 <code>refresh()</code> 方法，里面就是标准的 Spring ApplicationContext 的启动流程（参见本文第四章第 4.3 节），主要是 BeanFactory 的初始化以及相应的 bean 的加载与初始化。</li>
+</ol>
+<h3 id="6-4-DispatcherServlet"><a href="#6-4-DispatcherServlet" class="headerlink" title="6.4 DispatcherServlet"></a>6.4 DispatcherServlet</h3><p><code>DispatcherServlet</code> 是将 HTTP 请求分发至 handlers 或 controllers 的中央分发器，提供了便利的映射和异常处理功能。下面是它的一些特性：</p>
+<ol>
+<li><p>一个 web 应用可以配置多个 <code>DispatcherServlet</code>，每个 <code>DispatcherServlet</code> 在自己的命名空间内运行，加载自己私有的包含了 mapping 的应用上下文。只有通过 <code>ContextLoaderListener</code> 加载的上下文是共享的。</p>
+</li>
+<li><p>通过 <code>HandlerMapping</code> 的实现类来实现请求到 handler 的映射，可覆盖默认实现，默认实现是：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">org<span class="selector-class">.springframework</span><span class="selector-class">.web</span><span class="selector-class">.servlet</span><span class="selector-class">.handler</span><span class="selector-class">.BeanNameUrlHandlerMapping</span></span><br><span class="line">org<span class="selector-class">.springframework</span><span class="selector-class">.web</span><span class="selector-class">.servlet</span><span class="selector-class">.mvc</span><span class="selector-class">.annotation</span>.DefaultAnnotationHandlerMapping</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>HandlerAdapter</code> 接口，用来适配请求和 handler，可覆盖默认实现，默认实现是：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">org<span class="selector-class">.springframework</span><span class="selector-class">.web</span><span class="selector-class">.servlet</span><span class="selector-class">.mvc</span><span class="selector-class">.HttpRequestHandlerAdapter</span> → org<span class="selector-class">.springframework</span><span class="selector-class">.web</span><span class="selector-class">.HttpRequestHandler</span></span><br><span class="line">org<span class="selector-class">.springframework</span><span class="selector-class">.web</span><span class="selector-class">.servlet</span><span class="selector-class">.mvc</span><span class="selector-class">.SimpleControllerHandlerAdapter</span> → org<span class="selector-class">.springframework</span><span class="selector-class">.web</span><span class="selector-class">.servlet</span><span class="selector-class">.mvc</span><span class="selector-class">.Controller</span></span><br><span class="line">org<span class="selector-class">.springframework</span><span class="selector-class">.web</span><span class="selector-class">.servlet</span><span class="selector-class">.mvc</span><span class="selector-class">.annotation</span>.AnnotationMethodHandlerAdapter</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>HandlerExceptionResolver</code> 负责 dispatcher 的异常处理策略，例如，发生某些特定异常时映射到某个错误页面。</p>
+</li>
+</ol>
+<p>还有一些关于 <code>ViewResolver</code>、<code>MultipartResolver</code>、<code>LocaleResolver</code>、<code>ThemeResolver</code> 的，这里不一一列出。</p>
+<h4 id="DispatcherServlet-的创建"><a href="#DispatcherServlet-的创建" class="headerlink" title="DispatcherServlet 的创建"></a>DispatcherServlet 的创建</h4><p><code>DispatcherServlet</code> 的类继承关系：<code>DispatcherServlet</code> → <code>FrameworkServlet</code> → <code>HttpServletBean</code> → <code>HttpServlet</code>。</p>
+<p>Servlet 容器启动的时候会调用 <code>HttpServlet</code> 的 <code>init()</code> 方法，即调用 <code>HttpServletBean.init()</code>，其中会调用 <code>FrameworkServlet.initServletBean()</code>，进而调用其 <code>initWebApplicationContext()</code> 方法，创建这个 <code>DispatcherServlet</code> 的 <code>ApplicationContext</code>，并且会将 <code>ContextLoaderListener</code> 加载的 <code>ApplicationContext</code> 作为其 parent。</p>
+<p>在 <code>web.xml</code> 中配置 <code>DispatcherServlet</code> 的示例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>springmvc<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:config/spring.mvc/appcontext-servlet.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>contextConfigLocation</code> 参数指定这个 <code>DispatcherServlet</code> 的 <code>ApplicationContext</code> 的配置文件，<code>&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</code> 表示在容器启动时就加载。</p>
+<h2 id="七、Spring-对-WebSocket-的支持"><a href="#七、Spring-对-WebSocket-的支持" class="headerlink" title="七、Spring 对 WebSocket 的支持"></a>七、Spring 对 WebSocket 的支持</h2><h3 id="7-1-WebSocket-协议"><a href="#7-1-WebSocket-协议" class="headerlink" title="7.1 WebSocket 协议"></a>7.1 WebSocket 协议</h3><p>WebSocket 协议定义了 web 应用的客户端和服务端之间一种全双工、双向通信的能力。使用 HTTP 协议进行初始握手，HTTP 协议内置的机制允许客户端发送一个协议升级&#x2F;协议切换请求，服务端同意切换则返回 HTTP code 101，协议切换成功后，双方使用该 HTTP 请求底层的 TCP 连接进行双向通信。</p>
+<p>WebSocket 是异步的、事件驱动的。</p>
+<p>WebSocket 协议没有明确规定消息协议，它只是在 TCP 连接上的很薄的一层消息传递层，这导致在应用层很难实现一些功能，因此定义了 sub-protocol 的使用。客户端和服务端可在握手阶段通过请求头 <code>Sec-WebSocket-Protocol</code> 协商 sub-protocol。Spring 采用了 STOMP 协议，该协议已经得到了广泛支持。</p>
+<p>由于有些浏览器不支持，以及有些代理服务器配置为拒绝协议升级或切换，或者配置了连接超时时间，需要 fallback 机制来更好地支持 WebSocket。Spring 基于 SockJS 协议提供了透明的 fallback 机制。</p>
+<h4 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h4><p>WebSocket 协议适用于客户端和服务端需要高频低延迟地交互事件信息的场景，例如：金融、游戏、合作应用。</p>
+<h3 id="7-2-实现-WebSocket-Server"><a href="#7-2-实现-WebSocket-Server" class="headerlink" title="7.2 实现 WebSocket Server"></a>7.2 实现 WebSocket Server</h3><p>Spring 4 引入了 <code>spring-messaging</code> 模块支持 WebSocket。目前 Spring 在 Tomcat 7.0.47+、Jetty 9.1+、GlassFish 4.1+、WebLogic 12.1.3+、Undertow 1.0+（以及 WildFly 8.0+）上支持 WebSocket。</p>
+<h4 id="创建并配置-WebSocketHandler"><a href="#创建并配置-WebSocketHandler" class="headerlink" title="创建并配置 WebSocketHandler"></a>创建并配置 WebSocketHandler</h4><p>首先实现 <code>WebSocketHandler</code> 或扩展 <code>TextWebSocketHandler</code> &#x2F; <code>BinaryWebSocketHandler</code>，然后通过基于注解的 Java Config 或者 XML 命名空间配置将 URL 映射到 handler 上：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.web.socket.WebSocketHandler;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.socket.WebSocketSession;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.socket.TextMessage;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyHandler</span> <span class="keyword">extends</span> <span class="title class_">TextWebSocketHandler</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handleTextMessage</span><span class="params">(WebSocketSession session, TextMessage message)</span> &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>XML 配置示例如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">websocket:handlers</span> <span class="attr">allowed-origins</span>=<span class="string">&quot;*&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">websocket:mapping</span> <span class="attr">path</span>=<span class="string">&quot;/message/websocket&quot;</span> <span class="attr">handler</span>=<span class="string">&quot;messageWebSocketHandler&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">websocket:handshake-interceptors</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">&quot;parseQueryInterceptor&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">&quot;identityInterceptor&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">&quot;appRegisterInterceptor&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">websocket:handshake-interceptors</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">websocket:handlers</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-3-定制化握手过程"><a href="#7-3-定制化握手过程" class="headerlink" title="7.3 定制化握手过程"></a>7.3 定制化握手过程</h3><p>通过实现 <code>HandshakeInterceptor</code> 接口来定制握手过程，该 API 暴露了握手阶段的 <code>beforeHandshake</code> 和 <code>afterHandshake</code> 方法，可用于终止握手或者添加参数到 <code>WebSocketSession</code> 中。</p>
+<h3 id="7-4-WebSocketHandler-的包装"><a href="#7-4-WebSocketHandler-的包装" class="headerlink" title="7.4 WebSocketHandler 的包装"></a>7.4 WebSocketHandler 的包装</h3><p><code>WebSocketHandlerDecorator</code> 提供了日志和异常处理能力。<code>ExceptionWebSocketHandlerDecorator</code> 捕捉到异常后返回 HTTP code 1011 表示服务端异常。</p>
+<hr>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文基于 spring-boot 2.2.1.RELEASE &#x2F; spring 3.2.5 版本的源码阅读，从 Spring 基础概念（IOC、AOP、Bean 生命周期）出发，逐步深入到 Spring Boot 启动过程、refresh() 方法、XSD 扩展机制、以及 Tomcat 中部署 Spring Web 应用的方式，最后介绍了 Spring 对 WebSocket 的支持。文章只是粗略过了一遍流程，有些部分可能理解有误，内部细节还有待继续研究。另外不得不说，看 Spring 源码是真的累。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/l3306/p/10752907.html">Spring Boot 启动流程图</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5b679fbc5188251aad213110">@EnableAutoConfiguration 原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247484247&idx=1&sn=e228e29e344559e469ac3ecfa9715217&chksm=ebd74256dca0cb40059f3f627fc9450f916c1e1b39ba741842d91774f5bb7f518063e5acf5a0#rd">Spring 注解扫描</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5b06bf2df265da0de2574ee1">Spring AOP 源码分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/XML_Schema">XML Schema (Wikipedia)</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.spring.io/spring/docs/3.2.18.RELEASE/spring-framework-reference/htmlsingle/#xsd-config">Spring XSD 扩展官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010209217/article/details/80989268">Spring XSD 扩展分析（CSDN）</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xupeng874395012/article/details/79911149">Spring XSD 扩展实现（CSDN）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet/index.html">Servlet 工作原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/index.html">Tomcat 系统架构与设计模式（一）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/java/j-lo-tomcat2/">Tomcat 系统架构与设计模式（二）</a></li>
+<li><a target="_blank" rel="noopener" href="http://objcoding.com/2019/05/30/tomcat-architecture/">Tomcat 架构解析</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.spring.io/spring-framework/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/websocket.html">Spring WebSocket 官方文档</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+              <a href="/tags/AOP/" rel="tag"># AOP</a>
+              <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag"># 源码分析</a>
+              <a href="/tags/Spring-Boot/" rel="tag"># Spring Boot</a>
+              <a href="/tags/IOC/" rel="tag"># IOC</a>
+              <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/java-core/" rel="prev" title="Java 语言基础">
+                  <i class="fa fa-angle-left"></i> Java 语言基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/java-jvm/" rel="next" title="JVM 基础">
+                  JVM 基础 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

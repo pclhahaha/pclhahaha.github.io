@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Transformer 是当前所有大语言模型（GPT、Claude、Llama、Gemini）的底层架构。2017 年 Google 在《Attention Is All You Need》论文中提出它时，目标是解决机器翻译问题，但它的自注意力机制展现出惊人的通用性，最终彻底取代了 RNN&#x2F;LSTM，成为 NLP 乃至多模态领域的主导架构。 一、为什么需要 Transformer在 Tr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transformer 架构详解">
+<meta property="og:url" content="http://pclhahaha.github.io/transformer-architecture/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Transformer 是当前所有大语言模型（GPT、Claude、Llama、Gemini）的底层架构。2017 年 Google 在《Attention Is All You Need》论文中提出它时，目标是解决机器翻译问题，但它的自注意力机制展现出惊人的通用性，最终彻底取代了 RNN&#x2F;LSTM，成为 NLP 乃至多模态领域的主导架构。 一、为什么需要 Transformer在 Tr">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/transformer-architecture/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/transformer-architecture/","path":"transformer-architecture/","title":"Transformer 架构详解"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Transformer 架构详解 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-Transformer"><span class="nav-number">1.</span> <span class="nav-text">一、为什么需要 Transformer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">二、核心架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6"><span class="nav-number">3.</span> <span class="nav-text">三、自注意力机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="nav-number">4.</span> <span class="nav-text">四、多头注意力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81"><span class="nav-number">5.</span> <span class="nav-text">五、位置编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%85%B3%E9%94%AE%E5%8F%98%E4%BD%93"><span class="nav-number">6.</span> <span class="nav-text">六、关键变体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/transformer-architecture/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Transformer 架构详解 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Transformer 架构详解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Transformer 是当前所有大语言模型（GPT、Claude、Llama、Gemini）的底层架构。2017 年 Google 在《Attention Is All You Need》论文中提出它时，目标是解决机器翻译问题，但它的自注意力机制展现出惊人的通用性，最终彻底取代了 RNN&#x2F;LSTM，成为 NLP 乃至多模态领域的主导架构。</p>
+<h2 id="一、为什么需要-Transformer"><a href="#一、为什么需要-Transformer" class="headerlink" title="一、为什么需要 Transformer"></a>一、为什么需要 Transformer</h2><p>在 Transformer 之前，序列建模的主流方案是 RNN&#x2F;LSTM。它们的核心问题：</p>
+<ul>
+<li><strong>串行计算</strong>：处理第 N 个词必须等前 N-1 个词处理完——无法并行，训练慢</li>
+<li><strong>长程依赖衰减</strong>：处理 1000 个 token 的文本时，第 1 个 token 的信息经过 1000 步传递后衰减严重</li>
+<li><strong>梯度消失&#x2F;爆炸</strong>：反向传播经过几十步后梯度趋近于零或无穷大</li>
+</ul>
+<p>Transformer 用自注意力机制一举解决了这三个问题。</p>
+<h2 id="二、核心架构"><a href="#二、核心架构" class="headerlink" title="二、核心架构"></a>二、核心架构</h2><p>Transformer 由编码器（Encoder）和解码器（Decoder）堆叠而成，但 GPT 只用了 Decoder，BERT 只用了 Encoder。</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">输入文本 → <span class="punctuation">[</span><span class="built_in">Input</span> <span class="variable">Embedding</span> <span class="operator">+</span> <span class="variable">Positional</span> <span class="variable">Encoding</span><span class="punctuation">]</span></span><br><span class="line">              ↓</span><br><span class="line">    ┌─────────────────────────┐</span><br><span class="line">    │  <span class="variable">Multi</span><span class="operator">-</span><span class="built_in">Head</span> <span class="variable">Attention</span>   │ ← 自注意力：每个词关注所有词</span><br><span class="line">    │  <span class="variable">Add</span> <span class="operator">&amp;</span> <span class="built_in">Norm</span>             │</span><br><span class="line">    │  <span class="variable">Feed</span> <span class="built_in">Forward</span> <span class="punctuation">(</span><span class="variable">MLP</span><span class="punctuation">)</span>     │</span><br><span class="line">    │  <span class="variable">Add</span> <span class="operator">&amp;</span> <span class="built_in">Norm</span>             │</span><br><span class="line">    └─────────────────────────┘</span><br><span class="line">              ↓ <span class="punctuation">(</span>× <span class="built_in">N</span> 层堆叠<span class="punctuation">)</span></span><br><span class="line">         输出向量 → 下游任务</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、自注意力机制"><a href="#三、自注意力机制" class="headerlink" title="三、自注意力机制"></a>三、自注意力机制</h2><p>自注意力（Self-Attention）是 Transformer 的灵魂。核心公式：</p>
+<p>$$\text{Attention}(Q, K, V) &#x3D; \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$</p>
+<p>对每个 token，生成三个向量：</p>
+<ul>
+<li><strong>Q（Query）</strong>：我在找什么？</li>
+<li><strong>K（Key）</strong>：我能提供什么？</li>
+<li><strong>V（Value）</strong>：我的实际内容是什么？</li>
+</ul>
+<p>计算过程：</p>
+<ol>
+<li>计算 Q 和所有 K 的点积，得到注意力分数矩阵</li>
+<li>除以 $\sqrt{d_k}$（缩放因子，防止点积过大导致 softmax 梯度消失）</li>
+<li>Softmax 归一化为概率分布</li>
+<li>用概率分布对 V 加权求和——得到当前 token 的”上下文感知”表示</li>
+</ol>
+<p><strong>实际例子</strong>：处理句子”我昨天在书店买了一本关于分布式系统的书”时，token”书”的注意力权重分布中，”买”和”书店”的权重会很高，而”昨天”、”关于”的权重相对低——模型学会了关注语义相关的词。</p>
+<h2 id="四、多头注意力"><a href="#四、多头注意力" class="headerlink" title="四、多头注意力"></a>四、多头注意力</h2><p>单头注意力只能捕捉一种关系模式。多头注意力并行运行多个注意力头，每个头关注不同的语义维度：</p>
+<ul>
+<li>Head 1：关注语法结构（主谓宾）</li>
+<li>Head 2：关注指代关系（代词→先行词）</li>
+<li>Head 3：关注语义相似性</li>
+<li>Head N：关注位置邻近关系</li>
+</ul>
+<p>不同头关注不同维度，最终拼接起来通过线性层融合——这使得模型能同时捕捉多种语言特征。</p>
+<h2 id="五、位置编码"><a href="#五、位置编码" class="headerlink" title="五、位置编码"></a>五、位置编码</h2><p>自注意力本身是<strong>位置无关</strong>的——“我爱你”和”你爱我”在注意力机制下完全等价（只是 token 顺序不同，但注意力权重对称）。因此需要额外注入位置信息。</p>
+<p><strong>正弦位置编码</strong>（原论文方案）：</p>
+<p>$$PE_{(pos, 2i)} &#x3D; \sin\left(\frac{pos}{10000^{2i&#x2F;d_{model}}}\right)$$</p>
+<p>$$PE_{(pos, 2i+1)} &#x3D; \cos\left(\frac{pos}{10000^{2i&#x2F;d_{model}}}\right)$$</p>
+<p>偶数维度用正弦，奇数维度用余弦。这种设计使得模型可以外推到训练时未见过的序列长度。</p>
+<p>现代模型（GPT-3+、Llama）多使用<strong>可学习位置编码</strong>或 <strong>RoPE（旋转位置编码）</strong>——RoPE 通过旋转变换将位置信息编码到注意力计算中，在长文本外推方面表现更好。</p>
+<h2 id="六、关键变体"><a href="#六、关键变体" class="headerlink" title="六、关键变体"></a>六、关键变体</h2><table>
+<thead>
+<tr>
+<th>架构</th>
+<th>使用部分</th>
+<th>代表模型</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Encoder-only</td>
+<td>仅编码器</td>
+<td>BERT</td>
+<td>双向注意力，适合理解任务</td>
+</tr>
+<tr>
+<td>Decoder-only</td>
+<td>仅解码器</td>
+<td>GPT 系列、Llama</td>
+<td>单向（因果）注意力，适合生成任务</td>
+</tr>
+<tr>
+<td>Encoder-Decoder</td>
+<td>完整架构</td>
+<td>T5、BART</td>
+<td>适合翻译、摘要等 Seq2Seq 任务</td>
+</tr>
+</tbody></table>
+<p>GPT 系列之所以只用 Decoder，是因为它的核心任务是”预测下一个 token”——这是一个自回归生成任务，只需要单向注意力（每个 token 只能看到它之前的 token，不能看到未来的 token）。</p>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>Transformer 的突破不在于复杂——它的结构出奇简单（注意力 + 前馈网络 + 残差连接 + LayerNorm，堆叠 N 层）。突破在于<strong>可并行性</strong>（所有 token 同时计算注意力，不需要像 RNN 那样串行等待）和<strong>长程依赖建模</strong>（任意两个 token 之间的注意力路径长度为 O(1)，而非 RNN 的 O(N)）。这两点使得 Transformer 可以训练到千亿甚至万亿参数的规模——而这正是大语言模型能力涌现的基础。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/LLM/" rel="tag"># LLM</a>
+              <a href="/tags/Transformer/" rel="tag"># Transformer</a>
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/video-streaming-design/" rel="prev" title="视频流系统设计 (YouTube&#x2F;Netflix)">
+                  <i class="fa fa-angle-left"></i> 视频流系统设计 (YouTube/Netflix)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/testing-system/" rel="next" title="后端测试体系">
+                  后端测试体系 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

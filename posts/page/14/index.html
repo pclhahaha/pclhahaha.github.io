@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:type" content="website">
+<meta property="og:title" content="个人笔记">
+<meta property="og:url" content="http://pclhahaha.github.io/posts/page/14/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="pcl">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/posts/page/14/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"posts/page/14/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">个人笔记</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/sorting-algorithms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/sorting-algorithms/" class="post-title-link" itemprop="url">JDK 排序工程智慧</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <table>
+<thead>
+<tr>
+<th>算法</th>
+<th>平均复杂度</th>
+<th>最坏复杂度</th>
+<th>空间</th>
+<th>稳定</th>
+<th>核心思路</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>快速排序</td>
+<td>O(n log n)</td>
+<td>O(n²)</td>
+<td>O(log n)</td>
+<td>否</td>
+<td>分区 + 分治</td>
+</tr>
+<tr>
+<td>归并排序</td>
+<td>O(n log n)</td>
+<td>O(n log n)</td>
+<td>O(n)</td>
+<td>是</td>
+<td>分治 + 合并</td>
+</tr>
+<tr>
+<td>堆排序</td>
+<td>O(n log n)</td>
+<td>O(n log n)</td>
+<td>O(1)</td>
+<td>否</td>
+<td>建堆 + 弹出</td>
+</tr>
+<tr>
+<td>插入排序</td>
+<td>O(n²)</td>
+<td>O(n²)</td>
+<td>O(1)</td>
+<td>是</td>
+<td>小规模时简单高效</td>
+</tr>
+<tr>
+<td>计数排序</td>
+<td>O(n+k)</td>
+<td>O(n+k)</td>
+<td>O(k)</td>
+<td>是</td>
+<td>非比较排序，需要知道范围</td>
+</tr>
+</tbody></table>
+<p><strong>JDK 排序的实际选择：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JDK 8+ Arrays.sort() 的实际实现 (Dual-Pivot QuickSort):</span></span><br><span class="line"><span class="comment">// 1. 基本类型 (int[], long[], double[]) → Dual-Pivot QuickSort</span></span><br><span class="line"><span class="comment">//    - 选两个基准值 (pivot)，比经典快排减少约 10% 比较</span></span><br><span class="line"><span class="comment">//    - 小数组 (&lt; 47 个元素) 用插入排序</span></span><br><span class="line"><span class="comment">//    - 不稳定排序，但基本类型数组不需要稳定性</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// 2. 对象类型 (Object[], String[]) → TimSort</span></span><br><span class="line"><span class="comment">//    - 由 Python 的 Tim Peters 发明</span></span><br><span class="line"><span class="comment">//    - 归并排序 + 插入排序的混合体，利用数据中已有的有序片段 (run)</span></span><br><span class="line"><span class="comment">//    - 稳定排序，O(n log n) 最坏</span></span><br><span class="line"><span class="comment">//    - 对部分有序的数据极快（接近 O(n)）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么区分基本类型和引用类型？</strong> 基本类型数组排序不需要稳定性——<code>[5a, 5b]</code> 和 <code>[5b, 5a]</code> 没有区别。引用类型需要稳定性（<code>Comparator</code> 可能只比较部分字段），所以用稳定的 TimSort。</p>
+<p><strong>生产建议：</strong> 除非数据确实已经近似有序，否则不要手写排序。JDK 的 <code>Arrays.sort</code> 经过了二十年的工程调优（Dual-Pivot + TimSort + 归并 + 插入的混合策略 + 内联 SIMD 优化），自己写的排序几乎不可能比它好。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/state-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/state-pattern/" class="post-title-link" itemprop="url">状态模式 vs 策略模式</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>意图</strong>：允许对象在内部状态改变时改变它的行为，对象看起来好像修改了它的类。</p>
+<p><strong>为什么需要状态模式？</strong> 订单、工单、审批流等业务场景中，对象在不同状态下有不同的行为规则。最简单的实现方式是 <code>if-else</code> 判断状态，但当状态超过 5 个时，代码会变成不可维护的意大利面条。</p>
+<p><strong>UML 简述</strong>：Context 持有当前 State，State 对象决定何时流转到下一个状态。</p>
+<p><strong>订单状态机实现</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 状态接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">OrderState</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">(OrderContext ctx)</span>;       <span class="comment">// 支付</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">ship</span><span class="params">(OrderContext ctx)</span>;      <span class="comment">// 发货</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">confirm</span><span class="params">(OrderContext ctx)</span>;   <span class="comment">// 确认收货</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">cancel</span><span class="params">(OrderContext ctx)</span>;    <span class="comment">// 取消</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 待支付状态</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PendingState</span> <span class="keyword">implements</span> <span class="title class_">OrderState</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">(OrderContext ctx)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;支付成功&quot;</span>);</span><br><span class="line">        ctx.setState(<span class="keyword">new</span> <span class="title class_">ShippedState</span>());  <span class="comment">// 状态流转</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">ship</span><span class="params">(OrderContext ctx)</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(<span class="string">&quot;待支付状态不能发货&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">cancel</span><span class="params">(OrderContext ctx)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;订单已取消&quot;</span>);</span><br><span class="line">        ctx.setState(<span class="keyword">new</span> <span class="title class_">CancelledState</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// confirm() 同理抛异常...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 上下文——持有当前状态</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderContext</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">OrderState</span> <span class="variable">state</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PendingState</span>();  <span class="comment">// 初始状态</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setState</span><span class="params">(OrderState state)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.state = state;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">()</span>    &#123; state.pay(<span class="built_in">this</span>); &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">ship</span><span class="params">()</span>   &#123; state.ship(<span class="built_in">this</span>); &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">confirm</span><span class="params">()</span>&#123; state.confirm(<span class="built_in">this</span>); &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">cancel</span><span class="params">()</span> &#123; state.cancel(<span class="built_in">this</span>); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>状态模式 vs 策略模式的本质区别</strong></p>
+<p>这是另一个常见混淆点。两者的类结构几乎相同，但意图完全不同：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>状态模式</th>
+<th>策略模式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>关注点</td>
+<td>对象<strong>内部状态</strong>变化导致行为变化</td>
+<td>对象<strong>外部算法</strong>的替换</td>
+</tr>
+<tr>
+<td>谁决定切换</td>
+<td>状态对象自己决定何时流转</td>
+<td>由调用方&#x2F;上下文决定使用哪个策略</td>
+</tr>
+<tr>
+<td>切换频率</td>
+<td>频繁，且有严格的转换规则</td>
+<td>通常在初始化时选定，运行时很少变</td>
+</tr>
+<tr>
+<td>相互感知</td>
+<td>状态对象持有对上下文的引用</td>
+<td>策略对象通常不知道上下文的存在</td>
+</tr>
+</tbody></table>
+<p><strong>Spring State Machine</strong>：对于复杂流程，Spring 提供了专业的状态机框架：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableStateMachine</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderStateMachineConfig</span></span><br><span class="line">        <span class="keyword">extends</span> <span class="title class_">StateMachineConfigurerAdapter</span>&lt;String, String&gt; &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(StateMachineStateConfigurer&lt;String, String&gt; states)</span> &#123;</span><br><span class="line">        states.withStates()</span><br><span class="line">            .initial(<span class="string">&quot;PENDING&quot;</span>)</span><br><span class="line">            .states(<span class="keyword">new</span> <span class="title class_">HashSet</span>&lt;&gt;(Arrays.asList(</span><br><span class="line">                <span class="string">&quot;PENDING&quot;</span>, <span class="string">&quot;PAID&quot;</span>, <span class="string">&quot;SHIPPED&quot;</span>, <span class="string">&quot;COMPLETED&quot;</span>, <span class="string">&quot;CANCELLED&quot;</span>)));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(StateMachineTransitionConfigurer&lt;String, String&gt; transitions)</span> &#123;</span><br><span class="line">        transitions</span><br><span class="line">            .withExternal().source(<span class="string">&quot;PENDING&quot;</span>).target(<span class="string">&quot;PAID&quot;</span>).event(<span class="string">&quot;PAY&quot;</span>)</span><br><span class="line">            .and()</span><br><span class="line">            .withExternal().source(<span class="string">&quot;PAID&quot;</span>).target(<span class="string">&quot;SHIPPED&quot;</span>).event(<span class="string">&quot;SHIP&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/strategy-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/strategy-pattern/" class="post-title-link" itemprop="url">策略模式 — 消除 if-else</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>意图</strong>：定义一系列算法，把它们一个个封装起来，并且使它们可以相互替换。</p>
+<p>策略模式是消除 <code>if-else</code> 的利器，也是后端业务代码中最实用的模式。</p>
+<p><strong>UML 简述</strong>：定义策略接口和多个实现，Context 持有策略引用，通过替换不同策略来改变行为。</p>
+<p><strong>经典示例：支付策略</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">PaymentStrategy</span> &#123; <span class="type">boolean</span> <span class="title function_">pay</span><span class="params">(BigDecimal amount)</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component(&quot;ALIPAY&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AlipayPayment</span> <span class="keyword">implements</span> <span class="title class_">PaymentStrategy</span> &#123; <span class="comment">/* 调用支付宝 */</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component(&quot;WECHAT&quot;)</span>  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WechatPayment</span> <span class="keyword">implements</span> <span class="title class_">PaymentStrategy</span> &#123; <span class="comment">/* 调用微信支付 */</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PaymentService</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, PaymentStrategy&gt; strategyMap; <span class="comment">// Spring 自动注入所有实现</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">pay</span><span class="params">(String channel, BigDecimal amount)</span> &#123;</span><br><span class="line">        <span class="type">PaymentStrategy</span> <span class="variable">strategy</span> <span class="operator">=</span> strategyMap.get(channel);</span><br><span class="line">        <span class="keyword">if</span> (strategy == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;不支持的支付渠道: &quot;</span> + channel);</span><br><span class="line">        <span class="keyword">return</span> strategy.pay(amount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用 Spring 的依赖注入，所有 <code>PaymentStrategy</code> 的实现类会自动注入到 <code>Map</code> 中（key 是 Bean 名称）。<strong>新增支付渠道只需要加一个类，零修改已有代码</strong> —— 这就是 OCP 的体现。</p>
+<p><strong>JDK Comparator —— 策略模式的经典</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 策略：不同的比较规则</span></span><br><span class="line">List&lt;User&gt; users = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 策略 A：按年龄排序</span></span><br><span class="line">users.sort(Comparator.comparingInt(User::getAge));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 策略 B：按姓名排序</span></span><br><span class="line">users.sort(Comparator.comparing(User::getName));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 策略 C：按创建时间倒序</span></span><br><span class="line">users.sort(Comparator.comparing(User::getCreateTime).reversed());</span><br></pre></td></tr></table></figure>
+
+<p><code>Comparator</code> 接口就是策略接口，每次 <code>sort()</code> 调用传入不同的 Lambda 就是不同的策略。</p>
+<p><strong>Spring 中的策略模式——Resource 加载</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ResourceLoader 使用策略模式选择不同的 Resource 实现</span></span><br><span class="line"><span class="type">ResourceLoader</span> <span class="variable">loader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DefaultResourceLoader</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// classpath: → ClassPathResource</span></span><br><span class="line"><span class="type">Resource</span> <span class="variable">res1</span> <span class="operator">=</span> loader.getResource(<span class="string">&quot;classpath:application.yml&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// file: → FileSystemResource</span></span><br><span class="line"><span class="type">Resource</span> <span class="variable">res2</span> <span class="operator">=</span> loader.getResource(<span class="string">&quot;file:/opt/config/app.yml&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// http: → UrlResource</span></span><br><span class="line"><span class="type">Resource</span> <span class="variable">res3</span> <span class="operator">=</span> loader.getResource(<span class="string">&quot;https://example.com/config.yml&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>策略模式 vs 工厂模式</strong></p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>关注点</th>
+<th>返回</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>策略</td>
+<td>封装可互换的<strong>行为&#x2F;算法</strong></td>
+<td>通常无返回值，执行操作</td>
+</tr>
+<tr>
+<td>工厂</td>
+<td>封装可互换的<strong>创建逻辑</strong></td>
+<td>返回创建好的对象</td>
+</tr>
+</tbody></table>
+<p>两者经常组合使用：工厂负责选择策略，策略负责执行逻辑。支付示例中的 <code>strategyMap.get(channel)</code> 就是最简单的工厂。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/tcp-handshake/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/tcp-handshake/" class="post-title-link" itemprop="url">TCP 三次握手与四次挥手</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">CS基础</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CS%E5%9F%BA%E7%A1%80/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">客户端                             服务端</span><br><span class="line">   |-- SYN (<span class="attribute">seq</span>=x) ----------------&gt;|  SYN_SENT → SYN_RCVD</span><br><span class="line">   |&lt;- SYN+ACK (<span class="attribute">seq</span>=y, <span class="attribute">ack</span>=x+1) ---|  SYN_RCVD → ESTABLISHED</span><br><span class="line">   |-- ACK (<span class="attribute">seq</span>=x+1, <span class="attribute">ack</span>=y+1) ----&gt;|  ESTABLISHED</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么是三次，不是两次？</strong></p>
+<p>核心原因：<strong>防止历史连接导致服务端资源浪费</strong>（RFC 793）。假设两次握手：</p>
+<ol>
+<li>客户端发送 SYN(seq&#x3D;90)，网络延迟未到达</li>
+<li>客户端超时重发 SYN(seq&#x3D;100)，两次握手建立连接，数据传输完毕关闭</li>
+<li>旧的 SYN(seq&#x3D;90) 到达服务端，服务端直接进入 ESTABLISHED 分配资源，等待客户端发数据</li>
+<li>客户端认为这不是合法连接，不理会，服务端资源白白浪费</li>
+</ol>
+<p>三次握手让客户端在最终 ACK 阶段有机会拒绝旧的连接请求。另外，三次握手恰好让双方都能确认对方的初始序列号(ISN)，两次握手只能确认一方的 ISN。</p>
+<p><strong>SYN Flood 攻击及防御</strong></p>
+<p>攻击者伪造大量不存在的源 IP 发送 SYN，服务端回复 SYN+ACK 后进入 SYN_RCVD 分配半连接资源。半连接队列被占满，正常用户 SYN 被丢弃。</p>
+<table>
+<thead>
+<tr>
+<th>防御方式</th>
+<th>原理</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SYN Cookie</td>
+<td>连接信息编码进 ISN，不预分配资源</td>
+<td><code>sysctl -w net.ipv4.tcp_syncookies=1</code></td>
+</tr>
+<tr>
+<td>增大半连接队列</td>
+<td>提高 backlog</td>
+<td><code>sysctl -w net.ipv4.tcp_max_syn_backlog=8192</code></td>
+</tr>
+<tr>
+<td>缩短重试</td>
+<td>减少 SYN 重传次数</td>
+<td><code>sysctl -w net.ipv4.tcp_syn_retries=3</code></td>
+</tr>
+</tbody></table>
+<p><strong>全连接队列溢出</strong>：当 accept() 速度跟不上新连接到达速度时，全连接队列溢出：</p>
+<pre><code class="language-bash">netstat -s | grep -i &quot;listen.*overflow&quot;
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/template-method-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/template-method-pattern/" class="post-title-link" itemprop="url">模板方法模式</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>意图</strong>：在一个方法中定义算法的骨架，将某些步骤延迟到子类中实现。</p>
+<p>模板方法是我个人认为后端开发中最被低估的模式——它的价值在于<strong>把不变的部分固化在父类，把可变的部分留给子类</strong>，避免了重复代码。</p>
+<p><strong>UML 简述</strong>：抽象类定义 templateMethod（final，不可覆盖），调用一系列步骤方法——其中抽象方法由子类实现，钩子方法可选覆盖。</p>
+<p><strong>AbstractApplicationContext.refresh() —— 史上最强的模板方法</strong></p>
+<p>Spring 容器的启动过程是模板方法模式最宏大的展现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AbstractApplicationContext 的 refresh() 是模板方法（final 修饰）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">refresh</span><span class="params">()</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">    prepareRefresh();                    <span class="comment">// 1. 准备刷新</span></span><br><span class="line">    <span class="type">ConfigurableListableBeanFactory</span> <span class="variable">beanFactory</span> <span class="operator">=</span> obtainFreshBeanFactory();  <span class="comment">// 2. 获取 BeanFactory</span></span><br><span class="line">    prepareBeanFactory(beanFactory);     <span class="comment">// 3. 准备 BeanFactory</span></span><br><span class="line">    postProcessBeanFactory(beanFactory); <span class="comment">// 4. BeanFactory 后置处理（子类扩展点）</span></span><br><span class="line">    invokeBeanFactoryPostProcessors(beanFactory); <span class="comment">// 5. 调用 BeanFactoryPostProcessor</span></span><br><span class="line">    registerBeanPostProcessors(beanFactory);      <span class="comment">// 6. 注册 BeanPostProcessor</span></span><br><span class="line">    initMessageSource();                 <span class="comment">// 7. 初始化消息源</span></span><br><span class="line">    initApplicationEventMulticaster();   <span class="comment">// 8. 初始化事件广播器</span></span><br><span class="line">    onRefresh();                         <span class="comment">// 9. 子类扩展点（钩子方法）</span></span><br><span class="line">    registerListeners();                 <span class="comment">// 10. 注册监听器</span></span><br><span class="line">    finishBeanFactoryInitialization(beanFactory); <span class="comment">// 11. 实例化所有单例 Bean</span></span><br><span class="line">    finishRefresh();                     <span class="comment">// 12. 完成刷新</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>refresh()</code> 定义了容器启动的完整骨架，其中 <code>postProcessBeanFactory()</code> 和 <code>onRefresh()</code> 是留给子类的钩子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Spring Boot 中的扩展</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AnnotationConfigServletWebServerApplicationContext</span></span><br><span class="line">       <span class="keyword">extends</span> <span class="title class_">ServletWebServerApplicationContext</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onRefresh</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 启动内嵌 Web 服务器（Tomcat/Jetty）</span></span><br><span class="line">        createWebServer();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>JdbcTemplate —— 模板方法在数据访问中的典范</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; T <span class="title function_">query</span><span class="params">(String sql, RowMapper&lt;T&gt; rowMapper)</span> &#123;</span><br><span class="line">    <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>; <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>; <span class="type">ResultSet</span> <span class="variable">rs</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn = dataSource.getConnection();</span><br><span class="line">        ps = conn.prepareStatement(sql);</span><br><span class="line">        rs = ps.executeQuery();</span><br><span class="line">        <span class="keyword">return</span> rowMapper.mapRow(rs, <span class="number">1</span>);  <span class="comment">// 只有这一步是变化的</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">DataAccessException</span>(e);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        JdbcUtils.closeResultSet(rs);</span><br><span class="line">        JdbcUtils.closeStatement(ps);</span><br><span class="line">        JdbcUtils.closeConnection(conn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JdbcTemplate 将 JDBC 的 try-catch-finally 样板代码全部封装，开发者只需提供 SQL 和 <code>RowMapper</code>——“<strong>回调 + 模板方法</strong>“的混合模式。</p>
+<p><strong>InputStream 中的模板方法</strong>：JDK <code>InputStream.read(byte[])</code> 的默认实现循环调用子类的 <code>read()</code>，父类定义”按字节填充数组”的骨架，子类只需实现单字节读取。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/timing-wheel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/timing-wheel/" class="post-title-link" itemprop="url">时间轮 (Timing Wheel)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>传统定时任务用堆 (PriorityQueue)，每次取出最近任务，复杂度 O(log n)。在连接数极高的场景（如 Netty 管理百万级连接的超时检测），堆的 log n 插入成为瓶颈。</p>
+<p><strong>时间轮</strong>把时间维度映射到数组桶：</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">时间轮 (tick = 1s, wheelSize = 8):</span><br><span class="line">          ┌───┐</span><br><span class="line">          │<span class="number"> 0 </span>│ → [taskA] → [taskB]  ← 第<span class="number"> 0 </span>个 bucket</span><br><span class="line">          ├───┤</span><br><span class="line">          │<span class="number"> 1 </span>│ → [taskC]</span><br><span class="line">   ┌──────┼───┼──────┐</span><br><span class="line">   │      │<span class="number"> 2 </span>│      │ ← 指针 (cursor) 在每个 tick 前进一格</span><br><span class="line">   │      ├───┤      │</span><br><span class="line">   │<span class="number"> 7 </span>   │<span class="number"> 3 </span>│      │</span><br><span class="line">   │      ├───┤      │</span><br><span class="line">   │      │<span class="number"> 4 </span>│      │</span><br><span class="line">   └──────┼───┼──────┘</span><br><span class="line">          │<span class="number"> 5 </span>│ → [taskD]</span><br><span class="line">          ├───┤</span><br><span class="line">          │<span class="number"> 6 </span>│ → [taskE] → [taskF]</span><br><span class="line">          └───┘</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>插入</strong>：O(1)——直接挂到对应 bucket 的链表</li>
+<li><strong>删除</strong>：O(1)——从链表移除</li>
+<li><strong>触发</strong>：指针走到 bucket 时，取出所有该 bucket 的任务并执行</li>
+</ul>
+<p><strong>多层时间轮</strong>处理跨度很大的延迟——比如 3600 秒后的任务，放在”小时轮”里，等快到时间了再下沉到”分钟轮”。Netty 的 <code>HashedWheelTimer</code> 和 Kafka 的 <code>TimingWheel</code> 都采用类似设计。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/topological-sort/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/topological-sort/" class="post-title-link" itemprop="url">拓扑排序 (Kahn's Algorithm)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>场景：Maven&#x2F;Gradle 构建依赖解析</strong></p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">项目依赖:</span><br><span class="line"><span class="keyword">module</span>-A 依赖 [<span class="keyword">common</span>]</span><br><span class="line"><span class="keyword">module</span>-B 依赖 [<span class="keyword">common</span>]</span><br><span class="line"><span class="keyword">module</span>-C 依赖 [<span class="keyword">module</span>-A, <span class="keyword">module</span>-B]</span><br><span class="line"></span><br><span class="line">依赖 DAG:</span><br><span class="line">        [<span class="keyword">common</span>]      ← 入度 = <span class="number">0</span></span><br><span class="line">          /    \</span><br><span class="line">   [<span class="keyword">module</span>-A] [<span class="keyword">module</span>-B]  ← 入度 = <span class="number">1</span></span><br><span class="line">          \    /</span><br><span class="line">        [<span class="keyword">module</span>-C]  ← 入度 = <span class="number">2</span></span><br><span class="line"></span><br><span class="line">拓扑排序输出: <span class="keyword">common</span> → A → B → C (或 <span class="keyword">common</span> → B → A → C)</span><br></pre></td></tr></table></figure>
+
+<p>Maven 根据 POM 依赖关系构建有向无环图 (DAG)，然后用拓扑排序确定编译顺序。如果存在循环依赖（A 依赖 B，B 依赖 A），拓扑排序会失败，构建直接报错——这比等到运行时发现 Class 找不到要好得多。</p>
+<p><strong>拓扑排序算法 (Kahn’s Algorithm)：</strong></p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 计算每个节点的入度 (in-degree)</span><br><span class="line"><span class="bullet">2.</span> 所有入度为 0 的节点入队</span><br><span class="line"><span class="bullet">3.</span> while 队列非空:</span><br><span class="line"><span class="code">     出队 v → 加入结果</span></span><br><span class="line"><span class="code">     for v 的每个邻居 w:</span></span><br><span class="line"><span class="code">         w 的入度减 1</span></span><br><span class="line"><span class="code">         if w 入度 == 0 → w 入队</span></span><br><span class="line"><span class="code">4. 如果结果数 &lt; 节点数 → 存在环</span></span><br></pre></td></tr></table></figure>
+
+<p>Spring Boot 的自动配置加载、Gradle 的 Task 执行计划、AirFlow 的 DAG 调度，底层都有拓扑排序的影子。</p>
+<p>时间复杂度 O((V+E) log V)。对于网络延迟这种边权重非负的场景是最优的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/traffic-governance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/traffic-governance/" class="post-title-link" itemprop="url">流量治理 (限流/熔断/降级)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-1-限流"><a href="#1-1-限流" class="headerlink" title="1.1 限流"></a>1.1 限流</h3><blockquote>
+<p>限流的令牌桶&#x2F;漏桶&#x2F;滑动窗口等算法详见 <a href="distributed-theory.md">分布式系统理论基础</a> 的”流量控制”章节。</p>
+</blockquote>
+<p>在微服务架构中，限流的落点通常在三层：</p>
+<ol>
+<li><strong>网关层</strong>：全局限流，防止流量打死任何下游</li>
+<li><strong>RPC 框架层</strong>：Dubbo&#x2F;Sentinel 拦截器，服务级限流</li>
+<li><strong>业务层</strong>：对特定接口&#x2F;资源（如秒杀 SKU）的精准限流</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Sentinel 限流注解</span></span><br><span class="line"><span class="meta">@SentinelResource(value = &quot;createOrder&quot;, blockHandler = &quot;createOrderFallback&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Order <span class="title function_">createOrder</span><span class="params">(CreateOrderRequest request)</span> &#123;</span><br><span class="line">    <span class="comment">// 业务逻辑</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> Order <span class="title function_">createOrderFallback</span><span class="params">(CreateOrderRequest request, BlockException e)</span> &#123;</span><br><span class="line">    <span class="comment">// 被限流后的降级处理</span></span><br><span class="line">    <span class="keyword">return</span> Order.fail(<span class="string">&quot;系统繁忙，请稍后再试&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-熔断（Circuit-Breaker）"><a href="#1-2-熔断（Circuit-Breaker）" class="headerlink" title="1.2 熔断（Circuit Breaker）"></a>1.2 熔断（Circuit Breaker）</h3><p>熔断器的灵感来自电路保险丝：当电流过大时自动断开，保护电路。在微服务中同理——当某个下游服务故障率达到阈值，熔断器断开，后续请求直接失败（快速失败），不继续压垮它。</p>
+<p><strong>Hystrix 断路器状态机</strong>：</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">            请求失败数超过阈值</span><br><span class="line">┌─────────┐ ──────────────────────► ┌─────────┐</span><br><span class="line">│  <span class="keyword">CLOSED</span> │                          │   <span class="keyword">OPEN</span>  │</span><br><span class="line">│ (闭合)   │ ◄─────────────────────── │ (断开)   │</span><br><span class="line">│         │    超时后恢复检测         │         │</span><br><span class="line">└─────────┘                          └─────────┘</span><br><span class="line">     ▲                                    │</span><br><span class="line">     │                                    │ 探测请求成功</span><br><span class="line">     │         ┌─────────────┐            │</span><br><span class="line">     └─────────│ HALF-<span class="keyword">OPEN</span>   │◄───────────┘</span><br><span class="line">               │ (半开)       │</span><br><span class="line">               └─────────────┘</span><br><span class="line">               探测请求失败 → 重新 <span class="keyword">OPEN</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>核心参数</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HystrixCommand.Setter</span><br><span class="line">    .withCircuitBreakerEnabled(<span class="literal">true</span>)</span><br><span class="line">    .withCircuitBreakerRequestVolumeThreshold(<span class="number">20</span>)       <span class="comment">// 请求数阈值（最低 20 次）</span></span><br><span class="line">    .withCircuitBreakerErrorThresholdPercentage(<span class="number">50</span>)     <span class="comment">// 错误率 50% 触发熔断</span></span><br><span class="line">    .withCircuitBreakerSleepWindowInMilliseconds(<span class="number">5000</span>); <span class="comment">// 熔断后 5s 进入半开</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意事项</strong>：</p>
+<ul>
+<li>熔断器不是越多越好——每个熔断器维护独立的状态和线程池，开销不可忽视</li>
+<li>不要对<strong>所有异常</strong>都触发熔断计数——业务异常（如”商品已下架”）不是下游故障，不应参与熔断统计</li>
+<li>熔断颗粒度：一般以服务为单位，细粒度的可以到方法级别</li>
+</ul>
+<h3 id="1-3-降级（Fallback）"><a href="#1-3-降级（Fallback）" class="headerlink" title="1.3 降级（Fallback）"></a>1.3 降级（Fallback）</h3><p>降级是熔断&#x2F;限流被触发后的兜底逻辑。当系统判定当前不可靠时，宁可返回一个降级结果，也不让上游超时等待。</p>
+<p><strong>分类</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>容错降级</td>
+<td>被熔断&#x2F;限流时触发</td>
+<td>返回缓存数据 &#x2F; 提示”请重试”</td>
+</tr>
+<tr>
+<td>优雅降级</td>
+<td>主动关闭非核心功能，保证核心可用</td>
+<td>双11时关闭评论、推荐</td>
+</tr>
+<tr>
+<td>异步降级</td>
+<td>同步调用失败转为异步补偿</td>
+<td>打款失败 → 记录 → T+1 重试</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hystrix 降级（已不推荐，改用 Sentinel）</span></span><br><span class="line"><span class="meta">@HystrixCommand(fallbackMethod = &quot;getUserFallback&quot;)</span></span><br><span class="line"><span class="keyword">public</span> User <span class="title function_">getUser</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> userService.getUser(id); <span class="comment">// 可能失败</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> User <span class="title function_">getUserFallback</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">    <span class="comment">// 降级：返回缓存 / 默认用户</span></span><br><span class="line">    <span class="keyword">return</span> cacheService.getUserFromCache(id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-Sentinel"><a href="#1-4-Sentinel" class="headerlink" title="1.4 Sentinel"></a>1.4 Sentinel</h3><p>Sentinel（阿里开源）是取代 Hystrix 的更好选择，Hystrix 已进入维护模式。Sentinel 的核心能力：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>流控</td>
+<td>QPS&#x2F;并发线程数&#x2F;匀速排队（漏桶效果）</td>
+</tr>
+<tr>
+<td>熔断降级</td>
+<td>慢调用比例&#x2F;异常比例&#x2F;异常数</td>
+</tr>
+<tr>
+<td>热点参数限流</td>
+<td>对特定参数值（如 SKU ID）单独限流</td>
+</tr>
+<tr>
+<td>系统保护</td>
+<td>系统 Load&#x2F;CPU&#x2F;RT 超过阈值时自动限流</td>
+</tr>
+<tr>
+<td>规则持久化</td>
+<td>推送规则到 Nacos&#x2F;Apollo，动态生效</td>
+</tr>
+<tr>
+<td>控制台</td>
+<td>可视化 Dashboard，实时监控秒级数据</td>
+</tr>
+</tbody></table>
+<p><strong>Sentinel vs Hystrix</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Hystrix</th>
+<th>Sentinel</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>隔离策略</td>
+<td>线程池&#x2F;信号量</td>
+<td>信号量（轻量）</td>
+</tr>
+<tr>
+<td>熔断粒度</td>
+<td>服务级</td>
+<td>接口&#x2F;方法&#x2F;参数级</td>
+</tr>
+<tr>
+<td>规则配置</td>
+<td>代码硬编码</td>
+<td>控制台动态下发</td>
+</tr>
+<tr>
+<td>实时监控</td>
+<td>Hystrix Dashboard</td>
+<td>Sentinel Dashboard</td>
+</tr>
+<tr>
+<td>自适应</td>
+<td>无</td>
+<td>系统自适应保护</td>
+</tr>
+<tr>
+<td>维护状态</td>
+<td>停更</td>
+<td>活跃</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Sentinel 流控规则</span></span><br><span class="line"><span class="type">FlowRule</span> <span class="variable">rule</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FlowRule</span>();</span><br><span class="line">rule.setResource(<span class="string">&quot;createOrder&quot;</span>);</span><br><span class="line">rule.setGrade(RuleConstant.FLOW_GRADE_QPS);  <span class="comment">// QPS 限流</span></span><br><span class="line">rule.setCount(<span class="number">100</span>);                           <span class="comment">// 每秒 100 次</span></span><br><span class="line">rule.setControlBehavior(RuleConstant.CONTROL_BEHAVIOR_WARM_UP); <span class="comment">// 预热</span></span><br><span class="line">rule.setWarmUpPeriodSec(<span class="number">10</span>);</span><br><span class="line">FlowRuleManager.loadRules(Collections.singletonList(rule));</span><br></pre></td></tr></table></figure>
+
+<p><strong>最佳实践</strong>：规则统一在 Sentinel Dashboard 管理，通过 Nacos 做规则持久化，确保 Dashboard 重启后规则不丢失。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">sentinel:</span></span><br><span class="line">      <span class="attr">transport:</span></span><br><span class="line">        <span class="attr">dashboard:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8080</span></span><br><span class="line">      <span class="attr">datasource:</span></span><br><span class="line">        <span class="attr">ds1:</span></span><br><span class="line">          <span class="attr">nacos:</span></span><br><span class="line">            <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">            <span class="attr">data-id:</span> <span class="string">$&#123;spring.application.name&#125;-sentinel-rules</span></span><br><span class="line">            <span class="attr">group-id:</span> <span class="string">DEFAULT_GROUP</span></span><br><span class="line">            <span class="attr">data-type:</span> <span class="string">json</span></span><br><span class="line">            <span class="attr">rule-type:</span> <span class="string">flow</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="1-5-隔离"><a href="#1-5-隔离" class="headerlink" title="1.5 隔离"></a>1.5 隔离</h3><p>隔离是防止”服务内一个接口的异常拖整个服务”的关键。</p>
+<p><strong>线程池隔离</strong>：</p>
+<ul>
+<li>每个依赖服务分配独立的线程池</li>
+<li>优点：完全隔离，下游慢不会耗尽上游的线程</li>
+<li>缺点：线程上下文切换开销大，OOM 风险（线程栈内存）</li>
+</ul>
+<p><strong>信号量隔离</strong>：</p>
+<ul>
+<li>限制并发数，使用调用线程执行</li>
+<li>优点：轻量，无线程切换开销</li>
+<li>缺点：不隔离超时——下游慢会阻塞调用线程</li>
+</ul>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">线程池隔离（Hystrix）:                    信号量隔离（Sentinel）:</span><br><span class="line"></span><br><span class="line">┌──────────────┐                        ┌──────────────┐</span><br><span class="line">│  调用线程      │                        │  调用线程      │</span><br><span class="line">│      ▼         │                        │      ▼         │</span><br><span class="line">│  HystrixCmd    │                         │   Sentinel     │</span><br><span class="line">│      ▼         │                        │   检查信号量    │</span><br><span class="line">│ ┌───────────┐  │                        │      ▼         │</span><br><span class="line">│ │ 线程池 (<span class="number">10</span>) │ │                        │  直接执行调用   │</span><br><span class="line">│ │    ▼       │  │                        │  (若超过阈值则  │</span><br><span class="line">│ │  下游服务   │  │                        │   直接<span class="keyword">Block</span>)   │</span><br><span class="line">│ └───────────┘  │                        └──────────────┘</span><br><span class="line">└──────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>生产建议</strong>：</p>
+<ul>
+<li>大多数场景用信号量隔离（Sentinel 默认），性能更好</li>
+<li>当依赖的服务经常有慢查询且不可控时，用线程池隔离——宁可开销大一点，不能让整个服务阻塞</li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/trie-ac-automaton/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/trie-ac-automaton/" class="post-title-link" itemprop="url">Trie 字典树与 AC 自动机</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Trie（字典树&#x2F;前缀树）按字符串的每个字符逐层展开，共享公共前缀，适合前缀匹配场景。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Trie</span> 示例 (存储 <span class="string">&quot;abc&quot;</span>, <span class="string">&quot;abd&quot;</span>, <span class="string">&quot;bce&quot;</span>, <span class="string">&quot;bcf&quot;</span>):</span><br><span class="line">                    <span class="selector-attr">[root]</span></span><br><span class="line">                   /      \</span><br><span class="line">                 <span class="selector-tag">a</span>        <span class="selector-tag">b</span></span><br><span class="line">                /          \</span><br><span class="line">               <span class="selector-tag">b</span>            <span class="selector-tag">c</span></span><br><span class="line">              / \          / \</span><br><span class="line">             <span class="selector-tag">c</span>   <span class="selector-tag">d</span>        <span class="selector-tag">e</span>   <span class="selector-tag">f</span></span><br><span class="line">            (*)  (*)     (*)  (*)    ← * 表示是一个完整单词的结束</span><br></pre></td></tr></table></figure>
+
+<p><strong>ES Completion Suggester 中的 Trie：</strong></p>
+<p>Elasticsearch 的 <code>completion</code> 类型底层使用 Trie（实际上是 FST，见下一节）实现搜索建议。用户在搜索框输入 “spr”，ES 快速返回 “spring”, “spring boot”, “spring cloud” 等建议。</p>
+<p><strong>敏感词过滤：</strong></p>
+<p>Trie 的一个经典应用是 Aho-Corasick (AC) 自动机——基于 Trie + 失配指针实现多模式串同时匹配。常用于：</p>
+<ul>
+<li>内容审核系统（敏感词过滤）</li>
+<li>入侵检测系统（Snort 的规则匹配）</li>
+<li>搜索引擎的 Query 理解</li>
+</ul>
+<p>在实际的敏感词过滤系统中，一个包含 10 万个敏感词的 Trie，内存约占 10-50MB，可以实现在一篇 5000 字的文章中在几毫秒内找出所有敏感词。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/unit-testing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/unit-testing/" class="post-title-link" itemprop="url">单元测试金字塔</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">工程实践</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-1-JUnit-5-Mockito-基础"><a href="#1-1-JUnit-5-Mockito-基础" class="headerlink" title="1.1 JUnit 5 + Mockito 基础"></a>1.1 JUnit 5 + Mockito 基础</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ExtendWith(MockitoExtension.class)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OrderServiceTest</span> &#123;</span><br><span class="line">    <span class="meta">@Mock</span> <span class="keyword">private</span> OrderRepository orderRepository;</span><br><span class="line">    <span class="meta">@Mock</span> <span class="keyword">private</span> PaymentGateway paymentGateway;</span><br><span class="line">    <span class="meta">@InjectMocks</span> <span class="keyword">private</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="meta">@DisplayName(&quot;支付成功应更新订单状态&quot;)</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldUpdateOrderStatusWhenPaymentSucceeds</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> mock(Order.class);</span><br><span class="line">        <span class="keyword">when</span>(orderRepository.findById(<span class="number">1L</span>)).thenReturn(Optional.of(order));</span><br><span class="line">        <span class="keyword">when</span>(paymentGateway.pay(<span class="number">1L</span>)).thenReturn(PaymentResult.success());</span><br><span class="line"></span><br><span class="line">        orderService.pay(<span class="number">1L</span>);</span><br><span class="line">        verify(order).markAsPaid();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="meta">@DisplayName(&quot;订单不存在时应抛出异常&quot;)</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldThrowWhenOrderNotFound</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">when</span>(orderRepository.findById(<span class="number">1L</span>)).thenReturn(Optional.empty());</span><br><span class="line">        assertThrows(OrderNotFoundException.class, () -&gt; orderService.pay(<span class="number">1L</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-测试金字塔"><a href="#1-2-测试金字塔" class="headerlink" title="1.2 测试金字塔"></a>1.2 测试金字塔</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">┌──────┐</span><br><span class="line">│ E2E  │ ← 极少</span><br><span class="line">│ 集成  │ ← 较少</span><br><span class="line">│ 单元  │ ← 大量</span><br><span class="line">└──────┘</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th align="center">速度</th>
+<th align="center">稳定性</th>
+<th align="center">占比</th>
+<th>工具</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单元测试</td>
+<td align="center">毫秒</td>
+<td align="center">极高</td>
+<td align="center">70%+</td>
+<td>JUnit 5 + Mockito</td>
+</tr>
+<tr>
+<td>集成测试</td>
+<td align="center">秒</td>
+<td align="center">中</td>
+<td align="center">20%</td>
+<td>Spring Boot Test + Testcontainers</td>
+</tr>
+<tr>
+<td>E2E 测试</td>
+<td align="center">分钟</td>
+<td align="center">低</td>
+<td align="center">10%</td>
+<td>REST Assured &#x2F; Selenium</td>
+</tr>
+</tbody></table>
+<p>不要追求精确比例，<strong>追求反馈速度</strong>：单元测试 200ms 内完成，发现错误立即反馈。</p>
+<h3 id="1-3-什么值得测"><a href="#1-3-什么值得测" class="headerlink" title="1.3 什么值得测"></a>1.3 什么值得测</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">不值得测 →                        ← 最值得测 →</span><br><span class="line">简单 getter<span class="regexp">/setter   核心算法/</span>金额计算   复杂状态机<span class="regexp">/边界条件/</span>异常路径</span><br></pre></td></tr></table></figure>
+
+<p>核心规则：涉及钱必测；边界（null&#x2F;空&#x2F;零&#x2F;负&#x2F;超大值）必测；异常路径必测。不测 getter&#x2F;setter、框架代码、一眼可确认的简单逻辑。</p>
+<h3 id="1-4-TDD-争议与实践"><a href="#1-4-TDD-争议与实践" class="headerlink" title="1.4 TDD 争议与实践"></a>1.4 TDD 争议与实践</h3><p>TDD 的理想流程：写失败的测试 → 写最小代码通过 → 重构。现实态度：<strong>在复杂逻辑和核心算法上 TDD，在简单 CRUD 上后补测试。</strong> TDD 真正的价值不在”先写测试”，而在于<strong>驱动你思考接口设计</strong>——你必须先回答”输入是什么？输出是什么？边界是什么？”——这本身就是一次 mini 设计评审。</p>
+<h3 id="1-5-测试覆盖率"><a href="#1-5-测试覆盖率" class="headerlink" title="1.5 测试覆盖率"></a>1.5 测试覆盖率</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 行覆盖 ≠ 分支覆盖</span></span><br><span class="line"><span class="keyword">if</span> (score &gt;= <span class="number">90</span>) <span class="keyword">return</span> <span class="string">&quot;A&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (score &gt;= <span class="number">80</span>) <span class="keyword">return</span> <span class="string">&quot;B&quot;</span>;   <span class="comment">// 只测 95,75 → 行 100%，分支 67%</span></span><br><span class="line"><span class="keyword">return</span> <span class="string">&quot;C&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>核心业务 90%+&#x2F;85%+（行&#x2F;分支），公共库 90%+，CRUD 70%+，Controller 40%+。<strong>覆盖率是手段不是目的</strong>——用它发现未测试代码。CI 中设新代码阈值 ≥80%。</p>
+<hr>
+<pre><code class="language-yaml">
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/posts/page/13/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/posts/">1</a><span class="space">&hellip;</span><a class="page-number" href="/posts/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/posts/page/15/">15</a><a class="page-number" href="/posts/page/16/">16</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/posts/page/15/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

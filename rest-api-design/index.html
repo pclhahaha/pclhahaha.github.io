@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="REST API 是后端工程师每天都要打交道的东西。但”RESTful”这个词被过度使用——很多自称 REST 的 API 其实连基本规范都没遵守。这篇文章梳理一套切实可用的设计规范。 一、URL 设计1.1 命名规则1234567891011✅ GET    &#x2F;users              # 用户列表✅ GET    &#x2F;users&#x2F;123          # 单个用户✅ POST">
+<meta property="og:type" content="article">
+<meta property="og:title" content="REST API 设计规范">
+<meta property="og:url" content="http://pclhahaha.github.io/rest-api-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="REST API 是后端工程师每天都要打交道的东西。但”RESTful”这个词被过度使用——很多自称 REST 的 API 其实连基本规范都没遵守。这篇文章梳理一套切实可用的设计规范。 一、URL 设计1.1 命名规则1234567891011✅ GET    &#x2F;users              # 用户列表✅ GET    &#x2F;users&#x2F;123          # 单个用户✅ POST">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="幂等">
+<meta property="article:tag" content="API">
+<meta property="article:tag" content="REST">
+<meta property="article:tag" content="设计">
+<meta property="article:tag" content="版本管理">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/rest-api-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/rest-api-design/","path":"rest-api-design/","title":"REST API 设计规范"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>REST API 设计规范 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81URL-%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.</span> <span class="nav-text">一、URL 设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 命名规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%88%86%E9%A1%B5"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 分页</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E8%BF%87%E6%BB%A4%E3%80%81%E6%8E%92%E5%BA%8F%E3%80%81%E5%AD%97%E6%AE%B5%E9%80%89%E6%8B%A9"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 过滤、排序、字段选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81HTTP-%E7%8A%B6%E6%80%81%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">二、HTTP 状态码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%93%8D%E5%BA%94%E4%BD%93%E7%BB%93%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">三、响应体结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81API-%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">四、API 版本管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1"><span class="nav-number">5.</span> <span class="nav-text">五、幂等性设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E9%89%B4%E6%9D%83"><span class="nav-number">6.</span> <span class="nav-text">六、鉴权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E9%99%90%E6%B5%81%E5%A4%B4"><span class="nav-number">7.</span> <span class="nav-text">七、限流头</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81HATEOAS"><span class="nav-number">8.</span> <span class="nav-text">八、HATEOAS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81CORS-%E9%85%8D%E7%BD%AE"><span class="nav-number">9.</span> <span class="nav-text">九、CORS 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">10.</span> <span class="nav-text">十、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/rest-api-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="REST API 设计规范 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          REST API 设计规范
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/API/" itemprop="url" rel="index"><span itemprop="name">API</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>REST API 是后端工程师每天都要打交道的东西。但”RESTful”这个词被过度使用——很多自称 REST 的 API 其实连基本规范都没遵守。这篇文章梳理一套切实可用的设计规范。</p>
+<h2 id="一、URL-设计"><a href="#一、URL-设计" class="headerlink" title="一、URL 设计"></a>一、URL 设计</h2><h3 id="1-1-命名规则"><a href="#1-1-命名规则" class="headerlink" title="1.1 命名规则"></a>1.1 命名规则</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">✅ GET    /users              <span class="comment"># 用户列表</span></span><br><span class="line">✅ GET    /users/123          <span class="comment"># 单个用户</span></span><br><span class="line">✅ POST   /users              <span class="comment"># 创建用户</span></span><br><span class="line">✅ PUT    /users/123          <span class="comment"># 全量更新用户</span></span><br><span class="line">✅ PATCH  /users/123          <span class="comment"># 部分更新用户</span></span><br><span class="line">✅ DELETE /users/123          <span class="comment"># 删除用户</span></span><br><span class="line">✅ GET    /users/123/orders   <span class="comment"># 用户的订单列表</span></span><br><span class="line"></span><br><span class="line">❌ GET    /getUser?<span class="built_in">id</span>=123     <span class="comment"># 动词、驼峰</span></span><br><span class="line">❌ POST   /createUser         <span class="comment"># 动词</span></span><br><span class="line">❌ GET    /api/users/123      <span class="comment"># /api 前缀由网关统一添加</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>用名词而非动词</li>
+<li>用复数而非单数</li>
+<li>子资源用路径嵌套</li>
+<li>避免深嵌套（最多 2 层：<code>/users/123/orders</code>，不要 <code>/users/123/orders/456/items</code>）</li>
+</ul>
+<h3 id="1-2-分页"><a href="#1-2-分页" class="headerlink" title="1.2 分页"></a>1.2 分页</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 请求</span></span><br><span class="line">GET /users?page=<span class="number">2</span>&amp;page_size=<span class="number">20</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 响应</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;data&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span>...<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;pagination&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;page&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;page_size&quot;</span><span class="punctuation">:</span> <span class="number">20</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;total&quot;</span><span class="punctuation">:</span> <span class="number">1043</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;total_pages&quot;</span><span class="punctuation">:</span> <span class="number">53</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;next&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/users?page=3&amp;page_size=20&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prev&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/users?page=1&amp;page_size=20&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>游标分页</strong>（适用于实时 Feed 流）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;data&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span>...<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;pagination&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;cursor&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1625097600000&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;has_more&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>游标分页避免 offset 在数据变化时的重复&#x2F;丢失问题。</p>
+<h3 id="1-3-过滤、排序、字段选择"><a href="#1-3-过滤、排序、字段选择" class="headerlink" title="1.3 过滤、排序、字段选择"></a>1.3 过滤、排序、字段选择</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> /users?<span class="attribute">status</span>=active&amp;role=admin                    # 过滤</span><br><span class="line"><span class="built_in">GET</span> /users?<span class="attribute">sort</span>=-created_at,+name                      # 排序（- 降序）</span><br><span class="line"><span class="built_in">GET</span> /users?<span class="attribute">fields</span>=id,name,email                        # 字段选择</span><br><span class="line"><span class="built_in">GET</span> /users?<span class="attribute">q</span>=search+keyword                            # 搜索</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、HTTP-状态码"><a href="#二、HTTP-状态码" class="headerlink" title="二、HTTP 状态码"></a>二、HTTP 状态码</h2><table>
+<thead>
+<tr>
+<th>码</th>
+<th>含义</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>200</td>
+<td>OK</td>
+<td>GET&#x2F;PUT&#x2F;PATCH 成功</td>
+</tr>
+<tr>
+<td>201</td>
+<td>Created</td>
+<td>POST 创建成功，返回 <code>Location</code> 头</td>
+</tr>
+<tr>
+<td>204</td>
+<td>No Content</td>
+<td>DELETE 成功</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Bad Request</td>
+<td>参数校验失败、格式错误</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Unauthorized</td>
+<td>未提供凭证</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Forbidden</td>
+<td>已认证但无权限</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not Found</td>
+<td>资源不存在</td>
+</tr>
+<tr>
+<td>409</td>
+<td>Conflict</td>
+<td>并发冲突</td>
+</tr>
+<tr>
+<td>422</td>
+<td>Unprocessable</td>
+<td>语义错误（如重复提交）</td>
+</tr>
+<tr>
+<td>429</td>
+<td>Too Many Requests</td>
+<td>限流</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Internal Server Error</td>
+<td>未预期的服务端错误</td>
+</tr>
+<tr>
+<td>503</td>
+<td>Service Unavailable</td>
+<td>降级&#x2F;维护</td>
+</tr>
+</tbody></table>
+<p><strong>不要用 200 + error_code 字段替代 HTTP 状态码</strong>——中间件（网关、CDN、负载均衡器）都依赖 HTTP 状态码做流量控制和错误统计。</p>
+<h2 id="三、响应体结构"><a href="#三、响应体结构" class="headerlink" title="三、响应体结构"></a>三、响应体结构</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;success&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;data&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="number">123</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pcl&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pcl@example.com&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;request_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;a1b2c3d4&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>code</code>: 业务错误码，0 表示成功；与 HTTP 状态码互补（HTTP 状态码告诉网关”发生了什么”，业务错误码告诉客户端”为什么”）</li>
+<li><code>message</code>: 面向开发者的提示；面向用户的文案由客户端提供</li>
+<li><code>request_id</code>: 全链路追踪 ID，排查问题时关联前后端日志</li>
+</ul>
+<p><strong>错误响应</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="number">10001</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;email already exists&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;data&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;request_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;a1b2c3d4&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、API-版本管理"><a href="#四、API-版本管理" class="headerlink" title="四、API 版本管理"></a>四、API 版本管理</h2><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>做法</th>
+<th>优缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>URL 版本</strong></td>
+<td><code>/v1/users</code> <code>/v2/users</code></td>
+<td>最直观，网关路由简单；URL 变化</td>
+</tr>
+<tr>
+<td><strong>Header 版本</strong></td>
+<td><code>Accept: application/vnd.api.v2+json</code></td>
+<td>URL 不变；调试不直观</td>
+</tr>
+<tr>
+<td><strong>Query 参数</strong></td>
+<td><code>/users?version=2</code></td>
+<td>简单；污染 URL</td>
+</tr>
+</tbody></table>
+<p><strong>推荐</strong>：对外 API 用 URL 版本（清晰、可缓存、网关友好），内部 API 用 Header 版本。</p>
+<p>版本升级策略：</p>
+<ul>
+<li>新版本上线后，旧版本至少保留 6 个月</li>
+<li>通过监控和日志统计旧版本的调用量，降为 0 后才能下线</li>
+<li>版本升级指南用 changelog 形式通知调用方</li>
+</ul>
+<h2 id="五、幂等性设计"><a href="#五、幂等性设计" class="headerlink" title="五、幂等性设计"></a>五、幂等性设计</h2><p>支付、扣款、下单等写操作必须支持幂等：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 客户端生成幂等键</span></span><br><span class="line"><span class="symbol">POST</span> /<span class="built_in">v1</span>/orders</span><br><span class="line"><span class="symbol">Idempotency</span>-Key: <span class="number">8</span>f7d3b2a-<span class="number">1</span>c4e-<span class="number">4</span>a5b-<span class="number">9</span>d6e-<span class="number">3</span>f8a7c1b2d4e</span><br><span class="line"></span><br><span class="line"><span class="comment">// 服务端用 Redis + SETNX 保证幂等</span></span><br><span class="line"><span class="symbol">SETNX</span> idempotent:&#123;key&#125; <span class="meta">TTL</span><span class="number">=24</span>h</span><br></pre></td></tr></table></figure>
+
+<p>幂等键在服务端的存储需要设置 TTL（通常 24-72 小时），防止无限增长。对外告知客户端幂等键的格式要求（UUID v4 最佳），以及重试的合理间隔（指数退避）。</p>
+<p>GET 和 DELETE 天然幂等。PUT 幂等（相同输入相同输出）。PATCH 不保证幂等（取决于 patch 操作，需额外去重逻辑）。只有 POST 需要显式的幂等设计。</p>
+<h2 id="六、鉴权"><a href="#六、鉴权" class="headerlink" title="六、鉴权"></a>六、鉴权</h2><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">Authorization:</span> Bearer eyJhbGciOi...</span><br></pre></td></tr></table></figure>
+
+<p>框架：JWT（无状态，适合分布式）或 Opaque Token（可撤销，需要查 Redis）。</p>
+<p>JWT 注意事项：</p>
+<ul>
+<li>密钥定期轮换（用 <code>kid</code> header 标识当前密钥）</li>
+<li>短期 access token（15-60min）+ 长期 refresh token（7-30天）</li>
+<li>不要在 JWT 中存储敏感信息（payload 仅 base64 编码，非加密）</li>
+</ul>
+<h2 id="七、限流头"><a href="#七、限流头" class="headerlink" title="七、限流头"></a>七、限流头</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">X-RateLimit-Limit:</span> <span class="number">1000</span></span><br><span class="line"><span class="attr">X-RateLimit-Remaining:</span> <span class="number">847</span></span><br><span class="line"><span class="attr">X-RateLimit-Reset:</span> <span class="number">1625098200</span></span><br></pre></td></tr></table></figure>
+
+<p>让客户端知道自己还剩多少次调用、什么时候重置。超过限制返回 429 时，附带 <code>Retry-After</code> 头告知重试时间。</p>
+<h2 id="八、HATEOAS"><a href="#八、HATEOAS" class="headerlink" title="八、HATEOAS"></a>八、HATEOAS</h2><p>HATEOAS（Hypermedia as the Engine of Application State）是最容易被忽视的 REST 约束：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="number">123</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pcl&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;links&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span> <span class="attr">&quot;rel&quot;</span><span class="punctuation">:</span> <span class="string">&quot;self&quot;</span><span class="punctuation">,</span>     <span class="attr">&quot;href&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/users/123&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span> <span class="attr">&quot;rel&quot;</span><span class="punctuation">:</span> <span class="string">&quot;orders&quot;</span><span class="punctuation">,</span>   <span class="attr">&quot;href&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/users/123/orders&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span> <span class="attr">&quot;rel&quot;</span><span class="punctuation">:</span> <span class="string">&quot;settings&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;href&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/users/123/settings&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>返回值中包含相关资源的链接，客户端可以动态发现后续操作——减少了客户端和服务端的耦合。实际开发中多数团队不实现完全 HATEOAS，但至少返回 <code>self</code> 链接，方便调试和日志。</p>
+<h2 id="九、CORS-配置"><a href="#九、CORS-配置" class="headerlink" title="九、CORS 配置"></a>九、CORS 配置</h2><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Access</span>-Control-Allow-Origin: https://example.com</span><br><span class="line"><span class="keyword">Access</span>-Control-Allow-Methods: <span class="keyword">GET</span>,POST,PUT,<span class="keyword">DELETE</span></span><br><span class="line"><span class="keyword">Access</span>-Control-Allow-Headers: Content-<span class="keyword">Type</span>,<span class="keyword">Authorization</span></span><br><span class="line"><span class="keyword">Access</span>-Control-Max-Age: <span class="number">86400</span></span><br></pre></td></tr></table></figure>
+
+<p>不要用 <code>*</code> 通配符，明确指定允许的域名以减少安全风险。</p>
+<h2 id="十、小结"><a href="#十、小结" class="headerlink" title="十、小结"></a>十、小结</h2><p>REST API 设计规范的核心原则：URL 是资源名词、HTTP 方法表述操作、状态码表明结果、幂等键保证安全、版本号管理演进。好的 API 是团队间的契约，需要在可读性、兼容性和安全性之间找到平衡。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%82%E7%AD%89/" rel="tag"># 幂等</a>
+              <a href="/tags/API/" rel="tag"># API</a>
+              <a href="/tags/REST/" rel="tag"># REST</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1/" rel="tag"># 设计</a>
+              <a href="/tags/%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86/" rel="tag"># 版本管理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/redis/" rel="prev" title="Redis 深度解析">
+                  <i class="fa fa-angle-left"></i> Redis 深度解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/redshift-warehouse-guide/" rel="next" title="Redshift 数仓实战">
+                  Redshift 数仓实战 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Netflix 占全球互联网下行流量的 15%，YouTube 每分钟上传 500 小时视频。视频流系统的挑战在于：海量存储、实时转码、全球低延迟分发、以及千人千面的推荐。 一、核心需求   需求 说明    上传视频 支持各种格式、码率、分辨率   转码处理 将原始视频转为多个分辨率+码率版本   自适应流 根据用户网络状况动态切换清晰度   全球分发 CDN 边缘节点缓存，就近服务   搜索推">
+<meta property="og:type" content="article">
+<meta property="og:title" content="视频流系统设计 (YouTube&#x2F;Netflix)">
+<meta property="og:url" content="http://pclhahaha.github.io/video-streaming-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Netflix 占全球互联网下行流量的 15%，YouTube 每分钟上传 500 小时视频。视频流系统的挑战在于：海量存储、实时转码、全球低延迟分发、以及千人千面的推荐。 一、核心需求   需求 说明    上传视频 支持各种格式、码率、分辨率   转码处理 将原始视频转为多个分辨率+码率版本   自适应流 根据用户网络状况动态切换清晰度   全球分发 CDN 边缘节点缓存，就近服务   搜索推">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="CDN">
+<meta property="article:tag" content="Netflix">
+<meta property="article:tag" content="视频流">
+<meta property="article:tag" content="YouTube">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/video-streaming-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/video-streaming-design/","path":"video-streaming-design/","title":"视频流系统设计 (YouTube/Netflix)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>视频流系统设计 (YouTube/Netflix) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A0%B8%E5%BF%83%E9%9C%80%E6%B1%82"><span class="nav-number">1.</span> <span class="nav-text">一、核心需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E8%A7%86%E9%A2%91%E4%B8%8A%E4%BC%A0%E4%B8%8E%E5%AD%98%E5%82%A8"><span class="nav-number">2.</span> <span class="nav-text">二、视频上传与存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%8A%E4%BC%A0%E6%B5%81%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 上传流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%88%86%E7%89%87%E4%B8%8A%E4%BC%A0"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 分片上传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 存储架构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%A7%86%E9%A2%91%E8%BD%AC%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">三、视频转码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%BD%AC%E7%A0%81"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 为什么需要转码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E8%BD%AC%E7%A0%81%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 转码流水线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%86%85%E5%AE%B9%E5%88%86%E5%8F%91%E7%BD%91%E7%BB%9C-CDN"><span class="nav-number">4.</span> <span class="nav-text">四、内容分发网络 (CDN)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Netflix-Open-Connect"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 Netflix Open Connect</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-CDN-%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 CDN 缓存策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%9B%B4%E6%92%AD-vs-%E7%82%B9%E6%92%AD"><span class="nav-number">5.</span> <span class="nav-text">五、直播 vs 点播</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E6%9E%B6%E6%9E%84%E5%B7%AE%E5%BC%82"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 架构差异</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E7%9B%B4%E6%92%AD%E6%9E%B6%E6%9E%84"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 直播架构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%92%AD%E6%94%BE%E5%99%A8%E8%87%AA%E9%80%82%E5%BA%94%E7%A0%81%E7%8E%87"><span class="nav-number">6.</span> <span class="nav-text">六、播放器自适应码率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-ABR-%E7%AE%97%E6%B3%95"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 ABR 算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E9%A2%84%E5%8A%A0%E8%BD%BD%E7%AD%96%E7%95%A5"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 预加载策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%95%B0%E6%8D%AE%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%90%9C%E7%B4%A2"><span class="nav-number">7.</span> <span class="nav-text">七、数据架构与搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E8%A7%86%E9%A2%91%E5%85%83%E6%95%B0%E6%8D%AE"><span class="nav-number">7.1.</span> <span class="nav-text">7.1 视频元数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E"><span class="nav-number">7.2.</span> <span class="nav-text">7.2 搜索引擎</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AE%B9%E9%87%8F%E4%BC%B0%E7%AE%97"><span class="nav-number">8.</span> <span class="nav-text">八、容量估算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">九、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/video-streaming-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="视频流系统设计 (YouTube&#x2F;Netflix) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          视频流系统设计 (YouTube/Netflix)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Netflix 占全球互联网下行流量的 15%，YouTube 每分钟上传 500 小时视频。视频流系统的挑战在于：海量存储、实时转码、全球低延迟分发、以及千人千面的推荐。</p>
+<h2 id="一、核心需求"><a href="#一、核心需求" class="headerlink" title="一、核心需求"></a>一、核心需求</h2><table>
+<thead>
+<tr>
+<th>需求</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>上传视频</td>
+<td>支持各种格式、码率、分辨率</td>
+</tr>
+<tr>
+<td>转码处理</td>
+<td>将原始视频转为多个分辨率+码率版本</td>
+</tr>
+<tr>
+<td>自适应流</td>
+<td>根据用户网络状况动态切换清晰度</td>
+</tr>
+<tr>
+<td>全球分发</td>
+<td>CDN 边缘节点缓存，就近服务</td>
+</tr>
+<tr>
+<td>搜索推荐</td>
+<td>基于用户行为的个性化推荐</td>
+</tr>
+</tbody></table>
+<h2 id="二、视频上传与存储"><a href="#二、视频上传与存储" class="headerlink" title="二、视频上传与存储"></a>二、视频上传与存储</h2><h3 id="2-1-上传流程"><a href="#2-1-上传流程" class="headerlink" title="2.1 上传流程"></a>2.1 上传流程</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">客户端 → 分片上传 → 对象存储(S3)</span><br><span class="line">                      │</span><br><span class="line">                  <span class="selector-attr">[消息队列]</span></span><br><span class="line">                      │</span><br><span class="line">              ┌───────┴───────┐</span><br><span class="line">              │   转码服务     │</span><br><span class="line">              │  (异步处理)    │</span><br><span class="line">              └───────┬───────┘</span><br><span class="line">                      │</span><br><span class="line">              多分辨率版本 → 对象存储</span><br><span class="line">                      │</span><br><span class="line">                    CDN 预热</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-分片上传"><a href="#2-2-分片上传" class="headerlink" title="2.2 分片上传"></a>2.2 分片上传</h3><p>大视频（&gt;100MB）必须分片上传：</p>
+<ul>
+<li>将视频切分为 5-10MB 的 chunk</li>
+<li>支持断点续传：上传中断后可从中断位置继续</li>
+<li>合并：上传完成后，服务端合并所有分片（或直接保存分片元数据）</li>
+</ul>
+<h3 id="2-3-存储架构"><a href="#2-3-存储架构" class="headerlink" title="2.3 存储架构"></a>2.3 存储架构</h3><p>Netflix 将视频存储到 Amazon S3，但实际播放是从 Open Connect CDN 直接分发。存储和分发解耦：</p>
+<ul>
+<li><strong>原视频存储</strong>：S3&#x2F;OSS 对象存储，原始的高码率视频</li>
+<li><strong>转码版本</strong>：同样存储在对象存储，生成 1080p&#x2F;720p&#x2F;480p&#x2F;360p&#x2F;240p 多版本</li>
+<li><strong>元数据存储</strong>：MySQL&#x2F;PostgreSQL 存储视频标题、描述、标签、时长</li>
+</ul>
+<h2 id="三、视频转码"><a href="#三、视频转码" class="headerlink" title="三、视频转码"></a>三、视频转码</h2><h3 id="3-1-为什么需要转码"><a href="#3-1-为什么需要转码" class="headerlink" title="3.1 为什么需要转码"></a>3.1 为什么需要转码</h3><p>原始视频通常是单一高分格式（如 4K 60fps H.264），但用户设备差异巨大：</p>
+<ul>
+<li>iPhone 13 支持 HEVC 硬解</li>
+<li>Android 低端机可能只支持 H.264 Baseline</li>
+<li>浏览器 Web 端用 VP9 或 AV1</li>
+<li>弱网用户需要 360p 低码率版本</li>
+</ul>
+<h3 id="3-2-转码流水线"><a href="#3-2-转码流水线" class="headerlink" title="3.2 转码流水线"></a>3.2 转码流水线</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">原始视频 → 分析(场景检测) → 切片(按场景切段) → 并行转码 → 合并 → 输出多版本</span><br><span class="line">                │</span><br><span class="line">           <span class="selector-attr">[机器学习]</span></span><br><span class="line">           (内容分类/敏感内容检测/字幕生成)</span><br></pre></td></tr></table></figure>
+
+<p>关键优化：</p>
+<ul>
+<li><strong>DAG 调度</strong>：每个转码任务抽象的 DAG 节点，利用工作流引擎（如 Netflix Maestro）编排</li>
+<li><strong>自适应码率 (ABR)</strong>：HLS&#x2F;DASH 协议将视频切为 2-4 秒的小片段，每片段有多个码率版本。播放器根据当前缓冲和带宽动态切换。</li>
+<li><strong>GPU 加速</strong>：使用 NVIDIA GPU + NVENC 硬件编码，比 CPU 编码快 10x</li>
+</ul>
+<h2 id="四、内容分发网络-CDN"><a href="#四、内容分发网络-CDN" class="headerlink" title="四、内容分发网络 (CDN)"></a>四、内容分发网络 (CDN)</h2><h3 id="4-1-Netflix-Open-Connect"><a href="#4-1-Netflix-Open-Connect" class="headerlink" title="4.1 Netflix Open Connect"></a>4.1 Netflix Open Connect</h3><p>Netflix 不依赖第三方 CDN，而是构建了自己的 CDN 网络 Open Connect：</p>
+<ol>
+<li>将视频内容<strong>预推送到全球 1000+ 个 ISP 机房</strong></li>
+<li>用户点播时，请求首先路由到最近的 Open Connect 节点</li>
+<li>节点有缓存则直接返回，没有则回源拉取</li>
+</ol>
+<p><strong>关键指标</strong>：Netflix 的直播流可以在 60 秒内推送到 1 亿台设备。</p>
+<h3 id="4-2-CDN-缓存策略"><a href="#4-2-CDN-缓存策略" class="headerlink" title="4.2 CDN 缓存策略"></a>4.2 CDN 缓存策略</h3><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>热门内容</strong></td>
+<td>预热到所有边缘节点（如热门剧集全集）</td>
+</tr>
+<tr>
+<td><strong>长尾内容</strong></td>
+<td>仅存储在中心节点，按需回源</td>
+</tr>
+<tr>
+<td><strong>分层缓存</strong></td>
+<td>L1（边缘）→ L2（区域）→ L3（中心&#x2F;源站）</td>
+</tr>
+<tr>
+<td><strong>TTL 设置</strong></td>
+<td>不同内容设置不同 TTL，热门内容缓存更久</td>
+</tr>
+</tbody></table>
+<h2 id="五、直播-vs-点播"><a href="#五、直播-vs-点播" class="headerlink" title="五、直播 vs 点播"></a>五、直播 vs 点播</h2><h3 id="5-1-架构差异"><a href="#5-1-架构差异" class="headerlink" title="5.1 架构差异"></a>5.1 架构差异</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>点播 (VOD)</th>
+<th>直播 (Live)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>延迟要求</td>
+<td>秒级可接受</td>
+<td>毫秒-秒级（体育赛事）</td>
+</tr>
+<tr>
+<td>内容处理</td>
+<td>可提前转码</td>
+<td>实时转码</td>
+</tr>
+<tr>
+<td>分发方式</td>
+<td>CDN 缓存</td>
+<td>边缘节点实时转发</td>
+</tr>
+<tr>
+<td>协议</td>
+<td>HLS (10-30s 延迟)</td>
+<td>WebRTC&#x2F;RTMP (500ms-2s)</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-直播架构"><a href="#5-2-直播架构" class="headerlink" title="5.2 直播架构"></a>5.2 直播架构</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主播端 → RTMP 推流 → 直播服务器 → 实时转码(ABR) → </span><br><span class="line">    ├→ HLS 切片生成 → CDN 分发 → 普通观众 (<span class="number">10s</span> 延迟)</span><br><span class="line">    └→ WebRTC 低延迟通道 → 交互式观众 (<span class="number">500ms</span> 延迟)</span><br></pre></td></tr></table></figure>
+
+<p>Netflix 在 2024 年首次支持全球直播（如体育赛事、脱口秀），技术要点：</p>
+<ul>
+<li>使用 Fastly CDN 边缘计算处理实时转码</li>
+<li>HLS 低延迟模式（LL-HLS）将延迟降到 2-3 秒</li>
+<li>全球同步：通过 NTP 时间同步保证不同地区观众看到同一时刻内容</li>
+</ul>
+<h2 id="六、播放器自适应码率"><a href="#六、播放器自适应码率" class="headerlink" title="六、播放器自适应码率"></a>六、播放器自适应码率</h2><h3 id="6-1-ABR-算法"><a href="#6-1-ABR-算法" class="headerlink" title="6.1 ABR 算法"></a>6.1 ABR 算法</h3><p>播放器持续监测：</p>
+<ul>
+<li><strong>缓冲区长度</strong>：当前缓冲了多少秒数据</li>
+<li><strong>下载速度</strong>：每个片段下载耗费的时间</li>
+</ul>
+<p>决策逻辑：</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">buffer</span> &lt; <span class="number">5</span>s:</span><br><span class="line">    切换到最低码率（防止卡顿）</span><br><span class="line">elif <span class="built_in">buffer</span> &gt; <span class="number">15</span>s:</span><br><span class="line">    切换到更高码率（提高清晰度）</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    保持当前码率</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-预加载策略"><a href="#6-2-预加载策略" class="headerlink" title="6.2 预加载策略"></a>6.2 预加载策略</h3><ul>
+<li>Netflix 在浏览页面时后台预加载预告片</li>
+<li>YouTube 预加载推荐列表前 3 个视频的首个片段</li>
+<li>利用用户行为预测下一个可能播放的视频</li>
+</ul>
+<h2 id="七、数据架构与搜索"><a href="#七、数据架构与搜索" class="headerlink" title="七、数据架构与搜索"></a>七、数据架构与搜索</h2><h3 id="7-1-视频元数据"><a href="#7-1-视频元数据" class="headerlink" title="7.1 视频元数据"></a>7.1 视频元数据</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="params">video_id:</span> 主键</span><br><span class="line"><span class="params">title:</span> 标题</span><br><span class="line"><span class="params">description:</span> 描述</span><br><span class="line"><span class="params">tags:</span> [数组]</span><br><span class="line"><span class="params">duration_seconds:</span> 时长</span><br><span class="line"><span class="params">uploader_id:</span> 上传者</span><br><span class="line"><span class="params">urls:</span> &#123;<span class="number">1080</span><span class="params">p:</span> <span class="string">&quot;...&quot;</span>, <span class="number">720</span><span class="params">p:</span> <span class="string">&quot;...&quot;</span>, <span class="number">480</span><span class="params">p:</span> <span class="string">&quot;...&quot;</span>&#125;</span><br><span class="line"><span class="params">view_count:</span> 播放量 (定期更新)</span><br><span class="line"><span class="params">created_at:</span> 上传时间</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-2-搜索引擎"><a href="#7-2-搜索引擎" class="headerlink" title="7.2 搜索引擎"></a>7.2 搜索引擎</h3><p>YouTube 的搜索基于 Elasticsearch：</p>
+<ul>
+<li>倒排索引覆盖标题、描述、字幕</li>
+<li>排序公式综合播放量、点赞、评论、上传时间</li>
+<li>个性化排序通过机器学习模型（用户历史、兴趣特征 + 视频特征）计算相关性分数</li>
+</ul>
+<h2 id="八、容量估算"><a href="#八、容量估算" class="headerlink" title="八、容量估算"></a>八、容量估算</h2><p>假设 10 亿视频，平均大小 500MB，总存储 &#x3D; 10亿 × 500MB &#x3D; 500PB（不含多码率版本和副本）</p>
+<ul>
+<li>每日上传 100 万视频，100万 × 500MB &#x3D; 500TB&#x2F;天</li>
+<li>如果 10% 是热门内容需要 CDN 缓存：50TB × 3副本 &#x3D; 150TB CDN 存储</li>
+</ul>
+<p>YouTube 使用 Google 自研的 Colossus 文件系统 + Spanner 数据库，Netflix 使用 AWS S3 + Cassandra。</p>
+<h2 id="九、小结"><a href="#九、小结" class="headerlink" title="九、小结"></a>九、小结</h2><p>视频流系统的核心挑战是<strong>规模</strong>——从存储、转码、分发到播放的完整链路都必须在亿级用户和海量内容上保持稳定。关键技术：分片上传 + 异步转码流水线 + 自适应码率 (ABR) + 全球 CDN 分层缓存。Netflix 和 YouTube 分别代表了”自建 CDN”和”云原生”两种路线，都验证了各自在超大规模下的可行性。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/CDN/" rel="tag"># CDN</a>
+              <a href="/tags/Netflix/" rel="tag"># Netflix</a>
+              <a href="/tags/%E8%A7%86%E9%A2%91%E6%B5%81/" rel="tag"># 视频流</a>
+              <a href="/tags/YouTube/" rel="tag"># YouTube</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/virtualization/" rel="prev" title="虚拟化与容器化: 从 Hypervisor 到 K8s">
+                  <i class="fa fa-angle-left"></i> 虚拟化与容器化: 从 Hypervisor 到 K8s
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/transformer-architecture/" rel="next" title="Transformer 架构详解">
+                  Transformer 架构详解 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

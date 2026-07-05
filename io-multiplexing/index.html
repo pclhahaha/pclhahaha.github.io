@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="IO 多路复用是高性能网络编程的基石。从 select 到 poll 再到 epoll，内核的发展史就是一部”如何用更少的资源管理更多连接”的优化史。 一、为什么需要多路复用在传统的阻塞 IO 模型中，accept() 和 read() 都是阻塞的——一个连接的处理会阻塞整个线程： 12345&#x2F;&#x2F; 传统阻塞模型：一个连接一个线程while (1) &#123;    int client &#x3D; ac">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO 多路复用 — select&#x2F;poll&#x2F;epoll">
+<meta property="og:url" content="http://pclhahaha.github.io/io-multiplexing/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="IO 多路复用是高性能网络编程的基石。从 select 到 poll 再到 epoll，内核的发展史就是一部”如何用更少的资源管理更多连接”的优化史。 一、为什么需要多路复用在传统的阻塞 IO 模型中，accept() 和 read() 都是阻塞的——一个连接的处理会阻塞整个线程： 12345&#x2F;&#x2F; 传统阻塞模型：一个连接一个线程while (1) &#123;    int client &#x3D; ac">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="IO">
+<meta property="article:tag" content="多路复用">
+<meta property="article:tag" content="select">
+<meta property="article:tag" content="poll">
+<meta property="article:tag" content="epoll">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/io-multiplexing/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/io-multiplexing/","path":"io-multiplexing/","title":"IO 多路复用 — select/poll/epoll"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IO 多路复用 — select/poll/epoll | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">一、为什么需要多路复用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81select"><span class="nav-number">2.</span> <span class="nav-text">二、select</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81poll"><span class="nav-number">3.</span> <span class="nav-text">三、poll</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81epoll"><span class="nav-number">4.</span> <span class="nav-text">四、epoll</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E6%A0%B8%E5%BF%83-API"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 核心 API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E8%A7%A6%E5%8F%91%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 触发模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 底层实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%AF%B9%E6%AF%94%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">五、对比总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%9C%A8-Netty-%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">6.</span> <span class="nav-text">六、在 Netty 中的应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/io-multiplexing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="IO 多路复用 — select&#x2F;poll&#x2F;epoll | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IO 多路复用 — select/poll/epoll
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>IO 多路复用是高性能网络编程的基石。从 select 到 poll 再到 epoll，内核的发展史就是一部”如何用更少的资源管理更多连接”的优化史。</p>
+<h2 id="一、为什么需要多路复用"><a href="#一、为什么需要多路复用" class="headerlink" title="一、为什么需要多路复用"></a>一、为什么需要多路复用</h2><p>在传统的阻塞 IO 模型中，<code>accept()</code> 和 <code>read()</code> 都是阻塞的——一个连接的处理会阻塞整个线程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 传统阻塞模型：一个连接一个线程</span></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="type">int</span> client = accept(server_fd, ...);  <span class="comment">// 阻塞等待新连接</span></span><br><span class="line">    pthread_create(..., handle_client, client);  <span class="comment">// 为每个连接创建线程</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>问题：1000 个连接 &#x3D; 1000 个线程。每个线程占用 ~1MB 栈空间 + 上下文切换开销。多路复用让一个线程同时监视成百上千个连接。</p>
+<h2 id="二、select"><a href="#二、select" class="headerlink" title="二、select"></a>二、select</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">fd_set read_fds;</span><br><span class="line">FD_ZERO(&amp;read_fds);</span><br><span class="line">FD_SET(socket1, &amp;read_fds);  <span class="comment">// 将 socket1 加入监视集合</span></span><br><span class="line">FD_SET(socket2, &amp;read_fds);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 阻塞等待任意一个 socket 可读</span></span><br><span class="line"><span class="type">int</span> ready = select(max_fd + <span class="number">1</span>, &amp;read_fds, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= max_fd; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (FD_ISSET(i, &amp;read_fds)) &#123;</span><br><span class="line">        <span class="comment">// socket i 可读了</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最大连接数</td>
+<td>1024（FD_SETSIZE 限制，可重编译但效率下降）</td>
+</tr>
+<tr>
+<td>传入传出</td>
+<td>每次调用都要把整个 fd_set 从用户态复制到内核态</td>
+</tr>
+<tr>
+<td>查找就绪</td>
+<td>O(N) 遍历所有 fd 检查 <code>FD_ISSET</code></td>
+</tr>
+<tr>
+<td>触发模式</td>
+<td>仅水平触发（Level Triggered）</td>
+</tr>
+</tbody></table>
+<h2 id="三、poll"><a href="#三、poll" class="headerlink" title="三、poll"></a>三、poll</h2><p>poll 解决了 select 的 1024 限制，但本质还是轮询：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> <span class="title">fds</span>[10000];</span></span><br><span class="line">fds[<span class="number">0</span>].fd = socket1; fds[<span class="number">0</span>].events = POLLIN;</span><br><span class="line">fds[<span class="number">1</span>].fd = socket2; fds[<span class="number">1</span>].events = POLLIN;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> ready = poll(fds, nfds, timeout);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; nfds; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (fds[i].revents &amp; POLLIN) &#123;</span><br><span class="line">        <span class="comment">// fds[i].fd 可读了</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>相比 select 的改进</strong>：</p>
+<ul>
+<li>使用链表存储 fd，不再有 1024 限制</li>
+<li>事件和返回用不同字段（<code>events</code> 传入，<code>revents</code> 传出）</li>
+</ul>
+<p><strong>未解决的问题</strong>：仍然需要 O(N) 遍历所有 fd 来确定哪些就绪。</p>
+<h2 id="四、epoll"><a href="#四、epoll" class="headerlink" title="四、epoll"></a>四、epoll</h2><p>epoll 是 Linux 上的终极 IO 多路复用方案，通过”回调通知”彻底告别 O(N) 遍历。</p>
+<h3 id="4-1-核心-API"><a href="#4-1-核心-API" class="headerlink" title="4.1 核心 API"></a>4.1 核心 API</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> epfd = epoll_create(<span class="number">1</span>);  <span class="comment">// 创建 epoll 实例</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">ev</span>;</span></span><br><span class="line">ev.events = EPOLLIN;  <span class="comment">// 监视可读事件</span></span><br><span class="line">ev.data.fd = socket1;</span><br><span class="line">epoll_ctl(epfd, EPOLL_CTL_ADD, socket1, &amp;ev);  <span class="comment">// 注册</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 等待就绪事件</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">events</span>[<span class="title">MAX_EVENTS</span>];</span></span><br><span class="line"><span class="type">int</span> n = epoll_wait(epfd, events, MAX_EVENTS, timeout);</span><br><span class="line"></span><br><span class="line"><span class="comment">// events[0..n-1] 都是就绪的 fd，直接处理</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">    <span class="type">int</span> fd = events[i].data.fd;</span><br><span class="line">    <span class="comment">// 处理 fd</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心差异</strong>：<code>events[]</code> 返回的都是真正就绪的 fd，不需要遍历所有注册的 fd。</p>
+<h3 id="4-2-触发模式"><a href="#4-2-触发模式" class="headerlink" title="4.2 触发模式"></a>4.2 触发模式</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>行为</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LT（水平触发）</strong></td>
+<td>只要缓冲区有数据就不停通知</td>
+<td>简单可靠，潜在通知风暴</td>
+</tr>
+<tr>
+<td><strong>ET（边缘触发）</strong></td>
+<td>只在状态变化时通知一次</td>
+<td>高性能，但需要非阻塞 IO + 一次读完</td>
+</tr>
+</tbody></table>
+<p>Netty 默认使用 ET 模式以减少不必要的通知。</p>
+<h3 id="4-3-底层实现"><a href="#4-3-底层实现" class="headerlink" title="4.3 底层实现"></a>4.3 底层实现</h3><p>epoll 在内核中用<strong>红黑树</strong>存储所有注册的 fd，用<strong>就绪链表</strong>存储就绪的 fd：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">epoll_create → 创建 eventpoll 对象</span><br><span class="line">                ├─ 红黑树（rbr）：存储所有监视的 fd</span><br><span class="line">                ├─ 就绪链表（rdllist）：存储就绪的 fd</span><br><span class="line">                └─ 等待队列（wq）：阻塞在 epoll_wait 的进程</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">epoll_ctl</span><span class="params">(ADD)</span></span> → 将 fd 加入红黑树</span><br><span class="line">                  → 注册回调：当 fd 就绪时，将其加入就绪链表</span><br><span class="line"></span><br><span class="line">epoll_wait → 检查就绪链表</span><br><span class="line">             ├─ 有就绪 → 立即返回就绪事件列表</span><br><span class="line">             └─ 无就绪 → 进程睡眠，等待回调唤醒</span><br></pre></td></tr></table></figure>
+
+<p>当网卡收到数据 → 触发中断 → 内核协议栈处理 → 调用 epoll 注册的回调 → 将 fd 加入就绪链表 → 唤醒等待 epoll_wait 的进程。</p>
+<h2 id="五、对比总结"><a href="#五、对比总结" class="headerlink" title="五、对比总结"></a>五、对比总结</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>select</th>
+<th>poll</th>
+<th>epoll</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>性能（大量空闲连接）</td>
+<td>O(N) 线性下降</td>
+<td>O(N) 线性下降</td>
+<td>O(1)，仅活跃连接</td>
+</tr>
+<tr>
+<td>最大连接数</td>
+<td>1024</td>
+<td>无限制</td>
+<td>无限制（受系统内存限制）</td>
+</tr>
+<tr>
+<td>内核态&#x2F;用户态拷贝</td>
+<td>每次完整拷贝</td>
+<td>每次完整拷贝</td>
+<td>仅拷贝就绪事件</td>
+</tr>
+<tr>
+<td>触发模式</td>
+<td>仅 LT</td>
+<td>仅 LT</td>
+<td>LT + ET</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>连接数少</td>
+<td>连接数中</td>
+<td><strong>高并发首选</strong></td>
+</tr>
+</tbody></table>
+<h2 id="六、在-Netty-中的应用"><a href="#六、在-Netty-中的应用" class="headerlink" title="六、在 Netty 中的应用"></a>六、在 Netty 中的应用</h2><p>Netty 在 Linux 上自动选择 epoll，通过 <code>EpollEventLoop</code> 实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Netty 自动选择最优传输</span></span><br><span class="line"><span class="type">NioEventLoopGroup</span> <span class="variable">group</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NioEventLoopGroup</span>();</span><br><span class="line"><span class="comment">// 如果系统支持 epoll，实际创建 EpollEventLoop（更高效）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 或显式指定</span></span><br><span class="line"><span class="type">EpollEventLoopGroup</span> <span class="variable">epollGroup</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">EpollEventLoopGroup</span>();</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>select&#x2F;poll 靠轮询找到就绪的 fd（O(N)），epoll 靠回调通知直接拿到就绪列表（O(1)）。这个 O(N) 到 O(1) 的跨越，让单台服务器可以承载数十万甚至百万级的长连接。Java NIO 的 Selector 在 Linux 上底层就是 epoll。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/IO/" rel="tag"># IO</a>
+              <a href="/tags/%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" rel="tag"># 多路复用</a>
+              <a href="/tags/select/" rel="tag"># select</a>
+              <a href="/tags/poll/" rel="tag"># poll</a>
+              <a href="/tags/epoll/" rel="tag"># epoll</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/java-collections/" rel="prev" title="Java 集合框架深度解析">
+                  <i class="fa fa-angle-left"></i> Java 集合框架深度解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/instant-messaging-design/" rel="next" title="即时通讯系统设计 (WhatsApp&#x2F;微信)">
+                  即时通讯系统设计 (WhatsApp/微信) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

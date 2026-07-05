@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 定义与历史CAP 定理由 Eric Brewer 于 2000 年提出，后经 Seth Gilbert 和 Nancy Lynch 在 2002 年形式化证明，是分布式系统领域最基础也是最著名的定理之一。CAP 是以下三个属性的首字母缩写：  Consistency（一致性）：所有节点在同一时刻看到相同的数据。注意这里的”一致性”与 ACID 中的 C 不同——CAP 中的 C 近似于”强">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CAP 定理">
+<meta property="og:url" content="http://pclhahaha.github.io/cap-theorem/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 定义与历史CAP 定理由 Eric Brewer 于 2000 年提出，后经 Seth Gilbert 和 Nancy Lynch 在 2002 年形式化证明，是分布式系统领域最基础也是最著名的定理之一。CAP 是以下三个属性的首字母缩写：  Consistency（一致性）：所有节点在同一时刻看到相同的数据。注意这里的”一致性”与 ACID 中的 C 不同——CAP 中的 C 近似于”强">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="CAP">
+<meta property="article:tag" content="Eureka">
+<meta property="article:tag" content="ZooKeeper">
+<meta property="article:tag" content="Nacos">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/cap-theorem/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/cap-theorem/","path":"cap-theorem/","title":"CAP 定理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>CAP 定理 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%AE%9A%E4%B9%89%E4%B8%8E%E5%8E%86%E5%8F%B2"><span class="nav-number">1.</span> <span class="nav-text">1.1 定义与历史</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E5%90%8C%E6%97%B6%E6%BB%A1%E8%B6%B3"><span class="nav-number">2.</span> <span class="nav-text">1.2 为什么不能同时满足</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-CA-CP-AP-%E5%8F%96%E8%88%8D"><span class="nav-number">3.</span> <span class="nav-text">1.3 CA &#x2F; CP &#x2F; AP 取舍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E5%AE%9E%E9%99%85%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E6%9D%83%E8%A1%A1"><span class="nav-number">4.</span> <span class="nav-text">1.4 实际系统中的权衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-PACELC-%E6%89%A9%E5%B1%95"><span class="nav-number">5.</span> <span class="nav-text">1.5 PACELC 扩展</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/cap-theorem/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="CAP 定理 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CAP 定理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-定义与历史"><a href="#1-1-定义与历史" class="headerlink" title="1.1 定义与历史"></a>1.1 定义与历史</h3><p>CAP 定理由 Eric Brewer 于 2000 年提出，后经 Seth Gilbert 和 Nancy Lynch 在 2002 年形式化证明，是分布式系统领域最基础也是最著名的定理之一。CAP 是以下三个属性的首字母缩写：</p>
+<ul>
+<li><strong>Consistency（一致性）</strong>：所有节点在同一时刻看到相同的数据。注意这里的”一致性”与 ACID 中的 C 不同——CAP 中的 C 近似于”强一致性”或”线性一致性”，即写操作完成后，所有后续的读操作都能读到最新写入的值。</li>
+<li><strong>Availability（可用性）</strong>：每个非故障节点在合理时间内都能返回一个非错误的响应。注意这并不意味着返回的数据是”最新”的，只要求服务能响应。</li>
+<li><strong>Partition Tolerance（分区容错性）</strong>：当网络分区（节点之间通信中断）发生时，系统仍然能够继续运行。</li>
+</ul>
+<h3 id="1-2-为什么不能同时满足"><a href="#1-2-为什么不能同时满足" class="headerlink" title="1.2 为什么不能同时满足"></a>1.2 为什么不能同时满足</h3><p>理解 CAP 的关键在于：<strong>网络分区是不可避免的</strong>。在分布式系统中，节点间的网络通信可能随时中断，这不是一个可选项——它会发生。因此 P（分区容错性）在实际系统中是一个必须满足的条件。</p>
+<p>当网络分区发生时，系统面临一个关键抉择：是选择一致性（C），阻塞或拒绝请求直到分区恢复；还是选择可用性（A），允许各分区独立响应请求，接受数据不一致？</p>
+<p>以双节点主从复制为例：主节点负责写，从节点同步数据。当网络断开后：</p>
+<ul>
+<li>如果继续让从节点处理读请求 → 牺牲一致性（从节点数据可能过期）</li>
+<li>如果拒绝从节点的读请求 → 牺牲可用性（从节点不可用，尽管自身正常运行）</li>
+</ul>
+<h3 id="1-3-CA-CP-AP-取舍"><a href="#1-3-CA-CP-AP-取舍" class="headerlink" title="1.3 CA &#x2F; CP &#x2F; AP 取舍"></a>1.3 CA &#x2F; CP &#x2F; AP 取舍</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>选择</th>
+<th>典型场景</th>
+<th>代表系统</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CP</td>
+<td>一致性 + 分区容错</td>
+<td>金融转账、库存扣减</td>
+<td>ZooKeeper, etcd, Consul</td>
+</tr>
+<tr>
+<td>AP</td>
+<td>可用性 + 分区容错</td>
+<td>社交动态、用户信息</td>
+<td>Eureka, Cassandra, DynamoDB</td>
+</tr>
+<tr>
+<td>CA</td>
+<td>一致性 + 可用性</td>
+<td>无网络分区（单机）</td>
+<td>传统关系型数据库（单机）</td>
+</tr>
+</tbody></table>
+<p><strong>关键的认知转变</strong>：早期很多系统声称自己是 CA 系统，但这其实是一个伪命题。在真实分布式环境中，CA 意味着系统在分区发生时直接不可用——因为既不选择 C 也不选择 A。实际上，CA 只在单机系统或局域网无故障的理想条件下才成立。真正生产级的分布式系统必须在 CP 和 AP 之间做权衡。</p>
+<h3 id="1-4-实际系统中的权衡"><a href="#1-4-实际系统中的权衡" class="headerlink" title="1.4 实际系统中的权衡"></a>1.4 实际系统中的权衡</h3><p><strong>Eureka 的 CP → AP 演化</strong>：Spring Cloud 生态中，Eureka 最初设计强调分区容错和可用性，牺牲了强一致性。当 Eureka Server 集群出现网络分区时，各节点仍然可以接受服务注册和查询请求，即使数据存在短暂不一致。这是因为服务发现的容忍度较高——“宁可返回一个可能宕机的服务节点，也不拒绝所有请求”。</p>
+<p><strong>Nacos 的 AP + CP 混合模式</strong>：Nacos 默认采用 AP 模式，通过 Distro 协议实现最终一致性服务注册；同时支持切换到 CP 模式（基于 Raft），适用于对一致性要求较高的配置管理场景。这种”同一系统、两种模式”的设计打破了 CAP 二选一的刻板印象，实际上 CAP 指的是在分区发生时的一致性&#x2F;可用性选择，而非整个系统只能取其一。</p>
+<p><strong>现实中的 CAP 并非二元对立</strong>：</p>
+<ul>
+<li>系统可以在正常情况下同时提供 C 和 A</li>
+<li>仅在网络分区时才需要在 C 和 A 之间做取舍</li>
+<li>不同业务模块可以有不同选择（Nacos 配置中心选 CP，注册中心选 AP）</li>
+<li>可以通过”概率性 CAP”理解：将延迟超过某个阈值视为一种轻度分区，此时系统仍需做选择</li>
+</ul>
+<h3 id="1-5-PACELC-扩展"><a href="#1-5-PACELC-扩展" class="headerlink" title="1.5 PACELC 扩展"></a>1.5 PACELC 扩展</h3><p>PACELC 是对 CAP 的重要补充，由 Daniel J. Abadi 在 2010 年提出：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">如果发生网络分区 (P)：</span><br><span class="line">  如何在 <span class="selector-tag">A</span> 和 C 之间选择 (A/C)</span><br><span class="line">否则 (Else)：</span><br><span class="line">  如何在延迟 (L) 和一致性 (C) 之间选择 (L/C)</span><br></pre></td></tr></table></figure>
+
+<p>PACELC 指出，即使在正常运行（无分区）的情况下，系统设计也面临延迟与一致性的权衡，因为强一致性（如同步复制）必然带来更高的响应延迟。</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>有分区时</th>
+<th>无分区时</th>
+<th>分类</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZooKeeper</td>
+<td>C</td>
+<td>C</td>
+<td>PC&#x2F;EC</td>
+</tr>
+<tr>
+<td>Cassandra</td>
+<td>A</td>
+<td>L</td>
+<td>PA&#x2F;EL</td>
+</tr>
+<tr>
+<td>DynamoDB</td>
+<td>A</td>
+<td>L</td>
+<td>PA&#x2F;EL</td>
+</tr>
+<tr>
+<td>MongoDB（默认）</td>
+<td>C</td>
+<td>L</td>
+<td>PC&#x2F;EL</td>
+</tr>
+<tr>
+<td>CockroachDB</td>
+<td>C</td>
+<td>L</td>
+<td>PC&#x2F;EL</td>
+</tr>
+</tbody></table>
+<p>理解 PACELC 有助于我们在设计系统时不仅考虑极端的网络故障场景，也要考虑日常运行中”低延迟”与”强一致”的平衡。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/CAP/" rel="tag"># CAP</a>
+              <a href="/tags/Eureka/" rel="tag"># Eureka</a>
+              <a href="/tags/ZooKeeper/" rel="tag"># ZooKeeper</a>
+              <a href="/tags/Nacos/" rel="tag"># Nacos</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/chain-of-responsibility/" rel="prev" title="责任链模式 — Filter&#x2F;Interceptor&#x2F;Pipeline">
+                  <i class="fa fa-angle-left"></i> 责任链模式 — Filter/Interceptor/Pipeline
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/b-plus-tree/" rel="next" title="B+Tree 深度解析">
+                  B+Tree 深度解析 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

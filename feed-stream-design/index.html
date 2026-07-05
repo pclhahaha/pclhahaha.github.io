@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Feed 流（信息流）是社交和内容产品的核心——微博首页、朋友圈、抖音推荐，本质上都是在回答同一个问题：”用户打开 App 时，应该看到哪些内容，按什么顺序？” 一、业务场景核心操作：  用户 A 发布内容 → A 的所有粉丝的 Feed 中可见 用户 B 打开 App → 看到关注的人最新发布的动态  核心矛盾： 123写操作：一条内容需要&quot;分发&quot;给 N 个粉丝（推模式）读操">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Feed 流系统设计">
+<meta property="og:url" content="http://pclhahaha.github.io/feed-stream-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Feed 流（信息流）是社交和内容产品的核心——微博首页、朋友圈、抖音推荐，本质上都是在回答同一个问题：”用户打开 App 时，应该看到哪些内容，按什么顺序？” 一、业务场景核心操作：  用户 A 发布内容 → A 的所有粉丝的 Feed 中可见 用户 B 打开 App → 看到关注的人最新发布的动态  核心矛盾： 123写操作：一条内容需要&quot;分发&quot;给 N 个粉丝（推模式）读操">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="Feed流">
+<meta property="article:tag" content="推拉模型">
+<meta property="article:tag" content="Timeline">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/feed-stream-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/feed-stream-design/","path":"feed-stream-design/","title":"Feed 流系统设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Feed 流系统设计 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">一、业务场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%8E%A8%E6%A8%A1%E5%BC%8F%EF%BC%88Fanout-on-Write-%E5%86%99%E6%89%A9%E6%95%A3%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">二、推模式（Fanout on Write &#x2F; 写扩散）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%8B%89%E6%A8%A1%E5%BC%8F%EF%BC%88Fanout-on-Read-%E8%AF%BB%E6%89%A9%E6%95%A3%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">三、拉模式（Fanout on Read &#x2F; 读扩散）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%8E%A8%E6%8B%89%E7%BB%93%E5%90%88%EF%BC%88%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">四、推拉结合（混合模式）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%AD%98%E5%82%A8%E4%B8%8E%E5%88%86%E9%A1%B5"><span class="nav-number">5.</span> <span class="nav-text">五、存储与分页</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-Redis-%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 Redis 存储结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E5%86%B7%E7%83%AD%E5%88%86%E7%A6%BB"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 冷热分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E5%88%86%E9%A1%B5%E4%B8%8E%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 分页与一致性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%97%B6%E9%97%B4%E7%BA%BF%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">6.</span> <span class="nav-text">六、时间线一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%94%9F%E4%BA%A7%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">7.</span> <span class="nav-text">七、生产注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">八、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/feed-stream-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Feed 流系统设计 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Feed 流系统设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Feed 流（信息流）是社交和内容产品的核心——微博首页、朋友圈、抖音推荐，本质上都是在回答同一个问题：”用户打开 App 时，应该看到哪些内容，按什么顺序？”</p>
+<h2 id="一、业务场景"><a href="#一、业务场景" class="headerlink" title="一、业务场景"></a>一、业务场景</h2><p><strong>核心操作</strong>：</p>
+<ul>
+<li>用户 A 发布内容 → A 的所有粉丝的 Feed 中可见</li>
+<li>用户 B 打开 App → 看到关注的人最新发布的动态</li>
+</ul>
+<p><strong>核心矛盾</strong>：</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">写操作：一条内容需要<span class="string">&quot;分发&quot;</span>给 <span class="built_in">N</span> 个粉丝（推模式）</span><br><span class="line">读操作：打开 App 需要<span class="string">&quot;聚合&quot;</span> M 个关注者的内容（拉模式）</span><br><span class="line"><span class="built_in">N</span> 和 M 的数量级决定了两种模式的取舍</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、推模式（Fanout-on-Write-写扩散）"><a href="#二、推模式（Fanout-on-Write-写扩散）" class="headerlink" title="二、推模式（Fanout on Write &#x2F; 写扩散）"></a>二、推模式（Fanout on Write &#x2F; 写扩散）</h2><p><strong>原理</strong>：用户发内容时，直接把内容 ID 推送到所有粉丝的 Feed 收件箱中。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">用户 <span class="selector-tag">A</span> 发布动态</span><br><span class="line">    ↓</span><br><span class="line">查询 <span class="selector-tag">A</span> 的所有粉丝：<span class="selector-tag">B</span>, C, D, ...（<span class="number">100</span> 万粉丝）</span><br><span class="line">    ↓</span><br><span class="line">向每个粉丝的 Feed 收件箱中追加该动态 ID</span><br><span class="line">    ↓</span><br><span class="line">粉丝打开 App 时：直接从自己的收件箱按时间取最新内容</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong>：读路径极短，打开 App 即时展示（O(1)）<br><strong>缺点</strong>：写放大严重——大 V 发一条，要写 100 万次</p>
+<p><strong>存储选型</strong>：</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">粉丝收件箱 → Redis List / Sorted <span class="keyword">Set</span></span><br><span class="line">  - Key：feed:timeline:&#123;user_id&#125;</span><br><span class="line">  - Value：发布内容 ID 列表</span><br><span class="line">  - 每个用户最多保存 1000 条（超过的通过 ZREMRANGEBYRANK 自动裁剪）</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、拉模式（Fanout-on-Read-读扩散）"><a href="#三、拉模式（Fanout-on-Read-读扩散）" class="headerlink" title="三、拉模式（Fanout on Read &#x2F; 读扩散）"></a>三、拉模式（Fanout on Read &#x2F; 读扩散）</h2><p><strong>原理</strong>：用户发内容只存到自己发件箱，粉丝打开 App 时从所有关注者的发件箱聚合拉取。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">粉丝打开 App</span><br><span class="line">    ↓</span><br><span class="line">查询关注的用户列表：<span class="selector-attr">[A, B, C, ...]</span>（关注了 <span class="number">500</span> 人）</span><br><span class="line">    ↓</span><br><span class="line">从 <span class="selector-tag">A</span>、<span class="selector-tag">B</span>、C 的发件箱各拉取最新 N 条</span><br><span class="line">    ↓</span><br><span class="line">内存中合并、排序、去重、分页</span><br><span class="line">    ↓</span><br><span class="line">返回给客户端</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong>：写路径简单，无写扩散<br><strong>缺点</strong>：读路径重——关注 500 人就要做 500 次查询 + 内存归并排序</p>
+<p><strong>适用场景</strong>：用户关注数在 100~500 之间，粉丝数不可控</p>
+<h2 id="四、推拉结合（混合模式）"><a href="#四、推拉结合（混合模式）" class="headerlink" title="四、推拉结合（混合模式）"></a>四、推拉结合（混合模式）</h2><p>生产环境普遍采用的方案，核心思想：<strong>按粉丝数分级处理</strong>。</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">          用户发一条动态</span><br><span class="line">                 ↓</span><br><span class="line">        判断粉丝数 &gt; 阈值（如 <span class="number">1</span> 万）？</span><br><span class="line">        /                    <span class="string">\</span></span><br><span class="line">      是（大 V）             否（普通用户）</span><br><span class="line">      ↓                          ↓</span><br><span class="line"> 只写发件箱                    推送到粉丝收件箱</span><br><span class="line">（拉模式处理）                 （推模式处理）</span><br></pre></td></tr></table></figure>
+
+<p><strong>粉丝侧读取逻辑调整</strong>：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">打开 <span class="keyword">App</span></span><br><span class="line">    ↓</span><br><span class="line">从自己的收件箱取（普通用户推送的内容）</span><br><span class="line">    ↓</span><br><span class="line">从关注的大 V 发件箱拉取（大 V 的内容）</span><br><span class="line">    ↓</span><br><span class="line">合并 + 排序 + 返回</span><br></pre></td></tr></table></figure>
+
+<p><strong>阈值选择经验</strong>：</p>
+<ul>
+<li>阈值太低 → 退化为推模式，写放大问题</li>
+<li>阈值太高 → 退化为拉模式，读聚合开销大</li>
+<li>实践建议：1 万 ~ 10 万粉丝（根据系统压力动态调整）</li>
+</ul>
+<h2 id="五、存储与分页"><a href="#五、存储与分页" class="headerlink" title="五、存储与分页"></a>五、存储与分页</h2><h3 id="5-1-Redis-存储结构"><a href="#5-1-Redis-存储结构" class="headerlink" title="5.1 Redis 存储结构"></a>5.1 Redis 存储结构</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 收件箱：每个用户一个 Sorted Set</span></span><br><span class="line"><span class="symbol">Key:</span>   feed:inbox:<span class="punctuation">&#123;</span>user_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">Score:</span> 发布时间戳</span><br><span class="line"><span class="symbol">Value:</span> 动态 ID</span><br><span class="line"></span><br><span class="line"><span class="meta"># 发件箱：每个用户一个 Sorted Set</span></span><br><span class="line"><span class="symbol">Key:</span>   feed:outbox:<span class="punctuation">&#123;</span>user_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">Score:</span> 发布时间戳</span><br><span class="line"><span class="symbol">Value:</span> 动态 ID（只存大 V 的发件箱）</span><br><span class="line"></span><br><span class="line"><span class="meta"># 动态详情：</span></span><br><span class="line"><span class="symbol">Key:</span>   feed:detail:<span class="punctuation">&#123;</span>post_id<span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">Value:</span> <span class="title class_">JSON</span> <span class="punctuation">&#123;</span> 内容, 图片URL, 发布时间, 作者信息... <span class="punctuation">&#125;</span></span><br><span class="line"><span class="symbol">TTL:</span>   <span class="number">30</span> 天</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-冷热分离"><a href="#5-2-冷热分离" class="headerlink" title="5.2 冷热分离"></a>5.2 冷热分离</h3><table>
+<thead>
+<tr>
+<th>数据层级</th>
+<th>存储</th>
+<th>时间范围</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>热数据</td>
+<td>Redis Sorted Set</td>
+<td>最近 3 天</td>
+<td>TTL &#x3D; 7 天，自动过期</td>
+</tr>
+<tr>
+<td>温数据</td>
+<td>MySQL</td>
+<td>3 天 ~ 3 个月</td>
+<td>按时间分区，定时归档</td>
+</tr>
+<tr>
+<td>冷数据</td>
+<td>对象存储（COS&#x2F;OSS）</td>
+<td>3 个月以上</td>
+<td>压缩存储，按需加载</td>
+</tr>
+</tbody></table>
+<h3 id="5-3-分页与一致性"><a href="#5-3-分页与一致性" class="headerlink" title="5.3 分页与一致性"></a>5.3 分页与一致性</h3><ul>
+<li><strong>游标分页</strong>：使用时间戳作为游标，避免 offset 分页在数据变化时的重复&#x2F;丢失</li>
+<li><strong>MySQL 层面</strong>：<code>WHERE create_time &lt; last_cursor ORDER BY create_time DESC LIMIT 20</code></li>
+<li><strong>关注关系变化</strong>：如果在分页过程中关注&#x2F;取关某人，当前页不受影响，下一页反映最新关系</li>
+</ul>
+<h2 id="六、时间线一致性"><a href="#六、时间线一致性" class="headerlink" title="六、时间线一致性"></a>六、时间线一致性</h2><p><strong>问题</strong>：用户 B 先关注 A，A 发布动态，然后 B 取关 A。B 的 Feed 中是否应该看到这条动态？</p>
+<p>推模式下，动态已在 B 的收件箱中，取关后仍可见——这其实是合理的，因为发布时刻 B 确实是 A 的粉丝。</p>
+<p><strong>生产实践</strong>：读取时做一次关注关系校验，过滤掉已取关的用户内容。开销很小（关注关系可走本地缓存）。</p>
+<h2 id="七、生产注意事项"><a href="#七、生产注意事项" class="headerlink" title="七、生产注意事项"></a>七、生产注意事项</h2><p><strong>大 Key 问题</strong>：大 V 的动态详情可能很大（视频、长文），Redis 大 Key 影响稳定性。解决方案：Feed 收件箱只存 ID（几十字节），详情存独立 Key 或 MySQL。</p>
+<p><strong>热点问题</strong>：大 V 发内容后，短时间内被大量粉丝拉取。本地缓存（Caffeine）缓存热门内容详情 5 分钟，CDN 缓存图片&#x2F;视频等静态资源。</p>
+<p><strong>消息队列消峰</strong>：推模式下，大 V 发布触发百万级粉丝写入，通过消息队列分批消费。每批 1000 个粉丝，持续 10-30 秒完成全量扩散。</p>
+<h2 id="八、小结"><a href="#八、小结" class="headerlink" title="八、小结"></a>八、小结</h2><p>Feed 流系统的核心选择是推拉策略——没有银弹，只有权衡。推模式读快写慢，适合粉丝数可控的场景；拉模式写快读重，适合关注数可控的场景；混合模式在两者间找平衡，是大多数社交产品的最终选择。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/Feed%E6%B5%81/" rel="tag"># Feed流</a>
+              <a href="/tags/%E6%8E%A8%E6%8B%89%E6%A8%A1%E5%9E%8B/" rel="tag"># 推拉模型</a>
+              <a href="/tags/Timeline/" rel="tag"># Timeline</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/flash-sale-design/" rel="prev" title="秒杀系统设计">
+                  <i class="fa fa-angle-left"></i> 秒杀系统设计
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/external-merge-sort/" rel="next" title="分治思想与外部归并排序">
+                  分治思想与外部归并排序 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

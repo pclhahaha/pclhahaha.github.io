@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一、DDD 概述1.1 为什么需要 DDD大多数 Java 项目的代码结构是 controller → service → dao → model，这就是经典的贫血模型——对象只有数据没有行为，业务逻辑全部塞在 Service 层。项目初期开发快，但随着业务复杂化：  Service 类膨胀到 3000+ 行，方法之间相互调用，代码读起来像解谜。 业务规则散落各处：判断订单能否取消的逻辑在 Ord">
+<meta property="og:type" content="article">
+<meta property="og:title" content="领域驱动设计 (DDD)">
+<meta property="og:url" content="http://pclhahaha.github.io/ddd/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="一、DDD 概述1.1 为什么需要 DDD大多数 Java 项目的代码结构是 controller → service → dao → model，这就是经典的贫血模型——对象只有数据没有行为，业务逻辑全部塞在 Service 层。项目初期开发快，但随着业务复杂化：  Service 类膨胀到 3000+ 行，方法之间相互调用，代码读起来像解谜。 业务规则散落各处：判断订单能否取消的逻辑在 Ord">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="微服务">
+<meta property="article:tag" content="架构">
+<meta property="article:tag" content="DDD">
+<meta property="article:tag" content="领域驱动设计">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/ddd/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/ddd/","path":"ddd/","title":"领域驱动设计 (DDD)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>领域驱动设计 (DDD) | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81DDD-%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">一、DDD 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-DDD"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 为什么需要 DDD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-DDD-%E4%B8%8D%E6%98%AF%E9%93%B6%E5%BC%B9"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 DDD 不是银弹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-DDD-%E4%B8%8E%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 DDD 与微服务的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%88%98%E7%95%A5%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">二、战略设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%BB%9F%E4%B8%80%E8%AF%AD%E8%A8%80-Ubiquitous-Language"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 统一语言 (Ubiquitous Language)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%99%90%E7%95%8C%E4%B8%8A%E4%B8%8B%E6%96%87-Bounded-Context"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 限界上下文 (Bounded Context)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E4%B8%8A%E4%B8%8B%E6%96%87%E6%98%A0%E5%B0%84-Context-Map"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 上下文映射 (Context Map)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%88%98%E6%9C%AF%E8%AE%BE%E8%AE%A1"><span class="nav-number">3.</span> <span class="nav-text">三、战术设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%AE%9E%E4%BD%93-Entity"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 实体 (Entity)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%80%BC%E5%AF%B9%E8%B1%A1-Value-Object"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 值对象 (Value Object)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E8%81%9A%E5%90%88-Aggregate-%E4%B8%8E%E8%81%9A%E5%90%88%E6%A0%B9-Aggregate-Root"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 聚合 (Aggregate) 与聚合根 (Aggregate Root)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E9%A2%86%E5%9F%9F%E6%9C%8D%E5%8A%A1-Domain-Service"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 领域服务 (Domain Service)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E9%A2%86%E5%9F%9F%E4%BA%8B%E4%BB%B6-Domain-Event"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 领域事件 (Domain Event)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E8%B5%84%E6%BA%90%E5%BA%93-Repository"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 资源库 (Repository)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E5%B7%A5%E5%8E%82-Factory"><span class="nav-number">3.7.</span> <span class="nav-text">3.7 工厂 (Factory)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%9E%B6%E6%9E%84%E5%88%86%E5%B1%82"><span class="nav-number">4.</span> <span class="nav-text">四、架构分层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%9B%9B%E5%B1%82%E6%9E%B6%E6%9E%84%E4%B8%8E%E4%BE%9D%E8%B5%96%E5%80%92%E7%BD%AE"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 四层架构与依赖倒置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Transactional-%E5%BA%94%E8%AF%A5%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82%EF%BC%9F"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 @Transactional 应该在哪一层？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E5%85%AD%E8%BE%B9%E5%BD%A2%E6%9E%B6%E6%9E%84%EF%BC%88%E7%AB%AF%E5%8F%A3%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%89"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 六边形架构（端口适配器）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-Spring-Boot-%E9%A1%B9%E7%9B%AE%E5%8C%85%E7%BB%93%E6%9E%84"><span class="nav-number">4.4.</span> <span class="nav-text">4.5 Spring Boot 项目包结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81DDD-%E4%B8%8E%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86"><span class="nav-number">5.</span> <span class="nav-text">五、DDD 与微服务拆分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E9%99%90%E7%95%8C%E4%B8%8A%E4%B8%8B%E6%96%87-%E2%86%92-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E6%98%A0%E5%B0%84"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 限界上下文 → 微服务的映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E8%81%9A%E5%90%88%E5%86%85%E5%BC%BA%E4%B8%80%E8%87%B4%EF%BC%8C%E8%81%9A%E5%90%88%E9%97%B4%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 聚合内强一致，聚合间最终一致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1-%E2%86%92-Saga-%E6%A8%A1%E5%BC%8F"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 分布式事务 → Saga 模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81DDD-%E8%90%BD%E5%9C%B0%E5%AE%9E%E8%B7%B5"><span class="nav-number">6.</span> <span class="nav-text">六、DDD 落地实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-Application-Service-vs-Domain-Service"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 Application Service vs Domain Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-Repository-%E5%AE%9E%E7%8E%B0%EF%BC%88MyBatis-%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 Repository 实现（MyBatis 示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-JPA-%E5%85%85%E8%A1%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 JPA 充血模型的注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA%E4%B8%8E%E5%BB%BA%E8%AE%AE"><span class="nav-number">7.</span> <span class="nav-text">七、常见误区与建议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E4%B8%8D%E8%A6%81%E8%BF%87%E5%BA%A6%E8%AE%BE%E8%AE%A1"><span class="nav-number">7.1.</span> <span class="nav-text">7.1 不要过度设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E4%B8%8D%E6%98%AF%E6%89%80%E6%9C%89%E5%AF%B9%E8%B1%A1%E9%83%BD%E8%A6%81-DDD-%E5%8C%96"><span class="nav-number">7.2.</span> <span class="nav-text">7.2 不是所有对象都要 DDD 化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-%E8%81%9A%E5%90%88%E4%B8%8D%E8%83%BD%E5%A4%AA%E5%A4%A7"><span class="nav-number">7.3.</span> <span class="nav-text">7.3 聚合不能太大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-%E4%B8%8D%E8%A6%81%E4%B8%BA%E4%BA%86-DDD-%E8%80%8C-DDD"><span class="nav-number">7.4.</span> <span class="nav-text">7.4 不要为了 DDD 而 DDD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-5-%E5%9B%A2%E9%98%9F%E5%B1%82%E9%9D%A2%E5%BB%BA%E8%AE%AE"><span class="nav-number">7.5.</span> <span class="nav-text">7.5 团队层面建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/ddd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="领域驱动设计 (DDD) | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          领域驱动设计 (DDD)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="一、DDD-概述"><a href="#一、DDD-概述" class="headerlink" title="一、DDD 概述"></a>一、DDD 概述</h2><h3 id="1-1-为什么需要-DDD"><a href="#1-1-为什么需要-DDD" class="headerlink" title="1.1 为什么需要 DDD"></a>1.1 为什么需要 DDD</h3><p>大多数 Java 项目的代码结构是 <code>controller → service → dao → model</code>，这就是经典的<strong>贫血模型</strong>——对象只有数据没有行为，业务逻辑全部塞在 Service 层。项目初期开发快，但随着业务复杂化：</p>
+<ul>
+<li>Service 类膨胀到 3000+ 行，方法之间相互调用，代码读起来像解谜。</li>
+<li>业务规则散落各处：判断订单能否取消的逻辑在 OrderService、RefundService、LogisticsService 各有一份。</li>
+<li>新人打开 <code>OrderDO</code>，只有几十个 getter&#x2F;setter，真正的业务含义藏在 Service 里的某一行中。</li>
+</ul>
+<p><strong>充血模型</strong>把数据和行为放在一起：<code>Order</code> 对象自己知道怎么取消、怎么添加订单项、怎么计算总价。DDD 的核心思想是：<strong>将业务逻辑建模为领域模型，让代码结构与业务结构保持一致</strong>。</p>
+<h3 id="1-2-DDD-不是银弹"><a href="#1-2-DDD-不是银弹" class="headerlink" title="1.2 DDD 不是银弹"></a>1.2 DDD 不是银弹</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>为什么不适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>简单的 CRUD 系统（后台管理、数据面板）</td>
+<td>业务逻辑简单，贫血模型 + MyBatis Generator 足矣</td>
+</tr>
+<tr>
+<td>纯数据管道（ETL、日志处理）</td>
+<td>没有复杂的业务规则需要建模</td>
+</tr>
+<tr>
+<td>团队 2-3 人且业务不会扩张</td>
+<td>DDD 的学习成本和沟通成本高于收益</td>
+</tr>
+<tr>
+<td>技术驱动的项目（中间件、基础设施）</td>
+<td>领域逻辑不是核心</td>
+</tr>
+</tbody></table>
+<p><strong>DDD 适用场景</strong>：电商订单履约、保险理赔、银行贷款审批、供应链调度——业务流程长、状态多、规则复杂、需要多角色协作。</p>
+<blockquote>
+<p>判断标准：如果你的代码里频繁出现 <code>if status == xxx then do yyy</code>，且 status 有十几种，那就是 DDD 的信号。</p>
+</blockquote>
+<h3 id="1-3-DDD-与微服务的关系"><a href="#1-3-DDD-与微服务的关系" class="headerlink" title="1.3 DDD 与微服务的关系"></a>1.3 DDD 与微服务的关系</h3><p>DDD 和微服务是两个独立概念，但在实践中高度互补：</p>
+<ul>
+<li><strong>DDD 解决”怎么拆”的问题</strong>：限界上下文天然就是微服务拆分的边界。</li>
+<li><strong>微服务解决”怎么部署”的问题</strong>：每个限界上下文独立部署、独立扩展。</li>
+</ul>
+<p>没有 DDD 的拆分容易变成”拆表”——按数据库表拆服务，一个业务流程要调 7-8 个服务。通过限界上下文划分，服务边界就是业务能力边界：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DDD 提供划分依据           微服务提供技术落地</span><br><span class="line">┌──────────────┐         ┌──────────────┐</span><br><span class="line">│ 限界上下文    │   ──→   │  微服务 <span class="selector-tag">A</span>     │</span><br><span class="line">│ 聚合         │   ──→   │  数据所有权    │</span><br><span class="line">│ 领域事件     │   ──→   │  消息队列     │</span><br><span class="line">└──────────────┘         └──────────────┘</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、战略设计"><a href="#二、战略设计" class="headerlink" title="二、战略设计"></a>二、战略设计</h2><p>战略设计关注宏观建模——系统怎么划分、上下文之间怎么协作，回答”我们在做什么”和”边界在哪里”。</p>
+<h3 id="2-1-统一语言-Ubiquitous-Language"><a href="#2-1-统一语言-Ubiquitous-Language" class="headerlink" title="2.1 统一语言 (Ubiquitous Language)"></a>2.1 统一语言 (Ubiquitous Language)</h3><p>最常见的沟通场景：</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">产品经理：&quot;用户下单后如果 30 分钟没付钱，订单就自动关掉。&quot;</span><br><span class="line">开发：&quot;所以是 <span class="keyword">update</span> <span class="keyword">order</span> <span class="keyword">set</span> status = <span class="string">&#x27;CANCELLED&#x27;</span> <span class="keyword">where</span> create_time &lt; ?<span class="string">&quot;</span></span><br><span class="line"><span class="string">产品经理：&quot;</span>不是 cancelled，是关闭，我们叫<span class="string">&#x27;超时未支付自动关闭&#x27;</span>。<span class="string">&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>问题出在：<strong>代码里的词汇和业务语言不在一个语境里</strong>。统一语言要求：</p>
+<ol>
+<li>领域专家和开发团队一起定义<strong>词汇表</strong>，形成项目 Wiki 的术语表。</li>
+<li>代码中类名、方法名直接使用业务术语，不是翻译。</li>
+<li>术语在限界上下文中才有意义——同一个词在不同上下文可以有不同含义。</li>
+</ol>
+<p>实例——电商订单的统一语言：</p>
+<table>
+<thead>
+<tr>
+<th>业务术语</th>
+<th>代码映射</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>订单</td>
+<td><code>Order</code> (聚合根)</td>
+<td>用户提交的购买请求</td>
+</tr>
+<tr>
+<td>订单项</td>
+<td><code>OrderItem</code> (实体)</td>
+<td>订单中的商品条目</td>
+</tr>
+<tr>
+<td>已提交</td>
+<td><code>OrderStatus.SUBMITTED</code></td>
+<td>订单已创建等待支付</td>
+</tr>
+<tr>
+<td>已支付</td>
+<td><code>OrderStatus.PAID</code></td>
+<td>买家已完成付款</td>
+</tr>
+<tr>
+<td>已发货</td>
+<td><code>OrderStatus.SHIPPED</code></td>
+<td>仓库已出库</td>
+</tr>
+<tr>
+<td>履约</td>
+<td><code>FulfillmentService</code></td>
+<td>从支付到签收的全过程</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>核心原则：<strong>如果领域专家和你说的不是同一种语言，那你建的模就是错的</strong>。</p>
+</blockquote>
+<h3 id="2-2-限界上下文-Bounded-Context"><a href="#2-2-限界上下文-Bounded-Context" class="headerlink" title="2.2 限界上下文 (Bounded Context)"></a>2.2 限界上下文 (Bounded Context)</h3><p>限界上下文是 DDD 中最核心的概念。一个限界上下文就是一个<strong>语义明确的业务能力边界</strong>——边界内部的模型是内聚的、一致的和自洽的。</p>
+<p><strong>如何划分——四个维度</strong>：</p>
+<p><strong>1. 领域专家访谈。</strong> 和采购聊商品入库、和仓管聊出库、和运营聊订单——对话内容的边界往往就是上下文的边界。</p>
+<p><strong>2. 业务边界。</strong> 当一个概念在不同场景下语义变化时，就是上下文边界。比如”商品”：</p>
+<table>
+<thead>
+<tr>
+<th>上下文</th>
+<th>“商品”含义</th>
+<th>关心的属性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>商品上下文</td>
+<td>商品定义</td>
+<td>SKU、名称、规格、图片、品牌</td>
+</tr>
+<tr>
+<td>订单上下文</td>
+<td>下单快照</td>
+<td>下单时价格、数量、商品名</td>
+</tr>
+<tr>
+<td>库存上下文</td>
+<td>物理库存</td>
+<td>SKU、库存量、储位、批次</td>
+</tr>
+<tr>
+<td>物流上下文</td>
+<td>待运输包裹</td>
+<td>重量、体积、发货地址</td>
+</tr>
+</tbody></table>
+<p>如果全部塞进 <code>t_product(200 columns)</code>，就是标准的大泥球。</p>
+<p><strong>3. 组织结构（康威定律）。</strong> 商品团队和订单团队是两个独立小组，它们的系统大概率也需要分开。</p>
+<p><strong>4. 数据边界。</strong> 如果两张表总是一起被修改（强一致性事务），它们大概率在同一个上下文中。</p>
+<p><strong>电商系统上下文划分</strong>：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">┌──────────┬──────────┬───────────┬───────────┬──────────┬──────────┐</span><br><span class="line">│ 商品上下文│ 订单上下文│ 支付上下文 │ 库存上下文 │ 物流上下文│ 用户上下文│</span><br><span class="line">│ Product  │ <span class="keyword">Order</span>    <span class="title">│ Payment</span>   │ Inventory │ Logistics│ <span class="keyword">User</span>     <span class="title">│</span></span><br><span class="line"><span class="title">├──────────┼──────────┼───────────┼───────────┼──────────┼──────────┤</span></span><br><span class="line"><span class="title">│ 商品信息  │ 订单管理  │ 支付      │ 库存管理   │ 发货      │ 用户     │</span></span><br><span class="line"><span class="title">│ 类目管理  │ 购物车    │ 退款      │ 入库/出库  │ 签收      │ 地址     │</span></span><br><span class="line"><span class="title">│ 品牌管理  │ 订单状态  │ 对账      │ 库存预留   │ 轨迹追踪  │ 会员     │</span></span><br><span class="line"><span class="title">└──────────┴──────────┴───────────┴───────────┴──────────┴──────────┘</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-上下文映射-Context-Map"><a href="#2-3-上下文映射-Context-Map" class="headerlink" title="2.3 上下文映射 (Context Map)"></a>2.3 上下文映射 (Context Map)</h3><p>划分上下文只是第一步，上下文之间如何协作才是实战难点：</p>
+<p><strong>合作关系 (Partnership)</strong>：同一团队维护，目标一致，紧密协作。如支付和退款在同一个小团队。</p>
+<p><strong>共享内核 (Shared Kernel)</strong>：共享一部分模型和数据，各自有扩展。如用户登录态在各子系统中共享。共享内核应尽量小，只共享核心概念（UserId, Address）。</p>
+<p><strong>客户-供应商 (Customer-Supplier)</strong>：上游供能力，下游用能力。下游需求驱动上游接口。如订单（客户）依赖商品（供应商）查询商品信息。关键原则：<strong>下游（客户）定义接口契约，上游（供应商）实现</strong>。</p>
+<p><strong>防腐层 (Anti-Corruption Layer)</strong>：当下游依赖外部&#x2F;遗留系统而模型不一致时，引入翻译层：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 防腐层接口——只暴露订单上下文需要的语义</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">RiskAssessmentService</span> &#123;</span><br><span class="line">    RiskAssessmentResult <span class="title function_">assess</span><span class="params">(Order order)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 防腐层实现——将 Order 模型翻译为外部系统的格式</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RiskAssessmentAdapter</span> <span class="keyword">implements</span> <span class="title class_">RiskAssessmentService</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> RiskAssessmentResult <span class="title function_">assess</span><span class="params">(Order order)</span> &#123;</span><br><span class="line">        <span class="type">RiskRequest</span> <span class="variable">request</span> <span class="operator">=</span> RiskRequest.builder()</span><br><span class="line">            .userId(order.getUserId().toString())</span><br><span class="line">            .orderAmount(order.getTotalAmount().toPlainString())</span><br><span class="line">            .build();</span><br><span class="line">        <span class="type">RiskResponse</span> <span class="variable">response</span> <span class="operator">=</span> riskSystemClient.evaluate(request);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">RiskAssessmentResult</span>(</span><br><span class="line">            response.getRiskLevel() &lt;= <span class="number">2</span>,</span><br><span class="line">            response.getReason()</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>开放主机服务 &#x2F; 发布语言 (OHS&#x2F;PL)</strong>：一个上下文被多个下游消费时，提供标准化 API + 标准数据格式。如商品上下文提供 RESTful API + 商品 JSON Schema。</p>
+<p><strong>各行其道 (Separate Ways)</strong>：两个上下文不需要集成就不集成。</p>
+<table>
+<thead>
+<tr>
+<th>关系类型</th>
+<th>技术实现</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>合作关系 &#x2F; 共享内核</td>
+<td>进程内调用（同服务）</td>
+</tr>
+<tr>
+<td>客户-供应商</td>
+<td>RPC &#x2F; HTTP，下游定义接口契约</td>
+</tr>
+<tr>
+<td>防腐层</td>
+<td>独立模块，翻译外部模型</td>
+</tr>
+<tr>
+<td>开放主机</td>
+<td>标准化 REST API &#x2F; gRPC + 协议定义</td>
+</tr>
+</tbody></table>
+<h2 id="三、战术设计"><a href="#三、战术设计" class="headerlink" title="三、战术设计"></a>三、战术设计</h2><p>战略设计解决”是什么”和”边界在哪”，战术设计解决”怎么实现”。</p>
+<h3 id="3-1-实体-Entity"><a href="#3-1-实体-Entity" class="headerlink" title="3.1 实体 (Entity)"></a>3.1 实体 (Entity)</h3><p>实体是<strong>具有唯一标识</strong>的对象，属性可变但标识不变。同一个人 5 岁和 30 岁身高体重完全不同，但身份证号没变，所以是同一实体。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Order</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> OrderId id;             <span class="comment">// 唯一标识，不变</span></span><br><span class="line">    <span class="keyword">private</span> OrderStatus status;     <span class="comment">// 可变</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;OrderItem&gt; items;  <span class="comment">// 可变</span></span><br><span class="line">    <span class="keyword">private</span> Money totalAmount;      <span class="comment">// 可变</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object o)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">this</span> == o) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (!(o <span class="keyword">instanceof</span> Order)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> id.equals(((Order) o).id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> id.hashCode();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关键原则：实体通过唯一标识判断相等性，<code>equals</code>&#x2F;<code>hashCode</code> 仅基于标识实现；实体可变且应该有行为方法，而非 <code>setXxx()</code>。</p>
+<h3 id="3-2-值对象-Value-Object"><a href="#3-2-值对象-Value-Object" class="headerlink" title="3.2 值对象 (Value Object)"></a>3.2 值对象 (Value Object)</h3><p>值对象是<strong>没有唯一标识</strong>的不可变对象，用属性值定义相等性。典型：金额、地址、电话号码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Money</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> BigDecimal amount;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Money</span><span class="params">(BigDecimal amount)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (amount.compareTo(BigDecimal.ZERO) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Amount must not be negative&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">this</span>.amount = amount.setScale(<span class="number">2</span>, RoundingMode.HALF_UP);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Money <span class="title function_">add</span><span class="params">(Money other)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Money</span>(<span class="built_in">this</span>.amount.add(other.amount));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Money <span class="title function_">multiply</span><span class="params">(<span class="type">int</span> factor)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Money</span>(<span class="built_in">this</span>.amount.multiply(BigDecimal.valueOf(factor)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object o)</span> &#123; <span class="comment">/* 比较 amount */</span> &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123; <span class="keyword">return</span> Objects.hash(amount); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>特征：不可变（无 setter，修改返回新对象）；无标识（两张一样的 100 元无所谓哪一张）；自验证（构造时校验）。常见候选：金额、坐标范围、电话号码、邮箱、百分比、时间段。</p>
+<blockquote>
+<p>口诀：<strong>如果你关心它”是什么”而不是”是谁”，它就是值对象</strong>。</p>
+</blockquote>
+<h3 id="3-3-聚合-Aggregate-与聚合根-Aggregate-Root"><a href="#3-3-聚合-Aggregate-与聚合根-Aggregate-Root" class="headerlink" title="3.3 聚合 (Aggregate) 与聚合根 (Aggregate Root)"></a>3.3 聚合 (Aggregate) 与聚合根 (Aggregate Root)</h3><p>聚合是<strong>一组必须保持一致性的对象，对外只暴露一个入口——聚合根</strong>。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">聚合 <span class="string">&quot;Order&quot;</span></span><br><span class="line">┌──────────────────────────────────────────┐</span><br><span class="line">│  <span class="keyword">Order</span> <span class="title">(聚合根)                           │</span></span><br><span class="line"><span class="title">│  ├── orderId</span>                             │</span><br><span class="line">│  ├── status                              │</span><br><span class="line">│  ├── totalAmount                          │</span><br><span class="line">│  ├── items: List<span class="tag">&lt;OrderItem&gt;</span> (实体)        │</span><br><span class="line">│  │    └── 只能通过 <span class="keyword">Order</span> <span class="title">访问/修改         │</span></span><br><span class="line"><span class="title">│  └── shippingAddress</span>: Address (值对象)    │</span><br><span class="line">└──────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Order</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> OrderId id;</span><br><span class="line">    <span class="keyword">private</span> OrderStatus status;</span><br><span class="line">    <span class="keyword">private</span> List&lt;OrderItem&gt; items = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="type">Money</span> <span class="variable">totalAmount</span> <span class="operator">=</span> Money.ZERO;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 聚合根控制所有的修改入口</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addItem</span><span class="params">(ProductId productId, String name, <span class="type">int</span> quantity, Money price)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (status != OrderStatus.DRAFT) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderException</span>(<span class="string">&quot;Only draft order can add items&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        items.add(<span class="keyword">new</span> <span class="title class_">OrderItem</span>(productId, name, quantity, price));</span><br><span class="line">        recalculateTotal();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">submit</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (items.isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderException</span>(<span class="string">&quot;Cannot submit empty order&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.status = OrderStatus.SUBMITTED;</span><br><span class="line">        registerEvent(<span class="keyword">new</span> <span class="title class_">OrderSubmittedEvent</span>(<span class="built_in">this</span>.id));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (status != OrderStatus.SUBMITTED) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderException</span>(<span class="string">&quot;Only submitted order can be paid&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.status = OrderStatus.PAID;</span><br><span class="line">        registerEvent(<span class="keyword">new</span> <span class="title class_">OrderPaidEvent</span>(<span class="built_in">this</span>.id, <span class="built_in">this</span>.totalAmount));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">ship</span><span class="params">(TrackingNumber trackingNumber)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (status != OrderStatus.PAID) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderException</span>(<span class="string">&quot;Must be paid before shipping&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.status = OrderStatus.SHIPPED;</span><br><span class="line">        registerEvent(<span class="keyword">new</span> <span class="title class_">OrderShippedEvent</span>(<span class="built_in">this</span>.id, trackingNumber));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">recalculateTotal</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.totalAmount = items.stream()</span><br><span class="line">            .map(OrderItem::getSubTotal)</span><br><span class="line">            .reduce(Money.ZERO, Money::add);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 不暴露 setItems / setStatus</span></span><br><span class="line">    <span class="keyword">public</span> OrderStatus <span class="title function_">getStatus</span><span class="params">()</span> &#123; <span class="keyword">return</span> status; &#125;</span><br><span class="line">    <span class="keyword">public</span> List&lt;OrderItem&gt; <span class="title function_">getItems</span><span class="params">()</span> &#123; <span class="keyword">return</span> Collections.unmodifiableList(items); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>聚合设计的四条黄金法则</strong>：</p>
+<ol>
+<li><strong>聚合尽量小</strong>——只包含必须强一致的对象。大聚合等于大写锁。</li>
+<li><strong>通过 ID 引用其他聚合，而非对象引用</strong>——<code>Order</code> 持有 <code>UserId</code> 而非 <code>User</code> 对象。</li>
+<li><strong>聚合内部强一致性，聚合间最终一致性</strong>——事务只在单个聚合内生效。</li>
+<li><strong>聚合根控制所有访问</strong>——外部不能绕过 <code>Order</code> 直接修改 <code>OrderItem</code>。</li>
+</ol>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">错误（聚合过大）：                        正确（小聚合 + ID 引用）：</span><br><span class="line">┌──────────────────────────────┐        ┌─────────┐     ┌─────────┐</span><br><span class="line">│ <span class="keyword">Order</span> <span class="title">聚合 (含 User</span>/Product等) │        │ <span class="keyword">Order</span>   <span class="title">│     │ Product</span> │</span><br><span class="line">│ → 并发冲突、性能差             │        │ orderId │     │productId│</span><br><span class="line">└──────────────────────────────┘        │ userId  │──→  │ name    │</span><br><span class="line">                                        │productId│←    │ price   │</span><br><span class="line">                                        └─────────┘     └─────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-领域服务-Domain-Service"><a href="#3-4-领域服务-Domain-Service" class="headerlink" title="3.4 领域服务 (Domain Service)"></a>3.4 领域服务 (Domain Service)</h3><p>当某个业务操作<strong>不属于任何一个实体或值对象</strong>时，交给领域服务。判断标准：这个操作涉及多个聚合，而且没有一个自然的所有者。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 转账不属于 Account 的职责（Account 不知道自己转给谁）</span></span><br><span class="line"><span class="comment">// 也不属于 Money（Money 不知道账户），所以是领域服务</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TransferService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AccountRepository accountRepository;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(AccountId fromId, AccountId toId, Money amount)</span> &#123;</span><br><span class="line">        <span class="type">Account</span> <span class="variable">from</span> <span class="operator">=</span> accountRepository.findById(fromId).orElseThrow(...);</span><br><span class="line">        <span class="type">Account</span> <span class="variable">to</span> <span class="operator">=</span> accountRepository.findById(toId).orElseThrow(...);</span><br><span class="line">        from.debit(amount);</span><br><span class="line">        to.credit(amount);</span><br><span class="line">        accountRepository.save(from);</span><br><span class="line">        accountRepository.save(to);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-5-领域事件-Domain-Event"><a href="#3-5-领域事件-Domain-Event" class="headerlink" title="3.5 领域事件 (Domain Event)"></a>3.5 领域事件 (Domain Event)</h3><p>领域事件是聚合内已发生的<strong>有业务意义</strong>的状态变化——不是技术事件（”数据库写入成功”），而是业务事件（”订单已支付”）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderPaidEvent</span> <span class="keyword">extends</span> <span class="title class_">DomainEvent</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> OrderId orderId;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Money amount;</span><br><span class="line">    <span class="comment">// constructor / getter</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 聚合内部产生事件</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.status = OrderStatus.PAID;</span><br><span class="line">    registerEvent(<span class="keyword">new</span> <span class="title class_">OrderPaidEvent</span>(<span class="built_in">this</span>.id, <span class="built_in">this</span>.totalAmount));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 应用层在持久化后发布</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">payOrder</span><span class="params">(OrderId orderId)</span> &#123;</span><br><span class="line">    <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderRepository.findById(orderId).orElseThrow(...);</span><br><span class="line">    order.pay();</span><br><span class="line">    orderRepository.save(order);</span><br><span class="line">    order.getEvents().forEach(eventPublisher::publish);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>核心价值：解耦聚合（发券&#x2F;积分&#x2F;短信各自监听而非主动调用）；事件溯源（存储事件序列而非快照）；审计追踪。</p>
+<h3 id="3-6-资源库-Repository"><a href="#3-6-资源库-Repository" class="headerlink" title="3.6 资源库 (Repository)"></a>3.6 资源库 (Repository)</h3><p>Repository 是聚合的持久化接口，隐藏存储细节，让领域层<strong>像操作内存集合一样操作持久化数据</strong>。</p>
+<p><strong>Repository vs DAO</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DAO</th>
+<th>Repository</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>粒度</td>
+<td>按数据库表</td>
+<td>按聚合</td>
+</tr>
+<tr>
+<td>返回</td>
+<td>DO &#x2F; 数据库实体</td>
+<td>领域对象 (聚合)</td>
+</tr>
+<tr>
+<td>职责</td>
+<td>数据库 CRUD</td>
+<td>聚合的持久化与重建</td>
+</tr>
+<tr>
+<td>所属层</td>
+<td>基础设施层</td>
+<td>领域层接口（实现在基础设施层）</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 领域层接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">OrderRepository</span> &#123;</span><br><span class="line">    Optional&lt;Order&gt; <span class="title function_">findById</span><span class="params">(OrderId id)</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(Order order)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 基础设施层实现</span></span><br><span class="line"><span class="meta">@Repository</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderRepositoryImpl</span> <span class="keyword">implements</span> <span class="title class_">OrderRepository</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> OrderMapper orderMapper;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> OrderItemMapper itemMapper;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Optional&lt;Order&gt; <span class="title function_">findById</span><span class="params">(OrderId id)</span> &#123;</span><br><span class="line">        <span class="type">OrderDO</span> <span class="variable">orderDO</span> <span class="operator">=</span> orderMapper.selectById(id.getValue());</span><br><span class="line">        <span class="keyword">if</span> (orderDO == <span class="literal">null</span>) <span class="keyword">return</span> Optional.empty();</span><br><span class="line">        List&lt;OrderItemDO&gt; itemDOs = itemMapper.selectByOrderId(id.getValue());</span><br><span class="line">        <span class="keyword">return</span> Optional.of(Order.reconstitute(orderDO, itemDOs));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(Order order)</span> &#123;</span><br><span class="line">        <span class="type">OrderDO</span> <span class="variable">orderDO</span> <span class="operator">=</span> OrderDO.fromDomain(order);</span><br><span class="line">        orderMapper.upsert(orderDO);</span><br><span class="line">        itemMapper.deleteByOrderId(order.getId().getValue());</span><br><span class="line">        order.getItems().forEach(item -&gt; itemMapper.insert(OrderItemDO.from(item)));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关键点：Repository 接口在领域层，实现在基础设施层；<code>save</code> 保存整个聚合而非单表；重建聚合需工厂方法绕过业务校验。</p>
+<h3 id="3-7-工厂-Factory"><a href="#3-7-工厂-Factory" class="headerlink" title="3.7 工厂 (Factory)"></a>3.7 工厂 (Factory)</h3><p>当聚合创建逻辑复杂时用工厂封装。简单 <code>new Order(id)</code> 不需要工厂——<strong>只有构造有明显复杂度时（跨聚合依赖、多步构建）才需要</strong>。</p>
+<h2 id="四、架构分层"><a href="#四、架构分层" class="headerlink" title="四、架构分层"></a>四、架构分层</h2><h3 id="4-1-四层架构与依赖倒置"><a href="#4-1-四层架构与依赖倒置" class="headerlink" title="4.1 四层架构与依赖倒置"></a>4.1 四层架构与依赖倒置</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────────────────────────────────────────┐</span><br><span class="line">│              接口层 (Interface)                   │  Controller, DTO, 参数校验</span><br><span class="line">├──────────────────────────────────────────────────┤</span><br><span class="line">│              应用层 (Application)                 │  用例编排、事务管理、权限校验</span><br><span class="line">├──────────────────────────────────────────────────┤</span><br><span class="line">│               领域层 (Domain)                    │  Entity, ValueObject, Aggregate,</span><br><span class="line">│                                                  │  DomainService, Repository 接口</span><br><span class="line">├──────────────────────────────────────────────────┤</span><br><span class="line">│             基础设施层 (Infrastructure)           │  RepositoryImpl, MQ, 外部 API</span><br><span class="line">└──────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>依赖方向：接口层 → 应用层 → 领域层 ← 基础设施层</strong>（下层的依赖指向下层，但基础设施层通过接口实现指向领域层）。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">传统三层（依赖正置）                  DDD 四层（依赖倒置）</span><br><span class="line">┌─────────┐                      ┌─────────────┐</span><br><span class="line">│<span class="built_in"> Service </span> │──依赖──→ DAO         │  领域层      │</span><br><span class="line">└─────────┘                      │ (定义接口)    │</span><br><span class="line">   领域层知道基础设施                 └──────┬──────┘</span><br><span class="line">                                          │  实现</span><br><span class="line">                                   ┌──────┴──────┐</span><br><span class="line">                                   │  基础设施层   │</span><br><span class="line">                                   └─────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>各层职责划分</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 接口层——只做请求处理、协议转换</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderController</span> &#123;</span><br><span class="line">    <span class="meta">@PostMapping(&quot;/orders&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Result&lt;OrderVO&gt; <span class="title function_">createOrder</span><span class="params">(<span class="meta">@Valid</span> <span class="meta">@RequestBody</span> CreateOrderRequest request)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Result.success(applicationService.createOrder(toCommand(request)));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 应用层——用例编排、事务管理</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderApplicationService</span> &#123;</span><br><span class="line">    <span class="meta">@Transactional</span>  <span class="comment">// 事务在应用层</span></span><br><span class="line">    <span class="keyword">public</span> OrderId <span class="title function_">createOrder</span><span class="params">(CreateOrderCommand cmd)</span> &#123;</span><br><span class="line">        <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Order</span>(OrderId.generate(), cmd.getBuyerId());</span><br><span class="line">        cmd.getItems().forEach(i -&gt; order.addItem(i.getProductId(), i.getQuantity(), i.getPrice()));</span><br><span class="line">        order.submit();</span><br><span class="line">        orderRepository.save(order);</span><br><span class="line">        order.getEvents().forEach(eventPublisher::publish);</span><br><span class="line">        <span class="keyword">return</span> order.getId();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 领域层——纯业务逻辑，零框架依赖</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Order</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">submit</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (items.isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderException</span>(<span class="string">&quot;Cannot submit empty order&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.status = OrderStatus.SUBMITTED;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>代码归属判断标准</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>代码内容</th>
+<th>应属于</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>if (amount &lt; 0) throw ...</code></td>
+<td>领域层</td>
+</tr>
+<tr>
+<td>编排多个聚合 + <code>repository.save</code> + 发事件</td>
+<td>应用层</td>
+</tr>
+<tr>
+<td><code>request.getHeader(&quot;Authorization&quot;)</code></td>
+<td>接口层</td>
+</tr>
+<tr>
+<td><code>jdbcTemplate.update(...)</code></td>
+<td>基础设施层</td>
+</tr>
+</tbody></table>
+<h3 id="4-2-Transactional-应该在哪一层？"><a href="#4-2-Transactional-应该在哪一层？" class="headerlink" title="4.2 @Transactional 应该在哪一层？"></a>4.2 @Transactional 应该在哪一层？</h3><p><strong>答案：应用层。</strong> 事务是技术关注点，不是业务关注点。<code>Order.pay()</code> 只是在说”我现在已支付”，它不知道也不应该知道自己在数据库事务中。领域层应纯 Java 模块，不依赖 Spring 或任何框架——copy 到新项目不加依赖就能编译通过。</p>
+<h3 id="4-3-六边形架构（端口适配器）"><a href="#4-3-六边形架构（端口适配器）" class="headerlink" title="4.3 六边形架构（端口适配器）"></a>4.3 六边形架构（端口适配器）</h3><p>六边形架构的概念：领域逻辑是核心，所有外部依赖（DB、MQ、HTTP）通过端口（接口）和适配器（实现）连接到核心。</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">     ┌──────────────────────────────┐</span><br><span class="line">     │       适配器 (Adapter)        │</span><br><span class="line">     │   HTTP <span class="symbol">/</span> MQ <span class="symbol">/</span> CLI <span class="symbol">/</span> Test    │</span><br><span class="line">     ├──────────────────────────────┤</span><br><span class="line">     │       端口 (Port)            │</span><br><span class="line">┌────┴────┐                  ┌──────┴───┐</span><br><span class="line">│ 输入端口  │                  │ 输出端口   │</span><br><span class="line">└──────────┘                  └──────┬───┘</span><br><span class="line">     │                               │</span><br><span class="line">┌────┴───────────────────────────────┴───┐</span><br><span class="line">│           领域层 (Domain)              │</span><br><span class="line">│      业务规则不依赖任何外部框架          │</span><br><span class="line">└───────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>落地建议：不需教条画六边形，关键是做到 (1) 领域层零外部依赖 (2) 所有外部依赖通过接口倒置。做到这两点，换数据库&#x2F;换 MQ&#x2F;换 RPC 框架时领域代码一行不用改。</p>
+<p><strong>事件溯源 (Event Sourcing)</strong> 是 CQRS 进阶版：存储所有事件序列而非当前状态。适用于审计要求极高的金融场景，但复杂度高，不要轻易使用。</p>
+<h3 id="4-5-Spring-Boot-项目包结构"><a href="#4-5-Spring-Boot-项目包结构" class="headerlink" title="4.5 Spring Boot 项目包结构"></a>4.5 Spring Boot 项目包结构</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">com.example.order<span class="symbol">/</span></span><br><span class="line">├── interfaces<span class="symbol">/</span>                         <span class="comment"># 接口层</span></span><br><span class="line">│   ├── rest<span class="symbol">/OrderController.java</span>       <span class="comment"># REST 接口</span></span><br><span class="line">│   ├── dto<span class="symbol">/</span>                            <span class="comment"># 入参 DTO / 出参 VO</span></span><br><span class="line">│   └── mq<span class="symbol">/OrderEventListener.java</span>      <span class="comment"># 消息监听</span></span><br><span class="line">├── application<span class="symbol">/</span>                        <span class="comment"># 应用层</span></span><br><span class="line">│   ├── service<span class="symbol">/OrderApplicationService.java</span></span><br><span class="line">│   ├── command<span class="symbol">/</span>                        <span class="comment"># 应用层命令对象</span></span><br><span class="line">│   └── event<span class="symbol">/EventPublisher.java</span></span><br><span class="line">├── domain<span class="symbol">/</span>                             <span class="comment"># 领域层</span></span><br><span class="line">│   ├── model<span class="operator">/</span>order<span class="symbol">/</span></span><br><span class="line">│   │   ├── Order.java                  <span class="comment"># 聚合根</span></span><br><span class="line">│   │   ├── OrderId.java                <span class="comment"># 值对象</span></span><br><span class="line">│   │   ├── OrderItem.java              <span class="comment"># 实体</span></span><br><span class="line">│   │   ├── OrderStatus.java            <span class="comment"># 枚举</span></span><br><span class="line">│   │   └── Money.java                  <span class="comment"># 值对象</span></span><br><span class="line">│   ├── service<span class="symbol">/PricingService.java</span>     <span class="comment"># 领域服务接口</span></span><br><span class="line">│   ├── event<span class="symbol">/</span>                          <span class="comment"># 领域事件</span></span><br><span class="line">│   └── repository<span class="symbol">/OrderRepository.java</span> <span class="comment"># 仓储接口</span></span><br><span class="line">└── infrastructure<span class="symbol">/</span>                     <span class="comment"># 基础设施层</span></span><br><span class="line">    ├── persistence<span class="symbol">/</span></span><br><span class="line">    │   ├── OrderRepositoryImpl.java</span><br><span class="line">    │   ├── mapper<span class="symbol">/OrderMapper.java</span></span><br><span class="line">    │   └── converter<span class="symbol">/OrderConverter.java</span></span><br><span class="line">    ├── messaging<span class="symbol">/RabbitMQEventPublisher.java</span></span><br><span class="line">    └── external<span class="operator">/</span>RiskAssessmentAdapter.java</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、DDD-与微服务拆分"><a href="#五、DDD-与微服务拆分" class="headerlink" title="五、DDD 与微服务拆分"></a>五、DDD 与微服务拆分</h2><h3 id="5-1-限界上下文-→-微服务的映射"><a href="#5-1-限界上下文-→-微服务的映射" class="headerlink" title="5.1 限界上下文 → 微服务的映射"></a>5.1 限界上下文 → 微服务的映射</h3><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">限界上下文 ────────────────→ 微服务</span><br><span class="line">┌──────────────┐           ┌──────────────┐</span><br><span class="line">│   订单上下文  │    ─→     │ <span class="keyword">order-service </span>│</span><br><span class="line">│   <span class="keyword">Order聚合 </span> │           │  数据库:       │</span><br><span class="line">└──────────────┘           │  <span class="keyword">order_db </span>    │</span><br><span class="line">                           └──────────────┘</span><br><span class="line">┌──────────────┐           ┌──────────────┐</span><br><span class="line">│   商品上下文  │    ─→     │product-service│</span><br><span class="line">│   Product聚合│           └──────────────┘</span><br><span class="line">└──────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>理论上一上下文对应一微服务，实践中需权衡：极简上下文可合并到相邻服务；庞大上下文可进一步拆分。最终标准：<strong>一个微服务 &#x3D; 一个独立可部署单元，由一个自治团队负责</strong>。</p>
+<h3 id="5-2-聚合内强一致，聚合间最终一致"><a href="#5-2-聚合内强一致，聚合间最终一致" class="headerlink" title="5.2 聚合内强一致，聚合间最终一致"></a>5.2 聚合内强一致，聚合间最终一致</h3><ul>
+<li><strong>单聚合内修改</strong> → 本地数据库事务。</li>
+<li><strong>跨聚合修改</strong> → 领域事件 + 最终一致性。</li>
+</ul>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">订单支付流程：</span><br><span class="line"><span class="attribute">Order</span><span class="selector-class">.pay</span>()  →  OrderPaidEvent  →  InventoryService<span class="selector-class">.deductStock</span>()</span><br><span class="line">(本地事务)       (MQ 消息)            (库存服务自己的本地事务)</span><br><span class="line"></span><br><span class="line">               →  OrderPaidEvent  →  CouponService<span class="selector-class">.markAsUsed</span>()</span><br><span class="line">               →  OrderPaidEvent  →  NotificationService<span class="selector-class">.sendSMS</span>()</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-分布式事务-→-Saga-模式"><a href="#5-3-分布式事务-→-Saga-模式" class="headerlink" title="5.3 分布式事务 → Saga 模式"></a>5.3 分布式事务 → Saga 模式</h3><p>跨服务业务流程不能再用 <code>@Transactional</code>。在 DDD 中采用** Saga 模式**（补偿事务）：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">正向：订单创建 → 库存预留 → 支付扣款 → 积分发放</span><br><span class="line">某个步骤失败后的补偿：</span><br><span class="line">支付扣款失败 → 补偿：释放库存预留 → 补偿：取消订单</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderSagaOrchestrator</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">process</span><span class="params">(CreateOrderCommand cmd)</span> &#123;</span><br><span class="line">        <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderService.createDraft(cmd);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            inventoryService.reserve(order.getItems());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            orderService.cancel(order.getId());</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            paymentService.charge(order);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            inventoryService.release(order.getItems());</span><br><span class="line">            orderService.cancel(order.getId());</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>心态转变</strong>：从”一个分布式事务搞定一切”到”每步本地事务 + 失败补偿”——金融系统中的冲正就是这个模式。</p>
+<h2 id="六、DDD-落地实践"><a href="#六、DDD-落地实践" class="headerlink" title="六、DDD 落地实践"></a>六、DDD 落地实践</h2><h3 id="6-1-Application-Service-vs-Domain-Service"><a href="#6-1-Application-Service-vs-Domain-Service" class="headerlink" title="6.1 Application Service vs Domain Service"></a>6.1 Application Service vs Domain Service</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>Application Service</th>
+<th>Domain Service</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>职责</td>
+<td>用例编排、事务管理</td>
+<td>跨实体&#x2F;聚合的纯业务逻辑</td>
+</tr>
+<tr>
+<td>调用 Repository</td>
+<td>可以</td>
+<td>理论上可，不推荐</td>
+</tr>
+<tr>
+<td>调用外部服务</td>
+<td>可以</td>
+<td>不行（通过接口倒置）</td>
+</tr>
+<tr>
+<td>管理事务</td>
+<td>必须</td>
+<td>绝不</td>
+</tr>
+<tr>
+<td>典型例子</td>
+<td><code>createOrder()</code> &#x2F; <code>payOrder()</code></td>
+<td><code>PricingService</code> &#x2F; <code>TransferService</code></td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 应用层——编排</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">payOrder</span><span class="params">(OrderId orderId)</span> &#123;</span><br><span class="line">    <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderRepository.findById(orderId).orElseThrow(...);</span><br><span class="line">    order.pay();</span><br><span class="line">    orderRepository.save(order);</span><br><span class="line">    order.getEvents().forEach(eventPublisher::publish);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 领域服务——纯业务逻辑</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderPricingService</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> Money <span class="title function_">calculateTotal</span><span class="params">(List&lt;ItemRequest&gt; items, List&lt;Coupon&gt; coupons)</span> &#123;</span><br><span class="line">        <span class="type">Money</span> <span class="variable">subtotal</span> <span class="operator">=</span> items.stream()</span><br><span class="line">            .map(i -&gt; i.getPrice().multiply(i.getQuantity()))</span><br><span class="line">            .reduce(Money.ZERO, Money::add);</span><br><span class="line">        <span class="comment">// 优惠券处理...</span></span><br><span class="line">        <span class="keyword">return</span> subtotal;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-Repository-实现（MyBatis-示例）"><a href="#6-2-Repository-实现（MyBatis-示例）" class="headerlink" title="6.2 Repository 实现（MyBatis 示例）"></a>6.2 Repository 实现（MyBatis 示例）</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Repository</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderRepositoryImpl</span> <span class="keyword">implements</span> <span class="title class_">OrderRepository</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> OrderMapper orderMapper;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> OrderItemMapper itemMapper;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Optional&lt;Order&gt; <span class="title function_">findById</span><span class="params">(OrderId id)</span> &#123;</span><br><span class="line">        <span class="type">OrderDO</span> <span class="variable">orderDO</span> <span class="operator">=</span> orderMapper.selectById(id.getValue());</span><br><span class="line">        <span class="keyword">if</span> (orderDO == <span class="literal">null</span>) <span class="keyword">return</span> Optional.empty();</span><br><span class="line">        List&lt;OrderItemDO&gt; itemDOs = itemMapper.selectByOrderId(id.getValue());</span><br><span class="line">        <span class="keyword">return</span> Optional.of(toDomain(orderDO, itemDOs));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(Order order)</span> &#123;</span><br><span class="line">        <span class="type">OrderDO</span> <span class="variable">orderDO</span> <span class="operator">=</span> OrderDO.fromDomain(order);</span><br><span class="line">        <span class="keyword">if</span> (orderMapper.countById(order.getId().getValue()) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            orderMapper.update(orderDO);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            orderMapper.insert(orderDO);</span><br><span class="line">        &#125;</span><br><span class="line">        itemMapper.deleteByOrderId(order.getId().getValue());</span><br><span class="line">        order.getItems().forEach(item -&gt;</span><br><span class="line">            itemMapper.insert(OrderItemDO.from(item, order.getId())));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Order <span class="title function_">toDomain</span><span class="params">(OrderDO orderDO, List&lt;OrderItemDO&gt; itemDOs)</span> &#123;</span><br><span class="line">        List&lt;OrderItem&gt; items = itemDOs.stream()</span><br><span class="line">            .map(<span class="built_in">this</span>::toItemDomain)</span><br><span class="line">            .collect(Collectors.toList());</span><br><span class="line">        <span class="keyword">return</span> Order.reconstitute(</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">OrderId</span>(orderDO.getId()),</span><br><span class="line">            OrderStatus.valueOf(orderDO.getStatus()),</span><br><span class="line">            items,</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">Money</span>(<span class="keyword">new</span> <span class="title class_">BigDecimal</span>(orderDO.getTotalAmount()))</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-JPA-充血模型的注意事项"><a href="#6-3-JPA-充血模型的注意事项" class="headerlink" title="6.3 JPA 充血模型的注意事项"></a>6.3 JPA 充血模型的注意事项</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name = &quot;orders&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Order</span> &#123;</span><br><span class="line">    <span class="meta">@EmbeddedId</span></span><br><span class="line">    <span class="keyword">private</span> OrderId id;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Enumerated(EnumType.STRING)</span></span><br><span class="line">    <span class="keyword">private</span> OrderStatus status;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="title function_">Order</span><span class="params">()</span> &#123;&#125;   <span class="comment">// JPA only, protected</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 业务方法，不用 setter</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.status = OrderStatus.PAID;  <span class="comment">// field access</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>两个选择：(1) JPA 直接映射——领域对象即 <code>@Entity</code>，接受无参构造约束但不暴露 public setter；(2) 领域对象与数据对象分离——领域层纯 POJO，基础设施层独立 DO + Converter。推荐后者，但前者对于小项目足够。</p>
+<h2 id="七、常见误区与建议"><a href="#七、常见误区与建议" class="headerlink" title="七、常见误区与建议"></a>七、常见误区与建议</h2><h3 id="7-1-不要过度设计"><a href="#7-1-不要过度设计" class="headerlink" title="7.1 不要过度设计"></a>7.1 不要过度设计</h3><p>如果业务规则能在 3 行 if-else 内描述清楚，不需要 DDD。后台管理系统的用户 CRUD 上全套 Entity&#x2F;ValueObject&#x2F;Aggregate&#x2F;DomainService&#x2F;DomainEvent，维护成本远高于简单的 Controller → Service → Mapper。</p>
+<h3 id="7-2-不是所有对象都要-DDD-化"><a href="#7-2-不是所有对象都要-DDD-化" class="headerlink" title="7.2 不是所有对象都要 DDD 化"></a>7.2 不是所有对象都要 DDD 化</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 没必要</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PageRequest</span> <span class="keyword">extends</span> <span class="title class_">ValueObject</span> &#123;  <span class="comment">// ← 过度设计</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> page;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> size;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>PageRequest</code> 就是数据载体。战术模式只用在<strong>真正需要建模的业务概念</strong>上。</p>
+<h3 id="7-3-聚合不能太大"><a href="#7-3-聚合不能太大" class="headerlink" title="7.3 聚合不能太大"></a>7.3 聚合不能太大</h3><p>大聚合是落地中最常见的反模式——订单聚合里放用户、商品详情、优惠券、收货地址……15 个实体 12 张表。后果：每次保存性能差、不同订单因关联同一商品而行锁冲突、加载整个聚合内存压力大。</p>
+<p><strong>聚合只包含必须强一致的关联</strong>。商品改名不影响历史订单快照——订单保存的是下单时的快照值。</p>
+<h3 id="7-4-不要为了-DDD-而-DDD"><a href="#7-4-不要为了-DDD-而-DDD" class="headerlink" title="7.4 不要为了 DDD 而 DDD"></a>7.4 不要为了 DDD 而 DDD</h3><p>见过太多这样的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CreateOrderCommandHandler</span> <span class="keyword">implements</span> <span class="title class_">CommandHandler</span>&lt;CreateOrderCommand&gt; &#123; ... &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderCreatedEventHandler</span> <span class="keyword">implements</span> <span class="title class_">DomainEventHandler</span>&lt;OrderCreatedEvent&gt; &#123; ... &#125;</span><br><span class="line"><span class="comment">// 文件名比业务代码长，做的事就是 orderService.create()</span></span><br></pre></td></tr></table></figure>
+
+<p>DDD 的核心是<strong>业务建模</strong>，不是技术模式。从核心开始：统一语言 → 限界上下文 → 在核心上下文用聚合封装业务规则 → 渐进式引入 CQRS &#x2F; 领域事件。</p>
+<blockquote>
+<p><strong>删掉所有 DDD 名词后，代码是否仍清晰表达业务逻辑？如果是，就做对了。</strong></p>
+</blockquote>
+<h3 id="7-5-团队层面建议"><a href="#7-5-团队层面建议" class="headerlink" title="7.5 团队层面建议"></a>7.5 团队层面建议</h3><ul>
+<li>DDD 需要领域专家深度参与。产品经理只会扔 PRD，DDD 推不动。</li>
+<li><strong>别在全公司铺开 DDD</strong>。在最重要的 1-2 个核心域深度应用，其他子域继续 CRUD。</li>
+<li>代码审查聚焦”业务语义是否准确”，而非”是否用了正确的 DDD 模式”——后者是本末倒置。</li>
+<li>领域层代码应可脱离框架运行——不依赖 Spring、MyBatis、任何基础设施。</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">┌───────────────────────────────────────────────────┐</span><br><span class="line">│                DDD 落地核心口诀                    │</span><br><span class="line">├───────────────────────────────────────────────────┤</span><br><span class="line">│ 战略先行：统一语言 + 限界上下文 → 划定边界再动手    │</span><br><span class="line">│ 战术服务业务：只对复杂规则使用聚合/值对象          │</span><br><span class="line">│ 依赖倒置：领域层零框架依赖                         │</span><br><span class="line">│ 聚合在事务内，聚合间最终一致                       │</span><br><span class="line">│ 从核心域开始，渐进式推广                           │</span><br><span class="line">│ 不要求完美，先让代码说人话                         │</span><br><span class="line">└───────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li>Eric Evans, <em>Domain-Driven Design: Tackling Complexity in the Heart of Software</em> (2003)</li>
+<li>Vaughn Vernon, <em>Implementing Domain-Driven Design</em> (2013)</li>
+<li>Martin Fowler, <a target="_blank" rel="noopener" href="https://martinfowler.com/bliki/BoundedContext.html">BoundedContext</a></li>
+<li>Microsoft, <a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/dotnet/architecture/microservices/">.NET Microservices Architecture</a></li>
+<li>Chris Richardson, <a target="_blank" rel="noopener" href="https://microservices.io/patterns/">Microservices Patterns</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag"># 微服务</a>
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+              <a href="/tags/DDD/" rel="tag"># DDD</a>
+              <a href="/tags/%E9%A2%86%E5%9F%9F%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/" rel="tag"># 领域驱动设计</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/design-patterns/" rel="prev" title="设计模式 -- 后端实践">
+                  <i class="fa fa-angle-left"></i> 设计模式 -- 后端实践
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/dbt-data-transformation/" rel="next" title="dbt 数据转换实践">
+                  dbt 数据转换实践 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

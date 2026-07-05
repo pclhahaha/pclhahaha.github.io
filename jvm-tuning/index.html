@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="JVM 的性能瓶颈 80% 以上与 GC 有关。理解 GC 行为是后端工程师的基本功。 1.1 GC 日志分析开启 GC 日志（JDK 11+ 统一参数）： 1-Xlog:gc*,gc+age&#x3D;trace:file&#x3D;&#x2F;var&#x2F;log&#x2F;app&#x2F;gc-%t.log:time,level,tags:filecount&#x3D;10,filesize&#x3D;50M  关键日志解读（G1 示例）： 123456[2026">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM 调优实战">
+<meta property="og:url" content="http://pclhahaha.github.io/jvm-tuning/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="JVM 的性能瓶颈 80% 以上与 GC 有关。理解 GC 行为是后端工程师的基本功。 1.1 GC 日志分析开启 GC 日志（JDK 11+ 统一参数）： 1-Xlog:gc*,gc+age&#x3D;trace:file&#x3D;&#x2F;var&#x2F;log&#x2F;app&#x2F;gc-%t.log:time,level,tags:filecount&#x3D;10,filesize&#x3D;50M  关键日志解读（G1 示例）： 123456[2026">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="调优">
+<meta property="article:tag" content="GC日志">
+<meta property="article:tag" content="Arthas">
+<meta property="article:tag" content="MAT">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/jvm-tuning/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/jvm-tuning/","path":"jvm-tuning/","title":"JVM 调优实战"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JVM 调优实战 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-GC-%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">1.1 GC 日志分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-GC-%E8%B0%83%E4%BC%98%E7%9B%AE%E6%A0%87"><span class="nav-number">2.</span> <span class="nav-text">1.2 GC 调优目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-G1-GC-%E8%B0%83%E4%BC%98%E5%8F%82%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">1.3 G1 GC 调优参数</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/jvm-tuning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="JVM 调优实战 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JVM 调优实战
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" itemprop="url" rel="index"><span itemprop="name">性能优化</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>JVM 的性能瓶颈 80% 以上与 GC 有关。理解 GC 行为是后端工程师的基本功。</p>
+<h3 id="1-1-GC-日志分析"><a href="#1-1-GC-日志分析" class="headerlink" title="1.1 GC 日志分析"></a>1.1 GC 日志分析</h3><p><strong>开启 GC 日志（JDK 11+ 统一参数）</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Xlog:gc*,gc+age=trace:file=/var/log/app/gc-%t.log:<span class="keyword">time</span>,level,tags:filecount=10,filesize=50M</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键日志解读（G1 示例）</strong>：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-attr">[2026-07-05T10:30:15.123+0800]</span><span class="selector-attr">[gc,start     ]</span> <span class="built_in">GC</span>(<span class="number">42</span>) Pause Young (Normal) (G1 Evacuation Pause)</span><br><span class="line"><span class="selector-attr">[2026-07-05T10:30:15.156+0800]</span><span class="selector-attr">[gc,phases    ]</span> <span class="built_in">GC</span>(<span class="number">42</span>)   Pre Evacuate Collection Set: <span class="number">0.2ms</span></span><br><span class="line"><span class="selector-attr">[2026-07-05T10:30:15.157+0800]</span><span class="selector-attr">[gc,phases    ]</span> <span class="built_in">GC</span>(<span class="number">42</span>)   Evacuate Collection Set: <span class="number">30.5ms</span></span><br><span class="line"><span class="selector-attr">[2026-07-05T10:30:15.158+0800]</span><span class="selector-attr">[gc,phases    ]</span> <span class="built_in">GC</span>(<span class="number">42</span>)   Post Evacuate Collection Set: <span class="number">1.1ms</span></span><br><span class="line"><span class="selector-attr">[2026-07-05T10:30:15.160+0800]</span><span class="selector-attr">[gc,heap      ]</span> <span class="built_in">GC</span>(<span class="number">42</span>) Eden: <span class="number">2048</span><span class="built_in">M</span>(<span class="number">2048</span>M)-&gt;<span class="number">0</span><span class="built_in">B</span>(<span class="number">1536</span>M) Survivor: <span class="number">256</span>M-&gt;<span class="number">256</span>M Heap: <span class="number">3686</span><span class="built_in">M</span>(<span class="number">8192</span>M)-&gt;<span class="number">1669</span><span class="built_in">M</span>(<span class="number">8192</span>M)</span><br><span class="line"><span class="selector-attr">[2026-07-05T10:30:15.161+0800]</span><span class="selector-attr">[gc,cpu       ]</span> <span class="built_in">GC</span>(<span class="number">42</span>) User=<span class="number">0.34s</span> Sys=<span class="number">0.01s</span> Real=<span class="number">0.04s</span></span><br></pre></td></tr></table></figure>
+
+<p>关注点：</p>
+<ul>
+<li><strong>Pause 类型</strong>：Young &#x2F; Mixed &#x2F; Full —— Full GC 连续出现是红色警报</li>
+<li><strong>Pause 耗时</strong>：Real 值。G1 的目标是 &lt; 200ms，但实际通常在 10-50ms</li>
+<li><strong>Eden 回收后大小</strong>：回收后 Eden 清空为 0B 是正常的（Minor GC 后 Eden 全清空）</li>
+<li><strong>Heap 回收量</strong>：Heap before → Heap after，评估回收效率</li>
+<li><strong>GC 频率</strong>：如果 GC 日志中每次间隔 &lt; 1 秒，说明分配压力太大</li>
+</ul>
+<p><strong>GCEasy 在线分析</strong>：上传 gc.log 到 <a target="_blank" rel="noopener" href="https://gceasy.io/">gceasy.io</a> 可直接获得：</p>
+<ul>
+<li>吞吐量占比（GC 时间 &#x2F; 总运行时间）</li>
+<li>各 GC 暂停的 P50&#x2F;P99&#x2F;P99.9</li>
+<li>内存分配速率</li>
+<li>优化建议</li>
+</ul>
+<h3 id="1-2-GC-调优目标"><a href="#1-2-GC-调优目标" class="headerlink" title="1.2 GC 调优目标"></a>1.2 GC 调优目标</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>优先目标</th>
+<th>推荐收集器</th>
+<th>典型参数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>高吞吐</strong>（批处理&#x2F;离线计算）</td>
+<td>吞吐量 &gt; 99%，可容忍秒级暂停</td>
+<td>Parallel GC</td>
+<td><code>-XX:+UseParallelGC</code></td>
+</tr>
+<tr>
+<td><strong>低延迟</strong>（在线服务&#x2F;API）</td>
+<td>P99 暂停 &lt; 100ms</td>
+<td><strong>G1 GC</strong> (默认)</td>
+<td><code>-XX:+UseG1GC -XX:MaxGCPauseMillis=100</code></td>
+</tr>
+<tr>
+<td><strong>超低延迟</strong>（交易&#x2F;实时风控）</td>
+<td>P99 暂停 &lt; 10ms</td>
+<td><strong>ZGC</strong></td>
+<td><code>-XX:+UseZGC</code></td>
+</tr>
+<tr>
+<td><strong>超大堆</strong>（&gt; 32GB，离线分析）</td>
+<td>吞吐量优先</td>
+<td>G1 或 Parallel</td>
+<td><code>-XX:+UseParallelGC</code></td>
+</tr>
+</tbody></table>
+<p><strong>JDK 各版本默认收集器：</strong></p>
+<ul>
+<li>JDK 8：Parallel GC</li>
+<li>JDK 9-16：<strong>G1 GC</strong>（推荐用于绝大多数在线服务）</li>
+<li>JDK 17+：G1 GC（ZGC 在 JDK 21 成为备选推荐）</li>
+</ul>
+<h3 id="1-3-G1-GC-调优参数"><a href="#1-3-G1-GC-调优参数" class="headerlink" title="1.3 G1 GC 调优参数"></a>1.3 G1 GC 调优参数</h3><p>G1 的设计哲学是<strong>自适应</strong>——大部分参数无需手动设置，但以下几个值得关注：</p>
+<pre><code class="language-bash">
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+              <a href="/tags/%E8%B0%83%E4%BC%98/" rel="tag"># 调优</a>
+              <a href="/tags/GC%E6%97%A5%E5%BF%97/" rel="tag"># GC日志</a>
+              <a href="/tags/Arthas/" rel="tag"># Arthas</a>
+              <a href="/tags/MAT/" rel="tag"># MAT</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/jvm-gc-algorithms/" rel="prev" title="JVM GC 算法与收集器 (CMS&#x2F;G1&#x2F;ZGC)">
+                  <i class="fa fa-angle-left"></i> JVM GC 算法与收集器 (CMS/G1/ZGC)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/jvm-escape-analysis/" rel="next" title="逃逸分析与栈上分配">
+                  逃逸分析与栈上分配 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

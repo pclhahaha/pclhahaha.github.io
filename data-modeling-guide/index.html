@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="数据建模的核心问题是：如何把业务概念转化为便于查询和分析的表结构。初学者最常见的错误是把 OLTP 的第三范式直接搬到 OLAP 上——结果查询需要 JOIN 20 张表，性能一塌糊涂。 一、星型模型（Star Schema）最经典的数据仓库建模方式：一张事实表 + 多张维度表。 12345678910111213          ┌─────────┐          │ dim_user">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据建模方法论">
+<meta property="og:url" content="http://pclhahaha.github.io/data-modeling-guide/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="数据建模的核心问题是：如何把业务概念转化为便于查询和分析的表结构。初学者最常见的错误是把 OLTP 的第三范式直接搬到 OLAP 上——结果查询需要 JOIN 20 张表，性能一塌糊涂。 一、星型模型（Star Schema）最经典的数据仓库建模方式：一张事实表 + 多张维度表。 12345678910111213          ┌─────────┐          │ dim_user">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据工程">
+<meta property="article:tag" content="数据建模">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/data-modeling-guide/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/data-modeling-guide/","path":"data-modeling-guide/","title":"数据建模方法论"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据建模方法论 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%98%9F%E5%9E%8B%E6%A8%A1%E5%9E%8B%EF%BC%88Star-Schema%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">一、星型模型（Star Schema）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%9B%AA%E8%8A%B1%E6%A8%A1%E5%9E%8B%EF%BC%88Snowflake-Schema%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">二、雪花模型（Snowflake Schema）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E4%B8%89%E5%B1%82%E6%9E%B6%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">三、数据仓库三层架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AE%BD%E8%A1%A8-vs-%E6%98%9F%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">四、宽表 vs 星型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81Data-Vault%EF%BC%88%E6%95%B0%E6%8D%AE%E9%87%91%E5%BA%93%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">五、Data Vault（数据金库）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%BB%B4%E5%BA%A6%E5%BB%BA%E6%A8%A1%E5%AE%9E%E8%B7%B5%E7%BB%8F%E9%AA%8C"><span class="nav-number">6.</span> <span class="nav-text">六、维度建模实践经验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">七、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/data-modeling-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据建模方法论 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据建模方法论
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">数据工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>数据建模的核心问题是：如何把业务概念转化为便于查询和分析的表结构。初学者最常见的错误是把 OLTP 的第三范式直接搬到 OLAP 上——结果查询需要 JOIN 20 张表，性能一塌糊涂。</p>
+<h2 id="一、星型模型（Star-Schema）"><a href="#一、星型模型（Star-Schema）" class="headerlink" title="一、星型模型（Star Schema）"></a>一、星型模型（Star Schema）</h2><p>最经典的数据仓库建模方式：一张事实表 + 多张维度表。</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">          ┌─────────┐</span><br><span class="line">          │ dim_user │ (用户维度)</span><br><span class="line">          └────┬────┘</span><br><span class="line">               │</span><br><span class="line">┌─────────┐    │    ┌───────────┐</span><br><span class="line">│dim_date │────┼────│dim_product │ (日期/产品维度)</span><br><span class="line">└─────────┘    │    └───────────┘</span><br><span class="line">               │</span><br><span class="line">    ┌──────────┴──────────┐</span><br><span class="line">    │   fact_orders        │ (事实表)</span><br><span class="line">    │ user_id, product_id  │</span><br><span class="line">    │ date_id, amount, qty │</span><br><span class="line">    └─────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>优点：查询简单（事实表只需 JOIN 一次维度表）、性能好（维度表小可全缓存）。<br>缺点：维度表只支持单层，层级关系（如国家→省→市）需要冗余存储。</p>
+<h2 id="二、雪花模型（Snowflake-Schema）"><a href="#二、雪花模型（Snowflake-Schema）" class="headerlink" title="二、雪花模型（Snowflake Schema）"></a>二、雪花模型（Snowflake Schema）</h2><p>在星型模型基础上把维度表进一步规范化：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fact_orders</span><br><span class="line">    └─ <span class="keyword">dim_product</span></span><br><span class="line"><span class="keyword"></span>           └─ <span class="keyword">dim_category</span></span><br><span class="line"><span class="keyword"></span>                  └─ <span class="keyword">dim_department</span></span><br></pre></td></tr></table></figure>
+
+<p>优点：消除冗余、节省存储。<br>缺点：查询 JOIN 更多、写 SQL 更复杂。<strong>实践中用得很少</strong>——存储成本远小于开发时间的成本。</p>
+<h2 id="三、数据仓库三层架构"><a href="#三、数据仓库三层架构" class="headerlink" title="三、数据仓库三层架构"></a>三、数据仓库三层架构</h2><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────┐</span><br><span class="line">│   ODS（原始数据层）              │</span><br><span class="line">│   - 源系统数据的 <span class="number">1</span>:<span class="number">1</span> 镜像        │</span><br><span class="line">│   - 不做清洗和转换               │</span><br><span class="line">└────────────┬────────────────────┘</span><br><span class="line">             │ ETL</span><br><span class="line">┌────────────▼────────────────────┐</span><br><span class="line">│   DW（数据仓库层）               │</span><br><span class="line">│   - 清洗、去重、标准化            │</span><br><span class="line">│   - 事实表 + 维度表              │</span><br><span class="line">│   - 按业务域组织                 │</span><br><span class="line">└────────────┬────────────────────┘</span><br><span class="line">             │ 聚合</span><br><span class="line">┌────────────▼────────────────────┐</span><br><span class="line">│   DM（数据集市层）               │</span><br><span class="line">│   - 面向业务场景的聚合视图        │</span><br><span class="line">│   - <span class="keyword">BI </span>报表直接对接              │</span><br><span class="line">└─────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、宽表-vs-星型"><a href="#四、宽表-vs-星型" class="headerlink" title="四、宽表 vs 星型"></a>四、宽表 vs 星型</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>星型模型</th>
+<th>宽表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JOIN 次数</td>
+<td>1-3 次</td>
+<td>0</td>
+</tr>
+<tr>
+<td>存储空间</td>
+<td>省（维度表只存一份）</td>
+<td>冗余</td>
+</tr>
+<tr>
+<td>开发效率</td>
+<td>慢（需要建多张表）</td>
+<td>快（一次跑完）</td>
+</tr>
+<tr>
+<td>变更灵活</td>
+<td>高（维度变更只改一张表）</td>
+<td>低（需重建整张宽表）</td>
+</tr>
+</tbody></table>
+<p><strong>实践建议</strong>：先建星型模型保证数据一致性，再在 DM 层建宽表加速 BI 查询。不要上来就建宽表——你的维度会变、事实会变、业务需求会变。星型模型的适配成本远低于宽表。</p>
+<h2 id="五、Data-Vault（数据金库）"><a href="#五、Data-Vault（数据金库）" class="headerlink" title="五、Data Vault（数据金库）"></a>五、Data Vault（数据金库）</h2><p>适用于超大规模、多数据源、频繁变更的企业场景：</p>
+<figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Hub（业务实体）→ 比如 Hub_Customer（只存 business <span class="keyword">key</span>）</span><br><span class="line"><span class="keyword">Link</span>（实体关系）→ 比如 Link_Order_Customer</span><br><span class="line">Satellite（描述信息）→ 比如 Sat_Customer_Name, Sat_Customer_Address</span><br></pre></td></tr></table></figure>
+
+<p>优点：极度灵活、适合增量加载、历史追踪完整。<br>缺点：表数量爆炸、查询需要大量 JOIN。<strong>初创公司不要用。</strong></p>
+<h2 id="六、维度建模实践经验"><a href="#六、维度建模实践经验" class="headerlink" title="六、维度建模实践经验"></a>六、维度建模实践经验</h2><table>
+<thead>
+<tr>
+<th>实践</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>退化维度</strong></td>
+<td>把维度属性直接放到事实表中（如订单号），避免不必要的 JOIN</td>
+</tr>
+<tr>
+<td><strong>缓慢变化维度 (SCD)</strong></td>
+<td>Type1(覆盖), Type2(新增行+时间戳), Type3(新增列)</td>
+</tr>
+<tr>
+<td><strong>日期维度</strong></td>
+<td>永远要建——<code>dim_date</code> 包含年&#x2F;季&#x2F;月&#x2F;周&#x2F;日&#x2F;节假日&#x2F;是否周末</td>
+</tr>
+<tr>
+<td><strong>代理键 vs 自然键</strong></td>
+<td>外表用代理键（自增BIGINT），内部主键保证唯一</td>
+</tr>
+</tbody></table>
+<h2 id="七、小结"><a href="#七、小结" class="headerlink" title="七、小结"></a>七、小结</h2><p>数据建模的核心原则：<strong>让查询简单</strong>。星型模型是 80% 场景的最佳选择，宽表用于加速 BI，Data Vault 留给数据源 &gt; 50 个的大型企业。不要在建模阶段过度设计——表和关系会随着业务理解加深而演进。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%B7%A5%E7%A8%8B/" rel="tag"># 数据工程</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BB%BA%E6%A8%A1/" rel="tag"># 数据建模</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/data-quality-lineage/" rel="prev" title="数据质量与血缘">
+                  <i class="fa fa-angle-left"></i> 数据质量与血缘
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/data-cost-optimization/" rel="next" title="数据工程成本优化">
+                  数据工程成本优化 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Lease 是一种带超时时间的授权机制，核心语义是”在 T 时间内，我承诺不把你持有的权限给别人”。与锁不同，Lease 天然容忍持有者故障——过期自动释放，不需要显式的解锁操作。 一、核心机制Lease 的四个要素：  颁发：授权方颁发一个带有效期（TTL）的授权 续约：持约方在 Lease 过期之前可以申请续约 过期自动失效：授权方在 Lease 过期后自动收回权限，无需通信 到期前承诺：授权">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lease 租约机制">
+<meta property="og:url" content="http://pclhahaha.github.io/lease-mechanism/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="Lease 是一种带超时时间的授权机制，核心语义是”在 T 时间内，我承诺不把你持有的权限给别人”。与锁不同，Lease 天然容忍持有者故障——过期自动释放，不需要显式的解锁操作。 一、核心机制Lease 的四个要素：  颁发：授权方颁发一个带有效期（TTL）的授权 续约：持约方在 Lease 过期之前可以申请续约 过期自动失效：授权方在 Lease 过期后自动收回权限，无需通信 到期前承诺：授权">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T04:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="分布式锁">
+<meta property="article:tag" content="GFS">
+<meta property="article:tag" content="Lease">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/lease-mechanism/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/lease-mechanism/","path":"lease-mechanism/","title":"Lease 租约机制"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Lease 租约机制 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A0%B8%E5%BF%83%E6%9C%BA%E5%88%B6"><span class="nav-number">1.</span> <span class="nav-text">一、核心机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%B8%8E%E9%94%81%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">二、与锁的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.1.</span> <span class="nav-text">实现示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81GFS-Chunk-Lease%E2%80%94%E2%80%94%E7%BB%8F%E5%85%B8%E5%BA%94%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">三、GFS Chunk Lease——经典应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%85%B6%E4%BB%96%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.</span> <span class="nav-text">四、其他应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%B0%8F%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">五、小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/lease-mechanism/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Lease 租约机制 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lease 租约机制
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 12:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T12:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Lease 是一种带超时时间的授权机制，核心语义是”在 T 时间内，我承诺不把你持有的权限给别人”。与锁不同，Lease 天然容忍持有者故障——过期自动释放，不需要显式的解锁操作。</p>
+<h2 id="一、核心机制"><a href="#一、核心机制" class="headerlink" title="一、核心机制"></a>一、核心机制</h2><p>Lease 的四个要素：</p>
+<ul>
+<li><strong>颁发</strong>：授权方颁发一个带有效期（TTL）的授权</li>
+<li><strong>续约</strong>：持约方在 Lease 过期之前可以申请续约</li>
+<li><strong>过期自动失效</strong>：授权方在 Lease 过期后自动收回权限，无需通信</li>
+<li><strong>到期前承诺</strong>：授权方在 Lease 有效期内不会将相同权限授予第三方</li>
+</ul>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">时间线：</span><br><span class="line">  颁发 ←────────────── <span class="meta">TTL</span> (如 <span class="number">60</span>s) ──────────────→ 过期</span><br><span class="line">        持约方可在到期前续约     授权方承诺不转授</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、与锁的区别"><a href="#二、与锁的区别" class="headerlink" title="二、与锁的区别"></a>二、与锁的区别</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>锁</th>
+<th>Lease</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>持有方式</td>
+<td>显式申请和释放</td>
+<td>颁发 + 自动过期</td>
+</tr>
+<tr>
+<td>占有者故障</td>
+<td>死锁（需超时检测才能释放）</td>
+<td>过期自动释放，无死锁</td>
+</tr>
+<tr>
+<td>续约</td>
+<td>通常不可续</td>
+<td>到期前可申请续约</td>
+</tr>
+<tr>
+<td>通信开销</td>
+<td>每次加解锁都要通信</td>
+<td>只在续约时偶尔通信</td>
+</tr>
+<tr>
+<td>语义</td>
+<td>互斥访问</td>
+<td>时间边界内的独占承诺</td>
+</tr>
+</tbody></table>
+<p><strong>Lease 的核心优势</strong>：持有者宕机后不需要任何消息来释放资源——TTL 到期，权限自动归还。在分布式系统中，”靠超时兜底”比”靠故障检测”更可靠。</p>
+<h3 id="实现示例"><a href="#实现示例" class="headerlink" title="实现示例"></a>实现示例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LeaseManager</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, Lease&gt; leases = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 颁发 Lease</span></span><br><span class="line">    <span class="keyword">public</span> Lease <span class="title function_">grant</span><span class="params">(String resourceId, String holderId, <span class="type">long</span> ttlMs)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (leases.containsKey(resourceId)) &#123;</span><br><span class="line">            <span class="type">Lease</span> <span class="variable">existing</span> <span class="operator">=</span> leases.get(resourceId);</span><br><span class="line">            <span class="keyword">if</span> (!existing.isExpired()) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">LeaseConflictException</span>(<span class="string">&quot;lease held by &quot;</span> + existing.holderId);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">Lease</span> <span class="variable">lease</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Lease</span>(resourceId, holderId, System.currentTimeMillis() + ttlMs);</span><br><span class="line">        leases.put(resourceId, lease);</span><br><span class="line">        <span class="keyword">return</span> lease;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 续约</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">renew</span><span class="params">(String resourceId, String holderId, <span class="type">long</span> extendMs)</span> &#123;</span><br><span class="line">        <span class="type">Lease</span> <span class="variable">lease</span> <span class="operator">=</span> leases.get(resourceId);</span><br><span class="line">        <span class="keyword">if</span> (lease == <span class="literal">null</span> || !lease.holderId.equals(holderId)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        lease.expireAt = Math.max(lease.expireAt, System.currentTimeMillis() + extendMs);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 检查</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isValid</span><span class="params">(String resourceId)</span> &#123;</span><br><span class="line">        <span class="type">Lease</span> <span class="variable">lease</span> <span class="operator">=</span> leases.get(resourceId);</span><br><span class="line">        <span class="keyword">return</span> lease != <span class="literal">null</span> &amp;&amp; !lease.isExpired();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、GFS-Chunk-Lease——经典应用"><a href="#三、GFS-Chunk-Lease——经典应用" class="headerlink" title="三、GFS Chunk Lease——经典应用"></a>三、GFS Chunk Lease——经典应用</h2><p>GFS 论文中，Master 为每个 Chunk 授予其中一个 Chunkserver “主副本 Lease”（初始 60 秒），该主副本负责对该 Chunk 的所有写操作定序：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">1</span>. Client 请求 Master：我要写 Chunk A</span><br><span class="line"><span class="attribute">2</span>. Master 返回：主副本在 CS-<span class="number">1</span>，Lease 剩余 <span class="number">45</span>s</span><br><span class="line"><span class="attribute">3</span>. Client 向 CS-<span class="number">1</span> 发送数据</span><br><span class="line"><span class="attribute">4</span>. CS-<span class="number">1</span> 定序写入顺序 → 通知 CS-<span class="number">2</span>、CS-<span class="number">3</span> 写入</span><br><span class="line"><span class="attribute">5</span>. 全部完成 → 返回 Client</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么用 Lease 而不是永久授权？</strong> Master 可能宕机重启，如果 Chunkserver 持有永久授权，新 Master 不知道哪些 Chunk 被谁”锁定”。Lease 过期后 Master 可以安全地重新分配主副本——不需要知道旧持有者是否还活着。</p>
+<h2 id="四、其他应用场景"><a href="#四、其他应用场景" class="headerlink" title="四、其他应用场景"></a>四、其他应用场景</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>Lease 的作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>分布式缓存 TTL</strong></td>
+<td>缓存数据的有效期本质上是应用层 Lease——过期后从源重新拉取</td>
+</tr>
+<tr>
+<td><strong>Leader 选举</strong></td>
+<td>Leader 持有 Lease，Follower 在 Lease 期内不发起选举；Leader 宕机后 Lease 过期，Follower 重新选举</td>
+</tr>
+<tr>
+<td><strong>分布式锁替代</strong></td>
+<td>当操作可以在 Lease 边界内完成时，Lease 比锁更简洁——无死锁风险，无解锁开销</td>
+</tr>
+<tr>
+<td><strong>服务注册健康检查</strong></td>
+<td>注册中心为服务实例颁发 Lease，实例定期续约；实例宕机后 Lease 过期，自动摘除</td>
+</tr>
+</tbody></table>
+<h2 id="五、小结"><a href="#五、小结" class="headerlink" title="五、小结"></a>五、小结</h2><p>Lease 的核心思想是”用时间承诺替代显式协调”——这是一种比锁更轻量、更有弹性的分布式协同机制。GFS 的 Chunk Lease 是这一思想的经典实践，它用 60 秒的简单承诺替代了复杂的 Chunk 所有权协商，让系统在 Master 故障恢复时能安全地重新分配资源。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" rel="tag"># 分布式锁</a>
+              <a href="/tags/GFS/" rel="tag"># GFS</a>
+              <a href="/tags/Lease/" rel="tag"># Lease</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/llm-inference-optimization/" rel="prev" title="LLM 推理优化">
+                  <i class="fa fa-angle-left"></i> LLM 推理优化
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/leaderboard-design/" rel="next" title="排行榜系统设计">
+                  排行榜系统设计 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

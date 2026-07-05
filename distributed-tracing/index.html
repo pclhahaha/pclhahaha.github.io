@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 核心概念123456Trace Id: a1b2c3d4e5f67890├─ Span A: API Gateway           duration: 350ms│  ├─ Span B: OrderService.createOrder   duration: 200ms│  │  ├─ Span D: MySQL SELECT    duration: 80ms│  │  └─">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式链路追踪">
+<meta property="og:url" content="http://pclhahaha.github.io/distributed-tracing/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 核心概念123456Trace Id: a1b2c3d4e5f67890├─ Span A: API Gateway           duration: 350ms│  ├─ Span B: OrderService.createOrder   duration: 200ms│  │  ├─ Span D: MySQL SELECT    duration: 80ms│  │  └─">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="链路追踪">
+<meta property="article:tag" content="Jaeger">
+<meta property="article:tag" content="SkyWalking">
+<meta property="article:tag" content="OpenTelemetry">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/distributed-tracing/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/distributed-tracing/","path":"distributed-tracing/","title":"分布式链路追踪"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式链路追踪 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">1.1 核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-OpenTelemetry-%E6%A0%87%E5%87%86"><span class="nav-number">2.</span> <span class="nav-text">1.2 OpenTelemetry 标准</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-Jaeger-%E6%9E%B6%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">1.3 Jaeger 架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-SkyWalking"><span class="nav-number">4.</span> <span class="nav-text">1.4 SkyWalking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Spring-Cloud-Sleuth-Zipkin"><span class="nav-number">5.</span> <span class="nav-text">1.5 Spring Cloud Sleuth + Zipkin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E9%87%87%E6%A0%B7%E7%AD%96%E7%95%A5"><span class="nav-number">6.</span> <span class="nav-text">1.6 采样策略</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/distributed-tracing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式链路追踪 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式链路追踪
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/" itemprop="url" rel="index"><span itemprop="name">可观测性</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-核心概念"><a href="#1-1-核心概念" class="headerlink" title="1.1 核心概念"></a>1.1 核心概念</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Trace <span class="params">Id:</span> a1b2c3d4e5f67890</span><br><span class="line">├─ Span <span class="params">A:</span> API Gateway           <span class="params">duration:</span> <span class="number">350</span>ms</span><br><span class="line">│  ├─ Span <span class="params">B:</span> OrderService.createOrder   <span class="params">duration:</span> <span class="number">200</span>ms</span><br><span class="line">│  │  ├─ Span <span class="params">D:</span> MySQL SELECT    <span class="params">duration:</span> <span class="number">80</span>ms</span><br><span class="line">│  │  └─ Span <span class="params">E:</span> Redis GET       <span class="params">duration:</span> <span class="number">10</span>ms</span><br><span class="line">│  └─ Span <span class="params">C:</span> InventoryService.checkStock  <span class="params">duration:</span> <span class="number">120</span>ms</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Trace</strong>：一次完整请求链，由一组 Span 组成</li>
+<li><strong>Span</strong>：单个逻辑操作，含起止时间、Tag、事件</li>
+<li><strong>SpanContext</strong>：跨进程传递上下文（TraceId + SpanId + Baggage）</li>
+<li><strong>上下文传播</strong>：通过 HTTP Header <code>traceparent</code> 或 gRPC Metadata 传递</li>
+</ul>
+<h3 id="1-2-OpenTelemetry-标准"><a href="#1-2-OpenTelemetry-标准" class="headerlink" title="1.2 OpenTelemetry 标准"></a>1.2 OpenTelemetry 标准</h3><p>OTel 统一了 OpenTracing + OpenCensus，成为可观测性<strong>采集标准</strong>：</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable"><span class="class">Application</span></span> <span class="variable">Code</span></span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">┌─────────────────┐</span><br><span class="line">│  <span class="variable">OTel</span> <span class="variable">API</span>       │  手动埋点</span><br><span class="line">│  <span class="variable">OTel</span> <span class="variable">SDK</span>       │  采样/导出/处理</span><br><span class="line">└────────┬────────┘</span><br><span class="line">         │</span><br><span class="line">    ┌────┴────┬──────────┐</span><br><span class="line">    ▼         ▼          ▼</span><br><span class="line">  <span class="variable">OTLP</span>    <span class="variable">Jaeger</span>    <span class="variable">Zipkin</span>   ← 可导出到任何后端</span><br><span class="line">    │       <span class="variable">Thrift</span>     <span class="variable">HTTP</span></span><br><span class="line">    ▼         ▼          ▼</span><br><span class="line">┌─────────────────────────────┐</span><br><span class="line">│    <span class="variable">Collector</span> (可选)          │ 接收/处理/导出流水线</span><br><span class="line">└─────────────────────────────┘</span><br><span class="line">         │</span><br><span class="line">    ┌────┴──────────┐</span><br><span class="line">    ▼               ▼</span><br><span class="line"> <span class="function"><span class="title">Jaeger</span>(<span class="variable">Traces</span>)  <span class="title">Prometheus</span>(<span class="variable">Metrics</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>核心价值</strong>：厂商无关；统一 Traces + Metrics + Logs API；Java Agent 自动埋点 Spring&#x2F;gRPC&#x2F;Kafka&#x2F;Redis。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -javaagent:opentelemetry-javaagent.jar \</span><br><span class="line">     -Dotel.service.name=order-service \</span><br><span class="line">     -Dotel.traces.exporter=otlp \</span><br><span class="line">     -jar order-service.jar</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-Jaeger-架构"><a href="#1-3-Jaeger-架构" class="headerlink" title="1.3 Jaeger 架构"></a>1.3 Jaeger 架构</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Service A/B/C + Jaeger Client</span><br><span class="line">        │ Thrift/UDP</span><br><span class="line">        ▼</span><br><span class="line">┌─────────────────┐</span><br><span class="line">│  Jaeger Agent    │  DaemonSet，每 <span class="keyword">Node</span> <span class="title">一个，批处理转发</span></span><br><span class="line"><span class="title">└────────┬────────┘</span></span><br><span class="line"><span class="title">         │ gRPC</span></span><br><span class="line">         ▼</span><br><span class="line">┌─────────────────┐</span><br><span class="line">│ Jaeger Collector │  验证/索引 → 写 Kafka → 写 ES/Cassandra</span><br><span class="line">└─────────────────┘</span><br><span class="line">         │</span><br><span class="line">    ┌────┴──────┐</span><br><span class="line">    ▼           ▼</span><br><span class="line"> Ingester    Query Service + UI</span><br><span class="line">(Kafka→DB)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>存储</th>
+<th>适用场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Elasticsearch</strong></td>
+<td>生产首选</td>
+<td>全文检索，与日志共用 ES 集群</td>
+</tr>
+<tr>
+<td>Cassandra</td>
+<td>超大流量</td>
+<td>线性扩展，运维复杂</td>
+</tr>
+<tr>
+<td>ClickHouse</td>
+<td>新选择</td>
+<td>列存高压缩，OLAP 分析快</td>
+</tr>
+</tbody></table>
+<h3 id="1-4-SkyWalking"><a href="#1-4-SkyWalking" class="headerlink" title="1.4 SkyWalking"></a>1.4 SkyWalking</h3><p>国人开源 APM，Java Agent 自动埋点极强，几乎零代码侵入。</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">Service</span> + <span class="variable">SW</span> <span class="variable">Agent</span> ──<span class="variable">gRPC</span>──▶ <span class="function"><span class="title">OAP</span>(<span class="variable">Receiver</span>→<span class="variable">Analyzer</span>→<span class="variable">Aggregator</span>) ──▶ <span class="variable">ES</span>/<span class="variable">MySQL</span> ──▶ <span class="title">UI</span>(<span class="variable">RocketBot</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>核心特性</strong>：服务拓扑图（实时调用量&#x2F;延迟&#x2F;成功率）、JVM 级指标、慢端点检测、内置告警。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -javaagent:skywalking-agent.jar \</span><br><span class="line">     -DSW_AGENT_NAME=order-service \</span><br><span class="line">     -DSW_AGENT_COLLECTOR_BACKEND_SERVICES=oap:11800 \</span><br><span class="line">     -jar order-service.jar</span><br></pre></td></tr></table></figure>
+
+<p>自定义 Span：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Trace(operationName = &quot;customBusinessLogic&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">processOrder</span><span class="params">(Order order)</span> &#123;</span><br><span class="line">    ActiveSpan.tag(<span class="string">&quot;orderId&quot;</span>, order.getId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-5-Spring-Cloud-Sleuth-Zipkin"><a href="#1-5-Spring-Cloud-Sleuth-Zipkin" class="headerlink" title="1.5 Spring Cloud Sleuth + Zipkin"></a>1.5 Spring Cloud Sleuth + Zipkin</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">sleuth:</span></span><br><span class="line">    <span class="attr">sampler:</span></span><br><span class="line">      <span class="attr">probability:</span> <span class="number">0.1</span>    <span class="comment"># 10% 采样（生产）</span></span><br><span class="line">    <span class="attr">baggage:</span></span><br><span class="line">      <span class="attr">remote-fields:</span>       <span class="comment"># 跨服务传播自定义字段</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">userId</span></span><br><span class="line">  <span class="attr">zipkin:</span></span><br><span class="line">    <span class="attr">base-url:</span> <span class="string">http://zipkin:9411</span></span><br><span class="line">    <span class="attr">sender:</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">kafka</span>          <span class="comment"># 通过 Kafka 解耦</span></span><br></pre></td></tr></table></figure>
+
+<p>Sleuth 自动将 <code>traceId</code> 和 <code>spanId</code> 注入 MDC，日志输出：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="keyword">order</span>-service,a1b2c3d4e5f67890,a1b2c3d4e5f67890] <span class="keyword">INFO</span> - <span class="keyword">order</span> created</span><br><span class="line">[inventory-service,a1b2c3d4e5f67890,<span class="number">1234567890</span>abcdef] <span class="keyword">INFO</span> - stock deducted</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-6-采样策略"><a href="#1-6-采样策略" class="headerlink" title="1.6 采样策略"></a>1.6 采样策略</h3><p>全量追踪成本极高。生产推荐混合策略：</p>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">入口层：<span class="number">10</span>-<span class="number">30</span><span class="comment">% 随机采样</span></span><br><span class="line">    ↓</span><br><span class="line">规则层：错误 Trace → <span class="number">100</span><span class="comment">% 保留；延迟 &gt; 1s → 100% 保留</span></span><br><span class="line">    ↓</span><br><span class="line">收集层：异常服务提高采样率，正常流量降低</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>固定采样</td>
+<td>固定比例（10%）</td>
+<td>成本可预测</td>
+</tr>
+<tr>
+<td>概率采样</td>
+<td>根据延迟&#x2F;错误动态调整</td>
+<td>异常优先保留</td>
+</tr>
+<tr>
+<td>头部采样</td>
+<td>Trace 入口决定</td>
+<td>实现简单</td>
+</tr>
+<tr>
+<td>尾部采样</td>
+<td>Trace 完成后根据结果决定</td>
+<td>一定保留异常</td>
+</tr>
+</tbody></table>
+<p>Jaeger 配置：<code>sampler.type: probabilistic; sampler.param: 0.1</code>，关键操作 <code>perOperationStrategies</code> 设 100%。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" rel="tag"># 链路追踪</a>
+              <a href="/tags/Jaeger/" rel="tag"># Jaeger</a>
+              <a href="/tags/SkyWalking/" rel="tag"># SkyWalking</a>
+              <a href="/tags/OpenTelemetry/" rel="tag"># OpenTelemetry</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/distributed-transactions/" rel="prev" title="分布式事务方案对比">
+                  <i class="fa fa-angle-left"></i> 分布式事务方案对比
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/distributed-id/" rel="next" title="分布式 ID 生成方案">
+                  分布式 ID 生成方案 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

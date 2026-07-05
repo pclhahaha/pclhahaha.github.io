@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="B+Tree 擅长点查和范围查，但在写入密集型场景下有痛点：  每次写入需要多次随机 I&#x2F;O（更新 B+Tree 页、页分裂、维护索引） 页分裂时需要移动大量数据 机械磁盘随机写性能极差（~100 IOPS）  LSM-Tree 的核心思想：把随机写变成顺序写。 123456789101112131415161718LSM-Tree 核心架构:                    ┌─">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LSM-Tree 存储引擎">
+<meta property="og:url" content="http://pclhahaha.github.io/lsm-tree/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="B+Tree 擅长点查和范围查，但在写入密集型场景下有痛点：  每次写入需要多次随机 I&#x2F;O（更新 B+Tree 页、页分裂、维护索引） 页分裂时需要移动大量数据 机械磁盘随机写性能极差（~100 IOPS）  LSM-Tree 的核心思想：把随机写变成顺序写。 123456789101112131415161718LSM-Tree 核心架构:                    ┌─">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="Cassandra">
+<meta property="article:tag" content="LSM-Tree">
+<meta property="article:tag" content="LevelDB">
+<meta property="article:tag" content="RocksDB">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/lsm-tree/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/lsm-tree/","path":"lsm-tree/","title":"LSM-Tree 存储引擎"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LSM-Tree 存储引擎 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/lsm-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LSM-Tree 存储引擎 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LSM-Tree 存储引擎
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>B+Tree 擅长点查和范围查，但在<strong>写入密集型</strong>场景下有痛点：</p>
+<ul>
+<li>每次写入需要多次随机 I&#x2F;O（更新 B+Tree 页、页分裂、维护索引）</li>
+<li>页分裂时需要移动大量数据</li>
+<li>机械磁盘随机写性能极差（~100 IOPS）</li>
+</ul>
+<p>LSM-Tree 的核心思想：<strong>把随机写变成顺序写</strong>。</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">LSM-Tree 核心架构:</span><br><span class="line">                    ┌──────────────────────┐</span><br><span class="line">                    │    Write              │</span><br><span class="line">                    │     ↓                 │</span><br><span class="line">                    │  <span class="comment">[WAL (预写日志)]</span>      │  ← 崩溃恢复</span><br><span class="line">                    │     ↓                 │</span><br><span class="line">                    │  <span class="comment">[MemTable (内存树)]</span>   │  ← 一般是 SkipList/红黑树</span><br><span class="line">                    │     ↓ (满了 flush)    │</span><br><span class="line">                    └──────────────────────┘</span><br><span class="line">                              │</span><br><span class="line">────────── 磁盘分层的 SSTable ──────────</span><br><span class="line">      ┌─────────────────────────┐</span><br><span class="line">      │  Level 0: <span class="comment">[SSTable]</span> <span class="comment">[SSTable]</span> <span class="comment">[SSTable]</span> │  ← 各 SSTable 之间可能有重叠</span><br><span class="line">      │  Level 1: <span class="comment">[SSTable────SSTable────SSTable]</span> │  ← 同一层内 key 不重叠</span><br><span class="line">      │  Level 2: <span class="comment">[──────────────────────]</span>       │</span><br><span class="line">      │  ...                                    │</span><br><span class="line">      │  Level N: <span class="comment">[──────────────────────]</span>       │</span><br><span class="line">      └─────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>三层结构：</strong></p>
+<ol>
+<li><strong>MemTable（内存表）</strong>：接收写入请求，数据在内存中排序（跳表&#x2F;红黑树实现），同时为崩溃恢复先写 WAL（Write-Ahead Log）。写操作只是 Append WAL + 插入内存树，速度极快。</li>
+<li><strong>SSTable（Sorted String Table）</strong>：MemTable 满了之后刷到磁盘成为 SSTable——一个不可变的、按键排序的文件。Level 0 的 SSTable 可能相互重叠（因为是多个 MemTable 直接刷下来的），但 Level 1+ 的 SSTable 在同一层内是不重叠的。</li>
+<li><strong>Compaction（合并压缩）</strong>：后台线程不断将低层 SSTable 与高层 SSTable 合并，消除冗余数据（同 key 的旧版本、已删除的标记），保持查询性能。</li>
+</ol>
+<p><strong>写放大 vs 读放大 vs 空间放大：</strong></p>
+<table>
+<thead>
+<tr>
+<th>放大类型</th>
+<th>B+Tree</th>
+<th>LSM-Tree</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>写放大</td>
+<td>~1.1x（就地更新）</td>
+<td>10x-30x（WAL + 多次 Compaction 重复写入）</td>
+</tr>
+<tr>
+<td>读放大</td>
+<td>1（直接定位）</td>
+<td>10x+（需要查 MemTable + 多层 SSTable + BloomFilter）</td>
+</tr>
+<tr>
+<td>空间放大</td>
+<td>~1.1x</td>
+<td>~1.1x（Compaction 及时清理可保持很低）</td>
+</tr>
+</tbody></table>
+<p>LSM-Tree 适合写多读少的场景（时序数据、日志、消息队列），因为写入极快但读取需要访问多层 SSTable。RocksDB 通过 BloomFilter 在每个 SSTable 上做快速排除来降低读放大。</p>
+<p><strong>实际产品映射：</strong></p>
+<ul>
+<li><strong>LevelDB</strong>：Google 开源的 LSM-Tree 实现，MemTable 用跳表</li>
+<li><strong>RocksDB</strong>：Facebook 基于 LevelDB 的增强版，MySQL MyRocks 存储引擎的底层</li>
+<li><strong>Cassandra</strong>：LSM-Tree + 去中心化分布，MemTable + SSTable + Compaction</li>
+<li><strong>HBase</strong>：基于 HDFS 的 LSM-Tree 变体</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
+              <a href="/tags/Cassandra/" rel="tag"># Cassandra</a>
+              <a href="/tags/LSM-Tree/" rel="tag"># LSM-Tree</a>
+              <a href="/tags/LevelDB/" rel="tag"># LevelDB</a>
+              <a href="/tags/RocksDB/" rel="tag"># RocksDB</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/mybatis-cache/" rel="prev" title="MyBatis 一&#x2F;二级缓存">
+                  <i class="fa fa-angle-left"></i> MyBatis 一/二级缓存
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/logical-clocks/" rel="next" title="Lamport 逻辑时钟 &#x2F; Vector Clock">
+                  Lamport 逻辑时钟 / Vector Clock <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

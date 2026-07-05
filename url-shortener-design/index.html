@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 需求分析功能性需求  给定长 URL，生成唯一短链（如 t.cn&#x2F;xK3m9） 访问短链时，重定向到原始长 URL 短链可设置有效期 提供访问统计（点击量、来源、设备）  非功能性需求  低延迟：重定向 &lt; 50ms 高可用：99.99%（重定向链路不能挂） 高并发写入：日均 1 亿条短链生成 短链不可重复，同一长链尽量返回相同短链   1.2 容量估算假设日生成 1 亿条短链： 1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="短链系统设计">
+<meta property="og:url" content="http://pclhahaha.github.io/url-shortener-design/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 需求分析功能性需求  给定长 URL，生成唯一短链（如 t.cn&#x2F;xK3m9） 访问短链时，重定向到原始长 URL 短链可设置有效期 提供访问统计（点击量、来源、设备）  非功能性需求  低延迟：重定向 &lt; 50ms 高可用：99.99%（重定向链路不能挂） 高并发写入：日均 1 亿条短链生成 短链不可重复，同一长链尽量返回相同短链   1.2 容量估算假设日生成 1 亿条短链： 1">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="系统设计">
+<meta property="article:tag" content="Snowflake">
+<meta property="article:tag" content="短链">
+<meta property="article:tag" content="Base62">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/url-shortener-design/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/url-shortener-design/","path":"url-shortener-design/","title":"短链系统设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>短链系统设计 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">1.1 需求分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%AE%B9%E9%87%8F%E4%BC%B0%E7%AE%97"><span class="nav-number">2.</span> <span class="nav-text">1.2 容量估算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E7%9F%AD%E9%93%BE%E7%94%9F%E6%88%90%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">1.3 短链生成算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text">1.4 数据库设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E9%AB%98%E5%B9%B6%E5%8F%91%E4%BC%98%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">1.5 高并发优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-301-vs-302-%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">6.</span> <span class="nav-text">1.6 301 vs 302 重定向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-%E5%AE%8C%E6%95%B4%E6%9E%B6%E6%9E%84"><span class="nav-number">7.</span> <span class="nav-text">1.7 完整架构</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/url-shortener-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="短链系统设计 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          短链系统设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-需求分析"><a href="#1-1-需求分析" class="headerlink" title="1.1 需求分析"></a>1.1 需求分析</h3><p><strong>功能性需求</strong></p>
+<ul>
+<li>给定长 URL，生成唯一短链（如 <code>t.cn/xK3m9</code>）</li>
+<li>访问短链时，重定向到原始长 URL</li>
+<li>短链可设置有效期</li>
+<li>提供访问统计（点击量、来源、设备）</li>
+</ul>
+<p><strong>非功能性需求</strong></p>
+<ul>
+<li>低延迟：重定向 &lt; 50ms</li>
+<li>高可用：99.99%（重定向链路不能挂）</li>
+<li>高并发写入：日均 1 亿条短链生成</li>
+<li>短链不可重复，同一长链尽量返回相同短链</li>
+</ul>
+<hr>
+<h3 id="1-2-容量估算"><a href="#1-2-容量估算" class="headerlink" title="1.2 容量估算"></a>1.2 容量估算</h3><p>假设日生成 1 亿条短链：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">写入 QPS = 100,000,000 / 86,400 ≈ 1,157 QPS</span><br><span class="line"></span><br><span class="line">读取 QPS：假设每条短链平均被点击 10 次</span><br><span class="line"><span class="section">= 1,157 × 10 × 10（历史累积效应）≈ 115,700 QPS</span></span><br><span class="line"></span><br><span class="line">存储：每条记录约 500 Byte（长链 <span class="code">+ 短链 +</span> 元数据 + 索引）</span><br><span class="line">日增 = 1 亿 × 500B ≈ 50 GB</span><br><span class="line">年增 = 50 GB × 365 ≈ 18.25 TB</span><br><span class="line"></span><br><span class="line">带宽：115,700 × 1KB（302 响应体极小）≈ 115 MB/s ≈ 920 Mbps</span><br></pre></td></tr></table></figure>
+
+<p>结论：<strong>系统瓶颈在读，而非写</strong>。读取量是写入量的 100 倍。</p>
+<hr>
+<h3 id="1-3-短链生成算法"><a href="#1-3-短链生成算法" class="headerlink" title="1.3 短链生成算法"></a>1.3 短链生成算法</h3><p>这是短链系统的核心难题。两种主流方案：</p>
+<p><strong>方案 A：Hash + 进制转换</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">1</span>. 对长 URL 计算 MD5/SHA256 → <span class="number">128</span>/<span class="number">256</span> bit 哈希值</span><br><span class="line"><span class="attribute">2</span>. 取前 <span class="number">8</span> 字节（<span class="number">64</span> bit）转为十进制数字</span><br><span class="line"><span class="attribute">3</span>. 十进制转 Base62<span class="meta"> [0-9a-zA-Z] 得到 7 位短码</span></span><br><span class="line"><span class="meta">4. 如果哈希冲突，在长链末尾拼上随机串重新哈希</span></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>不需要发号器，无单点</td>
+<td>哈希冲突率随数据量增大而上升</td>
+</tr>
+<tr>
+<td>签名算法保证相同长链得到相同短链</td>
+<td>无法保证短链长度固定</td>
+</tr>
+</tbody></table>
+<p><strong>方案 B：自增 ID + Base62（推荐）</strong></p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1.</span> 发号器生成全局唯一自增 ID（Snowflake 或数据库自增）</span><br><span class="line"><span class="bullet">2.</span> 将 ID 转为 Base62 编码 → 短链</span><br><span class="line">   例：ID=100000000 → Base62 → &quot;6LAze&quot;</span><br><span class="line"><span class="bullet">3.</span> 用布隆过滤器判重，处理同一长链重复申请</span><br></pre></td></tr></table></figure>
+
+<p>Base62 编码字符集：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span>-<span class="number">9</span>(<span class="number">10</span>) + a-z(<span class="number">26</span>) + A-Z(<span class="number">26</span>) = <span class="number">62</span> 个字符</span><br><span class="line"><span class="symbol">7 </span>位可表示 <span class="number">62</span>^<span class="number">7</span> ≈ <span class="number">3.5</span> 万亿，足够使用</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么不用 UUID？</strong></p>
+<ul>
+<li>UUID 长度为 128 bit，Base62 编码后仍有约 22 位，太长了</li>
+<li>UUID 无序，数据库插入时 B+ 树频繁分裂，性能差</li>
+</ul>
+<hr>
+<h3 id="1-4-数据库设计"><a href="#1-4-数据库设计" class="headerlink" title="1.4 数据库设计"></a>1.4 数据库设计</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> short_url (</span><br><span class="line">    id          <span class="type">BIGINT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT,</span><br><span class="line">    short_code  <span class="type">VARCHAR</span>(<span class="number">8</span>)  <span class="keyword">NOT NULL</span> <span class="keyword">UNIQUE</span>,</span><br><span class="line">    long_url    TEXT        <span class="keyword">NOT NULL</span>,</span><br><span class="line">    long_hash   <span class="type">CHAR</span>(<span class="number">32</span>)    <span class="keyword">NOT NULL</span>,          <span class="comment">-- MD5 前 128 位</span></span><br><span class="line">    expires_at  DATETIME    <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    created_at  DATETIME    <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span>,</span><br><span class="line">    INDEX idx_long_hash (long_hash),</span><br><span class="line">    INDEX idx_expires_at (expires_at)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE TABLE</span> access_log (</span><br><span class="line">    id          <span class="type">BIGINT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT,</span><br><span class="line">    short_code  <span class="type">VARCHAR</span>(<span class="number">8</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    user_ip     <span class="type">VARCHAR</span>(<span class="number">45</span>),</span><br><span class="line">    user_agent  <span class="type">VARCHAR</span>(<span class="number">512</span>),</span><br><span class="line">    referer     <span class="type">VARCHAR</span>(<span class="number">1024</span>),</span><br><span class="line">    accessed_at DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span>,</span><br><span class="line">    INDEX idx_sc_at (short_code, accessed_at)</span><br><span class="line">) <span class="keyword">PARTITION</span> <span class="keyword">BY</span> <span class="keyword">RANGE</span> (TO_DAYS(accessed_at)) (...);</span><br></pre></td></tr></table></figure>
+
+<p><strong>设计要点</strong>：</p>
+<ul>
+<li><code>long_hash</code> 索引用于长链去重：新增长链时先查 <code>long_hash</code>，命中则直接返回已有短链</li>
+<li><code>access_log</code> 按天分区，定期归档&#x2F;删除，避免单表过大</li>
+<li>用 <code>BIGINT</code> 而非 <code>INT</code>：INT 上限约 21 亿，日增 1 亿条不到一年就会爆</li>
+</ul>
+<p><strong>布隆过滤器的使用场景</strong>：</p>
+<ul>
+<li>需求：对同一长链，每次都返回相同短链</li>
+<li>做法：每次生成短链后，在布隆过滤器写入 <code>long_hash</code></li>
+<li>缺点：布隆过滤器判重可能有误判（False Positive），命中后仍需查 DB 确认</li>
+</ul>
+<hr>
+<h3 id="1-5-高并发优化"><a href="#1-5-高并发优化" class="headerlink" title="1.5 高并发优化"></a>1.5 高并发优化</h3><p><strong>缓存策略</strong></p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">             ┌──────────┐</span><br><span class="line">用户请求 ──→ │  CDN/LB  │</span><br><span class="line">             └────┬─────┘</span><br><span class="line">                  ↓</span><br><span class="line">             ┌──────────┐</span><br><span class="line">             │ Redis 缓存│ ← 热点短链（<span class="meta">TTL</span> <span class="number">7</span> 天）</span><br><span class="line">             └────┬─────┘</span><br><span class="line">          缓存未命中</span><br><span class="line">                  ↓</span><br><span class="line">             ┌──────────┐</span><br><span class="line">             │  MySQL    │ ← 全量数据</span><br><span class="line">             └──────────┘</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Redis Key：<code>shortlink:&#123;short_code&#125;</code> → Value：长 URL JSON</li>
+<li>缓存预热：定时任务把即将过期的热门短链重新加载</li>
+<li>缓存穿透：布隆过滤器过滤不存在的短链，避免直接打 DB</li>
+</ul>
+<p><strong>预生成策略</strong></p>
+<ul>
+<li>写入高峰前，离线批量预生成一批短链放入”号池”</li>
+<li>线上直接从号池取号，写入延迟从 50ms 降至 5ms</li>
+<li>号池低于阈值时，异步补充</li>
+</ul>
+<p><strong>发号器选择</strong></p>
+<ul>
+<li>单机：数据库自增 ID（性能上限约 3000 QPS，不够用）</li>
+<li>分布式：Snowflake（Twitter 开源，64 bit：1+41+10+12）</li>
+<li>号段模式：每次从 DB 取一批号缓存在内存中（美团 Leaf）</li>
+<li>推荐：<strong>号段模式</strong>，兼顾性能与可靠性</li>
+</ul>
+<hr>
+<h3 id="1-6-301-vs-302-重定向"><a href="#1-6-301-vs-302-重定向" class="headerlink" title="1.6 301 vs 302 重定向"></a>1.6 301 vs 302 重定向</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>301（永久重定向）</th>
+<th>302（临时重定向）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>浏览器行为</td>
+<td>本地缓存，后续直接跳转</td>
+<td>每次都请求短链服务</td>
+</tr>
+<tr>
+<td>服务端压力</td>
+<td>低（只有首次请求）</td>
+<td>高（每次都要处理）</td>
+</tr>
+<tr>
+<td>统计准确性</td>
+<td>无法统计后续点击</td>
+<td>每次点击都有记录</td>
+</tr>
+<tr>
+<td>修改灵活性</td>
+<td>无法修改目标 URL</td>
+<td>可以随时修改</td>
+</tr>
+</tbody></table>
+<p><strong>选择建议</strong>：</p>
+<ul>
+<li>需要统计点击量 → <strong>302</strong></li>
+<li>不需要统计，追求极致性能 → <strong>301</strong></li>
+<li>大多数生产系统选择 <strong>302</strong>，因为数据价值大于性能损失</li>
+</ul>
+<hr>
+<h3 id="1-7-完整架构"><a href="#1-7-完整架构" class="headerlink" title="1.7 完整架构"></a>1.7 完整架构</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">                              ┌─────────────────────┐</span><br><span class="line">用户 ──→─ DNS ──→─ CDN ──→── │  API Gateway        │</span><br><span class="line">                              │  ┌───────┐ ┌──────┐ │</span><br><span class="line">                              │  │限流    │ │鉴权   │ │</span><br><span class="line">                              │  └───────┘ └──────┘ │</span><br><span class="line">                              └─────────┬───────────┘</span><br><span class="line">                                        │</span><br><span class="line">                        ┌───────────────┼───────────────┐</span><br><span class="line">                        ↓               ↓               ↓</span><br><span class="line">                 ┌────────────┐ ┌────────────┐ ┌────────────┐</span><br><span class="line">                 │ 短链生成服务 │ │ 重定向服务  │ │ 统计服务    │</span><br><span class="line">                 │ (Focus: 写) │ │ (Focus: 读) │ │ (异步消费)  │</span><br><span class="line">                 └──────┬─────┘ └──────┬─────┘ └──────┬─────┘</span><br><span class="line">                        │              │              │</span><br><span class="line">                        ↓              ↓              ↓</span><br><span class="line">                 ┌────────────┐ ┌───────────┐ ┌────────────┐</span><br><span class="line">                 │  Leaf 发号器│ │Redis Cluster│ │   Kafka    │</span><br><span class="line">                 └────────────┘ └─────┬─────┘ └──────┬─────┘</span><br><span class="line">                                      │              │</span><br><span class="line">                                      ↓              ↓</span><br><span class="line">                                ┌──────────────────────────┐</span><br><span class="line">                                │     MySQL (主从 + 分区)    │</span><br><span class="line">                                └──────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 系统设计</a>
+              <a href="/tags/Snowflake/" rel="tag"># Snowflake</a>
+              <a href="/tags/%E7%9F%AD%E9%93%BE/" rel="tag"># 短链</a>
+              <a href="/tags/Base62/" rel="tag"># Base62</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/web-vulnerabilities/" rel="prev" title="常见 Web 漏洞攻防">
+                  <i class="fa fa-angle-left"></i> 常见 Web 漏洞攻防
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/unit-testing/" rel="next" title="单元测试金字塔">
+                  单元测试金字塔 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

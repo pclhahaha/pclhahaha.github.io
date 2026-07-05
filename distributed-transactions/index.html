@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="分布式事务泛指跨多个节点的事务操作，目标是保证跨节点的数据一致性。传统单机数据库的 ACID 事务在分布式环境下无法直接使用，需要方案升级。 1.1 2PC（两阶段提交）流程2PC 引入协调者（Coordinator），将事务分为两个阶段： 阶段一 Prepare（投票阶段）：  协调者向所有参与者发送 prepare 请求 参与者执行事务操作（但不提交），记录 undo 和 redo 日志 参与">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式事务方案对比">
+<meta property="og:url" content="http://pclhahaha.github.io/distributed-transactions/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="分布式事务泛指跨多个节点的事务操作，目标是保证跨节点的数据一致性。传统单机数据库的 ACID 事务在分布式环境下无法直接使用，需要方案升级。 1.1 2PC（两阶段提交）流程2PC 引入协调者（Coordinator），将事务分为两个阶段： 阶段一 Prepare（投票阶段）：  协调者向所有参与者发送 prepare 请求 参与者执行事务操作（但不提交），记录 undo 和 redo 日志 参与">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="分布式事务">
+<meta property="article:tag" content="2PC">
+<meta property="article:tag" content="TCC">
+<meta property="article:tag" content="Saga">
+<meta property="article:tag" content="Seata">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/distributed-transactions/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/distributed-transactions/","path":"distributed-transactions/","title":"分布式事务方案对比"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式事务方案对比 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2PC%EF%BC%88%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">1.1 2PC（两阶段提交）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%BA%E9%99%B7"><span class="nav-number">1.2.</span> <span class="nav-text">缺陷</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-3PC%EF%BC%88%E4%B8%89%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">1.2 3PC（三阶段提交）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B"><span class="nav-number">2.1.</span> <span class="nav-text">改进</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%BA%E9%99%B7-1"><span class="nav-number">2.2.</span> <span class="nav-text">缺陷</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-TCC%EF%BC%88Try-Confirm-Cancel%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">1.3 TCC（Try-Confirm-Cancel）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E5%AE%9E%E7%8E%B0%EF%BC%9ATCC-%E4%BA%8B%E5%8A%A1%E5%8D%8F%E8%B0%83%E5%99%A8"><span class="nav-number">3.1.</span> <span class="nav-text">完整实现：TCC 事务协调器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-Saga"><span class="nav-number">4.</span> <span class="nav-text">1.4 Saga</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%8F%E8%B0%83%E5%BC%8F-Saga-%E5%BC%95%E6%93%8E%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.1.</span> <span class="nav-text">协调式 Saga 引擎实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E6%8E%92%E5%BC%8F-Saga%EF%BC%88%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">编排式 Saga（事件驱动）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8-%E6%9C%80%E5%A4%A7%E5%8A%AA%E5%8A%9B%E9%80%9A%E7%9F%A5"><span class="nav-number">5.</span> <span class="nav-text">1.5 本地消息表 + 最大努力通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-AT-%E6%A8%A1%E5%BC%8F%EF%BC%88Seata-%E5%8E%9F%E7%90%86%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">1.6 AT 模式（Seata 原理）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-%E5%90%84%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%A1%A8"><span class="nav-number">7.</span> <span class="nav-text">1.7 各方案对比表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-%E7%94%9F%E4%BA%A7%E5%AE%9E%E8%B7%B5%E8%A6%81%E7%82%B9"><span class="nav-number">8.</span> <span class="nav-text">1.8 生产实践要点</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/distributed-transactions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式事务方案对比 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式事务方案对比
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>分布式事务泛指跨多个节点的事务操作，目标是保证跨节点的数据一致性。传统单机数据库的 ACID 事务在分布式环境下无法直接使用，需要方案升级。</p>
+<h3 id="1-1-2PC（两阶段提交）"><a href="#1-1-2PC（两阶段提交）" class="headerlink" title="1.1 2PC（两阶段提交）"></a>1.1 2PC（两阶段提交）</h3><h4 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h4><p>2PC 引入协调者（Coordinator），将事务分为两个阶段：</p>
+<p><strong>阶段一 Prepare（投票阶段）</strong>：</p>
+<ol>
+<li>协调者向所有参与者发送 prepare 请求</li>
+<li>参与者执行事务操作（但不提交），记录 undo 和 redo 日志</li>
+<li>参与者返回 YES（可以提交）或 NO（需要回滚）</li>
+</ol>
+<p><strong>阶段二 Commit（提交阶段）</strong>：</p>
+<ol>
+<li>若所有参与者返回 YES → 协调者发 commit 请求，参与者提交事务并释放锁</li>
+<li>若任一参与者返回 NO 或超时 → 协调者发 rollback 请求，参与者回滚并释放锁</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2PC 协调者伪代码</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">twoPhaseCommit</span><span class="params">(List&lt;Participant&gt; participants)</span> &#123;</span><br><span class="line">    <span class="comment">// Phase 1: Prepare</span></span><br><span class="line">    <span class="keyword">for</span> (Participant p : participants) &#123;</span><br><span class="line">        <span class="type">boolean</span> <span class="variable">ok</span> <span class="operator">=</span> p.prepare();</span><br><span class="line">        <span class="keyword">if</span> (!ok) &#123;</span><br><span class="line">            rollbackAll(participants);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Phase 2: Commit</span></span><br><span class="line">    <span class="keyword">for</span> (Participant p : participants) &#123;</span><br><span class="line">        p.commit();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="缺陷"><a href="#缺陷" class="headerlink" title="缺陷"></a>缺陷</h4><table>
+<thead>
+<tr>
+<th>缺陷</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>同步阻塞</strong></td>
+<td>Prepare 阶段参与者锁定资源后等待协调者指令，期间其他事务无法访问这些资源</td>
+</tr>
+<tr>
+<td><strong>单点故障</strong></td>
+<td>协调者宕机后，参与者无法知道应该 commit 还是 rollback，陷入”阻塞等待”</td>
+</tr>
+<tr>
+<td><strong>脑裂</strong></td>
+<td>commit&#x2F;rollback 阶段，部分参与者收到指令、部分未收到，数据不一致</td>
+</tr>
+<tr>
+<td><strong>性能差</strong></td>
+<td>所有参与者必须串行等待，任一慢节点拖慢整个事务</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-3PC（三阶段提交）"><a href="#1-2-3PC（三阶段提交）" class="headerlink" title="1.2 3PC（三阶段提交）"></a>1.2 3PC（三阶段提交）</h3><p>3PC 在 2PC 基础上增加了一个 CanCommit 阶段，并为参与者和协调者分别引入超时机制：</p>
+<ol>
+<li><strong>CanCommit</strong>：协调者询问参与者”是否可以提交”（不执行任何操作，不持锁）</li>
+<li><strong>PreCommit</strong>：协调者发送预提交，参与者执行事务但不提交</li>
+<li><strong>DoCommit</strong>：协调者发送提交，参与者提交或超时自动提交</li>
+</ol>
+<h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><ul>
+<li>引入超时机制：参与者等待超时后<strong>自动提交</strong>（假设协调者已同意），减少阻塞时间</li>
+<li>CanCommit 阶段降低不必要持有的锁时间</li>
+</ul>
+<h4 id="缺陷-1"><a href="#缺陷-1" class="headerlink" title="缺陷"></a>缺陷</h4><ul>
+<li><strong>网络分区问题未根本解决</strong>：如果 PreCommit 后发生网络分区，部分参与者因超时自动提交、部分收到回滚——数据依然不一致</li>
+<li>多一轮通信开销，在高可用系统中性能反而不如 2PC</li>
+<li>在现实中几乎不被使用，更像一个学术上的改进尝试</li>
+</ul>
+<h3 id="1-3-TCC（Try-Confirm-Cancel）"><a href="#1-3-TCC（Try-Confirm-Cancel）" class="headerlink" title="1.3 TCC（Try-Confirm-Cancel）"></a>1.3 TCC（Try-Confirm-Cancel）</h3><p>TCC 是二阶段提交在业务层的变体，将事务拆分为三个操作：</p>
+<ul>
+<li><strong>Try</strong>：预留资源（锁定库存、冻结余额）</li>
+<li><strong>Confirm</strong>：确认提交（扣减库存、扣款）</li>
+<li><strong>Cancel</strong>：取消释放（释放库存、解冻余额）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TCC 接口示例</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">TccService</span> &#123;</span><br><span class="line">    <span class="comment">// Try: 冻结库存</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">tryFreezeInventory</span><span class="params">(String orderId, String skuId, <span class="type">int</span> count)</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Confirm: 确认扣减</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">confirmDeductInventory</span><span class="params">(String orderId, String skuId)</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Cancel: 释放冻结</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">cancelReleaseInventory</span><span class="params">(String orderId, String skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="完整实现：TCC-事务协调器"><a href="#完整实现：TCC-事务协调器" class="headerlink" title="完整实现：TCC 事务协调器"></a>完整实现：TCC 事务协调器</h4><figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">          ┌─────────────┐</span><br><span class="line">          │ <span class="variable">TCC</span> 协调器   │</span><br><span class="line">          │ <span class="punctuation">(</span>统筹状态机<span class="punctuation">)</span>  │</span><br><span class="line">          └──────┬──────┘</span><br><span class="line">                 │</span><br><span class="line">    ┌────────────┼────────────┐</span><br><span class="line">    │            │            │</span><br><span class="line"><span class="punctuation">[</span>库存服务<span class="punctuation">]</span>   <span class="punctuation">[</span>账户服务<span class="punctuation">]</span>   <span class="punctuation">[</span>订单服务<span class="punctuation">]</span></span><br><span class="line"><span class="variable">Try</span><span class="operator">/</span><span class="built_in">Confirm</span>  <span class="variable">Try</span><span class="operator">/</span><span class="built_in">Confirm</span>  <span class="variable">Try</span><span class="operator">/</span><span class="built_in">Confirm</span></span><br><span class="line"><span class="operator">/</span><span class="built_in">Cancel</span>      <span class="operator">/</span><span class="built_in">Cancel</span>      <span class="operator">/</span><span class="built_in">Cancel</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>事务日志表</strong>——记录每个 TCC 事务的状态：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> tcc_transaction (</span><br><span class="line">    tcc_id      <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">PRIMARY KEY</span>,   <span class="comment">-- 全局事务 ID</span></span><br><span class="line">    status      TINYINT <span class="keyword">DEFAULT</span> <span class="number">0</span>,         <span class="comment">-- 0-进行中 1-已确认 2-已取消</span></span><br><span class="line">    create_time DATETIME,</span><br><span class="line">    update_time DATETIME</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE TABLE</span> tcc_branch (</span><br><span class="line">    branch_id   <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">PRIMARY KEY</span>,</span><br><span class="line">    tcc_id      <span class="type">VARCHAR</span>(<span class="number">64</span>),</span><br><span class="line">    service     <span class="type">VARCHAR</span>(<span class="number">64</span>),               <span class="comment">-- 服务名</span></span><br><span class="line">    status      TINYINT <span class="keyword">DEFAULT</span> <span class="number">0</span>,         <span class="comment">-- 0-TRY 1-CONFIRM 2-CANCEL</span></span><br><span class="line">    retry_count <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    INDEX idx_tcc (tcc_id)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><strong>协调器核心逻辑</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TccCoordinator</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 阶段1：Try 所有分支</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">tryAll</span><span class="params">(String tccId, List&lt;TccCall&gt; calls)</span> &#123;</span><br><span class="line">        <span class="comment">// 记录全局事务</span></span><br><span class="line">        logStart(tccId);</span><br><span class="line">        </span><br><span class="line">        List&lt;TccCall&gt; succeeded = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (TccCall call : calls) &#123;</span><br><span class="line">                <span class="keyword">if</span> (call.<span class="keyword">try</span>()) &#123;</span><br><span class="line">                    succeeded.add(call);</span><br><span class="line">                    logBranch(tccId, call.getBranchId(), BRANCH_TRY);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TccException</span>(<span class="string">&quot;Try failed: &quot;</span> + call.getBranchId());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 全部 Try 成功 → Confirm 所有</span></span><br><span class="line">            confirmAll(tccId, calls);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="comment">// 任一 Try 失败 → Cancel 已成功的分支</span></span><br><span class="line">            cancelAll(tccId, succeeded);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 阶段2a：Confirm 所有分支</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">confirmAll</span><span class="params">(String tccId, List&lt;TccCall&gt; calls)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (TccCall call : calls) &#123;</span><br><span class="line">            retryUntilSuccess(() -&gt; call.confirm(), tccId, call.getBranchId());</span><br><span class="line">        &#125;</span><br><span class="line">        logFinish(tccId, STATUS_CONFIRMED);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 阶段2b：Cancel 已 Try 成功的分支</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">cancelAll</span><span class="params">(String tccId, List&lt;TccCall&gt; succeeded)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (TccCall call : succeeded) &#123;</span><br><span class="line">            retryUntilSuccess(() -&gt; call.cancel(), tccId, call.getBranchId());</span><br><span class="line">        &#125;</span><br><span class="line">        logFinish(tccId, STATUS_CANCELLED);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 重试直到成功（Confirm/Cancel 必须成功）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">retryUntilSuccess</span><span class="params">(Runnable op, String tccId, String branchId)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">retries</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (retries &lt; MAX_RETRIES) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                op.run(); <span class="keyword">return</span>;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                retries++;</span><br><span class="line">                sleep(Math.min(<span class="number">1000L</span> &lt;&lt; retries, <span class="number">60000L</span>));  <span class="comment">// 指数退避，最大 60s</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        alertHuman(tccId, branchId);  <span class="comment">// 最终失败 → 人工介入</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键挑战及实现</strong>：</p>
+<p><strong>空回滚（Empty Rollback）</strong>：Try 因网络超时未到达服务端，但协调者超时判定需要 Cancel。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 防悬挂/防空回滚实现</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">InventoryTccService</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">tryFreezeInventory</span><span class="params">(String orderId, String skuId, <span class="type">int</span> count)</span> &#123;</span><br><span class="line">        <span class="comment">// 1. 先检查是否已被 Cancel（防悬挂）</span></span><br><span class="line">        <span class="keyword">if</span> (isCancelled(orderId)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 2. 幂等检查</span></span><br><span class="line">        <span class="keyword">if</span> (isTried(orderId)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 3. 执行业务 + 记录状态（同一本地事务）</span></span><br><span class="line">        tccLogMapper.insert(orderId, <span class="string">&quot;TRY&quot;</span>);  <span class="comment">// 记录 Try 状态</span></span><br><span class="line">        inventoryMapper.freeze(skuId, count);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">cancelReleaseInventory</span><span class="params">(String orderId, String skuId)</span> &#123;</span><br><span class="line">        <span class="comment">// 1. 幂等检查</span></span><br><span class="line">        <span class="keyword">if</span> (isCancelled(orderId)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 2. 空回滚处理：如果从未 Try，也记录 Cancel 并返回成功</span></span><br><span class="line">        <span class="keyword">if</span> (!isTried(orderId)) &#123;</span><br><span class="line">            tccLogMapper.insert(orderId, <span class="string">&quot;CANCEL&quot;</span>);  <span class="comment">// 防悬挂标记</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 3. 执行回滚 + 记录状态</span></span><br><span class="line">        inventoryMapper.unfreeze(skuId, getFrozenCount(orderId));</span><br><span class="line">        tccLogMapper.updateStatus(orderId, <span class="string">&quot;CANCEL&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-Saga"><a href="#1-4-Saga" class="headerlink" title="1.4 Saga"></a>1.4 Saga</h3><p>Saga 的核心是”长事务拆为一组有序的本地事务 + 补偿事务”。与 TCC 不同，Saga 的本地事务直接提交（不先 Try），失败时执行补偿回滚。</p>
+<h4 id="协调式-Saga-引擎实现"><a href="#协调式-Saga-引擎实现" class="headerlink" title="协调式 Saga 引擎实现"></a>协调式 Saga 引擎实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SagaOrchestrator</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 定义 Saga 步骤</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">executeOrderSaga</span><span class="params">(String orderId, OrderRequest request)</span> &#123;</span><br><span class="line">        <span class="type">Saga</span> <span class="variable">saga</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Saga</span>(orderId);</span><br><span class="line">        </span><br><span class="line">        saga.addStep(<span class="string">&quot;createOrder&quot;</span>, </span><br><span class="line">            () -&gt; orderService.createOrder(request),           <span class="comment">// 正向</span></span><br><span class="line">            () -&gt; orderService.cancelOrder(request)            <span class="comment">// 补偿</span></span><br><span class="line">        );</span><br><span class="line">        </span><br><span class="line">        saga.addStep(<span class="string">&quot;reserveInventory&quot;</span>,</span><br><span class="line">            () -&gt; inventoryService.deduct(request.getSkuId(), request.getCount()),</span><br><span class="line">            () -&gt; inventoryService.rollback(request.getSkuId(), request.getCount())</span><br><span class="line">        );</span><br><span class="line">        </span><br><span class="line">        saga.addStep(<span class="string">&quot;processPayment&quot;</span>,</span><br><span class="line">            () -&gt; paymentService.charge(request.getAmount()),</span><br><span class="line">            () -&gt; paymentService.refund(request.getAmount())</span><br><span class="line">        );</span><br><span class="line">        </span><br><span class="line">        saga.execute();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Saga 内部状态机</strong>：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> ┌────────┐</span><br><span class="line"> │ <span class="literal">START</span>  │</span><br><span class="line"> └───┬────┘</span><br><span class="line">     │</span><br><span class="line">┌────▼────┐    失败     ┌─────────┐</span><br><span class="line">│ EXECUTING│───────────→│COMPENSATING│</span><br><span class="line">└────┬────┘            └─────┬─────┘</span><br><span class="line">     │ 成功                   │</span><br><span class="line">┌────▼────┐             ┌────▼────┐</span><br><span class="line">│COMPLETED│             │ ABORTED │</span><br><span class="line">└─────────┘             └─────────┘</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Saga</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;SagaStep&gt; steps = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">state</span> <span class="operator">=</span> <span class="string">&quot;START&quot;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">()</span> &#123;</span><br><span class="line">        state = <span class="string">&quot;EXECUTING&quot;</span>;</span><br><span class="line">        List&lt;Integer&gt; completedSteps = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; steps.size(); i++) &#123;</span><br><span class="line">                steps.get(i).execute();      <span class="comment">// 执行正向操作</span></span><br><span class="line">                completedSteps.add(i);       <span class="comment">// 记录已完成的步骤</span></span><br><span class="line">                persistState(completedSteps); <span class="comment">// 持久化到 DB</span></span><br><span class="line">            &#125;</span><br><span class="line">            state = <span class="string">&quot;COMPLETED&quot;</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            state = <span class="string">&quot;COMPENSATING&quot;</span>;</span><br><span class="line">            <span class="comment">// 逆序执行补偿（后执行的先回滚）</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> completedSteps.size() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">                steps.get(completedSteps.get(i)).compensate();</span><br><span class="line">            &#125;</span><br><span class="line">            state = <span class="string">&quot;ABORTED&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Saga 日志表</strong>——支持宕机恢复：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> saga_log (</span><br><span class="line">    saga_id     <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">PRIMARY KEY</span>,</span><br><span class="line">    step_index  <span class="type">INT</span>,                      <span class="comment">-- 当前执行到第几步</span></span><br><span class="line">    status      TINYINT,                  <span class="comment">-- 0-进行中 1-已完成 2-已终止</span></span><br><span class="line">    step_status <span class="type">VARCHAR</span>(<span class="number">1024</span>),            <span class="comment">-- JSON: [&#123;&quot;step&quot;:0,&quot;ok&quot;:true&#125;,&#123;&quot;step&quot;:1,&quot;ok&quot;:false&#125;]</span></span><br><span class="line">    payload     TEXT,                     <span class="comment">-- 请求参数，用于恢复时重试</span></span><br><span class="line">    create_time DATETIME</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><strong>宕机恢复</strong>：Saga 管理器启动时扫描状态为”进行中”的记录，根据 step_status 判断从哪一步继续执行补偿——被中断的事务如果有部分成功执行的步骤，从最后成功的步骤之后开始补偿。</p>
+<h4 id="编排式-Saga（事件驱动）"><a href="#编排式-Saga（事件驱动）" class="headerlink" title="编排式 Saga（事件驱动）"></a>编排式 Saga（事件驱动）</h4><p>不需要中心协调器，各服务通过事件总线通信：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">订单服务 → <span class="selector-attr">[OrderCreated]</span> → 库存服务 → <span class="selector-attr">[InventoryReserved]</span> → 支付服务 → <span class="selector-attr">[PaymentCompleted]</span></span><br><span class="line">                │ 失败                    │ 失败                    │ 失败</span><br><span class="line">                ↓                         ↓                        ↓</span><br><span class="line">          <span class="selector-attr">[OrderFailed]</span>           <span class="selector-attr">[InventoryRelease]</span>        <span class="selector-attr">[PaymentRefund]</span></span><br></pre></td></tr></table></figure>
+
+<p>各服务监听上游事件并执行自己的逻辑，失败时发布补偿事件。优点是无中心协调器、高度解耦；缺点是流程分散难以追踪——需要分布式链路追踪辅助调试。”</p>
+<h3 id="1-5-本地消息表-最大努力通知"><a href="#1-5-本地消息表-最大努力通知" class="headerlink" title="1.5 本地消息表 + 最大努力通知"></a>1.5 本地消息表 + 最大努力通知</h3><p>这是一种通过消息中间件实现最终一致性的方案：</p>
+<p><strong>核心思路</strong>：</p>
+<ol>
+<li>业务操作和消息记录在<strong>同一个本地事务</strong>中写入（本地消息表与业务表同库）</li>
+<li>后台任务轮询消息表，将消息投递到消息队列</li>
+<li>消费者处理消息，通过 ACK 确认消费</li>
+<li>对于需要通知结果的场景，生产方提供查询接口，消费方处理后回调通知</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 本地消息表结构</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> local_message (</span><br><span class="line">    id          <span class="type">BIGINT</span> <span class="keyword">PRIMARY KEY</span>,</span><br><span class="line">    business_id <span class="type">VARCHAR</span>(<span class="number">64</span>),</span><br><span class="line">    topic       <span class="type">VARCHAR</span>(<span class="number">128</span>),</span><br><span class="line">    payload     TEXT,</span><br><span class="line">    status      TINYINT <span class="keyword">DEFAULT</span> <span class="number">0</span>,  <span class="comment">-- 0待发送 1已发送 2已消费</span></span><br><span class="line">    retry_count <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    create_time DATETIME,</span><br><span class="line">    update_time DATETIME</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 业务操作 + 消息写入在同一事务中</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">placeOrder</span><span class="params">(Order order)</span> &#123;</span><br><span class="line">    orderMapper.insert(order);                    <span class="comment">// 业务操作</span></span><br><span class="line">    messageMapper.insert(buildMessage(order));    <span class="comment">// 消息记录</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>最大努力通知</strong>：投递方尽力通知，不保证 100% 到达；如果通知失败，依赖消费方的查询机制来获取最终结果。适用于对一致性要求不是 100% 的场景（如支付结果回调）。</p>
+<h3 id="1-6-AT-模式（Seata-原理）"><a href="#1-6-AT-模式（Seata-原理）" class="headerlink" title="1.6 AT 模式（Seata 原理）"></a>1.6 AT 模式（Seata 原理）</h3><p>Seata 的 AT 模式是一种无侵入的分布式事务方案，核心机制包括：</p>
+<ol>
+<li><strong>全局事务</strong>：由 TM（Transaction Manager）发起，TC（Transaction Coordinator）协调</li>
+<li><strong>分支事务</strong>：每个参与的 RM（Resource Manager）注册分支事务</li>
+<li><strong>两阶段提交</strong>：<ul>
+<li><strong>一阶段</strong>：各 RM 执行 SQL 并提交本地事务，同时记录 <strong>undo_log（前镜像 + 后镜像）</strong></li>
+<li><strong>二阶段-提交</strong>：TC 通知全局提交，各 RM 异步删除 undo_log</li>
+<li><strong>二阶段-回滚</strong>：TC 通知全局回滚，各 RM 根据 undo_log 生成反向 SQL 并执行</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- Seata undo_log 表结构</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> undo_log (</span><br><span class="line">    id            <span class="type">BIGINT</span> AUTO_INCREMENT <span class="keyword">PRIMARY KEY</span>,</span><br><span class="line">    branch_id     <span class="type">BIGINT</span>,</span><br><span class="line">    xid           <span class="type">VARCHAR</span>(<span class="number">100</span>),</span><br><span class="line">    context       <span class="type">VARCHAR</span>(<span class="number">128</span>),</span><br><span class="line">    rollback_info LONGBLOB,</span><br><span class="line">    log_status    <span class="type">INT</span>,</span><br><span class="line">    log_created   DATETIME,</span><br><span class="line">    log_modified  DATETIME</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键设计</strong>：</p>
+<ul>
+<li>undo_log 与业务操作在同一个本地事务中提交，保证原子性</li>
+<li>使用全局锁防止二阶段回滚期间数据被修改</li>
+<li>一阶段本地事务的提交释放了数据库锁，极大减少了 2PC 的锁持有时间</li>
+<li>前后镜像对比生成反向 SQL，不需要业务方编写补偿逻辑</li>
+</ul>
+<h3 id="1-7-各方案对比表"><a href="#1-7-各方案对比表" class="headerlink" title="1.7 各方案对比表"></a>1.7 各方案对比表</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>一致性</th>
+<th>性能</th>
+<th>侵入性</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2PC</td>
+<td>强一致</td>
+<td>低</td>
+<td>低</td>
+<td>短事务、跨库操作</td>
+</tr>
+<tr>
+<td>3PC</td>
+<td>强一致</td>
+<td>低</td>
+<td>低</td>
+<td>理论模型，生产极少使用</td>
+</tr>
+<tr>
+<td>TCC</td>
+<td>最终一致</td>
+<td>中</td>
+<td>高（需实现Try&#x2F;Confirm&#x2F;Cancel）</td>
+<td>资金扣减、库存锁定</td>
+</tr>
+<tr>
+<td>Saga 编排</td>
+<td>最终一致</td>
+<td>中高</td>
+<td>中</td>
+<td>长事务、跨服务流程</td>
+</tr>
+<tr>
+<td>Saga 协调</td>
+<td>最终一致</td>
+<td>中</td>
+<td>中</td>
+<td>流程可控的长事务</td>
+</tr>
+<tr>
+<td>本地消息表</td>
+<td>最终一致</td>
+<td>高</td>
+<td>低</td>
+<td>异步解耦、非实时一致性</td>
+</tr>
+<tr>
+<td>最大努力通知</td>
+<td>最终一致</td>
+<td>高</td>
+<td>低</td>
+<td>回调通知、弱依赖</td>
+</tr>
+<tr>
+<td>Seata AT</td>
+<td>弱一致&#x2F;最终一致</td>
+<td>中高</td>
+<td>低（无侵入）</td>
+<td>希望低改造成本的场景</td>
+</tr>
+</tbody></table>
+<h3 id="1-8-生产实践要点"><a href="#1-8-生产实践要点" class="headerlink" title="1.8 生产实践要点"></a>1.8 生产实践要点</h3><ol>
+<li><strong>不要在所有场景使用分布式事务</strong>——优先考虑业务重构（如合并服务减少跨库操作），实在不行再上分布式事务</li>
+<li><strong>幂等性是分布式事务的基石</strong>——所有 RPC 调用、消息消费、补偿操作都必须设计为幂等</li>
+<li><strong>事务反查机制</strong>：TCC 应提供反查接口，Saga 的协调器需要能查询分支事务状态</li>
+<li><strong>监控与告警</strong>：对所有分布式事务建立全链路追踪和异常告警，及时发现悬挂、空回滚、超时等问题</li>
+<li><strong>避免长事务</strong>：事务跨度越长，锁定资源越久，失败概率越大——长事务应拆分为 Saga</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" rel="tag"># 分布式事务</a>
+              <a href="/tags/2PC/" rel="tag"># 2PC</a>
+              <a href="/tags/TCC/" rel="tag"># TCC</a>
+              <a href="/tags/Saga/" rel="tag"># Saga</a>
+              <a href="/tags/Seata/" rel="tag"># Seata</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/dns-system/" rel="prev" title="DNS 域名系统">
+                  <i class="fa fa-angle-left"></i> DNS 域名系统
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/distributed-tracing/" rel="next" title="分布式链路追踪">
+                  分布式链路追踪 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

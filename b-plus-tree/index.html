@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="这是后端工程师最需要深入理解的数据结构——没有之一。InnoDB 的索引组织、查询性能、磁盘 I&#x2F;O 模型全都建立在一棵 B+Tree 上。 为什么是 B+Tree 而不是 BST&#x2F;红黑树？答案关键词：磁盘 I&#x2F;O。 数据库索引是存在磁盘上的，数据量远超内存容量。一次磁盘寻道约 5-10ms，一次内存访问约 100ns——差距是 5 万到 10 万倍。对于数据库来说，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="B+Tree 深度解析">
+<meta property="og:url" content="http://pclhahaha.github.io/b-plus-tree/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="这是后端工程师最需要深入理解的数据结构——没有之一。InnoDB 的索引组织、查询性能、磁盘 I&#x2F;O 模型全都建立在一棵 B+Tree 上。 为什么是 B+Tree 而不是 BST&#x2F;红黑树？答案关键词：磁盘 I&#x2F;O。 数据库索引是存在磁盘上的，数据量远超内存容量。一次磁盘寻道约 5-10ms，一次内存访问约 100ns——差距是 5 万到 10 万倍。对于数据库来说，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="B+Tree">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="索引">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/b-plus-tree/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/b-plus-tree/","path":"b-plus-tree/","title":"B+Tree 深度解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>B+Tree 深度解析 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-B-Tree-%E8%80%8C%E4%B8%8D%E6%98%AF-BST-%E7%BA%A2%E9%BB%91%E6%A0%91%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">为什么是 B+Tree 而不是 BST&#x2F;红黑树？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#B-Tree-vs-B-Tree-%E7%9A%84%E5%85%B3%E9%94%AE%E5%8C%BA%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">B-Tree vs B+Tree 的关键区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95-Clustered-Index-%E7%BB%84%E7%BB%87"><span class="nav-number">3.</span> <span class="nav-text">聚簇索引 (Clustered Index) 组织</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/b-plus-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="B+Tree 深度解析 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          B+Tree 深度解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>这是后端工程师最需要深入理解的数据结构——没有之一。InnoDB 的索引组织、查询性能、磁盘 I&#x2F;O 模型全都建立在一棵 B+Tree 上。</p>
+<h4 id="为什么是-B-Tree-而不是-BST-红黑树？"><a href="#为什么是-B-Tree-而不是-BST-红黑树？" class="headerlink" title="为什么是 B+Tree 而不是 BST&#x2F;红黑树？"></a>为什么是 B+Tree 而不是 BST&#x2F;红黑树？</h4><p>答案关键词：<strong>磁盘 I&#x2F;O</strong>。</p>
+<p>数据库索引是存在磁盘上的，数据量远超内存容量。一次磁盘寻道约 5-10ms，一次内存访问约 100ns——差距是 5 万到 10 万倍。对于数据库来说，”算法复杂度 O(log n)”不是用 CPU 执行步数衡量的，而是用<strong>磁盘 I&#x2F;O 次数</strong>衡量的。</p>
+<p>B+Tree 的核心设计目标：<strong>矮胖</strong>——让树的高度尽可能低，从而减少磁盘 I&#x2F;O 次数。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">B</span>+<span class="selector-tag">Tree</span> 结构 (InnoDB 典型: m=<span class="number">3</span> 阶, 实际可达 <span class="number">1000</span>+ 阶):</span><br><span class="line"></span><br><span class="line">                     <span class="selector-attr">[30 | 60]</span>              ← 非叶子节点 (存索引键 + 子节点指针)</span><br><span class="line">                   /     |     \</span><br><span class="line">          <span class="selector-attr">[10|20]</span>      <span class="selector-attr">[40|50]</span>      <span class="selector-attr">[70|80]</span>  ← 非叶子节点</span><br><span class="line">          /  |  \      /  |  \      /  |  \</span><br><span class="line">        <span class="selector-attr">[1-9]</span><span class="selector-attr">[10-19]</span><span class="selector-attr">[20-29]</span><span class="selector-attr">[30-39]</span><span class="selector-attr">[40-49]</span><span class="selector-attr">[50-59]</span><span class="selector-attr">[60-69]</span><span class="selector-attr">[70-79]</span><span class="selector-attr">[80-89]</span>  ← 叶子节点</span><br><span class="line">        ←→    ←→    ←→    ←→    ←→    ←→    ←→    ←→    ←→</span><br><span class="line">                    所有叶子节点通过双向链表串联 ←→</span><br></pre></td></tr></table></figure>
+
+<p><strong>B+Tree 选择矩形而非三角的原因 —— 扇出 (Fanout)：</strong></p>
+<p>每个 InnoDB Page 是 16KB。假设主键为 8 bytes 的 BIGINT，指针为 6 bytes（页号），一个索引记录 14 bytes。一个 16KB 的 Page 可以存约 1170 个索引项（实际受 Page Header 等开销影响，约 1000 个）。</p>
+<p>这就是扇出 (fanout) ≈ 1000——每个非叶子节点可以指向约 1000 个子节点。</p>
+<ul>
+<li><strong>高度 h&#x3D;1</strong>（只有根和叶子）：可容纳约 1,000 条记录</li>
+<li><strong>高度 h&#x3D;2</strong>：可容纳约 1,000 × 1,000 &#x3D; 1,000,000 条记录</li>
+<li><strong>高度 h&#x3D;3</strong>：可容纳约 1,000³ &#x3D; 1,000,000,000 条记录</li>
+</ul>
+<p>一行数据 1KB 时，叶子节点每个 Page 存 16 条记录。3 层 B+Tree 可以支撑 (1000² × 16) ≈ 1600万行——查一条数据最多只需要 3 次磁盘 I&#x2F;O。如果要存几十亿行，树高最多 4 层。</p>
+<p>作为对比：如果是一棵二叉树（BST&#x2F;红黑树），即使完全平衡，1 亿行数据约 2^27 需要约 27 层——也就是最多 27 次磁盘 I&#x2F;O，比 B+Tree 的 3-4 次差了近 10 倍。</p>
+<p><strong>这就是 InnoDB 选 B+Tree 最根本的原因——极致的磁盘 I&#x2F;O 优化。</strong></p>
+<h4 id="B-Tree-vs-B-Tree-的关键区别"><a href="#B-Tree-vs-B-Tree-的关键区别" class="headerlink" title="B-Tree vs B+Tree 的关键区别"></a>B-Tree vs B+Tree 的关键区别</h4><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>B-Tree</th>
+<th>B+Tree (InnoDB 实际使用)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据存储位置</td>
+<td>所有节点都存数据</td>
+<td><strong>仅叶子节点存数据</strong></td>
+</tr>
+<tr>
+<td>非叶子节点</td>
+<td>索引 + 数据</td>
+<td><strong>仅索引（占空间极小）</strong></td>
+</tr>
+<tr>
+<td>叶子节点之间</td>
+<td>没有链接</td>
+<td><strong>双向链表串联</strong></td>
+</tr>
+<tr>
+<td>范围查询</td>
+<td>需要回溯（中序遍历）</td>
+<td>叶子链表顺序扫描即可 O(k)</td>
+</tr>
+<tr>
+<td>扇出</td>
+<td>较小（因为存数据）</td>
+<td><strong>极大（因为只存索引）</strong></td>
+</tr>
+</tbody></table>
+<p>B+Tree 把数据集中在叶子节点，非叶子节点只存键值 + 指针，同样的 16KB Page 能放下更多索引项 → 更高的扇出 → 更矮的树 → 更少的 I&#x2F;O。</p>
+<h4 id="聚簇索引-Clustered-Index-组织"><a href="#聚簇索引-Clustered-Index-组织" class="headerlink" title="聚簇索引 (Clustered Index) 组织"></a>聚簇索引 (Clustered Index) 组织</h4><p>InnoDB 的主键索引就是聚簇索引——数据行直接存储在 B+Tree 的叶子节点上，而非叶子的 Value 就是一个 Page 指针。这与 MyISAM 的”数据文件独立、索引存数据地址”完全不同：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">InnoDB 聚簇索引:                          MyISAM 非聚簇索引:</span><br><span class="line">B+Tree 叶子节点                            B+Tree 叶子节点</span><br><span class="line">┌─────────────┐                         ┌─────────────┐</span><br><span class="line">│ <span class="attribute">PK</span>=100      │                         │ <span class="attribute">PK</span>=100      │</span><br><span class="line">│ <span class="attribute">col1</span>=<span class="string">&#x27;Alice&#x27;</span>│  ← 整行数据在这里！        │ 数据地址 #7 │ ───→ [数据文件 #7]</span><br><span class="line">│ <span class="attribute">col2</span>=<span class="string">&#x27;NY&#x27;</span>   │                         └─────────────┘</span><br><span class="line">│ <span class="built_in">..</span>.         │</span><br><span class="line">└─────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>聚簇索引的优势：主键查询一次 B+Tree 就能拿到完整行数据。劣势：二级索引的叶子节点存的是主键值（而不是数据地址），所以通过二级索引查询需要<strong>回表</strong>——先查二级索引拿到主键，再查聚簇索引拿到行数据。这就是为什么建议用覆盖索引避免回表。</p>
+<blockquote>
+<p>InnoDB 索引的详细分析（包括页内结构、联合索引、索引优化策略）参见 <a href="..%5Cdata%5Cmysql.md">MySQL 深度解析</a>。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
+              <a href="/tags/B-Tree/" rel="tag"># B+Tree</a>
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+              <a href="/tags/%E7%B4%A2%E5%BC%95/" rel="tag"># 索引</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/cap-theorem/" rel="prev" title="CAP 定理">
+                  <i class="fa fa-angle-left"></i> CAP 定理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/base-theory/" rel="next" title="BASE 理论">
+                  BASE 理论 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

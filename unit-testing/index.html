@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.1 JUnit 5 + Mockito 基础123456789101112131415161718192021222324@ExtendWith(MockitoExtension.class)class OrderServiceTest &#123;    @Mock private OrderRepository orderRepository;    @Mock private Payme">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单元测试金字塔">
+<meta property="og:url" content="http://pclhahaha.github.io/unit-testing/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="1.1 JUnit 5 + Mockito 基础123456789101112131415161718192021222324@ExtendWith(MockitoExtension.class)class OrderServiceTest &#123;    @Mock private OrderRepository orderRepository;    @Mock private Payme">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-04T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="测试">
+<meta property="article:tag" content="JUnit">
+<meta property="article:tag" content="Mockito">
+<meta property="article:tag" content="TDD">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/unit-testing/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/unit-testing/","path":"unit-testing/","title":"单元测试金字塔"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>单元测试金字塔 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-JUnit-5-Mockito-%E5%9F%BA%E7%A1%80"><span class="nav-number">1.</span> <span class="nav-text">1.1 JUnit 5 + Mockito 基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%B5%8B%E8%AF%95%E9%87%91%E5%AD%97%E5%A1%94"><span class="nav-number">2.</span> <span class="nav-text">1.2 测试金字塔</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%BB%80%E4%B9%88%E5%80%BC%E5%BE%97%E6%B5%8B"><span class="nav-number">3.</span> <span class="nav-text">1.3 什么值得测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-TDD-%E4%BA%89%E8%AE%AE%E4%B8%8E%E5%AE%9E%E8%B7%B5"><span class="nav-number">4.</span> <span class="nav-text">1.4 TDD 争议与实践</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87"><span class="nav-number">5.</span> <span class="nav-text">1.5 测试覆盖率</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/unit-testing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="单元测试金字塔 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          单元测试金字塔
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-07-05 00:00:00" itemprop="dateCreated datePublished" datetime="2026-07-05T00:00:00+08:00">2026-07-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">工程实践</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="1-1-JUnit-5-Mockito-基础"><a href="#1-1-JUnit-5-Mockito-基础" class="headerlink" title="1.1 JUnit 5 + Mockito 基础"></a>1.1 JUnit 5 + Mockito 基础</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ExtendWith(MockitoExtension.class)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OrderServiceTest</span> &#123;</span><br><span class="line">    <span class="meta">@Mock</span> <span class="keyword">private</span> OrderRepository orderRepository;</span><br><span class="line">    <span class="meta">@Mock</span> <span class="keyword">private</span> PaymentGateway paymentGateway;</span><br><span class="line">    <span class="meta">@InjectMocks</span> <span class="keyword">private</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="meta">@DisplayName(&quot;支付成功应更新订单状态&quot;)</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldUpdateOrderStatusWhenPaymentSucceeds</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> mock(Order.class);</span><br><span class="line">        <span class="keyword">when</span>(orderRepository.findById(<span class="number">1L</span>)).thenReturn(Optional.of(order));</span><br><span class="line">        <span class="keyword">when</span>(paymentGateway.pay(<span class="number">1L</span>)).thenReturn(PaymentResult.success());</span><br><span class="line"></span><br><span class="line">        orderService.pay(<span class="number">1L</span>);</span><br><span class="line">        verify(order).markAsPaid();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="meta">@DisplayName(&quot;订单不存在时应抛出异常&quot;)</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">shouldThrowWhenOrderNotFound</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">when</span>(orderRepository.findById(<span class="number">1L</span>)).thenReturn(Optional.empty());</span><br><span class="line">        assertThrows(OrderNotFoundException.class, () -&gt; orderService.pay(<span class="number">1L</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-测试金字塔"><a href="#1-2-测试金字塔" class="headerlink" title="1.2 测试金字塔"></a>1.2 测试金字塔</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">┌──────┐</span><br><span class="line">│ E2E  │ ← 极少</span><br><span class="line">│ 集成  │ ← 较少</span><br><span class="line">│ 单元  │ ← 大量</span><br><span class="line">└──────┘</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th align="center">速度</th>
+<th align="center">稳定性</th>
+<th align="center">占比</th>
+<th>工具</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单元测试</td>
+<td align="center">毫秒</td>
+<td align="center">极高</td>
+<td align="center">70%+</td>
+<td>JUnit 5 + Mockito</td>
+</tr>
+<tr>
+<td>集成测试</td>
+<td align="center">秒</td>
+<td align="center">中</td>
+<td align="center">20%</td>
+<td>Spring Boot Test + Testcontainers</td>
+</tr>
+<tr>
+<td>E2E 测试</td>
+<td align="center">分钟</td>
+<td align="center">低</td>
+<td align="center">10%</td>
+<td>REST Assured &#x2F; Selenium</td>
+</tr>
+</tbody></table>
+<p>不要追求精确比例，<strong>追求反馈速度</strong>：单元测试 200ms 内完成，发现错误立即反馈。</p>
+<h3 id="1-3-什么值得测"><a href="#1-3-什么值得测" class="headerlink" title="1.3 什么值得测"></a>1.3 什么值得测</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">不值得测 →                        ← 最值得测 →</span><br><span class="line">简单 getter<span class="regexp">/setter   核心算法/</span>金额计算   复杂状态机<span class="regexp">/边界条件/</span>异常路径</span><br></pre></td></tr></table></figure>
+
+<p>核心规则：涉及钱必测；边界（null&#x2F;空&#x2F;零&#x2F;负&#x2F;超大值）必测；异常路径必测。不测 getter&#x2F;setter、框架代码、一眼可确认的简单逻辑。</p>
+<h3 id="1-4-TDD-争议与实践"><a href="#1-4-TDD-争议与实践" class="headerlink" title="1.4 TDD 争议与实践"></a>1.4 TDD 争议与实践</h3><p>TDD 的理想流程：写失败的测试 → 写最小代码通过 → 重构。现实态度：<strong>在复杂逻辑和核心算法上 TDD，在简单 CRUD 上后补测试。</strong> TDD 真正的价值不在”先写测试”，而在于<strong>驱动你思考接口设计</strong>——你必须先回答”输入是什么？输出是什么？边界是什么？”——这本身就是一次 mini 设计评审。</p>
+<h3 id="1-5-测试覆盖率"><a href="#1-5-测试覆盖率" class="headerlink" title="1.5 测试覆盖率"></a>1.5 测试覆盖率</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 行覆盖 ≠ 分支覆盖</span></span><br><span class="line"><span class="keyword">if</span> (score &gt;= <span class="number">90</span>) <span class="keyword">return</span> <span class="string">&quot;A&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (score &gt;= <span class="number">80</span>) <span class="keyword">return</span> <span class="string">&quot;B&quot;</span>;   <span class="comment">// 只测 95,75 → 行 100%，分支 67%</span></span><br><span class="line"><span class="keyword">return</span> <span class="string">&quot;C&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>核心业务 90%+&#x2F;85%+（行&#x2F;分支），公共库 90%+，CRUD 70%+，Controller 40%+。<strong>覆盖率是手段不是目的</strong>——用它发现未测试代码。CI 中设新代码阈值 ≥80%。</p>
+<hr>
+<pre><code class="language-yaml">
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B5%8B%E8%AF%95/" rel="tag"># 测试</a>
+              <a href="/tags/JUnit/" rel="tag"># JUnit</a>
+              <a href="/tags/Mockito/" rel="tag"># Mockito</a>
+              <a href="/tags/TDD/" rel="tag"># TDD</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/url-shortener-design/" rel="prev" title="短链系统设计">
+                  <i class="fa fa-angle-left"></i> 短链系统设计
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/trie-ac-automaton/" rel="next" title="Trie 字典树与 AC 自动机">
+                  Trie 字典树与 AC 自动机 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

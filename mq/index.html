@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pclhahaha.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"onmobile":false},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":false},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一、为什么需要消息队列1.1 三大核心价值消息队列不是银弹，但在以下三个场景中价值极高： 解耦：生产者和消费者不再直接调用，仅通过 MQ 交换消息。上游服务不需要知道下游有哪些服务、各自的地址和接口，新增消费者时上游代码零改动。 12345678同步调用（耦合）:                      异步消息（解耦）:  OrderService">
+<meta property="og:type" content="article">
+<meta property="og:title" content="消息队列深度解析">
+<meta property="og:url" content="http://pclhahaha.github.io/mq/index.html">
+<meta property="og:site_name" content="个人笔记">
+<meta property="og:description" content="一、为什么需要消息队列1.1 三大核心价值消息队列不是银弹，但在以下三个场景中价值极高： 解耦：生产者和消费者不再直接调用，仅通过 MQ 交换消息。上游服务不需要知道下游有哪些服务、各自的地址和接口，新增消费者时上游代码零改动。 12345678同步调用（耦合）:                      异步消息（解耦）:  OrderService">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="pcl">
+<meta property="article:tag" content="消息队列">
+<meta property="article:tag" content="Kafka">
+<meta property="article:tag" content="RocketMQ">
+<meta property="article:tag" content="RabbitMQ">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://pclhahaha.github.io/mq/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://pclhahaha.github.io/mq/","path":"mq/","title":"消息队列深度解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>消息队列深度解析 | 个人笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","mhchem":false,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">个人笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-ai"><a href="/ai/" rel="section"><i class="fa fa-robot fa-fw"></i>AI</a></li><li class="menu-item menu-item-data"><a href="/data/" rel="section"><i class="fa fa-database fa-fw"></i>Data</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">1.</span> <span class="nav-text">一、为什么需要消息队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%B8%89%E5%A4%A7%E6%A0%B8%E5%BF%83%E4%BB%B7%E5%80%BC"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 三大核心价值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%86%B3%E7%AD%96%E6%A0%91"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 使用场景决策树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%BC%95%E5%85%A5-MQ-%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 引入 MQ 的代价</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Kafka"><span class="nav-number">2.</span> <span class="nav-text">二、Kafka</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 架构概览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Topic%E3%80%81Partition-%E4%B8%8E-Segment"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Topic、Partition 与 Segment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%B6%88%E6%81%AF%E5%AD%98%E5%82%A8%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 消息存储与零拷贝</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E5%88%86%E5%8C%BA%E5%88%86%E9%85%8D%E7%AD%96%E7%95%A5"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 分区分配策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%89%AF%E6%9C%AC%E6%9C%BA%E5%88%B6"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 副本机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-Leader-Epoch%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88-HW-%E4%B8%8D%E5%A4%9F"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 Leader Epoch：为什么 HW 不够</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-%E5%B9%82%E7%AD%89%E7%94%9F%E4%BA%A7%E8%80%85%E4%B8%8E%E4%BA%8B%E5%8A%A1"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 幂等生产者与事务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-8-%E6%B6%88%E8%B4%B9%E8%80%85%E4%B8%8E%E5%86%8D%E5%B9%B3%E8%A1%A1"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 消费者与再平衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-9-Kafka-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">2.9.</span> <span class="nav-text">2.9 Kafka 性能优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-10-Kafka-vs-%E5%85%B6%E4%BB%96-MQ"><span class="nav-number">2.10.</span> <span class="nav-text">2.10 Kafka vs 其他 MQ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81RocketMQ"><span class="nav-number">3.</span> <span class="nav-text">三、RocketMQ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%9E%B6%E6%9E%84"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%B6%88%E6%81%AF%E5%AD%98%E5%82%A8"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 消息存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 事务消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E5%BB%B6%E8%BF%9F%E6%B6%88%E6%81%AF"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 延迟消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E9%A1%BA%E5%BA%8F%E6%B6%88%E6%81%AF"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 顺序消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E9%AB%98%E5%8F%AF%E7%94%A8%E4%B8%8E-DLedger"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 高可用与 DLedger</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81RabbitMQ"><span class="nav-number">4.</span> <span class="nav-text">四、RabbitMQ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E6%9E%B6%E6%9E%84"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Exchange-%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 Exchange 类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E6%B6%88%E6%81%AF%E7%A1%AE%E8%AE%A4%E6%9C%BA%E5%88%B6"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 消息确认机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E4%B8%8E%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 死信队列与延迟队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%E9%95%9C%E5%83%8F%E9%98%9F%E5%88%97%E4%B8%8E%E4%BB%B2%E8%A3%81%E9%98%9F%E5%88%97"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 镜像队列与仲裁队列</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E9%80%9A%E7%94%A8%E4%B8%BB%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">五、通用主题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E6%B6%88%E6%81%AF%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 消息可靠性保证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E6%B6%88%E6%81%AF%E5%B9%82%E7%AD%89%E6%80%A7"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 消息幂等性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E6%B6%88%E6%81%AF%E7%A7%AF%E5%8E%8B%E5%A4%84%E7%90%86"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 消息积压处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-%E9%A1%BA%E5%BA%8F%E6%B6%88%E6%81%AF%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.4.</span> <span class="nav-text">5.4 顺序消息的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-MQ-%E9%80%89%E5%9E%8B%E5%8F%82%E8%80%83%E8%A1%A8"><span class="nav-number">5.5.</span> <span class="nav-text">5.5 MQ 选型参考表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-6-%E9%9D%A2%E8%AF%95%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">5.6.</span> <span class="nav-text">5.6 面试常见问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">六、总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pcl"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">pcl</p>
+  <div class="site-description" itemprop="description">个人技术笔记 - Java、系统编程、Web基础架构</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">394</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://pclhahaha.github.io/mq/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="pcl">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人笔记">
+      <meta itemprop="description" content="个人技术笔记 - Java、系统编程、Web基础架构">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="消息队列深度解析 | 个人笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          消息队列深度解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-01-01 00:00:00" itemprop="dateCreated datePublished" datetime="2025-01-01T00:00:00+08:00">2025-01-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="一、为什么需要消息队列"><a href="#一、为什么需要消息队列" class="headerlink" title="一、为什么需要消息队列"></a>一、为什么需要消息队列</h2><h3 id="1-1-三大核心价值"><a href="#1-1-三大核心价值" class="headerlink" title="1.1 三大核心价值"></a>1.1 三大核心价值</h3><p>消息队列不是银弹，但在以下三个场景中价值极高：</p>
+<p><strong>解耦</strong>：生产者和消费者不再直接调用，仅通过 MQ 交换消息。上游服务不需要知道下游有哪些服务、各自的地址和接口，新增消费者时上游代码零改动。</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">同步调用（耦合）:                      异步消息（解耦）:</span><br><span class="line">  <span class="keyword">OrderService </span>                        <span class="keyword">OrderService</span></span><br><span class="line"><span class="keyword"></span>    ├─► InventoryService                   │</span><br><span class="line">    ├─► CouponService                   [发布订单事件]</span><br><span class="line">    └─► NotificationService                 │</span><br><span class="line">                                         MQ <span class="keyword">Broker</span></span><br><span class="line"><span class="keyword"></span>                                       ↙    ↓    ↘</span><br><span class="line">                               Inventory Coupon Notification</span><br></pre></td></tr></table></figure>
+
+<p><strong>异步</strong>：非核心链路从同步调用改为异步消息，显著降低接口响应时间。下单时优惠券、积分、短信等逻辑从关键路径剥离。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">同步:  下单(50ms) → 扣库存(20ms) → 发优惠券(30ms) → 发短信(100ms) → 返回(总耗时200ms)</span></span><br><span class="line"><span class="section">异步:  下单(50ms) → 扣库存(20ms) → 返回(70ms)</span></span><br><span class="line">                   [异步] → 发优惠券 + 发短信</span><br></pre></td></tr></table></figure>
+
+<p><strong>削峰</strong>：突发流量先存入 MQ，后端按自身处理能力匀速消费，避免流量尖峰击垮服务。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">秒杀场景:  前端流量<span class="number"> 100000 </span>QPS → MQ 积压 → 后端匀速消费<span class="number"> 5000 </span>QPS</span><br></pre></td></tr></table></figure>
+
+<p>没有 MQ，后端需要按峰值扩容，资源利用率极低（日常可能只用 10%）。有了 MQ 削峰填谷，按平均水位配置即可。</p>
+<h3 id="1-2-使用场景决策树"><a href="#1-2-使用场景决策树" class="headerlink" title="1.2 使用场景决策树"></a>1.2 使用场景决策树</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">需要消息队列吗?</span><br><span class="line">├─ 需要多个下游服务同时消费同一事件? → 是 → 用 MQ (发布订阅)</span><br><span class="line">├─ 非核心逻辑拖慢了主流程响应时间? → 是 → 用 MQ (异步解耦)</span><br><span class="line">├─ 流量有尖峰, 后端处理能力有限? → 是 → 用 MQ (削峰填谷)</span><br><span class="line">├─ 需要跨系统/跨语言通信? → 是 → 用 MQ</span><br><span class="line">├─ 需要保证最终一致性(分布式事务)? → 是 → 用事务消息</span><br><span class="line">├─ 单服务内部异步处理, 不需要持久化? → 直接用线程池/协程</span><br><span class="line">├─ 数据量大(日志/埋点), 对可靠性要求不高? → Kafka</span><br><span class="line">├─ 金融/电商场景, 事务消息刚需? → RocketMQ</span><br><span class="line">└─ 灵活路由, 低延迟, 管理方便? → RabbitMQ</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-引入-MQ-的代价"><a href="#1-3-引入-MQ-的代价" class="headerlink" title="1.3 引入 MQ 的代价"></a>1.3 引入 MQ 的代价</h3><p>任何技术选型都是 trade-off：</p>
+<table>
+<thead>
+<tr>
+<th>代价</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>系统复杂度增加</td>
+<td>多了 Broker 集群需要部署、监控、运维</td>
+</tr>
+<tr>
+<td>一致性问题</td>
+<td>消息可能丢失、重复,变成最终一致性</td>
+</tr>
+<tr>
+<td>延迟增加</td>
+<td>多了一跳转发的网络开销</td>
+</tr>
+<tr>
+<td>调试困难</td>
+<td>链路追踪变复杂, 需要关联消息 ID</td>
+</tr>
+<tr>
+<td>数据一致性</td>
+<td>生产者&#x2F;消费者事务需要额外设计</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>生产经验</strong>：能用同步解决的问题不要强上 MQ。先问自己：真的需要异步吗？真的需要广播给多消费者吗？MQ 引入的是复杂度，不要为了”架构好看”而引入。</p>
+</blockquote>
+<hr>
+<h2 id="二、Kafka"><a href="#二、Kafka" class="headerlink" title="二、Kafka"></a>二、Kafka</h2><p>Kafka 最初由 LinkedIn 开发并开源，2011年成为 Apache 顶级项目。定位<strong>分布式流平台</strong>，核心能力是超高吞吐的顺序读写。LinkedIn 单集群日处理万亿级消息。</p>
+<h3 id="2-1-架构概览"><a href="#2-1-架构概览" class="headerlink" title="2.1 架构概览"></a>2.1 架构概览</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">            ┌────────────────────────────────┐</span><br><span class="line">            │          ZooKeeper/KRaft        │</span><br><span class="line">            │     (元数据/Controller选举)       │</span><br><span class="line">            └────┬──────────────────┬─────────┘</span><br><span class="line">                 │                  │</span><br><span class="line">  ┌──────────────┼──────────────────┼──────────────┐</span><br><span class="line">  │              ▼                  ▼              │</span><br><span class="line">  │         Controller          ~~~~~~~~~~         │</span><br><span class="line">  │   (管理分区Leader选举)        Replicas          │</span><br><span class="line">  │                                               │</span><br><span class="line">  │  ┌─────────┐  ┌─────────┐  ┌─────────┐       │</span><br><span class="line">  │  │ Broker1 │  │ Broker2 │  │ Broker3 │       │</span><br><span class="line">  │  │ T0P0(L) │  │ T0P0(F) │  │ T0P1(L) │ ...   │</span><br><span class="line">  │  │ T0P1(F) │  │ T0P2(L) │  │ T0P2(F) │       │</span><br><span class="line">  │  └─────────┘  └─────────┘  └─────────┘       │</span><br><span class="line">  └──────────────────┬───────────────────────────┘</span><br><span class="line">                     │</span><br><span class="line">     ┌───────────────┼───────────────┐</span><br><span class="line">     ▼               ▼               ▼</span><br><span class="line">┌─────────┐    ┌─────────┐    ┌─────────┐</span><br><span class="line">│Producer │    │Consumer │    │Consumer │</span><br><span class="line">│  App1   │    │ <span class="keyword">Group</span> <span class="title">A</span> │    │ <span class="keyword">Group</span> <span class="title">B</span> │</span><br><span class="line">└─────────┘    └─────────┘    └─────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心组件</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Broker</td>
+<td>Kafka 服务进程，一个 Kafka 集群由多个 Broker 组成</td>
+</tr>
+<tr>
+<td>Topic</td>
+<td>逻辑消息分类，生产者按 Topic 发送，消费者按 Topic 订阅</td>
+</tr>
+<tr>
+<td>Partition</td>
+<td>Topic 物理分区，每个 Partition 是一个有序、不可变的消息序列，持久化在磁盘</td>
+</tr>
+<tr>
+<td>Producer</td>
+<td>消息生产者，负责将消息推送到指定 Topic 的指定 Partition</td>
+</tr>
+<tr>
+<td>Consumer</td>
+<td>消息消费者，以 Pull 模式从 Broker 拉取消息</td>
+</tr>
+<tr>
+<td>Consumer Group</td>
+<td>消费组，组内消费者共享 Partitions，实现负载均衡</td>
+</tr>
+<tr>
+<td>Controller</td>
+<td>集群控制器（最先启动的 Broker），负责 Partition Leader 选举</td>
+</tr>
+<tr>
+<td>Coordinator</td>
+<td>为每个 Consumer Group 分配一个 Broker 作为 GroupCoordinator，管理 offset 提交和再平衡</td>
+</tr>
+</tbody></table>
+<p><strong>核心设计思想</strong>：</p>
+<p>Kafka 的吞吐量来自于<strong>全面拥抱顺序 IO</strong>。Broker 收到消息后直接追加到 Partition 日志末尾，不做任何索引更新（仅在内存中维护 offset-position 映射）。Consumer 拉取消息时，Broker 按 offset 读取，整个链路全是顺序读写。</p>
+<h3 id="2-2-Topic、Partition-与-Segment"><a href="#2-2-Topic、Partition-与-Segment" class="headerlink" title="2.2 Topic、Partition 与 Segment"></a>2.2 Topic、Partition 与 Segment</h3><p><strong>Partition 为什么关键</strong>：</p>
+<p>一个 Topic 可以有 N 个 Partition，分布在不同的 Broker 上，这是 Kafka 水平扩展的基石。Partition 内部消息严格有序，但不同 Partition 之间无法保证顺序。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Topic: <span class="attribute">order</span>-events (<span class="number">3</span> partitions)</span><br><span class="line"></span><br><span class="line">Partition <span class="number">0</span>: <span class="selector-attr">[msg0]</span> <span class="selector-attr">[msg1]</span> <span class="selector-attr">[msg2]</span> <span class="selector-attr">[msg3]</span> → 写入/读取顺序有序</span><br><span class="line">Partition <span class="number">1</span>: <span class="selector-attr">[msg0]</span> <span class="selector-attr">[msg1]</span> <span class="selector-attr">[msg2]</span>        → 与 P0 之间无序</span><br><span class="line">Partition <span class="number">2</span>: <span class="selector-attr">[msg0]</span> <span class="selector-attr">[msg1]</span>               → 多 Partition = 并发读写</span><br></pre></td></tr></table></figure>
+
+<p><strong>Partition 路由</strong>：Producer 发送消息时通过 <code>key.hashCode() % partitionCount</code> 确定目标 Partition。不指定 key 则轮询或随机。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Producer 发送代码</span></span><br><span class="line">ProducerRecord&lt;String, String&gt; record = <span class="keyword">new</span> <span class="title class_">ProducerRecord</span>&lt;&gt;(<span class="string">&quot;order-events&quot;</span>, <span class="string">&quot;orderId123&quot;</span>, <span class="string">&quot;message body&quot;</span>);</span><br><span class="line"><span class="comment">// 指定了 key(&quot;orderId123&quot;) → 相同 key 进入同一 Partition → 保证该 key 的消息有序</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Segment</strong>：每个 Partition 物理上由多个 Segment 文件组成。Segment 是 Kafka 存储的基本单元。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Partition</span> <span class="number">0</span> 目录:</span><br><span class="line">/var/kafka-logs/<span class="keyword">order</span>-events<span class="number">-0</span>/</span><br><span class="line">├── <span class="number">00000000000000000000.</span><span class="keyword">log</span>       ← 第一个 Segment 数据文件</span><br><span class="line">├── <span class="number">00000000000000000000.</span><span class="keyword">index</span>     ← 稀疏索引</span><br><span class="line">├── <span class="number">00000000000000000000.</span>timeindex ← 时间索引</span><br><span class="line">├── <span class="number">00000000000000500000.</span><span class="keyword">log</span>       ← 第二个 Segment(<span class="keyword">offset</span> &gt;= <span class="number">500000</span>)</span><br><span class="line">├── <span class="number">00000000000000500000.</span><span class="keyword">index</span></span><br><span class="line">├── leader-epoch-<span class="keyword">checkpoint</span>        ← Leader Epoch 文件</span><br><span class="line">└── <span class="keyword">partition</span>.metadata</span><br></pre></td></tr></table></figure>
+
+<p>Segment 文件名为基准 offset（该 Segment 第一条消息的 offset），如 <code>00000000000000500000.log</code> 表示该文件存储从 offset&#x3D;500000 开始的消息。Segment 有两个配置参数：</p>
+<ul>
+<li><code>log.segment.bytes</code>：Segment 文件大小上限（默认 1GB），达到后自动滚动创建新 Segment</li>
+<li><code>log.retention.hours</code>：消息保留时间（默认 168 小时&#x2F;7 天），超时的 Segment 直接删除</li>
+</ul>
+<h3 id="2-3-消息存储与零拷贝"><a href="#2-3-消息存储与零拷贝" class="headerlink" title="2.3 消息存储与零拷贝"></a>2.3 消息存储与零拷贝</h3><p><strong>消息格式 (v2)</strong>：</p>
+<p>Kafka 使用 Record Batch 作为最小读写单元，一个批次包含多条消息：</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Record Batch</span><span class="punctuation">:</span></span><br><span class="line"><span class="attribute">┌──────────────────────────────────────┐</span></span><br><span class="line"><span class="attribute">│ baseOffset</span><span class="punctuation">:</span> <span class="string">int64                    │ ← 批次起始 offset</span></span><br><span class="line"><span class="attribute">│ length</span><span class="punctuation">:</span> <span class="string">int32                        │ ← 批次总长度</span></span><br><span class="line"><span class="attribute">│ partitionLeaderEpoch</span><span class="punctuation">:</span> <span class="string">int32          │</span></span><br><span class="line"><span class="attribute">│ magic</span><span class="punctuation">:</span> <span class="string">int8 (=2)                     │ ← V2 版本</span></span><br><span class="line"><span class="attribute">│ crc</span><span class="punctuation">:</span> <span class="string">int32                           │</span></span><br><span class="line"><span class="attribute">│ attributes</span><span class="punctuation">:</span> <span class="string">int16 (压缩类型)          │</span></span><br><span class="line"><span class="attribute">│ lastOffsetDelta</span><span class="punctuation">:</span> <span class="string">int32               │</span></span><br><span class="line"><span class="attribute">│ firstTimestamp</span><span class="punctuation">:</span> <span class="string">int64                │</span></span><br><span class="line"><span class="attribute">│ lastTimestamp</span><span class="punctuation">:</span> <span class="string">int64                 │</span></span><br><span class="line"><span class="attribute">│ producerId</span><span class="punctuation">:</span> <span class="string">int64 (幂等)             │</span></span><br><span class="line"><span class="attribute">│ producerEpoch</span><span class="punctuation">:</span> <span class="string">int16                 │</span></span><br><span class="line"><span class="attribute">│ baseSequence</span><span class="punctuation">:</span> <span class="string">int32                  │</span></span><br><span class="line"><span class="attribute">│ records</span><span class="punctuation">:</span> <span class="string">Record[]                    │ ← 消息数组(可变部分)</span></span><br><span class="line">└──────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>V2 版本的 Record Batch 复用一条通用头部，减少了空间开销。对比 V1 每条消息独立头部，V2 的批处理压缩率更高。</p>
+<p><strong>稀疏索引</strong>：Kafka 并不为每条消息建立索引，而是每隔 <code>log.index.interval.bytes</code>（默认 4KB）在 <code>.index</code> 文件中记录一条 offset→position 映射。查找时二分定位到最近的索引条目，再顺序扫描剩余部分——用极小的内存和磁盘代价换来 O(logN) 的查找。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">查找 <span class="attribute">offset</span>=500000 的消息:</span><br><span class="line">  .index 文件二分定位 → 最近索引条目 (<span class="attribute">offset</span>=499990, <span class="attribute">pos</span>=2GB)</span><br><span class="line">  → 从 .log 文件的 2GB 位置顺序扫描 → 找到 <span class="attribute">offset</span>=500000</span><br></pre></td></tr></table></figure>
+
+<p><strong>零拷贝 sendfile</strong>：</p>
+<p>这是 Kafka 极高吞吐的核心技术。传统网络发送过程：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">传统 <span class="keyword">read</span>+<span class="keyword">write</span>（<span class="number">4</span> 次拷贝，<span class="number">2</span> 次系统调用）:</span><br><span class="line">  DMA <span class="keyword">copy</span>: 磁盘 → kernel <span class="keyword">buffer</span> (<span class="keyword">read</span> <span class="keyword">buffer</span>)</span><br><span class="line">  CPU <span class="keyword">copy</span>: kernel <span class="keyword">buffer</span> → user <span class="keyword">buffer</span> (应用程序)</span><br><span class="line">  CPU <span class="keyword">copy</span>: user <span class="keyword">buffer</span> → socket <span class="keyword">buffer</span></span><br><span class="line">  DMA <span class="keyword">copy</span>: socket <span class="keyword">buffer</span> → 网卡</span><br><span class="line"></span><br><span class="line">sendfile 零拷贝（<span class="number">2</span> 次拷贝，<span class="number">1</span> 次系统调用）:</span><br><span class="line">  DMA <span class="keyword">copy</span>: 磁盘 → kernel <span class="keyword">buffer</span> (pagecache)</span><br><span class="line">  DMA <span class="keyword">copy</span>: kernel <span class="keyword">buffer</span> → 网卡</span><br></pre></td></tr></table></figure>
+
+<p>在 Linux 中 Kafka 使用 <code>FileChannel.transferTo()</code>，底层调用 <code>sendfile()</code> 系统调用。数据从 pagecache 直接 DMA 到网卡，完全绕过用户态，CPU 零参与。这是 Kafka 单机能达到百万 QPS 的关键。</p>
+<p><strong>pagecache 加速</strong>：Kafka 不完全依赖零拷贝。OS 的页缓存会缓存活跃 Segment。消费者通常追最新消息，这些数据大概率在 pagecache 中，此时读取完全不走磁盘 IO，等同于内存读取。</p>
+<blockquote>
+<p><strong>生产经验</strong>：Kafka 不推荐使用超大堆内存（通常 5-6GB 即可），把剩余内存留给 OS 的 pagecache。Kafka 重度依赖 pagecache 做读缓存和写缓冲。JVM 堆反而越分配越浪费（GC 压力）。</p>
+</blockquote>
+<h3 id="2-4-分区分配策略"><a href="#2-4-分区分配策略" class="headerlink" title="2.4 分区分配策略"></a>2.4 分区分配策略</h3><p>Consumer Group 内消费者如何分配 Partition 的消费权，由 <code>partition.assignment.strategy</code> 控制。各策略对比：</p>
+<p><strong>RangeAssignor（默认，已不推荐）</strong>：</p>
+<p>每个 Topic 独立分配，按 Partition 序号连续分段发给 Group 内消费者。</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">Topic</span>-A(<span class="number">6</span>分区) + <span class="number">3</span>个消费者:</span><br><span class="line">  <span class="built_in">C0</span> → <span class="built_in">P0</span>, <span class="built_in">P1</span></span><br><span class="line">  <span class="built_in">C1</span> → <span class="built_in">P2</span>, <span class="built_in">P3</span></span><br><span class="line">  <span class="built_in">C2</span> → <span class="built_in">P4</span>, <span class="built_in">P5</span></span><br></pre></td></tr></table></figure>
+
+<p>问题：如果 Group 订阅了多个 Topic，部分消费者会”持续过载”。假设 Topic-A 6 分区，Topic-B 3 分区，3 个消费者：</p>
+<ul>
+<li>C0 → Topic-A P0P1 + Topic-B P0 <strong>&#x3D; 3 个分区</strong></li>
+<li>C1 → Topic-A P2P3 + Topic-B P1 &#x3D; 3 个分区</li>
+<li>C2 → Topic-A P4P5 + Topic-B P2 &#x3D; 3 个分区</li>
+</ul>
+<p>但如果 Topic-B 只有 1 个分区：</p>
+<ul>
+<li>C0 → Topic-A P0P1 + Topic-B P0 &#x3D; 3 个分区</li>
+<li>C1 → Topic-A P2P3 &#x3D; 2 个分区</li>
+<li>C2 → Topic-A P4P5 &#x3D; 2 个分区</li>
+</ul>
+<p>这还不严重。更严重的是当消费者数量变化触发再平衡时，Range 策略导致<strong>数据倾斜的概率极高</strong>。</p>
+<p><strong>RoundRobinAssignor</strong>：</p>
+<p>将所有订阅的 Topic 的 Partitions 统一排序后轮询分配。解决了 Range 在单 Topic 下的倾斜问题，但再平衡时大面积重新分配。</p>
+<p><strong>StickyAssignor</strong>：</p>
+<p>在 RoundRobin 基础上，记录上次分配方案，再平衡时<strong>尽可能保持原有分配不变</strong>。减少不必要的 Partition 迁移，降低再平衡开销。</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">初始分配(<span class="number">3</span>消费者, <span class="number">6</span>分区):</span><br><span class="line">  <span class="built_in">C0</span> → <span class="built_in">P0</span>, <span class="built_in">P1</span>   <span class="built_in">C1</span> → <span class="built_in">P2</span>, <span class="built_in">P3</span>   <span class="built_in">C2</span> → <span class="built_in">P4</span>, <span class="built_in">P5</span></span><br><span class="line"></span><br><span class="line"><span class="symbol">C2</span> 退出, Sticky 策略:</span><br><span class="line">  <span class="built_in">C0</span> → <span class="built_in">P0</span>, <span class="built_in">P1</span>, <span class="built_in">P4</span>     ← 新增 <span class="built_in">P4</span>(来自 <span class="built_in">C2</span>)</span><br><span class="line">  <span class="built_in">C1</span> → <span class="built_in">P2</span>, <span class="built_in">P3</span>, <span class="built_in">P5</span>     ← 新增 <span class="built_in">P5</span>(来自 <span class="built_in">C2</span>)</span><br><span class="line">  (原有 <span class="built_in">P0</span>-<span class="built_in">P3</span> 分配未动——<span class="string">&quot;粘性&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>非 Sticky 策略(如 RoundRobin)可能把所有 6 个分区重新打散到 C0、C1，全部重新分配。</p>
+<p><strong>CooperativeStickyAssignor（推荐）</strong>：</p>
+<p>Kafka 2.4+ 引入，是 StickyAssignor 的升级版。传统 Eager 协议下再平衡会<strong>先撤销所有消费者 → 再重新分配</strong>，期间所有消费暂停（Stop-The-World）。Cooperative Sticky 基于 <code>CooperativeRebalanceProtocol</code>，允许消费者<strong>分批逐步</strong>释放和分配 Partition，再平衡期间未迁移的分区继续消费——大幅减少短暂消费中断。</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">Eager</span> 协议:   全部 Revoke → STOP → 全部分配</span><br><span class="line"><span class="symbol">Cooperative:</span>  <span class="built_in">C2</span>退出→ <span class="built_in">C2</span>的<span class="built_in">P4</span>→慢慢迁移给<span class="built_in">C0</span>, <span class="built_in">P5</span>→慢慢迁移给<span class="built_in">C1</span></span><br><span class="line">              迁移期间 <span class="built_in">C0</span>(P0P1) 和 <span class="built_in">C1</span>(P2P3) 照常消费</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生产推荐配置(Kafka 2.4+)</span></span><br><span class="line"><span class="attr">partition.assignment.strategy</span>=<span class="string">org.apache.kafka.clients.consumer.CooperativeStickyAssignor</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-5-副本机制"><a href="#2-5-副本机制" class="headerlink" title="2.5 副本机制"></a>2.5 副本机制</h3><p><strong>Replica 分类</strong>：</p>
+<p>每个 Partition 有 N 个副本（默认 <code>replication.factor=3</code>），其中只有 Leader 负责读写，Follower 只从 Leader 同步数据。</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">Partition</span> <span class="number">0</span>:  <span class="function"><span class="title">Broker1</span>(<span class="variable">Leader</span>)  <span class="title">Broker2</span>(<span class="variable">Follower</span>)  <span class="title">Broker3</span>(<span class="variable">Follower</span>)</span></span><br><span class="line">                ↑ 读写           ↑ 同步             ↑ 同步</span><br></pre></td></tr></table></figure>
+
+<p>所有读<strong>写</strong>请求只发给 Leader，Follower 的唯一职责是同步——这是典型的 Leader-Follower（主从）同步模型，牺牲读的横向扩展换取强一致语义。Kafka 不提供主从读写分离。</p>
+<p><strong>ISR (In-Sync Replicas)</strong>：</p>
+<p>Leader 维护一个 ISR 列表，记录与 Leader 同步”足够快”的 Follower 集合。判断标准由两个参数控制：</p>
+<ul>
+<li><code>replica.lag.time.max.ms</code>（默认 30s）：Follower 超过此时间未发起 fetch 请求则踢出 ISR</li>
+<li><code>replica.lag.max.messages</code>（Kafka 0.9+ 已移除此参数）：原按消息条数判断，现已废弃，因为消息大小差异大时缺乏统一标尺</li>
+</ul>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ISR 变化示例:</span><br><span class="line">  初始: ISR = [<span class="keyword">B1(Leader), </span><span class="keyword">B2, </span><span class="keyword">B3]</span></span><br><span class="line"><span class="keyword"></span>  <span class="keyword">B2 </span>网络抖动, <span class="number">30</span>s 未同步 → ISR = [<span class="keyword">B1, </span><span class="keyword">B3]</span></span><br><span class="line"><span class="keyword"></span>  <span class="keyword">B2 </span>恢复追上 → ISR = [<span class="keyword">B1, </span><span class="keyword">B3, </span><span class="keyword">B2]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>HW (High Watermark) 和 LEO (Log End Offset)</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LEO</td>
+<td>Log End Offset</td>
+<td>当前日志最后一条消息的 offset+1（下一写入位置）</td>
+</tr>
+<tr>
+<td>HW</td>
+<td>High Watermark</td>
+<td>所有 ISR 副本都已确认的最小 LEO，消费者只能读到 HW 之前的消息</td>
+</tr>
+</tbody></table>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">B1</span><span class="params">(Leader)</span></span>:  <span class="selector-attr">[msg0]</span> <span class="selector-attr">[msg1]</span> <span class="selector-attr">[msg2]</span> <span class="selector-attr">[msg3]</span> <span class="selector-attr">[   ]</span></span><br><span class="line">              ↑                        ↑</span><br><span class="line">              HW=<span class="number">2</span>                    LEO=<span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">B2</span><span class="params">(Follower)</span></span>: <span class="selector-attr">[msg0]</span> <span class="selector-attr">[msg1]</span> <span class="selector-attr">[   ]</span></span><br><span class="line">              ↑          ↑</span><br><span class="line">              HW=<span class="number">2</span>      LEO=<span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">B3</span><span class="params">(Follower)</span></span>: <span class="selector-attr">[msg0]</span> <span class="selector-attr">[msg1]</span> <span class="selector-attr">[msg2]</span> <span class="selector-attr">[   ]</span></span><br><span class="line">              ↑                    ↑</span><br><span class="line">              HW=<span class="number">2</span>                LEO=<span class="number">3</span></span><br><span class="line"></span><br><span class="line">HW = <span class="built_in">min</span>(LEO_B1, LEO_B2, LEO_B3) = <span class="built_in">min</span>(<span class="number">4</span>, <span class="number">2</span>, <span class="number">3</span>) = <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>消费者最多读到 offset&#x3D;1（即 msg1）。即使 Leader 上有 msg2、msg3，但只要有一个 ISR 副本未同步，这些消息就不可见——这就是 Kafka 如何用 HW 提供**已提交(committed)**语义。</p>
+<p><strong>Leader 故障恢复流程</strong>：</p>
+<ol>
+<li>Controller 监听到 Leader Broker 失联（ZooKeeper watch &#x2F; KRaft heartbeat）</li>
+<li>Controller 从 ISR 中选出新 Leader（优选 AR 列表中靠前的）</li>
+<li>Controller 向所有 Broker 广播新的 LeaderAndIsr 请求</li>
+<li>各 Follower 收到后，将自己的 HW 之上的消息截断（truncate），与新 Leader 对齐</li>
+</ol>
+<p><strong>unclean.leader.election.enable</strong>：</p>
+<p>当 ISR 为空（所有 ISR 副本宕机）时：</p>
+<ul>
+<li><code>true</code>：允许从 OSR（Out-of-Sync Replica，非同步副本）中选举 Leader → 可能会丢消息，但服务可用</li>
+<li><code>false</code>（默认）：宁可服务不可用也不丢消息</li>
+</ul>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CAP 权衡:</span><br><span class="line">  unclean.leader.election.<span class="keyword">enable</span>=<span class="keyword">true</span>  → 牺牲 C（一致性）, 保 A（可用性）</span><br><span class="line">  unclean.leader.election.<span class="keyword">enable</span>=<span class="keyword">false</span> → 牺牲 A, 保 C</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>生产经验</strong>：金融&#x2F;支付场景必须设为 <code>false</code>。日志&#x2F;监控场景可以设为 <code>true</code>（丢几条日志可接受，但不能中断）。</p>
+</blockquote>
+<h3 id="2-6-Leader-Epoch：为什么-HW-不够"><a href="#2-6-Leader-Epoch：为什么-HW-不够" class="headerlink" title="2.6 Leader Epoch：为什么 HW 不够"></a>2.6 Leader Epoch：为什么 HW 不够</h3><p><strong>HW 截断的数据丢失问题</strong>：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">场景1(consumer 读完 follower 后 leader 宕机):</span><br><span class="line">  Leader <span class="attribute">LEO</span>=2, <span class="attribute">HW</span>=2   Follower <span class="attribute">LEO</span>=2, <span class="attribute">HW</span>=2</span><br><span class="line">  消费者从 Follower 读到 msg0, msg1 (<span class="attribute">HW</span>=2)</span><br><span class="line">  Leader 收到 msg2(<span class="attribute">LEO</span>=3), Follower 未同步</span><br><span class="line">  Leader 宕机 → Follower 当选 Leader → 截断到 <span class="attribute">HW</span>=2</span><br><span class="line">  结果: msg2 丢失但 msg0-msg1 安全</span><br><span class="line"></span><br><span class="line">场景2(HW 截断数据差异问题):</span><br><span class="line">  Leader <span class="attribute">LEO</span>=2, <span class="attribute">HW</span>=2   Follower <span class="attribute">LEO</span>=1, <span class="attribute">HW</span>=1</span><br><span class="line">  Leader 宕机 → Follower 当选 Leader(<span class="attribute">LEO</span>=1)</span><br><span class="line">  之前 Leader 的 msg1 是 leader <span class="attribute">epoch</span>=0 产出的</span><br><span class="line">  新 Leader 产出 msg1<span class="string">&#x27;(leader epoch=1)</span></span><br><span class="line"><span class="string">  旧 Leader 恢复, 发现 HW 差异 → 截断高位数据</span></span><br><span class="line"><span class="string">  但 epoch 语义下, 旧 Leader 的 msg1 vs 新 Leader 的 msg1&#x27;</span> 需要能区分</span><br></pre></td></tr></table></figure>
+
+<p><strong>Leader Epoch 方案</strong>（Kafka 0.11+）：</p>
+<p>Leader Epoch 本质是每个 Leader 任期内分配一个单调递增的序号。每个 Broker 维护 <code>leader-epoch-checkpoint</code> 文件：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Leader Epoch  checkpoint:</span><br><span class="line"><span class="number">0</span>  <span class="built_in">offset</span>=<span class="number">0</span>    ← 第一个 Leader 任期起始 <span class="built_in">offset</span></span><br><span class="line"><span class="number">1</span>  <span class="built_in">offset</span>=<span class="number">100</span>  ← 第二个 Leader 任期起始 <span class="built_in">offset</span></span><br><span class="line"><span class="number">2</span>  <span class="built_in">offset</span>=<span class="number">250</span>  ← 第三个 Leader 任期起始 <span class="built_in">offset</span></span><br></pre></td></tr></table></figure>
+
+<p>当 Follower 从新 Leader 同步时，先发送自己的 Leader Epoch → 新 Leader 返回对应的 offset → Follower 据此决定截断点，而不是仅凭 HW。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Follower 恢复步骤:</span><br><span class="line">  1. Follower 向新 Leader 发送 LeaderEpochRequest(<span class="attribute">epoch</span>=1)</span><br><span class="line">  2. Leader 返回 LeaderEpochEndOffset(<span class="attribute">epoch</span>=1, <span class="attribute">endOffset</span>=100)</span><br><span class="line">  3. Follower 截断到 <span class="attribute">offset</span>=100</span><br><span class="line">  4. 从 <span class="attribute">offset</span>=100 开始同步</span><br><span class="line"></span><br><span class="line">这样避免了仅凭 HW 截断导致的 <span class="string">&quot;少截&quot;</span>(数据歧义) 或 <span class="string">&quot;多截&quot;</span>(丢失已提交数据) 问题。</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-7-幂等生产者与事务"><a href="#2-7-幂等生产者与事务" class="headerlink" title="2.7 幂等生产者与事务"></a>2.7 幂等生产者与事务</h3><p><strong>幂等生产者</strong>（Exactly Once, 单 Partition）：</p>
+<p>原理：每个 Producer 分配 PID（Producer ID），每条消息携带 <code>&lt;PID, Partition, SequenceNumber&gt;</code> 三元组。Broker 维护每个 PID 的最近 5 个序列号，检测到重复 SequenceNumber 时直接丢弃。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">启用幂等: enable.<span class="attribute">idempotence</span>=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line">Producer 发送 msg0(<span class="attribute">seq</span>=0) → Broker 写入成功, 记录 PID:<span class="attribute">seq</span>=0</span><br><span class="line">Producer 重试 msg0(<span class="attribute">seq</span>=0) → Broker 检测 <span class="attribute">seq</span>=0 已存在 → 丢弃, 但返回成功 ACK</span><br><span class="line">Producer 发送 msg1(<span class="attribute">seq</span>=1) → Broker 写入成功, 记录 PID:<span class="attribute">seq</span>=1</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：幂等只能保证<strong>单分区内</strong>的 Exactly Once，跨分区无法保证。另外 Producer 重启后 PID 会变，不能跨会话去重。</p>
+</blockquote>
+<p><strong>事务</strong>（Exactly Once，跨分区）：</p>
+<p>Kafka 事务提供原子性地写入多个 Topic+Partition。实现基于两阶段提交：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">beginTransaction</span><span class="params">()</span></span></span><br><span class="line">  send T0P0 msg-A</span><br><span class="line">  send T1P0 msg-B</span><br><span class="line">  send T2P0 msg-C</span><br><span class="line">  <span class="comment">// 消费-处理-生产 (consume-transform-produce)</span></span><br><span class="line"><span class="function"><span class="title">commitTransaction</span><span class="params">()</span></span></span><br><span class="line"><span class="comment">// 要么 A+B+C 全部提交, 要么全部回滚</span></span><br></pre></td></tr></table></figure>
+
+<p>事务实现中 Kafka 引入了 Transaction Coordinator（事务协调器），原理：</p>
+<ol>
+<li>Producer 向 TC 注册，获得 transactionalId（对应 PID 和 epoch）</li>
+<li>TC 在 <code>__transaction_state</code> 内部 Topic 中记录事务状态（Ongoing → PrepareCommit → CompleteCommit）</li>
+<li>提交时 TC 向涉及的各 Partition Leader 发送 Marker 消息（Commit&#x2F;Abort），Consumer 自动跳过未提交或已回滚的数据</li>
+<li>失败恢复时 TC 扫描 <code>__transaction_state</code> 完成待定事务</li>
+</ol>
+<p><strong>消费者事务隔离</strong>：<code>isolation.level=read_committed</code>（默认 <code>read_uncommitted</code>）。设置为 <code>read_committed</code> 后，消费者只读取已提交的消息，事务中未提交的消息不可见。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 事务 Producer 配置</span></span><br><span class="line">props.put(<span class="string">&quot;transactional.id&quot;</span>, <span class="string">&quot;tx-order-001&quot;</span>);</span><br><span class="line">props.put(<span class="string">&quot;enable.idempotence&quot;</span>, <span class="literal">true</span>);  <span class="comment">// 事务依赖幂等</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 消费-处理-生产示例</span></span><br><span class="line">producer.initTransactions();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    producer.beginTransaction();</span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : consumer.poll(<span class="number">100</span>)) &#123;</span><br><span class="line">        <span class="comment">// 处理消息</span></span><br><span class="line">        producer.send(<span class="keyword">new</span> <span class="title class_">ProducerRecord</span>&lt;&gt;(<span class="string">&quot;output-topic&quot;</span>, result));</span><br><span class="line">        <span class="comment">// 提交 offset (通过 Producer 而非 consumer.commitSync)</span></span><br><span class="line">        producer.sendOffsetsToTransaction(offsetMap, <span class="string">&quot;consumer-group-id&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    producer.commitTransaction();</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    producer.abortTransaction();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-8-消费者与再平衡"><a href="#2-8-消费者与再平衡" class="headerlink" title="2.8 消费者与再平衡"></a>2.8 消费者与再平衡</h3><p><strong>消费者拉模式</strong>：Kafka 消费者采用 Pull（拉）模型，而非 Push（推）。原因：</p>
+<ul>
+<li>Pull 允许消费者按自身处理能力拉取，天然支持流控</li>
+<li>如果推模式，Broker 不知道消费者处理速度，要么消费过慢积压、要么推送过快 OOM</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 消费者核心循环</span></span><br><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofSeconds(<span class="number">1</span>));</span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">        process(record);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 手动提交 offset</span></span><br><span class="line">    consumer.commitSync();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>拉模式的实现：<code>poll()</code> 并非一次网络请求，而是预取+Fetcher 缓存。Consumer 在后台异步拉取消息放入内部队列，<code>poll()</code> 从队列获取。</p>
+<p><strong>自动提交 vs 手动提交</strong>：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">enable<span class="selector-class">.auto</span>.commit=false（生产环境必须 false）</span><br><span class="line"></span><br><span class="line">自动提交危险场景:</span><br><span class="line">  poll 获取 <span class="number">100</span> 条消息</span><br><span class="line">  处理到第 <span class="number">50</span> 条时, 自动提交间隔触发 → 提交 <span class="attribute">offset</span>=<span class="number">100</span></span><br><span class="line">  随后消费者宕机 → 剩余 <span class="number">50</span> 条消息丢失(<span class="attribute">offset</span> 已提交,重启后从 <span class="number">101</span> 开始)</span><br><span class="line"></span><br><span class="line">手动提交:</span><br><span class="line">  <span class="keyword">for</span> each record:</span><br><span class="line">    <span class="built_in">process</span>(record)          <span class="comment">// 先处理</span></span><br><span class="line">    consumer<span class="selector-class">.commitSync</span>()    <span class="comment">// 逐条提交(不推荐,性能差)</span></span><br><span class="line">  <span class="comment">// 或者:</span></span><br><span class="line">  <span class="built_in">processBatch</span>(records)      <span class="comment">// 整批处理</span></span><br><span class="line">  consumer<span class="selector-class">.commitSync</span>()      <span class="comment">// 批量提交(容易重复消费,但 at-least-once)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>再平衡(ReBalance)</strong>：</p>
+<p>Consumer Group 发生以下情况时触发再平衡：</p>
+<ul>
+<li>新消费者加入 Group</li>
+<li>消费者离开 Group（心跳超时）</li>
+<li>订阅的 Topic 的 Partition 数量变化</li>
+<li>消费者取消订阅</li>
+</ul>
+<p>再平衡过程（Eager 协议）：</p>
+<ol>
+<li>GroupCoordinator 通知所有消费者 Revoke（撤销所有分区）</li>
+<li>消费者提交当前 offset → 释放分区</li>
+<li>Coordinator 重新分配分区方案</li>
+<li>通知消费者 Assign（分配新分区）</li>
+<li>消费者从上次提交的 offset 恢复消费</li>
+</ol>
+<p>过程中 Step1-Step4 期间所有消费者暂停消费，是 <code>Stop-The-World</code> 式的。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Kafka 再平衡优化:</span><br><span class="line">  max.poll.interval.<span class="attribute">ms</span>=300000     (poll 间隔上限, 超时触发再平衡)</span><br><span class="line">  session.timeout.<span class="attribute">ms</span>=45000        (会话超时)</span><br><span class="line">  heartbeat.interval.<span class="attribute">ms</span>=3000      (心跳间隔, 建议 &lt; session.timeout.ms/3)</span><br><span class="line">  group.initial.rebalance.delay.<span class="attribute">ms</span>=3000  (初始再平衡延迟, 避免短暂加入就退出)</span><br></pre></td></tr></table></figure>
+
+<p><strong>重复消费与漏消费</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>原因</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>at-most-once</code></td>
+<td>先提交 offset 再处理</td>
+<td>可能漏消费（处理失败但 offset 已提交）</td>
+</tr>
+<tr>
+<td><code>at-least-once</code></td>
+<td>先处理再提交 offset</td>
+<td>可能重复消费（提交失败，重启后重复处理）</td>
+</tr>
+<tr>
+<td><code>exactly-once</code></td>
+<td>消费+处理+提交在事务中</td>
+<td>精确一次</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 推荐的手动提交代码(封装)</span></span><br><span class="line"><span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">msgId</span> <span class="operator">=</span> record.value();  <span class="comment">// 解析业务 ID</span></span><br><span class="line">    <span class="keyword">if</span> (redis.setnx(<span class="string">&quot;dedup:&quot;</span> + msgId, <span class="string">&quot;1&quot;</span>, <span class="number">86400</span>)) &#123;</span><br><span class="line">        <span class="comment">// 首次处理(幂等去重)</span></span><br><span class="line">        process(record);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 记录处理成功的最大 offset, 批量提交</span></span><br></pre></td></tr></table></figure>
+
+<p>Kafka 的 exactly-once 消费只能通过事务模式实现（<code>consumer-producer-transaction</code>），即 consume-transform-produce 场景。</p>
+<h3 id="2-9-Kafka-性能优化"><a href="#2-9-Kafka-性能优化" class="headerlink" title="2.9 Kafka 性能优化"></a>2.9 Kafka 性能优化</h3><p><strong>为什么 Kafka 这么快</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">单机百万 QPS 的秘密:</span><br><span class="line"><span class="bullet">  1.</span> 顺序写磁盘 (追加, 无磁头寻道, 600MB/s vs 随机写 100KB/s)</span><br><span class="line"><span class="bullet">  2.</span> pagecache (写入到 OS 缓存即返回, OS 异步刷盘)</span><br><span class="line"><span class="bullet">  3.</span> 零拷贝 sendfile (消费端读取不经过用户态)</span><br><span class="line"><span class="bullet">  4.</span> 批量处理 (Producer 攒批, Broker 批量刷盘, Consumer 批量拉取)</span><br><span class="line"><span class="bullet">  5.</span> 分区并行 (多分区 = 多线程并发读写)</span><br><span class="line"><span class="bullet">  6.</span> 无状态 Broker (Broker 不记录消费状态, metadata 全部在 Consumer 端)</span><br></pre></td></tr></table></figure>
+
+<p><strong>Producer 端优化参数</strong>：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 批次大小 - 调整到吞吐 vs 延迟的甜蜜点</span></span><br><span class="line"><span class="attr">batch.size</span>=<span class="string">16384                     # 默认 16KB, 可调到 64KB~512KB</span></span><br><span class="line"><span class="attr">linger.ms</span>=<span class="string">5                          # 攒批等待时间, 默认 0, 建议 1-5ms</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 压缩 - 以 CPU 换吞吐</span></span><br><span class="line"><span class="attr">compression.type</span>=<span class="string">lz4                 # lz4 在 CPU 和压缩率之间平衡最好</span></span><br><span class="line"><span class="comment"># gzip: 压缩率高, CPU 开销大; snappy: CPU 低, 压缩率一般; lz4: 最佳折中</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 内存管理</span></span><br><span class="line"><span class="attr">buffer.memory</span>=<span class="string">33554432              # Producer 缓冲总大小(默认 32MB)</span></span><br><span class="line"><span class="attr">max.in.flight.requests.per.connection</span>=<span class="string">5  # 同时发送的最大未确认请求数</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 可靠性</span></span><br><span class="line"><span class="attr">acks</span>=<span class="string">all                            # 所有 ISR 副本确认后才返回</span></span><br><span class="line"><span class="attr">retries</span>=<span class="string">3                           # 重试次数(已启用幂等的场景, 默认 Integer.MAX_VALUE)</span></span><br><span class="line"><span class="attr">enable.idempotence</span>=<span class="string">true             # 开启幂等(自动配置 acks=all, retries=MAX, max.in.flight=5)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Broker 端优化参数</strong>：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># --- 日志刷盘 ---</span></span><br><span class="line"><span class="attr">log.flush.interval.messages</span>=<span class="string">10000   # 多少条消息刷盘(默认 Long.MAX, 几乎不主动刷, 信任 OS)</span></span><br><span class="line"><span class="attr">log.flush.interval.ms</span>=<span class="string">1000          # 刷盘间隔</span></span><br><span class="line"><span class="comment"># Kafka 的持久化信条: 相信 OS 的 pagecache, 尽量不过早强制刷盘</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># --- 网络 ---</span></span><br><span class="line"><span class="attr">num.network.threads</span>=<span class="string">8               # 网络线程数(接收请求、发送响应)</span></span><br><span class="line"><span class="attr">num.io.threads</span>=<span class="string">16                   # IO 线程数(处理实际读写)</span></span><br><span class="line"><span class="attr">socket.send.buffer.bytes</span>=<span class="string">102400     # SO_SNDBUF</span></span><br><span class="line"><span class="attr">socket.receive.buffer.bytes</span>=<span class="string">102400  # SO_RCVBUF</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># --- 内存 ---</span></span><br><span class="line"><span class="comment"># Kafka 的堆内存 = 6GB 够用了, 关键是让 OS 有更多内存做 pagecache</span></span><br><span class="line"><span class="comment"># 假设机器 64GB 物理内存: heap=6GB, 剩余 58GB 给 OS(pagecache+其他)</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># --- 分区 ---</span></span><br><span class="line"><span class="attr">num.partitions</span>=<span class="string">3                    # 单 Topic 默认分区数, 根据吞吐和集群规模设定</span></span><br><span class="line"><span class="comment"># 分区不是越多越好: 分区越多 → Controller 负载越大 → 故障恢复时间越长</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Consumer 端优化参数</strong>：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 拉取参数</span></span><br><span class="line"><span class="attr">fetch.min.bytes</span>=<span class="string">1024                # 最少拉取字节数(累计到此才返回)</span></span><br><span class="line"><span class="attr">fetch.max.wait.ms</span>=<span class="string">500               # 最长等待时间(即使未满 fetch.min.bytes 也返回)</span></span><br><span class="line"><span class="attr">max.partition.fetch.bytes</span>=<span class="string">1048576   # 单次从单分区拉取最大值(1MB)</span></span><br><span class="line"><span class="attr">fetch.max.bytes</span>=<span class="string">52428800            # 单次 poll 总拉取最大值(50MB)</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 消费吞吐优化</span></span><br><span class="line"><span class="attr">max.poll.records</span>=<span class="string">500                # 单次 poll 最大记录数</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>压缩对比测试数据（参考）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>压缩算法</th>
+<th>压缩率</th>
+<th>CPU 开销</th>
+<th>吞吐量</th>
+<th>网络带宽节省</th>
+<th>推荐场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>none</td>
+<td>100%</td>
+<td>0</td>
+<td>最高</td>
+<td>0</td>
+<td>内网高带宽</td>
+</tr>
+<tr>
+<td>lz4</td>
+<td>~50%</td>
+<td>低</td>
+<td>略降 5%</td>
+<td>~50%</td>
+<td><strong>通用推荐</strong></td>
+</tr>
+<tr>
+<td>snappy</td>
+<td>~55%</td>
+<td>低</td>
+<td>略降 5%</td>
+<td>~45%</td>
+<td>计算弱场景</td>
+</tr>
+<tr>
+<td>gzip</td>
+<td>~30%</td>
+<td>高</td>
+<td>降 30%+</td>
+<td>~70%</td>
+<td>跨机房&#x2F;公网</td>
+</tr>
+<tr>
+<td>zstd</td>
+<td>~35%</td>
+<td>中</td>
+<td>降 15%+</td>
+<td>~65%</td>
+<td>Kafka 2.1+ 推荐</td>
+</tr>
+</tbody></table>
+<h3 id="2-10-Kafka-vs-其他-MQ"><a href="#2-10-Kafka-vs-其他-MQ" class="headerlink" title="2.10 Kafka vs 其他 MQ"></a>2.10 Kafka vs 其他 MQ</h3><p>Kafka 本质是<strong>分布式日志存储系统</strong>，而不是传统消息队列。理解这一点才能正确选型：</p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>Kafka</th>
+<th>RocketMQ</th>
+<th>RabbitMQ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定位</td>
+<td>分布式流平台&#x2F;日志系统</td>
+<td>金融级业务消息</td>
+<td>通用消息代理(AMQP)</td>
+</tr>
+<tr>
+<td>吞吐量</td>
+<td>极高(百万QPS)</td>
+<td>高(十万QPS)</td>
+<td>中(万级QPS)</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>ms 级</td>
+<td>ms 级</td>
+<td>us 级(微秒级)</td>
+</tr>
+<tr>
+<td>消息优先级</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>事务消息</td>
+<td>支持(0.11+)</td>
+<td>原生支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>延迟消息</td>
+<td>无原生支持</td>
+<td>支持(18级)</td>
+<td>通过 DLX 模拟</td>
+</tr>
+<tr>
+<td>顺序消息</td>
+<td>单分区内有序</td>
+<td>同一队列内有序</td>
+<td>单队列内有序</td>
+</tr>
+<tr>
+<td>消息回查</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>运维复杂度</td>
+<td>高(需 ZooKeeper&#x2F;KRaft)</td>
+<td>高(多独立组件)</td>
+<td>低(Erlang 稳定)</td>
+</tr>
+<tr>
+<td>社区活跃度</td>
+<td>极高</td>
+<td>较高(阿里)</td>
+<td>高(VMware)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、RocketMQ"><a href="#三、RocketMQ" class="headerlink" title="三、RocketMQ"></a>三、RocketMQ</h2><p>RocketMQ 源自阿里巴巴自研的消息中间件 MetaQ，2016年捐赠给 Apache 基金会。淘宝双十一交易链路使用 RocketMQ 承载核心业务消息。</p>
+<h3 id="3-1-架构"><a href="#3-1-架构" class="headerlink" title="3.1 架构"></a>3.1 架构</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">                        ┌──────────────┐</span><br><span class="line">                        │  NameServer  │  无状态、纯内存元数据路由</span><br><span class="line">                        │  (Cluster)   │  各节点独立, 无数据同步</span><br><span class="line">                        └──────┬───────┘</span><br><span class="line">              注册/心跳↑        ↑ 路由发现</span><br><span class="line">   ┌─────────────────┼────────┼─────────────────┐</span><br><span class="line">   ▼                 │        │                  ▼</span><br><span class="line">┌─────────┐     ┌─────────┐   ┌─────────┐   ┌─────────┐</span><br><span class="line">│Producer │     │ Broker  │   │ Broker  │   │Consumer │</span><br><span class="line">│ <span class="keyword">Group</span>   <span class="title">│     │ Master</span>  │   │ <span class="keyword">Master</span>  <span class="title">│   │ Group</span>   │</span><br><span class="line">│         │────►│   ↓     │   │         │◄──│         │</span><br><span class="line">│         │     │ 同步    │   │         │   │         │</span><br><span class="line">│         │     │ <span class="literal">Slave</span>   │   │ <span class="literal">Slave</span>   │   │         │</span><br><span class="line">└─────────┘     └─────────┘   └─────────┘   └─────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>组件职责</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NameServer</td>
+<td>轻量级路由注册中心，Broker 注册地址和 Topic 信息。各 NameServer 节点独立无状态，不互相通信</td>
+</tr>
+<tr>
+<td>Broker</td>
+<td>消息存储和转发核心。区分 Master 和 Slave，Master 提供读写，Slave 从 Master 同步</td>
+</tr>
+<tr>
+<td>Producer</td>
+<td>生产者。通过 NameServer 发现 Broker，按负载均衡发送</td>
+</tr>
+<tr>
+<td>Consumer</td>
+<td>消费者。Pull 模式，支持广播消费和集群消费两种模式</td>
+</tr>
+</tbody></table>
+<p><strong>为什么 NameServer 不用 ZooKeeper</strong>：</p>
+<p>NameServer 设计极为简洁——CAP 理论下选择 AP（可用性+分区容错），牺牲了强一致性。Broker 注册通过超时心跳（默认 30s），NameServer 节点之间不要求数据一致。如果某 NameServer 数据陈旧，Broker 和 Client 直接重试下一个——代价极低。</p>
+<blockquote>
+<p>设计哲学：简单即可靠。NameServer 只有几百行代码，几乎不出 bug。ZooKeeper 生态复杂，运维成本高，对于路由发现这类场景属于过度设计。</p>
+</blockquote>
+<h3 id="3-2-消息存储"><a href="#3-2-消息存储" class="headerlink" title="3.2 消息存储"></a>3.2 消息存储</h3><p>RocketMQ 存储采用<strong>单一 CommitLog + 多个 ConsumeQueue</strong> 的架构，与 Kafka 的「一个 Partition 一个日志」完全不同：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">磁盘目录结构:</span><br><span class="line"><span class="operator">/</span>root<span class="operator">/</span>store<span class="symbol">/</span></span><br><span class="line">├── commitlog<span class="symbol">/</span></span><br><span class="line">│   ├── <span class="number">00000000000000000000</span>     ← 所有 Topic 的消息统一写入此 CommitLog</span><br><span class="line">│   └── <span class="number">00000000001073741824</span></span><br><span class="line">├── consumequeue<span class="symbol">/</span></span><br><span class="line">│   ├── TopicA<span class="operator">/</span><span class="number">0</span><span class="symbol">/</span></span><br><span class="line">│   │   └── <span class="number">00000000000000000000</span> ← ConsumeQueue(每个文件约 <span class="number">600</span> 万条目)</span><br><span class="line">│   └── TopicA<span class="operator">/</span><span class="number">1</span><span class="symbol">/</span></span><br><span class="line">│       └── <span class="number">00000000000000000000</span></span><br><span class="line">├── index<span class="symbol">/</span>                       ← 消息 Key<span class="operator">/</span>时间索引</span><br><span class="line">│   └── ...</span><br><span class="line">└── config<span class="symbol">/</span></span><br><span class="line">    └── consumerOffset.json       ← 消费进度</span><br></pre></td></tr></table></figure>
+
+<p><strong>CommitLog</strong>：所有 Topic 的所有消息顺序追加到一个 CommitLog。每个条目固定 20 字节大小：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CommitLog 条目（固定 <span class="number">20</span> 字节）:</span><br><span class="line">┌──────────────────────────────┐</span><br><span class="line">│ offset:   <span class="keyword">long</span> (<span class="number">8</span>B)          │  ← 消息在 CommitLog 中的物理偏移</span><br><span class="line">│ <span class="keyword">size</span>:     <span class="keyword">int</span>  (<span class="number">4</span>B)          │  ← 消息大小</span><br><span class="line">│ tagsCode: <span class="keyword">long</span> (<span class="number">8</span>B)          │  ← Tag 的 HashCode</span><br><span class="line">└──────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>ConsumeQueue</strong>：Topic 按 Partition（Queue）生成 ConsumeQueue，每个 ConsumeQueue 是该 Topic&#x2F;Queue 对应的消息索引列表。这不是消息体副本，而是指向 CommitLog 的指针。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ConsumeQueue 条目（固定 <span class="number">20</span> 字节）:</span><br><span class="line"><span class="function"><span class="title">offset</span><span class="params">(<span class="number">8</span>B)</span></span> + <span class="built_in">size</span>(<span class="number">4</span>B) + <span class="built_in">tagsCode</span>(<span class="number">8</span>B)</span><br></pre></td></tr></table></figure>
+
+<p>通过 ConsumeQueue 条目可以快速定位到 CommitLog 中的具体消息。因为 ConsumeQueue 是固定大小条目，消费时随机访问效率极高。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">消费流程:</span><br><span class="line"><span class="bullet">  1.</span> Consumer 根据 QueueId + offset → 定位 ConsumeQueue 索引条目</span><br><span class="line"><span class="bullet">  2.</span> 解析出 CommitLog offset + size</span><br><span class="line"><span class="bullet">  3.</span> 从 CommitLog 读取完整消息体</span><br></pre></td></tr></table></figure>
+
+<p><strong>对比 Kafka 存储</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Kafka</th>
+<th>RocketMQ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>底层文件</td>
+<td>一个 Partition &#x3D; 一组 Segment</td>
+<td>全局 CommitLog + 多个 ConsumeQueue</td>
+</tr>
+<tr>
+<td>写入</td>
+<td>不同 Partition 方向分散写</td>
+<td>所有 Topic 顺序写入同一个 CommitLog</td>
+</tr>
+<tr>
+<td>读取</td>
+<td>按 Partition 直接读</td>
+<td>先读 ConsumeQueue(索引) → 再读 CommitLog(数据)</td>
+</tr>
+<tr>
+<td>磁盘 IO</td>
+<td>写入分散、读取集中</td>
+<td>写入集中、读取两次（索引+数据）</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>海量日志、流式处理</td>
+<td>Topic 数量多(轻量级 Queue)</td>
+</tr>
+</tbody></table>
+<p>RocketMQ 的设计取舍：因为只有顺序追加，所有 Topic 共享同一份顺序写——磁盘写入效率极高。但读取时多了一次索引查找。此设计使 RocketMQ 支持海量 Topic（数万个），每个 Topic 的队列开销极低（仅 ConsumeQueue 索引文件）。</p>
+<h3 id="3-3-事务消息"><a href="#3-3-事务消息" class="headerlink" title="3.3 事务消息"></a>3.3 事务消息</h3><p>RocketMQ 的事务消息是分布式事务的一种实现（最终一致性），原理图：</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Producer          Broker              本地事务执行</span><br><span class="line">  │                 │                    (如订单DB)</span><br><span class="line">  │── Half Msg ────►│</span><br><span class="line">  │                 │ (存储半消息, 对消费者不可见)</span><br><span class="line">  │◄─── OK ────────│</span><br><span class="line">  │                 │</span><br><span class="line">  │ 执行本地事务 ◄──┘</span><br><span class="line">  │ (如: <span class="keyword">Insert</span> <span class="keyword">order</span>)</span><br><span class="line">  │                 │</span><br><span class="line">  │── <span class="keyword">Commit</span> ──────►│  成功 → 半消息变为可见</span><br><span class="line">  │   或 <span class="keyword">Rollback</span>   │  失败 → 半消息标记删除</span><br><span class="line">  │                 │</span><br><span class="line">  │  如果 <span class="keyword">Commit</span>     │</span><br><span class="line">  │  超时未收到      │</span><br><span class="line">  │                 │</span><br><span class="line">  │◄── 回查 ───────│  Broker 回调 Producer checkLocalTransaction()</span><br><span class="line">  │── <span class="keyword">Commit</span> ──────►│  Producer 返回事务状态</span><br></pre></td></tr></table></figure>
+
+<p><strong>半消息（Half Msg）</strong>：发送给 Broker 但不会被消费者拉取到的消息。原理：</p>
+<ul>
+<li>Broker 将半消息先写入 CommitLog，标记 consumeQueueOffset&#x3D;0</li>
+<li>不写入 ConsumeQueue（因此对消费者不可见）</li>
+<li>收到 Commit 后更新 OP Topic，写 ConsumeQueue → 消费者可见</li>
+</ul>
+<p><strong>回查机制</strong>：</p>
+<p>Producer 发送半消息后，可能因网络、宕机导致 Commit&#x2F;Rollback 丢失。Broker 定时扫描未确认的半消息，调用 Producer 注册的 <code>checkLocalTransaction()</code> 接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Producer 实现事务回查</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderTransactionListener</span> <span class="keyword">implements</span> <span class="title class_">TransactionListener</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> LocalTransactionState <span class="title function_">executeLocalTransaction</span><span class="params">(Message msg, Object arg)</span> &#123;</span><br><span class="line">        <span class="comment">// Step1: 执行本地事务</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            orderService.createOrder((Order)arg);</span><br><span class="line">            <span class="keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">return</span> LocalTransactionState.ROLLBACK_MESSAGE;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> LocalTransactionState <span class="title function_">checkLocalTransaction</span><span class="params">(MessageExt msg)</span> &#123;</span><br><span class="line">        <span class="comment">// Step2: Broker 回查时调用</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">orderId</span> <span class="operator">=</span> msg.getKeys();</span><br><span class="line">        <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderService.getOrder(orderId);</span><br><span class="line">        <span class="keyword">if</span> (order != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> LocalTransactionState.ROLLBACK_MESSAGE;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>生产经验</strong>：回查接口必须幂等且快速。建议直接查数据库确认状态，不要依赖缓存（可能过期）。设置合理超时时间（默认 6s），超时后 Broker 会重试回查最多 15 次。</p>
+</blockquote>
+<h3 id="3-4-延迟消息"><a href="#3-4-延迟消息" class="headerlink" title="3.4 延迟消息"></a>3.4 延迟消息</h3><p>RocketMQ 不支持”任意时间的延迟”, 而是 <strong>18 个固定的延迟级别</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// messageDelayLevel = &quot;1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h&quot;</span></span><br><span class="line"><span class="comment">//                   1   2   3    4   5  6  7  8  9  10 11 12 13 14  15  16  17 18</span></span><br><span class="line"></span><br><span class="line"><span class="type">Message</span> <span class="variable">msg</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Message</span>(<span class="string">&quot;TopicTest&quot;</span>, <span class="string">&quot;TagA&quot;</span>, <span class="string">&quot;Hello&quot;</span>.getBytes());</span><br><span class="line">msg.setDelayTimeLevel(<span class="number">3</span>);  <span class="comment">// 延迟 10s</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>实现原理</strong>：Broker 内部有一个 <code>SCHEDULE_TOPIC_XXXX</code> 系统 Topic，按延迟级别分为 18 个队列 (delayLevel&#x3D;1→Queue0, delayLevel&#x3D;2→Queue1, …)。延迟流程：</p>
+<ol>
+<li>Broker 收到延迟消息后不写入目标 ConsumeQueue，而是写入 <code>SCHEDULE_TOPIC_XXXX</code> 对应队列</li>
+<li>一个内部 Timer 线程轮询每个延迟队列，到期后将消息从 <code>SCHEDULE_TOPIC_XXXX</code> 移动到目标 Topic 的 ConsumeQueue</li>
+<li>Consumer 正常消费</li>
+</ol>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">延迟消息流程:</span><br><span class="line">  <span class="variable">Producer</span> → <span class="function"><span class="title">Broker</span>(<span class="variable">CommitLog</span>)</span></span><br><span class="line">              → 写入 <span class="variable">ScheduleTopic</span> <span class="variable">Queue</span>[<span class="variable">delayLevel</span>]</span><br><span class="line">              → <span class="variable">Timer</span> 扫描到期的延迟消息</span><br><span class="line">              → 写入目标 <span class="variable">Topic</span> <span class="variable">ConsumeQueue</span></span><br><span class="line">              → <span class="variable">Consumer</span> 正常消费</span><br></pre></td></tr></table></figure>
+
+<p>如果业务需要超过 2 小时的延迟，可以将 <code>messageDelayLevel</code> 配置扩展为更多级别。但注意级别过多会增加 Timer 扫描开销。</p>
+<h3 id="3-5-顺序消息"><a href="#3-5-顺序消息" class="headerlink" title="3.5 顺序消息"></a>3.5 顺序消息</h3><p>RocketMQ 实现全局严格顺序和分区顺序两种方案：</p>
+<p><strong>分区顺序（生产推荐）</strong>：</p>
+<p>相同 Sharding Key（如订单 ID）的消息发往同一 MessageQueue，保证局部顺序：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 生产者: 指定选择算法</span></span><br><span class="line">producer.send(msg, <span class="keyword">new</span> <span class="title class_">MessageQueueSelector</span>() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> MessageQueue <span class="title function_">select</span><span class="params">(List&lt;MessageQueue&gt; mqs, Message msg, Object arg)</span> &#123;</span><br><span class="line">        <span class="type">Long</span> <span class="variable">orderId</span> <span class="operator">=</span> (Long) arg;</span><br><span class="line">        <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> (<span class="type">int</span>) (orderId % mqs.size());</span><br><span class="line">        <span class="keyword">return</span> mqs.get(index);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;, orderId);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 消费者: 同一 Queue 的消息用单线程处理</span></span><br><span class="line">consumer.registerMessageListener(<span class="keyword">new</span> <span class="title class_">MessageListenerOrderly</span>() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ConsumeOrderlyStatus <span class="title function_">consumeMessage</span><span class="params">(List&lt;MessageExt&gt; msgs, ConsumeOrderlyContext ctx)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (MessageExt msg : msgs) &#123;</span><br><span class="line">            process(msg);  <span class="comment">// 这些消息来自同一 Queue, 顺序有保证</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ConsumeOrderlyStatus.SUCCESS;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>消费者端 <code>MessageListenerOrderly</code> 内部加了一把 <strong>Broker 级别的锁</strong>（对 Queue 加锁，不是全局锁）。同一 Queue 同一时刻只有一个线程消费，但不同 Queue 并行消费。这就是分区有序的核心实现。</p>
+<p><strong>全局顺序（谨慎使用）</strong>：同一 Topic 的所有消息只发往一个 Queue。此时吞吐降到单机水平，失去了 MQ 的扩展能力。极少场景使用（如数据库 Binlog 同步）。</p>
+<h3 id="3-6-高可用与-DLedger"><a href="#3-6-高可用与-DLedger" class="headerlink" title="3.6 高可用与 DLedger"></a>3.6 高可用与 DLedger</h3><p><strong>主从同步</strong>（旧方案）：</p>
+<ul>
+<li>同步双写：Master 写入后等待 Slave 刷盘确认 → 可靠性高，延迟大</li>
+<li>异步复制：Master 完成后异步推给 Slave → 延迟低，可能丢消息</li>
+</ul>
+<p>Master 故障时需要人工干预切换到 Slave，自动化切换（如依赖 controllers）存在脑裂风险。</p>
+<p><strong>DLedger（Raft 协议实现）</strong>：</p>
+<p>RocketMQ 4.5+ 引入基于 Raft 协议的 DLedger 替代传统主从同步。每个 DLedger Group 内通过 Raft 选举 Leader：</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">DLedger Group</span><span class="punctuation">:</span></span><br><span class="line">  <span class="attribute">Broker1 (Leader)         Broker2 (Follower)       Broker3 (Follower)</span></span><br><span class="line"><span class="attribute">  接收写入                   同步日志                  同步日志</span></span><br><span class="line"><span class="attribute">  提交到多数派后返回</span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line"><span class="attribute">Raft 保证</span><span class="punctuation">:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">强 Leader 选举, 防止脑裂</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">日志必须复制到多数节点后才标记为 committed</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">故障自动切换, 秒级恢复</span></span><br></pre></td></tr></table></figure>
+
+<p>DLedger 的核心优势：<strong>自动故障转移</strong>、<strong>无单点</strong>、<strong>强一致日志复制</strong>。代价是写操作需要多数派确认（N&#x3D;3 时写入延迟增加），吞吐下降约 20-30%。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DLedger 配置</span></span><br><span class="line"><span class="attr">enableDLegerCommitLog</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">dLegerGroup</span>=<span class="string">broker-a</span></span><br><span class="line"><span class="attr">dLegerPeers</span>=<span class="string">n0-192.168.1.1:40911;n1-192.168.1.2:40911;n2-192.168.1.3:40911</span></span><br><span class="line"><span class="attr">dLegerSelfId</span>=<span class="string">n0</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、RabbitMQ"><a href="#四、RabbitMQ" class="headerlink" title="四、RabbitMQ"></a>四、RabbitMQ</h2><p>RabbitMQ 是 AMQP 0-9-1 协议的经典实现，由 Erlang 语言编写。定位<strong>通用消息代理</strong>，以其灵活的路由能力和丰富的协议支持闻名。</p>
+<h3 id="4-1-架构"><a href="#4-1-架构" class="headerlink" title="4.1 架构"></a>4.1 架构</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">                   RabbitMQ Broker</span><br><span class="line">┌─────────────────────────────────────────────────┐</span><br><span class="line">│                    VHost                         │</span><br><span class="line">│  ┌─────────────────┐                            │</span><br><span class="line">│  │     Exchange    │ ← 生产者发消息到 Exchange   │</span><br><span class="line">│  │  (Direct/Topic  │                            │</span><br><span class="line">│  │   Fanout/Header)│                            │</span><br><span class="line">│  └────┬──────┬─────┘                            │</span><br><span class="line">│       │      │                                   │</span><br><span class="line">│  Binding   Binding    (路由 key 匹配)            │</span><br><span class="line">│       │      │                                   │</span><br><span class="line">│  ┌────▼──────▼─────┐                            │</span><br><span class="line">│  │    Queue        │ ← 消息队列(持久化/绑定)      │</span><br><span class="line">│  └────┬────────────┘                            │</span><br><span class="line">│       │ Consumer 消费                             │</span><br><span class="line">└───────┼──────────────────────────────────────────┘</span><br><span class="line">        ▼</span><br><span class="line">    Consumer</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心模型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Broker</td>
+<td>RabbitMQ 服务实例</td>
+</tr>
+<tr>
+<td>VHost</td>
+<td>虚拟主机，逻辑隔离（类似 namespace）。每个 VHost 有独立的 Exchange&#x2F;Queue&#x2F;权限</td>
+</tr>
+<tr>
+<td>Exchange</td>
+<td>交换机，收到消息后按路由规则投递到 Queue</td>
+</tr>
+<tr>
+<td>Queue</td>
+<td>消息队列，消息持久化存储。消费者从 Queue 取消息</td>
+</tr>
+<tr>
+<td>Binding</td>
+<td>绑定关系，Exchange 和 Queue 之间的路由规则</td>
+</tr>
+<tr>
+<td>Routing Key</td>
+<td>路由键，Exchange 根据此 key 和 Binding 规则决定消息投递到哪个 Queue</td>
+</tr>
+<tr>
+<td>Channel</td>
+<td>轻量级连接（复用 TCP 连接），一个 Connection 内可以创建多个 Channel</td>
+</tr>
+</tbody></table>
+<p><strong>RabbitMQ 内存模型</strong>：VMware 官方实测单 Queue 可达 20000 条&#x2F;s。但在 Erlang 内存模型和 GC 机制下，消息堆积千万级以上时会性能断崖式下跌。设计时请用大量 Queue（如数百个）分散积压，而非少量 Queue 深度堆积。</p>
+<h3 id="4-2-Exchange-类型"><a href="#4-2-Exchange-类型" class="headerlink" title="4.2 Exchange 类型"></a>4.2 Exchange 类型</h3><p><strong>Direct Exchange</strong>：精确匹配 Routing Key。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Binding:  QueueA ← <span class="attribute">routing_key</span>=<span class="string">&quot;order&quot;</span>   Exchange(direct)</span><br><span class="line">          QueueB ← <span class="attribute">routing_key</span>=<span class="string">&quot;payment&quot;</span> Exchange(direct)</span><br><span class="line"></span><br><span class="line">Producer → Exchange, <span class="attribute">routing_key</span>=<span class="string">&quot;order&quot;</span>  → QueueA (精确匹配)</span><br><span class="line">Producer → Exchange, <span class="attribute">routing_key</span>=<span class="string">&quot;payment&quot;</span> → QueueB</span><br><span class="line">Producer → Exchange, <span class="attribute">routing_key</span>=<span class="string">&quot;stock&quot;</span>  → 丢弃 (无匹配)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">      Producer</span><br><span class="line">         │</span><br><span class="line">         ▼</span><br><span class="line">   ┌─────────────┐</span><br><span class="line">   │ Direct       │</span><br><span class="line">   │ Exchange     │</span><br><span class="line">   └───┬─────┬────┘</span><br><span class="line">       │     │</span><br><span class="line"><span class="attribute">key</span>=order  <span class="attribute">key</span>=payment</span><br><span class="line">       │     │</span><br><span class="line">  ┌────▼┐ ┌──▼──────┐</span><br><span class="line">  │QueueA│ │QueueB   │</span><br><span class="line">  └──────┘ └─────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>Topic Exchange</strong>：按通配符模式匹配。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Binding: QueueA ← routing_key=&quot;order.*&quot;     (匹配 <span class="keyword">order</span>.<span class="keyword">create</span>, <span class="keyword">order</span>.pay)</span><br><span class="line">         QueueB ← routing_key=&quot;order.#&quot;     (匹配 <span class="keyword">order</span>.* 和 <span class="keyword">order</span>.a.b.c 等任意多级)</span><br><span class="line">         QueueC ← routing_key=&quot;*.create&quot;    (匹配 <span class="keyword">order</span>.<span class="keyword">create</span>, payment.<span class="keyword">create</span>)</span><br><span class="line"></span><br><span class="line">*  : 匹配一级 (用 . 分隔)</span><br><span class="line">#  : 匹配零级或多级</span><br></pre></td></tr></table></figure>
+
+<p><strong>Fanout Exchange</strong>：广播——忽略 Routing Key，消息投递到所有绑定的 Queue。性能最高（无路由匹配开销），用于广播场景（如配置刷新、缓存失效）。</p>
+<p><strong>Headers Exchange</strong>：按 Header 属性路由（不再依赖 Routing Key）。绑定时指定 <code>x-match=all|any</code> 和多个 header 匹配条件。极少使用，因性能较差。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Spring AMQP 声明示例</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="keyword">public</span> DirectExchange <span class="title function_">orderExchange</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">DirectExchange</span>(<span class="string">&quot;order.exchange&quot;</span>, <span class="literal">true</span>, <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="keyword">public</span> Queue <span class="title function_">orderQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> QueueBuilder.durable(<span class="string">&quot;order.queue&quot;</span>)</span><br><span class="line">        .withArgument(<span class="string">&quot;x-dead-letter-exchange&quot;</span>, <span class="string">&quot;dlx.exchange&quot;</span>)</span><br><span class="line">        .withArgument(<span class="string">&quot;x-dead-letter-routing-key&quot;</span>, <span class="string">&quot;dlx.order&quot;</span>)</span><br><span class="line">        .build();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="keyword">public</span> Binding <span class="title function_">orderBinding</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> BindingBuilder.bind(orderQueue()).to(orderExchange()).with(<span class="string">&quot;order.created&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-消息确认机制"><a href="#4-3-消息确认机制" class="headerlink" title="4.3 消息确认机制"></a>4.3 消息确认机制</h3><p>RabbitMQ 提供生产端和消费端的双重确认：</p>
+<p><strong>Publisher Confirm（生产者确认）</strong>：</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Broker 收到消息并持久化后返回 ACK:</span><br><span class="line">  Spring AMQP:</span><br><span class="line">    <span class="function"><span class="title">rabbitTemplate</span>.setConfirmCallback((correlationData, ack, cause) -&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (ack) &#123;</span><br><span class="line">            <span class="comment">// 消息已到达 Broker (Exchange 确认收到)</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">log</span>.error(<span class="string">&quot;消息发送失败: &quot;</span> + cause);</span><br><span class="line">            <span class="comment">// 需要补偿: 重试、落库、告警</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：Publisher Confirm 只确认消息到达 Exchange，不保证到达 Queue（因为 Routing Key 不匹配时静默丢弃）。需要同时设置 <code>mandatory=true</code> 配合 ReturnCallback 感知无法路由的消息。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ReturnCallback: 消息无法路由到 Queue 时的回调</span></span><br><span class="line">rabbitTemplate.setMandatory(<span class="literal">true</span>);</span><br><span class="line">rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -&gt; &#123;</span><br><span class="line">    log.error(<span class="string">&quot;消息无法路由: exchange=&#123;&#125;, routingKey=&#123;&#125;, reply=&#123;&#125;&quot;</span>, exchange, routingKey, replyText);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><strong>Consumer Ack（消费者确认）</strong>：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">确认模式:</span><br><span class="line">  <span class="operator">-</span> <span class="params">auto:</span> 方法正常返回 → ACK; 抛异常 → NACK 并 requeue</span><br><span class="line">  <span class="operator">-</span> <span class="params">manual:</span> 消费者显式调用 basicAck <span class="symbol">/</span> basicNack <span class="symbol">/</span> basicReject</span><br><span class="line">  <span class="operator">-</span> <span class="params">none:</span> 自动 ACK (绝不推荐——消息可能静默丢失)</span><br><span class="line"></span><br><span class="line">手动确认:</span><br><span class="line">  channel.basicAck(deliveryTag, <span class="literal">false</span>);     <span class="operator">//</span> 确认单条</span><br><span class="line">  channel.basicNack(deliveryTag, <span class="literal">false</span>, requeue); <span class="operator">//</span> 拒绝单条, 可选 requeue</span><br><span class="line">  channel.basicReject(deliveryTag, requeue);      <span class="operator">//</span> 拒绝单条, 不能批量</span><br><span class="line"></span><br><span class="line">  <span class="operator">//</span> basicNack 第三个参数 multiple<span class="operator">=</span><span class="literal">true</span> 批量 Nack(该 deliveryTag 及之前所有)</span><br></pre></td></tr></table></figure>
+
+<p><strong>ACK 超时与 Consumer 恢复</strong>：RabbitMQ 本身没有 consumer ack timeout 机制。消费者处理消息时间过长不 ACK，消息一直处于 unacked 状态。需要通过 <code>consumer_timeout</code>（RabbitMQ 3.12+）配置。</p>
+<h3 id="4-4-死信队列与延迟队列"><a href="#4-4-死信队列与延迟队列" class="headerlink" title="4.4 死信队列与延迟队列"></a>4.4 死信队列与延迟队列</h3><p><strong>死信队列（DLX: Dead Letter Exchange）</strong>：消息在以下三种情况下成为死信：</p>
+<ol>
+<li>被消费者 Reject 且 <code>requeue=false</code></li>
+<li>消息 TTL 到期（Queue 级别的 <code>x-message-ttl</code>）</li>
+<li>Queue 满（<code>x-max-length</code> 或 <code>x-max-length-bytes</code> 超出限制）</li>
+</ol>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">正常 <span class="built_in">Queue</span>:</span><br><span class="line">  ┌─────────────┐</span><br><span class="line">  │ <span class="keyword">order</span>.<span class="built_in">queue</span> │──► Consumer</span><br><span class="line">  └──────┬──────┘</span><br><span class="line">         │ (死信条件触发)</span><br><span class="line">         ▼</span><br><span class="line">  ┌─────────────┐</span><br><span class="line">  │ dlx.exchange │→ DLQ <span class="built_in">Queue</span> → 死信消费者(告警/记录/补偿)</span><br><span class="line">  └─────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>延迟队列</strong>：RabbitMQ 没有原生延迟队列，通过 TTL + DLX 组合实现。</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">延迟队列实现:</span><br><span class="line">  ┌────────────────────┐</span><br><span class="line">  │ delay.queue         │    ← <span class="keyword">x</span>-message-ttl<span class="operator">=</span><span class="number">10000</span>  (<span class="number">10</span>秒)</span><br><span class="line">  │ <span class="keyword">x</span>-dead-letter-      │    ← 绑定 DLX</span><br><span class="line">  │   exchange<span class="operator">=</span><span class="keyword">target</span>   │</span><br><span class="line">  └─────────┬──────────┘</span><br><span class="line">            │ (消息过期<span class="punctuation">,</span> 自动成为死信)</span><br><span class="line">            ▼</span><br><span class="line">  ┌────────────────────┐</span><br><span class="line">  │ <span class="keyword">target</span>.queue        │    ← 真正的消费队列</span><br><span class="line">  └─────────┬──────────┘</span><br><span class="line">            ▼</span><br><span class="line">        Consumer</span><br></pre></td></tr></table></figure>
+
+<p>但这种方式有<strong>严重缺陷</strong>：Queue 级别的 TTL 作用于整个队列，一旦设置了不同 TTL 的消息需要不同队列。而且 RabbitMQ 只在消息到达 Queue 头部时才会检测 TTL（惰性过期）——即使退后一条消息的 TTL 到了，只要它不在队首就不会被投递到 DLX。</p>
+<p><strong>RabbitMQ 3.8+ 延迟插件</strong>：通过 <code>rabbitmq_delayed_message_exchange</code> 插件获得原生延迟能力。安装插件后，Exchange 类型包含 <code>x-delayed-message</code>，消息携带 <code>x-delay</code> 头指定延迟毫秒数。</p>
+<h3 id="4-5-镜像队列与仲裁队列"><a href="#4-5-镜像队列与仲裁队列" class="headerlink" title="4.5 镜像队列与仲裁队列"></a>4.5 镜像队列与仲裁队列</h3><p><strong>镜像队列（Mirrored Queues, 经典队列高可用）</strong>：</p>
+<p>采用 Active-Active 架构，所有节点都能接收读写，但背后节点同步遵循 Master 模式：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">镜像队列(<span class="attribute">ha-mode</span>=exactly, <span class="attribute">ha-params</span>=2, 即 1 Master + 1 Mirror):</span><br><span class="line">  Node1(Master)          Node2(Mirror)</span><br><span class="line">  ┌────────────┐         ┌────────────┐</span><br><span class="line">  │<span class="built_in"> Queue </span>V3   │←─同步──│<span class="built_in"> Queue </span>V3   │</span><br><span class="line">  └────────────┘         └────────────┘</span><br><span class="line">      ↑ 读写                 ↑ (故障时可接管)</span><br><span class="line">  Consumer/Producer      Consumer/Producer</span><br></pre></td></tr></table></figure>
+
+<p>所有客户端只与 Master 交互，Mirror 节点是被动的。Master 执行任何操作（写入、ACK）前，先将操作发送到所有 Mirror → 收到确认 → 然后 Master 执行。同步复制，强一致。</p>
+<p><strong>镜像队列的缺陷</strong>：</p>
+<ul>
+<li>所有消息完全复制到 Mirror → 每个节点存储整个 Queue，磁盘使用效率低</li>
+<li>同步复制导致性能下降明显（瓶颈在同步最慢的节点）</li>
+<li>不支持自动故障恢复和集群规模扩展（加节点不提升吞吐，只增加副本）</li>
+</ul>
+<p><strong>仲裁队列（Quorum Queues, RabbitMQ 3.8+）</strong>：</p>
+<p>基于 Raft 共识协议的 Queue 类型，替代镜像队列的新方案：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>镜像队列</th>
+<th>仲裁队列</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>共识协议</td>
+<td>类同步复制(设计不规范)</td>
+<td>Raft(成熟共识算法)</td>
+</tr>
+<tr>
+<td>数据复制</td>
+<td>全量复制到所有 Mirror</td>
+<td>Raft 日志复制(多数派确认)</td>
+</tr>
+<tr>
+<td>故障恢复</td>
+<td>人工&#x2F;MQ 策略切换</td>
+<td>自动 Leader 选举秒级</td>
+</tr>
+<tr>
+<td>持久性</td>
+<td>可选(durable&#x2F;transient)</td>
+<td>强制持久化(数据无法脱离磁盘)</td>
+</tr>
+<tr>
+<td>消息顺序</td>
+<td>保证</td>
+<td>保证</td>
+</tr>
+<tr>
+<td>重复消费处理</td>
+<td>无</td>
+<td>自动检测+过滤重复消息</td>
+</tr>
+<tr>
+<td>内存占用</td>
+<td>小</td>
+<td>较大(Raft 日志元数据)</td>
+</tr>
+<tr>
+<td>吞吐量</td>
+<td>较高</td>
+<td>略低于镜像队列(写在 Raft 日志)</td>
+</tr>
+</tbody></table>
+<p>仲裁队列关键配置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明仲裁队列</span></span><br><span class="line"><span class="type">Queue</span> <span class="variable">quorumQueue</span> <span class="operator">=</span> QueueBuilder.durable(<span class="string">&quot;quorum.order.queue&quot;</span>)</span><br><span class="line">    .quorum()  <span class="comment">// 标记为仲裁队列</span></span><br><span class="line">    .withArgument(<span class="string">&quot;x-quorum-initial-group-size&quot;</span>, <span class="number">3</span>)  <span class="comment">// 初始节点数</span></span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>生产经验</strong>：新项目直接使用仲裁队列，不要引入镜像队列。仲裁队列基于 Raft 的设计更健壮，且支持自动恢复和扩展。镜像队列已进入维护模式。</p>
+</blockquote>
+<hr>
+<h2 id="五、通用主题"><a href="#五、通用主题" class="headerlink" title="五、通用主题"></a>五、通用主题</h2><h3 id="5-1-消息可靠性保证"><a href="#5-1-消息可靠性保证" class="headerlink" title="5.1 消息可靠性保证"></a>5.1 消息可靠性保证</h3><p>消息从生产到消费，经历三个阶段，每个阶段都可能丢失消息：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">阶段<span class="number">1</span>: 生产可靠        阶段<span class="number">2</span>: 存储可靠          阶段<span class="number">3</span>: 消费可靠</span><br><span class="line">Producer → <span class="keyword">Broker </span>   <span class="keyword">Broker </span>存储、副本        <span class="keyword">Broker </span>→ Consumer</span><br></pre></td></tr></table></figure>
+
+<p><strong>阶段1：生产可靠性</strong></p>
+<table>
+<thead>
+<tr>
+<th>MQ</th>
+<th>保证方式</th>
+<th>关键参数&#x2F;API</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kafka</td>
+<td>同步发送 + acks&#x3D;all</td>
+<td><code>acks=all</code>, <code>enable.idempotence=true</code>, 同步 <code>Future.get()</code></td>
+</tr>
+<tr>
+<td>RocketMQ</td>
+<td>同步发送 + 刷盘策略</td>
+<td><code>SYNC_FLUSH</code> 刷盘, <code>sendResult.getSendStatus()</code> 检查</td>
+</tr>
+<tr>
+<td>RabbitMQ</td>
+<td>Publisher Confirm + mandatory</td>
+<td><code>setConfirmCallback()</code>, <code>setReturnCallback()</code>, 消息持久化 <code>deliveryMode=2</code></td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Kafka 可靠发送示例</span></span><br><span class="line">Future&lt;RecordMetadata&gt; future = producer.send(record);</span><br><span class="line"><span class="type">RecordMetadata</span> <span class="variable">meta</span> <span class="operator">=</span> future.get(); <span class="comment">// 同步等待, 阻塞获取结果</span></span><br><span class="line"><span class="comment">// 或用回调:</span></span><br><span class="line">producer.send(record, (metadata, exception) -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (exception != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 重试或落库</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><strong>阶段2：存储可靠性</strong></p>
+<ul>
+<li>Kafka：设置 <code>replication.factor=3</code>, <code>min.insync.replicas=2</code>, <code>unclean.leader.election.enable=false</code></li>
+<li>RocketMQ：同步刷盘 + 主从同步复制（或 DLedger）</li>
+<li>RabbitMQ：<code>durable=true</code> + 镜像队列或仲裁队列</li>
+</ul>
+<p><strong>阶段3：消费可靠性</strong></p>
+<table>
+<thead>
+<tr>
+<th>MQ</th>
+<th>可靠性保证</th>
+<th>具体机制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kafka</td>
+<td>手动提交 offset</td>
+<td><code>enable.auto.commit=false</code>, <code>consumer.commitSync()</code> 处理完再提交</td>
+</tr>
+<tr>
+<td>RocketMQ</td>
+<td>消费状态返回</td>
+<td><code>ConsumeConcurrentlyStatus.CONSUME_SUCCESS</code> 或 <code>RECONSUME_LATER</code></td>
+</tr>
+<tr>
+<td>RabbitMQ</td>
+<td>手动 ACK</td>
+<td><code>channel.basicAck()</code> 确认, <code>channel.basicNack()</code> 处理失败 requeue</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>核心原则</strong>：只要有一环缺失，消息就可能丢失。一条穿越全链路的消息 &#x3D; 生产者确认 + Broker 副本 + 消费者确认。三缺一，可靠性不作数。</p>
+</blockquote>
+<h3 id="5-2-消息幂等性"><a href="#5-2-消息幂等性" class="headerlink" title="5.2 消息幂等性"></a>5.2 消息幂等性</h3><p>MQ 的语义保证是 at-least-once（至少一次），这意味着每条消息可能被重复消费。消费端必须实现幂等。</p>
+<p><strong>方案1：业务唯一键</strong>（最推荐）</p>
+<p>每条消息携带业务唯一 ID（如数据库主键、订单号等），消费端利用数据库唯一约束保证幂等：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 数据库唯一键去重</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">consume</span><span class="params">(OrderEvent event)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        orderDao.insert(event.toOrder());  <span class="comment">// order_id 有唯一索引</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (DuplicateKeyException e) &#123;</span><br><span class="line">        <span class="comment">// 已处理过, 跳过</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 幂等保证: 相同 order_id 只会插入成功一次</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>方案2：去重表</strong>（通用方案）</p>
+<p>维护一张 <code>message_consumer_log</code> 表，记录 <code>msg_id</code> 和处理状态：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> message_consumer_log (</span><br><span class="line">    msg_id <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">PRIMARY KEY</span>,</span><br><span class="line">    status <span class="type">VARCHAR</span>(<span class="number">20</span>),    <span class="comment">-- PROCESSING, CONSUMED</span></span><br><span class="line">    create_time DATETIME,</span><br><span class="line">    update_time DATETIME</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 消费逻辑</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> message_consumer_log (msg_id, status) <span class="keyword">VALUES</span> (?, <span class="string">&#x27;PROCESSING&#x27;</span>);</span><br><span class="line"><span class="comment">-- 成功返回 → 执行业务逻辑</span></span><br><span class="line"><span class="comment">-- 失败(重复键) → 跳过</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">consume</span><span class="params">(Message msg)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">msgId</span> <span class="operator">=</span> msg.getKey();</span><br><span class="line">    <span class="comment">// 尝试插入去重记录(唯一键冲突则跳过)</span></span><br><span class="line">    <span class="type">boolean</span> <span class="variable">inserted</span> <span class="operator">=</span> messageLogDao.insertIfAbsent(msgId);</span><br><span class="line">    <span class="keyword">if</span> (!inserted) <span class="keyword">return</span>; <span class="comment">// 已消费, 跳过</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        businessLogic(msg);</span><br><span class="line">        messageLogDao.updateStatus(msgId, <span class="string">&quot;CONSUMED&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        <span class="comment">// 处理失败, 状态保持 PROCESSING</span></span><br><span class="line">        <span class="comment">// 支持后续重试(根据状态决定是否重试)</span></span><br><span class="line">        <span class="keyword">throw</span> e;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>方案3：Redis SetNX</strong>（适合低延迟场景）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">dedupKey</span> <span class="operator">=</span> <span class="string">&quot;msg:dedup:&quot;</span> + msgId;</span><br><span class="line"><span class="type">Boolean</span> <span class="variable">firstTime</span> <span class="operator">=</span> redisTemplate.opsForValue()</span><br><span class="line">    .setIfAbsent(dedupKey, <span class="string">&quot;1&quot;</span>, Duration.ofHours(<span class="number">24</span>));</span><br><span class="line"><span class="keyword">if</span> (Boolean.TRUE.equals(firstTime)) &#123;</span><br><span class="line">    process(msg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>三种方案对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>可靠性</th>
+<th>性能</th>
+<th>复杂度</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>业务唯一键</td>
+<td>最高</td>
+<td>高(单次查)</td>
+<td>低</td>
+<td><strong>优先推荐</strong></td>
+</tr>
+<tr>
+<td>去重表</td>
+<td>高</td>
+<td>中(写两次 DB)</td>
+<td>中</td>
+<td>通用</td>
+</tr>
+<tr>
+<td>Redis SetNX</td>
+<td>中(过期后失去幂等)</td>
+<td>极高</td>
+<td>低</td>
+<td>允许 24h 窗口内去重</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>生产经验</strong>：业务唯一键是第一选择。例如订单号天生唯一，不需要额外去重表。只有在消息没有自然唯一键时才用去重表或 Redis 方案。</p>
+</blockquote>
+<h3 id="5-3-消息积压处理"><a href="#5-3-消息积压处理" class="headerlink" title="5.3 消息积压处理"></a>5.3 消息积压处理</h3><p>消息积压是 MQ 系统最常见的生产事故。原因通常是消费速度低于生产速度，或消费者全部宕机。</p>
+<p><strong>积压程度分级</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>描述</th>
+<th>应急方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>轻度 (&lt; 百万)</td>
+<td>消费慢</td>
+<td>扩容消费者实例</td>
+</tr>
+<tr>
+<td>中度 (百万~千万)</td>
+<td>临时消费速度不够</td>
+<td>紧急增加消费者，跳过非核心处理</td>
+</tr>
+<tr>
+<td>重度 (&gt;千万)</td>
+<td>磁盘空间告急</td>
+<td>先止损(扩容磁盘&#x2F;新建 Topic 转移)，再处理积压</td>
+</tr>
+</tbody></table>
+<p><strong>应急处理流程</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 步骤1: 止损 - 判断积压原因</span></span><br><span class="line"><span class="comment"># 消费者宕机 → 重启消费者</span></span><br><span class="line"><span class="comment"># 消费逻辑慢 → 扩容消费者实例(不能超过分区数)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 步骤2: 临时修复 - 跳过非核心逻辑</span></span><br><span class="line"><span class="comment"># 快速消费积压的代码(跳过复杂计算、第三方调用):</span></span><br><span class="line">public void emergencyConsume(Message msg) &#123;</span><br><span class="line">    // 只做核心落库, 跳过通知/统计</span><br><span class="line">    orderDao.insert(msg.toOrder());</span><br><span class="line">    // 不做: smsService.send(), analyticsService.report()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤3：消息转发</strong>（重度积压）</p>
+<p>如果积压量大到快影响磁盘空间，把积压的 Topic 消息快速消费后转发到新 Topic：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">原 <span class="built_in">Topic</span>(积压 <span class="number">1</span> 亿条) → 紧急消费者(只做转发) → 新 Topic</span><br><span class="line">→ 新消费者组(加速消费)</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤4：批量扩容消费者</strong>（如果消费者实例 &lt; 分区数）</p>
+<p>Kafka 的消费并发上限 &#x3D; Partition 数量。如果 8 个分区但只有 4 个消费者，扩容到 8 个即可线性提升消费速度。</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">特别注意</span><span class="punctuation">:</span> <span class="string">Kafka 消费者实例数 &gt; 分区数时, 多余实例空闲(不会参与消费)</span></span><br><span class="line"><span class="attribute">RocketMQ 同理</span><span class="punctuation">:</span> <span class="string">消费者数 &gt; 消息队列数(默认 readQueueNums)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>预防措施</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 监控消费滞后 (Kafka)</span></span><br><span class="line">consumer.metrics().forEach((name, metric) -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (name.name().equals(<span class="string">&quot;records-lag&quot;</span>)) &#123;</span><br><span class="line">        gauge.set(metric.value());  <span class="comment">// Prometheus 指标上报</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 告警规则(示例):</span></span><br><span class="line"><span class="comment">// records-lag &gt; 100000 持续 5min → P2 告警</span></span><br><span class="line"><span class="comment">// records-lag &gt; 1000000 持续 2min → P1 告警</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-4-顺序消息的实现"><a href="#5-4-顺序消息的实现" class="headerlink" title="5.4 顺序消息的实现"></a>5.4 顺序消息的实现</h3><p><strong>为什么要全局顺序</strong>：RDBMS binlog 同步、状态机复制等场景要求严格顺序。</p>
+<p><strong>单 Partition 单线程消费</strong>（Kafka + RocketMQ 通用模式）：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">生产者: 相同 key → 路由到同一 Partition</span><br><span class="line">消费者: 对 Partition 加锁, 单线程消费</span><br><span class="line"><span class="symbol"></span></span><br><span class="line"><span class="symbol">Kafka:</span></span><br><span class="line">  <span class="comment">// Producer: 指定 key</span></span><br><span class="line">  new ProducerRecord<span class="params">&lt;&gt;</span>(<span class="string">&quot;topic&quot;</span>, <span class="string">&quot;orderId123&quot;</span>, messageBody)<span class="punctuation">;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Consumer: 按分区顺序处理</span></span><br><span class="line">  <span class="comment">// 每个 Partition 只会分配给 Group 内的一个消费者</span></span><br><span class="line">  <span class="comment">// 这个消费者内部按顺序 poll 和 process</span></span><br><span class="line"><span class="symbol"></span></span><br><span class="line"><span class="symbol">RocketMQ:</span></span><br><span class="line">  <span class="comment">// Producer: MessageQueueSelector</span></span><br><span class="line">  <span class="comment">// Consumer: MessageListenerOrderly</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>全局顺序</strong>：Topic 只有 1 个 Partition&#x2F;MessageQueue——所有消息严格有序，但吞吐上限为单机。建议只在写 Binlog 或其他极少数场景下采用。</p>
+<h3 id="5-5-MQ-选型参考表"><a href="#5-5-MQ-选型参考表" class="headerlink" title="5.5 MQ 选型参考表"></a>5.5 MQ 选型参考表</h3><table>
+<thead>
+<tr>
+<th>选型维度</th>
+<th>Kafka</th>
+<th>RocketMQ</th>
+<th>RabbitMQ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>吞吐量</strong></td>
+<td>★★★★★ 百万级</td>
+<td>★★★★☆ 十万级</td>
+<td>★★★☆☆ 万级</td>
+</tr>
+<tr>
+<td><strong>延迟</strong></td>
+<td>ms 级</td>
+<td>ms 级</td>
+<td>μs 级</td>
+</tr>
+<tr>
+<td><strong>可靠性</strong></td>
+<td>★★★★☆ at-least-once</td>
+<td>★★★★★ 金融级</td>
+<td>★★★★☆ 高可靠性</td>
+</tr>
+<tr>
+<td><strong>事务消息</strong></td>
+<td>支持(0.11+), 但复杂</td>
+<td>★★★★★ 原生半消息+回查</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td><strong>延迟消息</strong></td>
+<td>需自建</td>
+<td>★★★★★ 18 个级别</td>
+<td>需 DLX 模拟&#x2F;插件</td>
+</tr>
+<tr>
+<td><strong>消息查询&#x2F;回溯</strong></td>
+<td>按 offset 回溯</td>
+<td>★★★★★ 按 Key&#x2F;时间查询</td>
+<td>不支持回溯</td>
+</tr>
+<tr>
+<td><strong>多语言支持</strong></td>
+<td>Java 最佳, 多语言</td>
+<td>Java 最佳</td>
+<td>★★★★★ 所有语言</td>
+</tr>
+<tr>
+<td><strong>运维复杂度</strong></td>
+<td>★★★☆☆ 需 ZooKeeper&#x2F;KRaft</td>
+<td>★★☆☆☆ 多个独立组件</td>
+<td>★★★★★ 简单部署</td>
+</tr>
+<tr>
+<td><strong>社区活跃</strong></td>
+<td>★★★★★ Apache 顶级</td>
+<td>★★★★☆ 阿里主导</td>
+<td>★★★★☆ VMware 维护</td>
+</tr>
+<tr>
+<td><strong>云原生</strong></td>
+<td>★★★★★ K8s Operator</td>
+<td>★★★☆☆ 容器化一般</td>
+<td>★★★★☆ K8s 支持好</td>
+</tr>
+<tr>
+<td><strong>典型场景</strong></td>
+<td>日志采集、流计算、事件溯源、Clickstream</td>
+<td>交易消息、电商订单、分布式事务</td>
+<td>业务解耦、RPC 异步化、服务间通信</td>
+</tr>
+<tr>
+<td><strong>不适合场景</strong></td>
+<td>低延迟(ms以下)、大量 Topic</td>
+<td>海量 Topic (数万+) 有压力</td>
+<td>高吞吐(10w+)、消息大量积压</td>
+</tr>
+</tbody></table>
+<p><strong>选型决策规则</strong>：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 1. 日处理量 &gt; 百亿消息</span></span><br><span class="line"></span><br><span class="line">→ Kafka <span class="punctuation">(</span>别无选择<span class="punctuation">)</span></span><br><span class="line"><span class="meta"># 2. 金融/支付/电商核心交易链路</span></span><br><span class="line"></span><br><span class="line">→ RocketMQ <span class="punctuation">(</span>事务消息 <span class="punctuation">+</span> 回查 <span class="punctuation">+</span> 刷盘保证<span class="punctuation">)</span></span><br><span class="line"><span class="meta"># 3. 企业内服务间异步通信，路由灵活，请求-响应模式</span></span><br><span class="line"></span><br><span class="line">→ RabbitMQ <span class="punctuation">(</span>AMQP 标准、Exchange 灵活路由<span class="punctuation">)</span></span><br><span class="line"><span class="meta"># 4. 日志、埋点、流式 ETL</span></span><br><span class="line"></span><br><span class="line">→ Kafka <span class="punctuation">(</span>极致吞吐、直连存储、Kafka Streams<span class="punctuation">)</span></span><br><span class="line"><span class="meta"># 5. 物联网（千万设备连接，低功耗协议）</span></span><br><span class="line"></span><br><span class="line">→ RabbitMQ <span class="punctuation">(</span>MQTT 插件<span class="punctuation">)</span> 或 EMQX</span><br><span class="line"><span class="meta"># 6. 中小型项目、少量消息、不想运维复杂</span></span><br><span class="line"></span><br><span class="line">→ RabbitMQ <span class="punctuation">(</span>单节点就够用<span class="punctuation">)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-6-面试常见问题"><a href="#5-6-面试常见问题" class="headerlink" title="5.6 面试常见问题"></a>5.6 面试常见问题</h3><p><strong>1. Kafka 为什么能实现百万 QPS？</strong></p>
+<p>顺序写磁盘、零拷贝 sendfile、pagecache、批量处理、分区并发、无状态 Broker——这些是 Kafka 性能优势的六大支柱。顺序写 SSD 可达 600MB&#x2F;s，传统随机写磁盘仅 ~100KB&#x2F;s，差 6000 倍。sendfile 将网络传输的 CPU 复制从 4 次降到 2 次 DMA，且全程绕过用户态。pagecache 使读操作和写缓冲几乎都在内存中完成。批量处理将大量小 IO 汇聚为大 IO。</p>
+<p><strong>2. RocketMQ 的事务消息和 Kafka 的事务有何区别？</strong></p>
+<p>RocketMQ 事务消息通过半消息（Half Msg）+ 回查机制，解决分布式事务中 MQ 与 DB 的一致性问题。Kafka 事务是保证生产者跨分区原子写入（更接近数据库事务语义）。RocketMQ 的事务消息设计更贴近业务——引入”反查”确保事务最终一致——而 Kafka 需要 EOS（Exactly Once Semantics）实现跨分区事务，但应用层更多用于流处理而不是业务事务。</p>
+<p><strong>3. 如何保证消息不丢失？</strong></p>
+<p>从生产端到 Broker 到消费端三阶段不可缺一。生产端：同步确认（<code>acks=all</code>、Publisher Confirm）。Broker 端：多副本，<code>min.insync.replicas &gt;= 2</code>，拒绝 unclean 选举。消费端：禁用自动提交，处理完毕再提交 offset 或 ACK。另外，幂等去重保证重复消息不会产生数据问题。三阶段任一缺失都会导致消息可靠性失效。</p>
+<p><strong>4. ISR 为什么缩小？</strong></p>
+<p>网络抖动或 Follower 节点 GC 停顿，导致 Follower 超过 <code>replica.lag.time.max.ms</code>（默认 30s）未与 Leader 同步，被踢出 ISR。这时 <code>min.insync.replicas</code> 可能不满足，生产者收到 NOT_ENOUGH_REPLICAS 异常。优化方向：增大 <code>replica.lag.time.max.ms</code>、增加 <code>num.replica.fetchers</code> 线程数、增加 Follower 节点资源。</p>
+<p><strong>5. 消息重复消费了怎么办？</strong></p>
+<p>MQ 的保证是 at-least-once，重复消费是必然的（而非 bug）。解决方案就是消费端幂等——业务唯一键、去重表、Redis SetNX。设计消费逻辑时必须假定每条消息至少会收到一次。</p>
+<p><strong>6. 顺序消息消费慢怎么办？</strong></p>
+<p>这是顺序消息的天然瓶颈——单线程消费意味着无法水平扩展。如果消费端是 IO 密集型，把核心逻辑拆为两部分：先消费存入本地 B+Tree &#x2F; 有序队列，再用多线程处理，最终按 key 聚合。也可以队列内加速：将计算密集型操作异步化，只保留顺序的聚合步骤。</p>
+<p><strong>7. RabbitMQ 的 Channel 为什么是线程不安全的？</strong></p>
+<p>Channel 是 Erlang 进程映射到客户端的轻量级对象，其底层 Erlang 进程是单线程 actor 模型（不是锁保护）。因此多个线程并发操作同一个 Channel 会破坏 Erlang 的消息不变性。方案：每个线程分配独立 Channel，或线程间通过队列传递操作。</p>
+<p><strong>8. 如何实现一个延时任意时间的延时消息？</strong></p>
+<p>原生 RocketMQ 只支持 18 个级别，RabbitMQ 需 DLX 模拟。通用方案是：维护一个基于时间轮的调度器（如 Netty 的 <code>HashedWheelTimer</code>），生产者把消息的时间写入数据库，调度器定时轮询到期消息并通过 MQ 投递出去。时间轮的优点是 O(1) 插入和删除，适合海量定时消息场景。</p>
+<hr>
+<h2 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h2><p>消息队列的选择不是看哪个技术”最新最好”，而是匹配业务形态：</p>
+<ul>
+<li><strong>高吞吐流处理</strong> → Kafka：顺序读写、零拷贝、pagecache，单机百万 QPS</li>
+<li><strong>核心交易链路</strong> → RocketMQ：事务消息、半消息回查、分布式最终一致性</li>
+<li><strong>灵活路由通信</strong> → RabbitMQ：Direct&#x2F;Topic&#x2F;Fanout 路由、AMQP 标准、低延迟</li>
+</ul>
+<p>三个 MQ 的存储模型截然不同——Kafka 的 Partition Segment、RocketMQ 的 CommitLog+ConsumeQueue、RabbitMQ 的 Queue 索引——反映了不同的设计哲学：</p>
+<ul>
+<li>Kafka 是”分布式日志”——消息分层为有序 Segment，适合大规模顺序消费</li>
+<li>RocketMQ 是”数据库的事务日志”——所有 Topic 共用一个 CommitLog，轻量级 Topic</li>
+<li>RabbitMQ 是”消息路由器”——Exchange 路由 → Queue 存储，灵活与可靠兼得</li>
+</ul>
+<p>理解存储模型和共识机制（ISR、Raft、主从同步）的区别，比掌握 API 重要得多。MQ 的难点不在”发送和接收”，而在于<strong>消息可靠性、幂等性、积压处理、顺序保证</strong>这些生产问题的解决。</p>
+<p>选好 MQ，用好 MQ，才能让异步消息从”有问题”变成”看不见”——这才是高级工程师的分水岭。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag"># 消息队列</a>
+              <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+              <a href="/tags/RocketMQ/" rel="tag"># RocketMQ</a>
+              <a href="/tags/RabbitMQ/" rel="tag"># RabbitMQ</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/security/" rel="prev" title="后端安全">
+                  <i class="fa fa-angle-left"></i> 后端安全
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/java-netty/" rel="next" title="Java NIO 与 Netty">
+                  Java NIO 与 Netty <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2019 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pcl</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
