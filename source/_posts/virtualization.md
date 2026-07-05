@@ -12,20 +12,9 @@ categories:
   - 基础设施
 ---
 
-```yaml
-# docker-compose.yml 存储配置示例
-services:
-  db:
-    image: postgres:16
-    volumes:
-      - pgdata:/var/lib/postgresql/data             # named volume
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro  # bind mount
-    tmpfs:
-      - /tmp
-volumes:
-  pgdata:
-    driver: local
-```
+---
+
+> 📖 本文前六节（Docker 基础、容器 vs 虚拟机、镜像分层、网络模式、存储卷、多阶段构建）已独立为 [Docker 深度解析](/docker-deep-dive/)，建议先阅读。以下从 Dockerfile 实践开始。
 
 ### 1.7 Dockerfile 最佳实践
 
@@ -89,7 +78,7 @@ secrets:
 
 ---
 
-## 二、容器编排：Kubernetes 深度解析容器编排：Kubernetes 深度解析
+## 二、容器编排——Kubernetes 深度解析
 
 ### 2.1 架构全景
 
