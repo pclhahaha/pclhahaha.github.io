@@ -30,7 +30,7 @@ comments: false
   <h1>数据工程知识图谱</h1>
   <p>数据湖 · 数仓 · ETL · 调度 · 流处理</p>
   <div class="kg-stats">
-    <div class="kg-stat"><div class="kg-stat-num">5</div><div class="kg-stat-label">篇文章</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">9</div><div class="kg-stat-label">篇文章</div></div>
     <div class="kg-stat"><div class="kg-stat-num">4</div><div class="kg-stat-label">分类</div></div>
   </div>
 </div>
@@ -65,7 +65,7 @@ comments: false
     <div class="kg-cat-title">数据湖</div>
     <div class="kg-links">
       <a class="kg-link" href="/s3-data-lake-guide/">S3 数据湖最佳实践</a>
-      <a class="kg-link" href="#" style="color:#999">Iceberg / Delta Lake / Hudi（待补充）</a>
+      <a class="kg-link" href="/iceberg-delta-hudi/">Iceberg / Delta Lake / Hudi</a>
     </div>
   </div>
   <div class="kg-category">
@@ -78,7 +78,7 @@ comments: false
   <div class="kg-category">
     <div class="kg-cat-title">数据建模</div>
     <div class="kg-links">
-      <a class="kg-link" href="#" style="color:#999">星型/雪花/Vault（待补充）</a>
+      <a class="kg-link" href="/data-modeling-guide/">数据建模方法论</a>
     </div>
   </div>
 </div>
@@ -95,9 +95,9 @@ comments: false
 <div class="kg-section">
   <div class="kg-section-title">📊 数据治理</div>
   <div class="kg-links">
-    <a class="kg-link" href="#" style="color:#999">数据质量（待补充）</a>
-    <a class="kg-link" href="#" style="color:#999">数据血缘（待补充）</a>
-    <a class="kg-link" href="#" style="color:#999">成本优化（待补充）</a>
+    <a class="kg-link" href="/data-quality-lineage/">数据质量与血缘</a>
+    <a class="kg-link" href="/data-quality-lineage/">数据血缘</a>
+    <a class="kg-link" href="/data-cost-optimization/">成本优化</a>
   </div>
 </div>
 

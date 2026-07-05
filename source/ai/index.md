@@ -30,7 +30,7 @@ comments: false
   <h1>AI 与 LLM Agent 知识图谱</h1>
   <p>大语言模型 · Agent 框架 · RAG · 推理优化</p>
   <div class="kg-stats">
-    <div class="kg-stat"><div class="kg-stat-num">4</div><div class="kg-stat-label">篇文章</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">8</div><div class="kg-stat-label">篇文章</div></div>
     <div class="kg-stat"><div class="kg-stat-num">3</div><div class="kg-stat-label">分类</div></div>
   </div>
 </div>
@@ -46,13 +46,13 @@ comments: false
   <div class="kg-category">
     <div class="kg-cat-title">训练与微调</div>
     <div class="kg-links">
-      <a class="kg-link" href="#" style="color:#999">预训练 / SFT / RLHF（待补充）</a>
+      <a class="kg-link" href="/llm-training-pipeline/">预训练 / SFT / RLHF</a>
     </div>
   </div>
   <div class="kg-category">
     <div class="kg-cat-title">模型选型</div>
     <div class="kg-links">
-      <a class="kg-link" href="#" style="color:#999">开源模型对比（待补充）</a>
+      <a class="kg-link" href="/llm-model-selection/">开源模型选型</a>
     </div>
   </div>
 </div>
@@ -74,7 +74,7 @@ comments: false
   <div class="kg-category">
     <div class="kg-cat-title">进阶</div>
     <div class="kg-links">
-      <a class="kg-link" href="#" style="color:#999">Function Calling / Tool Use（待补充）</a>
+      <a class="kg-link" href="/function-calling-guide/">Function Calling 与 Tool Use</a>
       <a class="kg-link" href="#" style="color:#999">Multi-Agent 协作（待补充）</a>
     </div>
   </div>
@@ -93,7 +93,7 @@ comments: false
 <div class="kg-section">
   <div class="kg-section-title">⚡ 推理优化</div>
   <div class="kg-links">
-    <a class="kg-link" href="#" style="color:#999">vLLM / TensorRT（待补充）</a>
+    <a class="kg-link" href="/llm-inference-optimization/">LLM 推理优化 (vLLM/量化)</a>
     <a class="kg-link" href="#" style="color:#999">量化 GPTQ / AWQ（待补充）</a>
     <a class="kg-link" href="#" style="color:#999">Prompt Caching（待补充）</a>
   </div>
