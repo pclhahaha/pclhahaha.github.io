@@ -7,7 +7,7 @@ tags:
   - WhatsApp
   - 消息系统
   - Erlang
-cases:
+categories:
   - 系统设计
 ---
 

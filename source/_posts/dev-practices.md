@@ -487,3 +487,4 @@ public PaymentResult fallback(PaymentRequest req, RemoteAccessException e) {
 2. **让规范自动化**：Commit 模板、Checkstyle、CI 静态扫描——人靠意志力，机器靠配置
 3. **面向故障设计**：超时、重试、降级、熔断不是"高级功能"，是每个调用外部依赖的接口都必须认真对待的基本功
 `
+```

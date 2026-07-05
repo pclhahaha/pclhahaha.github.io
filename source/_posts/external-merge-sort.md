@@ -35,4 +35,4 @@ Phase 2 (归并):
 - **聚合查询下推**：`COUNT(*)`/`SUM()` 先在各分片执行，结果汇总到协调者
 - **GFS 的 chunk 设计**：大文件被切分成 64MB chunks 分布式存储在 chunkserver 上
 
-> 更详细的 GFS 设计参见 [分布式系统](distributed.md)。
+> 更详细的 GFS 设计参见 [分布式系统](/distributed-theory/)。

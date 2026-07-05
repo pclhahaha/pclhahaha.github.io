@@ -33,6 +33,6 @@ Key 映射规则: hash(key) 落在哪个区间，就归属哪个 Node 管理
 
 **虚拟节点：** 如果节点数太少，环上分布不均会导致数据倾斜——某些节点负载远高于其他节点。解法是**虚拟节点**——每个物理节点映射为多个虚拟节点分散在环上，均匀化数据分布。Dubbo 的一致性哈希负载均衡也采用了这个方案。
 
-> 一致性哈希在 Redis Cluster 和客户端分区（如 Jedis Sharded）中的实现细节，参见 [分布式系统](distributed.md)。
+> 一致性哈希在 Redis Cluster 和客户端分区（如 Jedis Sharded）中的实现细节，参见 [分布式系统](/distributed-theory/)。
 
 ---

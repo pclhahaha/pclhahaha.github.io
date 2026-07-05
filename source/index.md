@@ -133,6 +133,7 @@ type: index
       <a class="kg-link" href="/java-hashmap/">HashMap (JDK8)</a>
       <a class="kg-link" href="/java-concurrenthashmap/">ConcurrentHashMap</a>
       <a class="kg-link" href="/java-linkedhashmap-lru/">LinkedHashMap 与 LRU</a>
+      <a class="kg-link" href="/java-collections/">📖 集合框架（全文）</a>
     </div>
   </div>
 
@@ -186,7 +187,10 @@ type: index
       <a class="kg-link" href="/grpc-protobuf/">gRPC 与 Protobuf</a>
       <a class="kg-link" href="/java-completablefuture/">CompletableFuture</a>
       <a class="kg-link" href="/reactive-programming/">响应式编程</a>
+      <a class="kg-link" href="/java-netty/">Java NIO 与 Netty</a>
+      <a class="kg-link" href="/java-rpc-async/">📖 RPC 与异步编程（概述）</a>
     </div>
+
   </div>
 
   <div class="kg-category">
@@ -265,6 +269,7 @@ type: index
       <a class="kg-link" href="/jwt-authentication/">JWT 认证</a>
       <a class="kg-link" href="/oauth2-sso/">OAuth2 与 SSO</a>
       <a class="kg-link" href="/web-vulnerabilities/">Web 漏洞攻防</a>
+      <a class="kg-link" href="/security/">📖 后端安全（全文）</a>
     </div>
   </div>
 
