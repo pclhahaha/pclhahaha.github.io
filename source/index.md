@@ -39,9 +39,9 @@ type: index
   <h1>后端知识图谱</h1>
   <p>全栈后端工程师知识体系 · 持续更新</p>
   <div class="kg-stats">
-    <div class="kg-stat"><div class="kg-stat-num">113</div><div class="kg-stat-label">篇文章</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">126</div><div class="kg-stat-label">篇文章</div></div>
     <div class="kg-stat"><div class="kg-stat-num">13</div><div class="kg-stat-label">分类</div></div>
-    <div class="kg-stat"><div class="kg-stat-num">100+</div><div class="kg-stat-label">标签</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">300+</div><div class="kg-stat-label">标签</div></div>
   </div>
 </div>
 
@@ -271,11 +271,36 @@ type: index
   <div class="kg-category">
     <div class="kg-cat-title">系统设计</div>
     <div class="kg-links">
+  <div class="kg-category">
+    <div class="kg-cat-title">系统设计案例</div>
+    <div class="kg-links">
       <a class="kg-link" href="/url-shortener-design/">短链系统</a>
       <a class="kg-link" href="/flash-sale-design/">秒杀系统</a>
       <a class="kg-link" href="/feed-stream-design/">Feed 流</a>
       <a class="kg-link" href="/leaderboard-design/">排行榜</a>
+      <a class="kg-link" href="/instant-messaging-design/">即时通讯</a>
+      <a class="kg-link" href="/video-streaming-design/">视频流</a>
+      <a class="kg-link" href="/object-storage-design/">对象存储</a>
+      <a class="kg-link" href="/search-engine-design/">搜索引擎</a>
+      <a class="kg-link" href="/payment-system-design/">支付系统</a>
+      <a class="kg-link" href="/location-service-design/">地理位置</a>
+      <a class="kg-link" href="/notification-system-design/">通知系统</a>
+      <a class="kg-link" href="/web-crawler-design/">分布式爬虫</a>
+      <a class="kg-link" href="/architecture-evolution/">架构风格演进</a>
       <a class="kg-link" href="/system-design/">📖 系统设计方法论（全文）</a>
+    </div>
+  </div>
+
+  <div class="kg-category">
+    <div class="kg-cat-title">大厂架构案例</div>
+    <div class="kg-links">
+      <a class="kg-link" href="/netflix-architecture-case-study/">Netflix 全球直播</a>
+      <a class="kg-link" href="/google-spanner-case-study/">Google Spanner</a>
+      <a class="kg-link" href="/whatsapp-architecture-case-study/">WhatsApp 消息系统</a>
+      <a class="kg-link" href="/meta-memcached-case-study/">Meta Memcached</a>
+      <a class="kg-link" href="/discord-architecture-case-study/">Discord 实时通信</a>
+    </div>
+  </div>
     </div>
   </div>
 </div>
