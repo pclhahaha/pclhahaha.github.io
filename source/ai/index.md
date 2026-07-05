@@ -30,7 +30,7 @@ comments: false
   <h1>AI 与 LLM Agent 知识图谱</h1>
   <p>大语言模型 · Agent 框架 · RAG · 推理优化</p>
   <div class="kg-stats">
-    <div class="kg-stat"><div class="kg-stat-num">8</div><div class="kg-stat-label">篇文章</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">12</div><div class="kg-stat-label">篇文章</div></div>
     <div class="kg-stat"><div class="kg-stat-num">3</div><div class="kg-stat-label">分类</div></div>
   </div>
 </div>
@@ -75,7 +75,7 @@ comments: false
     <div class="kg-cat-title">进阶</div>
     <div class="kg-links">
       <a class="kg-link" href="/function-calling-guide/">Function Calling 与 Tool Use</a>
-      <a class="kg-link" href="#" style="color:#999">Multi-Agent 协作（待补充）</a>
+      <a class="kg-link" href="/multi-agent-collaboration/">Multi-Agent 协作</a>
     </div>
   </div>
 </div>
@@ -84,9 +84,9 @@ comments: false
   <div class="kg-section-title">🔍 RAG 体系</div>
   <div class="kg-links">
     <a class="kg-link" href="/rag-system-design/">RAG 体系详解</a>
-    <a class="kg-link" href="#" style="color:#999">Agentic RAG（待补充）</a>
-    <a class="kg-link" href="#" style="color:#999">Graph RAG（待补充）</a>
-    <a class="kg-link" href="#" style="color:#999">RAG 评估 RAGAS（待补充）</a>
+    <a class="kg-link" href="/agentic-graph-rag/">Agentic RAG</a>
+    <a class="kg-link" href="/agentic-graph-rag/">Graph RAG</a>
+    <a class="kg-link" href="/rag-system-design/">RAG 评估</a>
   </div>
 </div>
 
@@ -94,16 +94,16 @@ comments: false
   <div class="kg-section-title">⚡ 推理优化</div>
   <div class="kg-links">
     <a class="kg-link" href="/llm-inference-optimization/">LLM 推理优化 (vLLM/量化)</a>
-    <a class="kg-link" href="#" style="color:#999">量化 GPTQ / AWQ（待补充）</a>
-    <a class="kg-link" href="#" style="color:#999">Prompt Caching（待补充）</a>
+    <a class="kg-link" href="/llm-inference-optimization/">量化 GPTQ / AWQ</a>
+    <a class="kg-link" href="/llm-inference-optimization/">Prompt Caching</a>
   </div>
 </div>
 
 <div class="kg-section">
   <div class="kg-section-title">🛡️ 工程与安全</div>
   <div class="kg-links">
-    <a class="kg-link" href="#" style="color:#999">LLMOps 监控（待补充）</a>
-    <a class="kg-link" href="#" style="color:#999">Prompt Injection 防御（待补充）</a>
+    <a class="kg-link" href="/llm-security/">LLM 安全</a>
+    <a class="kg-link" href="/llm-security/">Prompt Injection 防御</a>
   </div>
 </div>
 

@@ -30,7 +30,7 @@ comments: false
   <h1>数据工程知识图谱</h1>
   <p>数据湖 · 数仓 · ETL · 调度 · 流处理</p>
   <div class="kg-stats">
-    <div class="kg-stat"><div class="kg-stat-num">9</div><div class="kg-stat-label">篇文章</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">13</div><div class="kg-stat-label">篇文章</div></div>
     <div class="kg-stat"><div class="kg-stat-num">4</div><div class="kg-stat-label">分类</div></div>
   </div>
 </div>
@@ -41,7 +41,7 @@ comments: false
     <div class="kg-cat-title">批处理</div>
     <div class="kg-links">
       <a class="kg-link" href="/spark-emr-guide/">Spark on EMR 深度解析</a>
-      <a class="kg-link" href="#" style="color:#999">Spark SQL 调优（待补充）</a>
+      <a class="kg-link" href="/spark-emr-guide/">Spark SQL 调优</a>
     </div>
   </div>
   <div class="kg-category">
@@ -53,7 +53,7 @@ comments: false
   <div class="kg-category">
     <div class="kg-cat-title">流处理</div>
     <div class="kg-links">
-      <a class="kg-link" href="#" style="color:#999">Flink 实时计算（待补充）</a>
+      <a class="kg-link" href="/flink-stream-processing/">Flink 实时计算</a>
       <a class="kg-link" href="#" style="color:#999">Kafka Streams（待补充）</a>
     </div>
   </div>
@@ -87,8 +87,8 @@ comments: false
   <div class="kg-section-title">⏱️ 调度与编排</div>
   <div class="kg-links">
     <a class="kg-link" href="/airflow-production-guide/">Airflow 生产级实践</a>
-    <a class="kg-link" href="#" style="color:#999">DAG 设计模式（待补充）</a>
-    <a class="kg-link" href="#" style="color:#999">dbt 数据转换（待补充）</a>
+    <a class="kg-link" href="/airflow-dag-patterns/">Airflow DAG 设计模式</a>
+    <a class="kg-link" href="/dbt-data-transformation/">dbt 数据转换</a>
   </div>
 </div>
 
