@@ -11,9 +11,6 @@ tags:
 categories:
   - Java
 ---
-
-[TOC]
-
 ## 一、Java 基础
 
 ### 1. String / StringBuilder / StringBuffer 区别？

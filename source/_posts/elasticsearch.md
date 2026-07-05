@@ -10,9 +10,6 @@ tags:
 categories:
   - 存储
 ---
-
-[TOC]
-
 ## 一、ES 基础概念
 
 Elasticsearch（简称 ES）是一个基于 Lucene 构建的分布式、RESTful 风格的实时搜索与数据分析引擎。它不仅是一个全文搜索引擎，同时也具备数据存储和分析能力。

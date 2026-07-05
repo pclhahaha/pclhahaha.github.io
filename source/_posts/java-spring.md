@@ -12,9 +12,6 @@ tags:
 categories:
   - Java
 ---
-
-[TOC]
-
 # Spring 源码解析
 
 ## 一、Spring 基础概念

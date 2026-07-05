@@ -11,9 +11,6 @@ tags:
 categories:
   - Java
 ---
-
-[TOC]
-
 # Java 语言基础
 
 ## 一、基础数据类型

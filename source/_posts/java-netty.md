@@ -12,9 +12,6 @@ categories:
 ---
 
 # Java NIO 与 Netty
-
-[TOC]
-
 ## 一、IO模型
 
 ### 1.1 传统 BIO Socket 编程

@@ -10,9 +10,6 @@ tags:
 categories:
   - 分布式
 ---
-
-[TOC]
-
 ## 一、DDD 概述
 
 ### 1.1 为什么需要 DDD

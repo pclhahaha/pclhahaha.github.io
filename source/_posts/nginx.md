@@ -10,9 +10,6 @@ tags:
 categories:
   - 基础设施
 ---
-
-[TOC]
-
 ## Nginx 概述
 
 ### 为什么需要 Nginx

@@ -11,9 +11,6 @@ tags:
 categories:
   - 分布式
 ---
-
-[TOC]
-
 ## 一、CAP 定理
 
 ### 1.1 定义与历史

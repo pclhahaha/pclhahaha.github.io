@@ -11,9 +11,6 @@ tags:
 categories:
   - CS基础
 ---
-
-[TOC]
-
 ## 一、TCP/IP 协议栈
 
 ### 1.1 OSI 七层模型 vs TCP/IP 四层模型

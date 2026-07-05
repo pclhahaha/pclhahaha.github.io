@@ -11,9 +11,6 @@ tags:
 categories:
   - Java
 ---
-
-[TOC]
-
 ## 一、集合框架概览
 
 Java 集合框架从两个顶层接口出发：`Collection` 和 `Map`。

@@ -9,9 +9,6 @@ tags:
 categories:
   - 基础设施
 ---
-
-[TOC]
-
 # cgroups学习笔记
 
 ## 一、名词解释

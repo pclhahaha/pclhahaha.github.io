@@ -10,9 +10,6 @@ tags:
 categories:
   - Java
 ---
-
-[TOC]
-
 ## 一、ORM 概述
 
 ### 1.1 JDBC 痛点
