@@ -34,10 +34,22 @@ menu:
 # ---------------------------------------------------------------
 sidebar:
   position: left
-  display: post
+  display: always
   padding: 18
   offset: 12
   onmobile: false
+
+# ---------------------------------------------------------------
+# Sidebar Links
+# ---------------------------------------------------------------
+links:
+  知识图谱:
+    后端: /
+    AI / Agent: /ai/
+    数据工程: /data/
+
+links_settings:
+  icon: fa fa-globe
 
 # ---------------------------------------------------------------
 # Sidebar Avatar
