@@ -97,52 +97,246 @@ public interface TccService {
 }
 ```
 
-#### 关键挑战
+#### 完整实现：TCC 事务协调器
 
-**空回滚（Empty Rollback）**：Try 阶段因网络超时未到达服务端，但协调者认为需要 Cancel，此时服务端未执行过 Try。Cancel 操作要能识别并返回成功（幂等处理）。
+```
+                    ┌─────────────┐
+                    │ TCC 协调器   │
+                    │ (统筹状态机)  │
+                    └──────┬──────┘
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+          [库存服务]   [账户服务]   [订单服务]
+          Try/Confirm  Try/Confirm  Try/Confirm
+          /Cancel      /Cancel      /Cancel
+```
 
-**悬挂（Suspension）**：Try 请求因网络延迟在 Cancel 之后才到达。此时业务应拒绝该 Try 请求（资源已释放），需要保留 Cancel 记录判断。
+**事务日志表**——记录每个 TCC 事务的状态：
 
-**幂等（Idempotence）**：Confirm 和 Cancel 可能因网络重试被多次调用，必须保证重复调用不会重复扣减或重复释放。
+```sql
+CREATE TABLE tcc_transaction (
+    tcc_id      VARCHAR(64) PRIMARY KEY,   -- 全局事务 ID
+    status      TINYINT DEFAULT 0,         -- 0-进行中 1-已确认 2-已取消
+    create_time DATETIME,
+    update_time DATETIME
+);
+
+CREATE TABLE tcc_branch (
+    branch_id   VARCHAR(64) PRIMARY KEY,
+    tcc_id      VARCHAR(64),
+    service     VARCHAR(64),               -- 服务名
+    status      TINYINT DEFAULT 0,         -- 0-TRY 1-CONFIRM 2-CANCEL
+    retry_count INT DEFAULT 0,
+    INDEX idx_tcc (tcc_id)
+);
+```
+
+**协调器核心逻辑**：
 
 ```java
-// 使用事务控制表处理悬挂的简单思路
-public boolean tryFreeze(String orderId) {
-    // 检查是否有 Cancel 先到达的记录
-    if (isCancelled(orderId)) return false;
-    // 幂等检查
-    if (isTried(orderId)) return true;
-    // 执行业务并记录状态
-    return freezeInventory(orderId);
+public class TccCoordinator {
+    
+    // 阶段1：Try 所有分支
+    public boolean tryAll(String tccId, List<TccCall> calls) {
+        // 记录全局事务
+        logStart(tccId);
+        
+        List<TccCall> succeeded = new ArrayList<>();
+        try {
+            for (TccCall call : calls) {
+                if (call.try()) {
+                    succeeded.add(call);
+                    logBranch(tccId, call.getBranchId(), BRANCH_TRY);
+                } else {
+                    throw new TccException("Try failed: " + call.getBranchId());
+                }
+            }
+            // 全部 Try 成功 → Confirm 所有
+            confirmAll(tccId, calls);
+            return true;
+        } catch (Exception e) {
+            // 任一 Try 失败 → Cancel 已成功的分支
+            cancelAll(tccId, succeeded);
+            return false;
+        }
+    }
+    
+    // 阶段2a：Confirm 所有分支
+    private void confirmAll(String tccId, List<TccCall> calls) {
+        for (TccCall call : calls) {
+            retryUntilSuccess(() -> call.confirm(), tccId, call.getBranchId());
+        }
+        logFinish(tccId, STATUS_CONFIRMED);
+    }
+    
+    // 阶段2b：Cancel 已 Try 成功的分支
+    private void cancelAll(String tccId, List<TccCall> succeeded) {
+        for (TccCall call : succeeded) {
+            retryUntilSuccess(() -> call.cancel(), tccId, call.getBranchId());
+        }
+        logFinish(tccId, STATUS_CANCELLED);
+    }
+    
+    // 重试直到成功（Confirm/Cancel 必须成功）
+    private void retryUntilSuccess(Runnable op, String tccId, String branchId) {
+        int retries = 0;
+        while (retries < MAX_RETRIES) {
+            try {
+                op.run(); return;
+            } catch (Exception e) {
+                retries++;
+                sleep(Math.min(1000L << retries, 60000L));  // 指数退避，最大 60s
+            }
+        }
+        alertHuman(tccId, branchId);  // 最终失败 → 人工介入
+    }
+}
+```
+
+**关键挑战及实现**：
+
+**空回滚（Empty Rollback）**：Try 因网络超时未到达服务端，但协调者超时判定需要 Cancel。
+
+```java
+// 防悬挂/防空回滚实现
+public class InventoryTccService {
+    
+    public boolean tryFreezeInventory(String orderId, String skuId, int count) {
+        // 1. 先检查是否已被 Cancel（防悬挂）
+        if (isCancelled(orderId)) return false;
+        
+        // 2. 幂等检查
+        if (isTried(orderId)) return true;
+        
+        // 3. 执行业务 + 记录状态（同一本地事务）
+        tccLogMapper.insert(orderId, "TRY");  // 记录 Try 状态
+        inventoryMapper.freeze(skuId, count);
+        return true;
+    }
+    
+    public boolean cancelReleaseInventory(String orderId, String skuId) {
+        // 1. 幂等检查
+        if (isCancelled(orderId)) return true;
+        
+        // 2. 空回滚处理：如果从未 Try，也记录 Cancel 并返回成功
+        if (!isTried(orderId)) {
+            tccLogMapper.insert(orderId, "CANCEL");  // 防悬挂标记
+            return true;
+        }
+        
+        // 3. 执行回滚 + 记录状态
+        inventoryMapper.unfreeze(skuId, getFrozenCount(orderId));
+        tccLogMapper.updateStatus(orderId, "CANCEL");
+        return true;
+    }
 }
 ```
 
 ### 1.4 Saga
 
-Saga 由 Hector Garcia-Molina 在 1987 年的论文中提出，核心思想是将长事务拆分为一组有序的本地事务，每个本地事务都有对应的补偿事务。
+Saga 的核心是"长事务拆为一组有序的本地事务 + 补偿事务"。与 TCC 不同，Saga 的本地事务直接提交（不先 Try），失败时执行补偿回滚。
 
-#### 编排（Choreography）vs 协调（Orchestration）
+#### 协调式 Saga 引擎实现
 
-| 模式 | 描述 | 优点 | 缺点 |
-|------|------|------|------|
-| **编排式** | 各服务通过事件驱动相互调用，无中心协调者 | 松耦合、天然分布 | 复杂流程难以追踪，循环依赖风险 |
-| **协调式** | 中央 Saga 协调器控制事务执行和补偿流程 | 流程清晰、易于监控 | 协调器成为耦合点和单点 |
+```java
+public class SagaOrchestrator {
+    
+    // 定义 Saga 步骤
+    public void executeOrderSaga(String orderId, OrderRequest request) {
+        Saga saga = new Saga(orderId);
+        
+        saga.addStep("createOrder", 
+            () -> orderService.createOrder(request),           // 正向
+            () -> orderService.cancelOrder(request)            // 补偿
+        );
+        
+        saga.addStep("reserveInventory",
+            () -> inventoryService.deduct(request.getSkuId(), request.getCount()),
+            () -> inventoryService.rollback(request.getSkuId(), request.getCount())
+        );
+        
+        saga.addStep("processPayment",
+            () -> paymentService.charge(request.getAmount()),
+            () -> paymentService.refund(request.getAmount())
+        );
+        
+        saga.execute();
+    }
+}
+```
+
+**Saga 内部状态机**：
 
 ```
-// 编排式 Saga（事件驱动）
-订单服务 → 库存服务 → 支付服务
-  ↓ ↓ ↓  事件驱动，各服务监听上游事件并执行下一步
-
-// 协调式 Saga（中心协调）
-订单Saga协调器 → 创建订单 → 锁定库存 → 执行支付
-                   ↓失败         ↓失败
-                补偿订单     释放库存 ← 补偿
+    ┌────────┐
+    │ START  │
+    └───┬────┘
+        │
+   ┌────▼────┐    失败     ┌─────────┐
+   │ EXECUTING│───────────→│COMPENSATING│
+   └────┬────┘            └─────┬─────┘
+        │ 成功                   │
+   ┌────▼────┐             ┌────▼────┐
+   │COMPLETED│             │ ABORTED │
+   └─────────┘             └─────────┘
 ```
 
-#### 前向恢复与后向恢复
+```java
+public class Saga {
+    private final List<SagaStep> steps = new ArrayList<>();
+    private String state = "START";
+    
+    public void execute() {
+        state = "EXECUTING";
+        List<Integer> completedSteps = new ArrayList<>();
+        
+        try {
+            for (int i = 0; i < steps.size(); i++) {
+                steps.get(i).execute();      // 执行正向操作
+                completedSteps.add(i);       // 记录已完成的步骤
+                persistState(completedSteps); // 持久化到 DB
+            }
+            state = "COMPLETED";
+        } catch (Exception e) {
+            state = "COMPENSATING";
+            // 逆序执行补偿（后执行的先回滚）
+            for (int i = completedSteps.size() - 1; i >= 0; i--) {
+                steps.get(completedSteps.get(i)).compensate();
+            }
+            state = "ABORTED";
+        }
+    }
+}
+```
 
-- **前向恢复（Forward Recovery）**：重试失败的事务步骤，直到成功。适用于幂等操作、确定性成功概率高的场景。
-- **后向恢复（Backward Recovery）**：执行补偿事务回滚已完成的步骤。适用于业务上需要原子性、失败后"恢复原状"的场景。
+**Saga 日志表**——支持宕机恢复：
+
+```sql
+CREATE TABLE saga_log (
+    saga_id     VARCHAR(64) PRIMARY KEY,
+    step_index  INT,                      -- 当前执行到第几步
+    status      TINYINT,                  -- 0-进行中 1-已完成 2-已终止
+    step_status VARCHAR(1024),            -- JSON: [{"step":0,"ok":true},{"step":1,"ok":false}]
+    payload     TEXT,                     -- 请求参数，用于恢复时重试
+    create_time DATETIME
+);
+```
+
+**宕机恢复**：Saga 管理器启动时扫描状态为"进行中"的记录，根据 step_status 判断从哪一步继续执行补偿——被中断的事务如果有部分成功执行的步骤，从最后成功的步骤之后开始补偿。
+
+#### 编排式 Saga（事件驱动）
+
+不需要中心协调器，各服务通过事件总线通信：
+
+```
+订单服务 → [OrderCreated] → 库存服务 → [InventoryReserved] → 支付服务 → [PaymentCompleted]
+                │ 失败                    │ 失败                    │ 失败
+                ↓                         ↓                        ↓
+          [OrderFailed]           [InventoryRelease]        [PaymentRefund]
+```
+
+各服务监听上游事件并执行自己的逻辑，失败时发布补偿事件。优点是无中心协调器、高度解耦；缺点是流程分散难以追踪——需要分布式链路追踪辅助调试。"
 
 ### 1.5 本地消息表 + 最大努力通知
 
