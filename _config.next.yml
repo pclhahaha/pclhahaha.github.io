@@ -26,6 +26,8 @@ favicon:
 menu:
   home: / || fa fa-home
   archives: /archives/ || fa fa-archive
+  AI: /ai/ || fa fa-robot
+  Data: /data/ || fa fa-database
 
 # ---------------------------------------------------------------
 # Sidebar
