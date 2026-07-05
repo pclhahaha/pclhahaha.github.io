@@ -292,5 +292,3 @@ As a pre-condition, some operations need the JVM to arrive at a safe point where
 [^7]:https://juejin.im/post/5c151b266fb9a049ac790d9a
 [^8]: https://www.cnblogs.com/benwu/articles/5812903.html
 [^9]: https://www.jianshu.com/p/9d2788fffd5f
-`
-```

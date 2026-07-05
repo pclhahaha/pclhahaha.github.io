@@ -85,4 +85,3 @@ public static IntStream generate(IntSupplier s) {
             new StreamSpliterators.InfiniteSupplyingSpliterator.OfInt(Long.MAX_VALUE, s), false);
 }
 ```
-`

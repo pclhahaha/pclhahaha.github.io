@@ -14,7 +14,7 @@ categories:
 
 Raft 是 Diego Ongaro 和 John Ousterhout 于 2013 年提出的共识算法，核心设计目标是功能与 Paxos 等价但更易于理解和工程实现。Raft 将共识问题分解为三个相对独立的子问题：**领导者选举（Leader Election）**、**日志复制（Log Replication）**、**安全性（Safety）**。
 
-#### 7.2.1 基础概念
+### 1.1 基础概念
 
 - **节点状态**：每个节点在任何时刻处于三种状态之一——**Leader**（最多一个，处理所有客户端请求）、**Follower**（被动响应 Leader 和 Candidate 的 RPC）、**Candidate**（竞选 Leader 的中间状态）
 - **Term（任期）**：逻辑时钟概念，用连续递增的整数表示。每个 Term 最多产生一个 Leader，如果选举失败（选票分散），该 Term 以无 Leader 结束，进入下一个 Term
