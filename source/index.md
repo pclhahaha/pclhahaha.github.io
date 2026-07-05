@@ -342,52 +342,11 @@ type: index
 </div>
 
 <div class="kg-section">
-  <div class="kg-section-title"><span class="emoji">🤖</span>AI 与 LLM Agent</div>
-
-  <div class="kg-category">
-    <div class="kg-cat-title">LLM 基础</div>
-    <div class="kg-links">
-      <a class="kg-link" href="/transformer-architecture/">Transformer 架构详解</a>
-    </div>
+  <div class="kg-section-title"><span class="emoji">🧭</span>更多领域</div>
+  <div class="kg-links">
+    <a class="kg-link" href="/ai/" style="background:#eef5ff; color:#3b82f6;">🤖 AI 与 LLM Agent</a>
+    <a class="kg-link" href="/data/" style="background:#f0fdf4; color:#16a34a;">📊 数据工程</a>
   </div>
-
-  <div class="kg-category">
-    <div class="kg-cat-title">Agent 框架</div>
-    <div class="kg-links">
-      <a class="kg-link" href="/langgraph-guide/">LangGraph 实战</a>
-      <a class="kg-link" href="/mcp-protocol-guide/">MCP 协议详解</a>
-    </div>
-  </div>
-
-  <div class="kg-category">
-    <div class="kg-cat-title">RAG 体系</div>
-    <div class="kg-links">
-      <a class="kg-link" href="/rag-system-design/">RAG 体系详解</a>
-    </div>
-  </div>
-
-</div>
-
-<div class="kg-section">
-  <div class="kg-section-title"><span class="emoji">📊</span>数据工程</div>
-
-  <div class="kg-category">
-    <div class="kg-cat-title">计算引擎</div>
-    <div class="kg-links">
-      <a class="kg-link" href="/spark-emr-guide/">Spark on EMR 深度解析</a>
-      <a class="kg-link" href="/hive-trino-guide/">Hive 与 Trino 实战</a>
-    </div>
-  </div>
-
-  <div class="kg-category">
-    <div class="kg-cat-title">调度与存储</div>
-    <div class="kg-links">
-      <a class="kg-link" href="/airflow-production-guide/">Airflow 生产级实践</a>
-      <a class="kg-link" href="/s3-data-lake-guide/">S3 数据湖最佳实践</a>
-      <a class="kg-link" href="/redshift-warehouse-guide/">Redshift 数仓实战</a>
-    </div>
-  </div>
-
 </div>
 
 </div>
