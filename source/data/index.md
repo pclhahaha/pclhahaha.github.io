@@ -30,7 +30,7 @@ comments: false
   <h1>数据工程知识图谱</h1>
   <p>数据湖 · 数仓 · ETL · 调度 · 流处理</p>
   <div class="kg-stats">
-    <div class="kg-stat"><div class="kg-stat-num">13</div><div class="kg-stat-label">篇文章</div></div>
+    <div class="kg-stat"><div class="kg-stat-num">15</div><div class="kg-stat-label">篇文章</div></div>
     <div class="kg-stat"><div class="kg-stat-num">4</div><div class="kg-stat-label">分类</div></div>
   </div>
 </div>
@@ -54,7 +54,7 @@ comments: false
     <div class="kg-cat-title">流处理</div>
     <div class="kg-links">
       <a class="kg-link" href="/flink-stream-processing/">Flink 实时计算</a>
-      <a class="kg-link" href="#" style="color:#999">Kafka Streams（待补充）</a>
+      <a class="kg-link" href="/kafka-streams/">Kafka Streams</a>
     </div>
   </div>
 </div>
@@ -72,7 +72,7 @@ comments: false
     <div class="kg-cat-title">数据仓库</div>
     <div class="kg-links">
       <a class="kg-link" href="/redshift-warehouse-guide/">Redshift 数仓实战</a>
-      <a class="kg-link" href="#" style="color:#999">Snowflake / BigQuery（待补充）</a>
+      <a class="kg-link" href="/snowflake-bigquery/">Snowflake / BigQuery</a>
     </div>
   </div>
   <div class="kg-category">
