@@ -403,3 +403,4 @@ public interface Supplier<T> {
 [^3]: https://objcoding.com/2019/03/04/lambda/#top
 [^4]: https://github.com/CarpenterLee/JavaLambdaInternals
 [^5]: https://juejin.im/post/5abc9ccc6fb9a028d6643eea#heading-13
+`

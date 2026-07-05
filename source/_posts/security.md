@@ -375,3 +375,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 **7. "API 签名为什么要加 Nonce？"** → Timestamp 只能防过期重放，Nonce 保证同一时间窗口内每条请求唯一。两者配合才能彻底防重放。
 
 **8. "为什么 Symmetric（HS256）JWT 不推荐用于微服务？"** → 所有服务共享同一把密钥，任何一个服务密钥泄露就能伪造所有服务的 JWT。RS256 用私钥签名公钥验证，即使公钥泄露无法伪造。
+`

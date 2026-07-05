@@ -782,3 +782,4 @@ DDD 的核心是**业务建模**，不是技术模式。从核心开始：统一
 - Martin Fowler, [BoundedContext](https://martinfowler.com/bliki/BoundedContext.html)
 - Microsoft, [.NET Microservices Architecture](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/)
 - Chris Richardson, [Microservices Patterns](https://microservices.io/patterns/)
+`

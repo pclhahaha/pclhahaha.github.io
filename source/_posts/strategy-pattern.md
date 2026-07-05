@@ -87,3 +87,4 @@ Resource res3 = loader.getResource("https://example.com/config.yml");
 两者经常组合使用：工厂负责选择策略，策略负责执行逻辑。支付示例中的 `strategyMap.get(channel)` 就是最简单的工厂。
 
 ---
+`

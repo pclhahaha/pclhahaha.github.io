@@ -78,3 +78,4 @@ JdbcTemplate 将 JDBC 的 try-catch-finally 样板代码全部封装，开发者
 **InputStream 中的模板方法**：JDK `InputStream.read(byte[])` 的默认实现循环调用子类的 `read()`，父类定义"按字节填充数组"的骨架，子类只需实现单字节读取。
 
 ---
+`
